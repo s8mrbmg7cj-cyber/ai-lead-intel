@@ -3,269 +3,454 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lead Intel Agent — Operator Panel</title>
+<title>Client Acquisition System</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#030508;--bg2:#070b12;--card:rgba(255,255,255,0.03);
-  --border:rgba(255,165,0,0.12);--border2:rgba(255,165,0,0.25);
+  --bg:#030508;--card:rgba(255,255,255,0.03);
+  --border:rgba(255,165,0,0.12);--border2:rgba(255,165,0,0.28);
   --orange:#ff8c00;--orange2:#ffb347;--orange-dim:rgba(255,140,0,0.1);
-  --green:#00e676;--green-dim:rgba(0,230,118,0.1);--green-border:rgba(0,230,118,0.2);
-  --red:#ff3d57;--red-dim:rgba(255,61,87,0.1);--red-border:rgba(255,61,87,0.2);
-  --blue:#4a9eff;--blue-dim:rgba(74,158,255,0.1);--blue-border:rgba(74,158,255,0.2);
-  --text:#ffe8c0;--muted:rgba(255,232,192,0.5);--dim:rgba(255,232,192,0.25);
+  --green:#00e676;--green-dim:rgba(0,230,118,0.08);--green-border:rgba(0,230,118,0.2);
+  --red:#ff3d57;--red-dim:rgba(255,61,87,0.08);--red-border:rgba(255,61,87,0.2);
+  --blue:#4a9eff;--blue-dim:rgba(74,158,255,0.08);--blue-border:rgba(74,158,255,0.2);
+  --purple:#bf5fff;--purple-dim:rgba(191,95,255,0.08);--purple-border:rgba(191,95,255,0.2);
+  --pink:#ff5fa0;--pink-dim:rgba(255,95,160,0.08);--pink-border:rgba(255,95,160,0.2);
+  --text:#ffe8c0;--muted:rgba(255,232,192,0.55);--dim:rgba(255,232,192,0.28);
   --mono:'Share Tech Mono',monospace;--head:'Rajdhani',sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,140,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,140,0,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-.app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px;}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
-.logo{font-family:var(--head);font-size:20px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,140,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,140,0,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:24px;}
+
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.logo{font-family:var(--head);font-size:18px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);}
 .logo span{color:var(--text);}
 .hstatus{font-family:var(--mono);font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;}
 .hstatus::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.search-panel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:24px;}
-.search-title{font-family:var(--head);font-size:16px;font-weight:600;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;}
-.search-row{display:grid;grid-template-columns:1fr 1fr auto auto;gap:12px;align-items:end;}
-.field label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:0.12em;text-transform:uppercase;display:block;margin-bottom:6px;}
-.field input,.field select{width:100%;padding:9px 12px;background:rgba(255,140,0,0.06);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;}
-.field input:focus,.field select:focus{border-color:var(--border2);}
-.field input::placeholder{color:var(--dim);}
-.field select option{background:#07080c;}
-.btn{padding:9px 20px;border-radius:4px;font-family:var(--head);font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;}
+
+/* TRACKER */
+.tracker{background:rgba(0,230,118,0.04);border:1px solid var(--green-border);border-radius:6px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.tracker-left{font-family:var(--mono);font-size:11px;color:var(--green);}
+.tracker-right{display:flex;align-items:center;gap:10px;}
+.tracker-num{font-family:var(--head);font-size:26px;font-weight:700;color:var(--orange);line-height:1;}
+.tracker-of{font-family:var(--mono);font-size:10px;color:var(--dim);}
+.tracker-bar-wrap{width:120px;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.tracker-bar{height:100%;background:var(--green);border-radius:3px;transition:width 0.3s;}
+.btn{padding:7px 14px;border-radius:4px;font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap;}
 .btn-orange{background:var(--orange);color:#000;}
 .btn-orange:hover{background:var(--orange2);}
-.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.btn-ghost{background:rgba(255,255,255,0.04);color:var(--text);border:1px solid var(--border);}
 .btn-ghost:hover{border-color:var(--border2);}
 .btn-green{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
 .btn-blue{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);}
-.btn:disabled{opacity:0.5;cursor:not-allowed;}
-.status-bar{font-family:var(--mono);font-size:11px;color:var(--dim);padding:10px 0;margin-bottom:20px;letter-spacing:0.05em;}
-.status-bar span{color:var(--orange);}
-.leads-grid{display:flex;flex-direction:column;gap:20px;}
-.lead-card{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color 0.2s;}
+.btn-sm{padding:4px 10px;font-size:10px;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* LINK TIMING */
+.timing-guide{background:rgba(74,158,255,0.04);border:1px solid var(--blue-border);border-radius:8px;padding:14px 18px;margin-bottom:16px;}
+.tg-title{font-family:var(--head);font-size:12px;font-weight:700;color:var(--blue);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.tg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.tg-box{border-radius:5px;padding:10px 12px;}
+.tg-box.no{background:var(--red-dim);border:1px solid var(--red-border);}
+.tg-box.when{background:var(--orange-dim);border:1px solid var(--border2);}
+.tg-box.how{background:var(--green-dim);border:1px solid var(--green-border);}
+.tg-box h4{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;}
+.tg-box.no h4{color:var(--red);}
+.tg-box.when h4{color:var(--orange2);}
+.tg-box.how h4{color:var(--green);}
+.tg-box p{font-size:11px;color:var(--muted);line-height:1.55;}
+
+/* SEARCH */
+.search-panel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:14px;}
+.search-row{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;align-items:end;}
+.field label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.field input,.field select{width:100%;padding:8px 11px;background:rgba(255,140,0,0.06);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus{border-color:var(--border2);}
+.field input::placeholder{color:var(--dim);}
+.field select option{background:#07080c;}
+
+.statusbar{font-family:var(--mono);font-size:11px;color:var(--dim);padding:8px 0 14px;letter-spacing:0.04em;}
+.statusbar span{color:var(--orange);}
+
+/* LEAD CARD */
+.leads-grid{display:flex;flex-direction:column;gap:18px;}
+.lead-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .lead-card:hover{border-color:var(--border2);}
-.lead-header{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px;border-bottom:1px solid var(--border);background:rgba(255,140,0,0.03);}
-.lead-name{font-family:var(--head);font-size:20px;font-weight:700;color:var(--text);letter-spacing:0.04em;margin-bottom:6px;}
-.lead-meta{font-family:var(--mono);font-size:11px;color:var(--dim);display:flex;gap:16px;flex-wrap:wrap;}
-.lead-meta span{display:flex;align-items:center;gap:4px;}
-.rating-good{color:var(--green);}
-.rating-med{color:var(--orange);}
-.rating-low{color:var(--red);}
-.pain-badge{background:rgba(255,140,0,0.1);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;font-size:12px;color:var(--orange2);max-width:300px;text-align:right;}
-.lead-body{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-.analysis-col h4{font-family:var(--mono);font-size:10px;letter-spacing:0.15em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;}
-.weakness{background:var(--red-dim);border-left:2px solid var(--red);border-radius:0 4px 4px 0;padding:8px 12px;font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
-.opportunity{background:var(--green-dim);border-left:2px solid var(--green);border-radius:0 4px 4px 0;padding:8px 12px;font-size:13px;color:var(--muted);line-height:1.5;}
-.messages-col h4{font-family:var(--mono);font-size:10px;letter-spacing:0.15em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;}
-.msg-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
-.msg-tab{padding:4px 10px;border-radius:3px;font-family:var(--mono);font-size:10px;cursor:pointer;border:1px solid var(--border);color:var(--dim);background:none;transition:all 0.15s;letter-spacing:0.05em;}
-.msg-tab.active{background:var(--orange-dim);color:var(--orange);border-color:var(--border2);}
-.msg-content{display:none;}
-.msg-content.active{display:block;}
-.msg-text{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;padding:12px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;font-style:italic;}
-.msg-label{font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:0.05em;}
-.link-highlight{color:var(--blue);text-decoration:underline;}
-.msg-actions{display:flex;gap:8px;align-items:center;}
-.send-result{font-family:var(--mono);font-size:11px;color:var(--green);margin-top:6px;display:none;}
-.empty-state{text-align:center;padding:60px 20px;color:var(--dim);}
-.empty-state p{font-family:var(--mono);font-size:13px;margin-bottom:8px;}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 18px;background:rgba(255,140,0,0.025);border-bottom:1px solid var(--border);}
+.lead-name{font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);letter-spacing:0.04em;margin-bottom:4px;}
+.lead-meta{font-family:var(--mono);font-size:10px;color:var(--dim);display:flex;gap:12px;flex-wrap:wrap;}
+.lead-meta span{display:flex;align-items:center;gap:3px;}
+.g{color:var(--green);}
+.y{color:var(--orange);}
+.r{color:var(--red);}
+.pain-tag{background:var(--orange-dim);border:1px solid var(--border2);border-radius:4px;padding:4px 9px;font-size:11px;color:var(--orange2);max-width:260px;text-align:right;line-height:1.45;flex-shrink:0;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:9px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;background:none;border-left:none;border-right:none;border-top:none;}
+.tab:hover{color:var(--muted);}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+
+/* PANELS */
+.panel{display:none;padding:18px;}
+.panel.active{display:block;}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+
+/* SHARED COMPONENTS */
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--dim);text-transform:uppercase;margin-bottom:8px;}
+.msg-block{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;transition:border-color 0.15s;}
+.msg-block:hover{border-color:var(--border2);}
+.msg-block:last-child{margin-bottom:0;}
+.msg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.msg-tag{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;}
+.t-sms{background:var(--orange-dim);color:var(--orange);border:1px solid var(--border2);}
+.t-email{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border);}
+.t-ads{background:var(--pink-dim);color:var(--pink);border:1px solid var(--pink-border);}
+.t-gmb{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);}
+.t-ig{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+.t-link{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+.t-close{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border);}
+.msg-hint{font-family:var(--mono);font-size:9px;color:var(--dim);}
+.msg-text{font-size:13px;color:var(--muted);line-height:1.65;font-style:italic;margin-bottom:8px;}
+.msg-actions{display:flex;gap:6px;align-items:center;}
+.link-pill{display:inline-flex;align-items:center;gap:3px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:8px;color:var(--green);margin-left:6px;}
+
+.weakness-block{background:var(--red-dim);border-left:2px solid var(--red);padding:8px 11px;font-size:12px;color:var(--muted);margin-bottom:7px;line-height:1.5;border-radius:0 4px 4px 0;}
+.opp-block{background:var(--green-dim);border-left:2px solid var(--green);padding:8px 11px;font-size:12px;color:var(--muted);line-height:1.5;border-radius:0 4px 4px 0;}
+.quick-box{background:rgba(255,140,0,0.06);border:1px solid var(--border2);border-radius:6px;padding:14px;}
+.quick-text{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:10px;font-style:italic;}
+
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.obj-block{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:11px;}
+.obj-trigger{font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
+.obj-reply{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:8px;line-height:1.55;}
+
+.ads-tip{background:var(--pink-dim);border:1px solid var(--pink-border);border-radius:6px;padding:11px 14px;margin-bottom:12px;font-size:12px;color:rgba(255,95,160,0.8);line-height:1.6;}
+.ads-tip strong{color:var(--pink);}
+.gmb-tip{background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:6px;padding:11px 14px;margin-bottom:12px;font-size:12px;color:rgba(74,158,255,0.8);line-height:1.6;}
+.gmb-tip strong{color:var(--blue);}
+
+.empty-state{text-align:center;padding:50px 20px;color:var(--dim);}
+.empty-state p{font-family:var(--mono);font-size:12px;margin-bottom:6px;}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:5px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.tips-bar{background:rgba(0,230,118,0.05);border:1px solid var(--green-border);border-radius:6px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:rgba(0,230,118,0.7);line-height:1.6;}
-.tips-bar strong{color:var(--green);}
-@media(max-width:700px){
-  .search-row{grid-template-columns:1fr 1fr;}
-  .lead-body{grid-template-columns:1fr;}
-  .lead-header{flex-direction:column;gap:10px;}
+
+@media(max-width:800px){
+  .search-row,.tg-row,.panel-grid,.obj-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="logo">Lead <span>Intel</span> Agent</div>
-    <div class="hstatus">SYSTEM ONLINE</div>
-  </header>
-  <div class="tips-bar">
-    <strong>How to use:</strong> Run the agent → copy the SMS message → find the business on Google → text them from your phone.
-    Don't send the link in the first message — wait for a reply, then send Follow-Up 1 which includes your landing page link.
-    <strong>Goal: 20 texts sent today = your first client this week.</strong>
-  </div>
-  <div class="search-panel">
-    <div class="search-title">// Find & Analyze Leads</div>
-    <div class="search-row">
-      <div class="field">
-        <label>Business Type</label>
-        <input type="text" id="query" placeholder="car detailing, landscaping, HVAC..." value="car detailing">
-      </div>
-      <div class="field">
-        <label>City</label>
-        <input type="text" id="city" placeholder="Salt Lake City, UT" value="Salt Lake City, UT">
-      </div>
-      <div class="field">
-        <label>Limit</label>
-        <select id="limit">
-          <option value="3">3 leads</option>
-          <option value="5" selected>5 leads</option>
-          <option value="10">10 leads</option>
-        </select>
-      </div>
-      <button class="btn btn-orange" onclick="runAgent()" id="runBtn">▶ Run Agent</button>
+
+<header>
+  <div class="logo">Client <span>Acquisition</span> System</div>
+  <div class="hstatus">ONLINE</div>
+</header>
+
+<!-- DAILY TRACKER -->
+<div class="tracker">
+  <div class="tracker-left">// Daily Outreach Tracker — Goal: 20 contacts</div>
+  <div class="tracker-right">
+    <div>
+      <div class="tracker-num" id="sentCount">0</div>
+      <div class="tracker-of">of 20 today</div>
     </div>
-  </div>
-  <div class="status-bar" id="statusBar">// Ready — enter a business type and city, then click Run Agent</div>
-  <div class="leads-grid" id="leadsGrid">
-    <div class="empty-state">
-      <p>No leads generated yet.</p>
-      <p>Click "Run Agent" to find and analyze local businesses.</p>
-    </div>
+    <div class="tracker-bar-wrap"><div class="tracker-bar" id="trackerBar" style="width:0%"></div></div>
+    <button class="btn btn-green btn-sm" onclick="markSent()">+ Mark Sent</button>
+    <button class="btn btn-ghost btn-sm" onclick="resetTracker()">Reset</button>
   </div>
 </div>
+
+<!-- LINK TIMING GUIDE -->
+<div class="timing-guide">
+  <div class="tg-title">⚡ When to Send the Link — Read Every Day</div>
+  <div class="tg-row">
+    <div class="tg-box no"><h4>❌ Never First</h4><p>Cold link = spam. They delete it instantly. Build curiosity first — the link means nothing until they feel the problem.</p></div>
+    <div class="tg-box when"><h4>⏰ Send Link When...</h4><p>They reply anything. They ask "how does it work?" They say "send info." One reply = they're warm. That's the moment.</p></div>
+    <div class="tg-box how"><h4>✅ Say This With It</h4><p>"Here's a quick demo of what I mean — 2 mins: [link]" — show them something, don't pitch them something.</p></div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-panel">
+  <div style="font-family:var(--head);font-size:13px;font-weight:600;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">// Find & Analyze Leads</div>
+  <div class="search-row">
+    <div class="field"><label>Business Type</label><input type="text" id="query" placeholder="car detailing, landscaping, HVAC..." value="car detailing"></div>
+    <div class="field"><label>City</label><input type="text" id="city" placeholder="Salt Lake City, UT" value="Salt Lake City, UT"></div>
+    <div class="field"><label>Limit</label>
+      <select id="limit">
+        <option value="3">3 leads</option>
+        <option value="5" selected>5 leads</option>
+        <option value="10">10 leads</option>
+      </select>
+    </div>
+    <button class="btn btn-orange" onclick="runAgent()" id="runBtn">▶ Run Agent</button>
+  </div>
+</div>
+
+<div class="statusbar" id="statusBar">// Ready — run the agent to generate full acquisition sequences</div>
+
+<div class="leads-grid" id="leadsGrid">
+  <div class="empty-state">
+    <p>No leads yet. Click Run Agent above.</p>
+    <p>Each lead gets: 5-message SMS sequence · Email · Meta Ad copy · GMB outreach · Instagram DM · Conversation engine · Objection responses</p>
+  </div>
+</div>
+
+</div>
 <script>
-async function runAgent() {
+// TRACKER
+let sentToday = parseInt(localStorage.getItem('sentToday')||'0');
+if(localStorage.getItem('trackerDate')!==new Date().toDateString()){sentToday=0;localStorage.setItem('trackerDate',new Date().toDateString());}
+updateTracker();
+function markSent(){sentToday++;localStorage.setItem('sentToday',sentToday);updateTracker();}
+function resetTracker(){sentToday=0;localStorage.setItem('sentToday','0');updateTracker();}
+function updateTracker(){
+  document.getElementById('sentCount').textContent=sentToday;
+  document.getElementById('trackerBar').style.width=Math.min(sentToday/20*100,100)+'%';
+}
+
+// RUN AGENT
+async function runAgent(){
   const query=document.getElementById('query').value.trim();
   const city=document.getElementById('city').value.trim();
   const limit=document.getElementById('limit').value;
   const btn=document.getElementById('runBtn');
   const status=document.getElementById('statusBar');
   const grid=document.getElementById('leadsGrid');
-  if(!query||!city){alert('Enter a business type and city.');return;}
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span>Running...';
-  status.innerHTML='// Scraping '+query+' in '+city+'... analyzing with AI...';
-  grid.innerHTML='<div class="empty-state"><p><span class="spinner"></span>Finding and analyzing businesses — takes about 15 seconds...</p></div>';
+  if(!query||!city){alert('Enter business type and city.');return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Analyzing...';
+  status.innerHTML='// Building full acquisition sequences for '+query+' in '+city+'...';
+  grid.innerHTML='<div class="empty-state"><p><span class="spinner"></span>Finding businesses + generating all sequences — ~20 seconds...</p></div>';
   try{
     const res=await fetch('/api/generate-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,city,limit:parseInt(limit)})});
     const data=await res.json();
     if(!data.success)throw new Error(data.error||'Failed');
-    status.innerHTML='// Found <span>'+data.count+'</span> businesses — AI analysis complete. Copy messages and start texting.';
-    grid.innerHTML=data.leads.map((lead,i)=>renderLeadCard(lead,i)).join('');
+    status.innerHTML='// <span>'+data.count+'</span> businesses ready — all sequences generated. Start outreach.';
+    grid.innerHTML=data.leads.map((lead,i)=>renderCard(lead,i)).join('');
   }catch(err){
     status.innerHTML='// ERROR: '+err.message;
-    grid.innerHTML='<div class="empty-state"><p>Error: '+err.message+'</p></div>';
+    grid.innerHTML='<div class="empty-state"><p>Error: '+err.message+'<br><br>Make sure you are on ai-lead-intel.vercel.app — not a local file.</p></div>';
   }
-  btn.disabled=false;
-  btn.innerHTML='▶ Run Agent';
+  btn.disabled=false;btn.innerHTML='▶ Run Agent';
 }
-function renderLeadCard(lead,idx){
-  const ratingClass=lead.rating>=4.3?'rating-good':lead.rating>=3.8?'rating-med':'rating-low';
-  const id='lead-'+idx;
-  return `<div class="lead-card">
-    <div class="lead-header">
+
+function renderCard(l,idx){
+  const id='L'+idx;
+  const rc=l.rating>=4.3?'g':l.rating>=3.8?'y':'r';
+  const lp='ai-lead-intel.vercel.app';
+
+  // Generate all content
+  const seq=[
+    {tag:'t-sms',label:'Day 1 — Opening SMS',hint:'No link. Pure curiosity.',txt:l.msg_1||''},
+    {tag:'t-sms',label:'Day 3 — Nudge',hint:'Still no link. Short.',txt:l.msg_2||''},
+    {tag:'t-sms',label:'Day 5 — Paint the Pain',hint:'Problem focus, no solution.',txt:l.msg_3||''},
+    {tag:'t-link',label:'Day 7 — Send Link ✓',hint:'NOW send link. Frame as demo.',txt:l.msg_4||'',hasLink:true},
+    {tag:'t-sms',label:'Day 10 — Final',hint:'Last attempt. Zero pressure.',txt:l.msg_5||''},
+    {tag:'t-email',label:'Email Version',hint:'Subject: '+(l.email_subject||''),txt:l.email_body||''},
+  ];
+
+  const convo=[
+    {label:'1. When they reply anything',txt:l.reply_acknowledge||''},
+    {label:'2. Expand the problem',txt:l.reply_expand_problem||''},
+    {label:'3. Transition to solution',txt:l.reply_transition||''},
+    {label:'4. 🔗 Send the link NOW',txt:l.reply_send_link||'',isLink:true},
+    {label:'5. Ask for the close',txt:l.reply_close||''},
+  ];
+
+  const objs=[
+    {trigger:'"We already handle calls"',txt:l.obj_already_handle_calls||''},
+    {trigger:'"Not interested"',txt:l.obj_not_interested||''},
+    {trigger:'"We\'re too busy"',txt:l.obj_too_busy||''},
+    {trigger:'"How much is it?"',txt:l.obj_how_much||''},
+    {trigger:'"Send me info"',txt:l.obj_send_info||''},
+  ];
+
+  const bname=l.business_name;
+  const cat=l.category;
+
+  // META ADS
+  const metaAds=[
+    {label:'Ad Headline 1',txt:`Are you losing ${cat} jobs to voicemail?`},
+    {label:'Ad Headline 2',txt:`Most ${cat} businesses miss 5+ calls a week.`},
+    {label:'Ad Headline 3',txt:`Your phone is losing you $2,000/month.`},
+    {label:'Primary Text',txt:`Every missed call is a job going to your competitor. They called you first — but you were on a job. 60 seconds later, they called someone else.\n\nWe built a system that texts them back instantly, qualifies them, and books the job automatically.\n\nNo contracts. Setup in 48 hours. One recovered job pays for the whole month.\n\nClick to see how it works →`},
+    {label:'Ad CTA',txt:`Book a Free Demo`},
+    {label:'Targeting Note',hint:true,txt:`Target: Business owners aged 28-55 · Interests: Home services, small business, contractor tools · Location: Your city + 25mi radius · Exclude: employees (job title filter)`},
+  ];
+
+  // GMB OUTREACH
+  const gmbMsgs=[
+    {label:'GMB Review Response (if they have bad reviews)',txt:`Thanks for the feedback — we hear you. We've made changes to how we handle calls and follow-ups so no one falls through the cracks. Appreciate your patience.`},
+    {label:'GMB Q&A Plant (post a question + answer)',txt:`Q: Do you text back if I miss your call?\nA: Yes — we text back within 60 seconds so you never lose a lead, even if we're on another job.`},
+    {label:'GMB Message Outreach',txt:`Hey — I noticed ${bname} on Google Maps and had a quick question about how you handle calls when you're on a job. Is there someone I could ask?`},
+  ];
+
+  // INSTAGRAM DM
+  const igDMs=[
+    {label:'Instagram DM — Opening',txt:`Hey! Love what you're doing with ${bname} — quick question, when someone calls and you're on a job, do they usually leave a voicemail or just hang up?`},
+    {label:'Instagram DM — Follow-Up',txt:`Hey again — totally understand if it's not the right time. I built something that a few ${cat} businesses near you have been using to recover jobs from missed calls. Might be worth 2 mins: ${lp}`},
+    {label:'Instagram Comment (on their post)',txt:`Love this! Quick question — do you guys have a way to follow up with people who call when you're busy on a job?`},
+  ];
+
+  function msgBlocks(items){
+    return items.map(m=>`
+      <div class="msg-block">
+        <div class="msg-header">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="msg-tag ${m.tag||'t-sms'}">${m.label}</span>
+            ${m.hasLink?'<span class="link-pill">🔗 LINK</span>':''}
+          </div>
+          ${m.hint&&!m.hint===true?`<span class="msg-hint">${m.hint}</span>`:''}
+          ${typeof m.hint==='string'?`<span class="msg-hint">${m.hint}</span>`:''}
+        </div>
+        <div class="msg-text">"${(m.txt||'').replace(/\n/g,'<br>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&lt;br&gt;/g,'<br>')}"</div>
+        <div class="msg-actions">
+          <button class="btn btn-ghost btn-sm" onclick="cp(this,${JSON.stringify(m.txt)})">Copy</button>
+          <button class="btn btn-green btn-sm" onclick="markSent()">✓ Sent</button>
+        </div>
+      </div>`).join('');
+  }
+
+  return `
+  <div class="lead-card">
+    <div class="lead-top">
       <div>
-        <div class="lead-name">${lead.business_name}</div>
+        <div class="lead-name">${bname}</div>
         <div class="lead-meta">
-          <span class="${ratingClass}">★ ${lead.rating}</span>
-          <span>${lead.review_count} reviews</span>
-          <span>${lead.category}</span>
-          <span>${lead.city}</span>
-          ${lead.website?'<span>🌐 '+lead.website+'</span>':'<span style="color:var(--red)">⚠ No website</span>'}
-          ${lead.phone?'<span>📞 '+lead.phone+'</span>':''}
+          <span class="${rc}">★ ${l.rating}</span>
+          <span>${l.review_count} reviews</span>
+          <span>${cat}</span>
+          <span>${l.city}</span>
+          ${l.website?'<span>🌐 '+l.website+'</span>':'<span class="r">⚠ No website</span>'}
+          ${l.phone?'<span>📞 '+l.phone+'</span>':''}
         </div>
       </div>
-      ${lead.pain_point?'<div class="pain-badge">🎯 '+lead.pain_point+'</div>':''}
+      ${l.pain_point?'<div class="pain-tag">🎯 '+l.pain_point+'</div>':''}
     </div>
-    <div class="lead-body">
-      <div class="analysis-col">
-        <h4>// AI Analysis</h4>
-        <div class="weakness">⚠ ${lead.weakness_1}</div>
-        <div class="weakness">⚠ ${lead.weakness_2}</div>
-        <div class="opportunity">💡 ${lead.opportunity}</div>
-      </div>
-      <div class="messages-col">
-        <h4>// Outreach Messages</h4>
-        <div class="msg-tabs">
-          <button class="msg-tab active" onclick="switchTab('${id}','sms',this)">📱 SMS #1</button>
-          <button class="msg-tab" onclick="switchTab('${id}','email',this)">📧 Email</button>
-          <button class="msg-tab" onclick="switchTab('${id}','fu1',this)">📱 Follow-Up 1</button>
-          <button class="msg-tab" onclick="switchTab('${id}','fu2',this)">📱 Follow-Up 2</button>
-          <button class="msg-tab" onclick="switchTab('${id}','fue',this)">📧 Follow-Up Email</button>
+
+    <div class="tabs">
+      <button class="tab active" onclick="sw('${id}','analysis',this)">Analysis</button>
+      <button class="tab" onclick="sw('${id}','sms',this)">📱 SMS Sequence</button>
+      <button class="tab" onclick="sw('${id}','convo',this)">💬 Conversation</button>
+      <button class="tab" onclick="sw('${id}','obj',this)">🛡 Objections</button>
+      <button class="tab" onclick="sw('${id}','ads',this)">📣 Meta Ads</button>
+      <button class="tab" onclick="sw('${id}','gmb',this)">📍 GMB</button>
+      <button class="tab" onclick="sw('${id}','ig',this)">📸 Instagram</button>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div id="${id}-analysis" class="panel active">
+      <div class="panel-grid">
+        <div>
+          <div class="section-label">// AI Weaknesses</div>
+          <div class="weakness-block">⚠ ${l.weakness_1||''}</div>
+          <div class="weakness-block">⚠ ${l.weakness_2||''}</div>
+          <div class="opp-block" style="margin-top:8px;">💡 ${l.opportunity||''}</div>
         </div>
-        <div id="${id}-sms" class="msg-content active">
-          <div class="msg-label">// DAY 1 — Send this first. No link. Just curiosity.</div>
-          <div class="msg-text">${lead.outreach?.sms||lead.sms_message||''}</div>
-          <div class="msg-actions">
-            <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="copyMsg('${id}','sms',this)">Copy</button>
-            ${lead.phone?'<button class="btn btn-orange" style="padding:5px 12px;font-size:11px;" onclick="sendSMS(\''+lead.phone+'\',\''+id+'\',\'sms\')">Send SMS</button>':'<span style="font-family:var(--mono);font-size:10px;color:var(--dim);">Find number on Google Maps</span>'}
-          </div>
-          <div class="send-result" id="${id}-sms-result"></div>
-        </div>
-        <div id="${id}-email" class="msg-content">
-          <div class="msg-label">// DAY 1 — Send alongside SMS or instead of it</div>
-          <div class="msg-text"><strong style="color:var(--orange2);">Subject:</strong> ${lead.outreach?.email_subject||''}<br><br>${lead.outreach?.email_body||''}</div>
-          <div class="msg-actions">
-            <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="copyMsg('${id}','email',this)">Copy</button>
-          </div>
-        </div>
-        <div id="${id}-fu1" class="msg-content">
-          <div class="msg-label">// DAY 3 — If no reply. Includes your landing page link.</div>
-          <div class="msg-text">${(lead.outreach?.followup_sms_1||lead.followup_sms_1||'').replace(/ai-lead-intel\.vercel\.app/g,'<span class="link-highlight">ai-lead-intel.vercel.app</span>')}</div>
-          <div class="msg-actions">
-            <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="copyMsg('${id}','fu1',this)">Copy</button>
-            ${lead.phone?'<button class="btn btn-orange" style="padding:5px 12px;font-size:11px;" onclick="sendSMS(\''+lead.phone+'\',\''+id+'\',\'fu1\')">Send SMS</button>':''}
-          </div>
-          <div class="send-result" id="${id}-fu1-result"></div>
-        </div>
-        <div id="${id}-fu2" class="msg-content">
-          <div class="msg-label">// DAY 6 — Final follow-up. Low pressure.</div>
-          <div class="msg-text">${lead.outreach?.followup_sms_2||lead.followup_sms_2||''}</div>
-          <div class="msg-actions">
-            <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="copyMsg('${id}','fu2',this)">Copy</button>
-            ${lead.phone?'<button class="btn btn-orange" style="padding:5px 12px;font-size:11px;" onclick="sendSMS(\''+lead.phone+'\',\''+id+'\',\'fu2\')">Send SMS</button>':''}
-          </div>
-          <div class="send-result" id="${id}-fu2-result"></div>
-        </div>
-        <div id="${id}-fue" class="msg-content">
-          <div class="msg-label">// DAY 4 — Follow-up email with social proof + link</div>
-          <div class="msg-text">${lead.outreach?.followup_email||lead.followup_email||''}</div>
-          <div class="msg-actions">
-            <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="copyMsg('${id}','fue',this)">Copy</button>
+        <div>
+          <div class="section-label">// Send This Right Now</div>
+          <div class="quick-box">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:7px;">DAY 1 OPENING SMS — Find their number on Google Maps and text this:</div>
+            <div class="quick-text">"${l.msg_1||''}"</div>
+            <div style="display:flex;gap:7px;align-items:center;">
+              <button class="btn btn-orange btn-sm" onclick="cp(this,${JSON.stringify(l.msg_1||'')})">Copy SMS</button>
+              <button class="btn btn-green btn-sm" onclick="markSent()">✓ Mark Sent</button>
+              ${!l.phone?'<span style="font-family:var(--mono);font-size:9px;color:var(--dim);">→ Google Maps for number</span>':''}
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- SMS SEQUENCE -->
+    <div id="${id}-sms" class="panel">
+      <div style="background:var(--orange-dim);border:1px solid var(--border2);border-radius:5px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:var(--orange2);">
+        📱 <strong>The 5-message sequence.</strong> Send Day 1 today. Only send the next if no reply. Link goes out on Day 7 — not before.
+      </div>
+      ${msgBlocks(seq)}
+    </div>
+
+    <!-- CONVERSATION ENGINE -->
+    <div id="${id}-convo" class="panel">
+      <div style="background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:5px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:rgba(74,158,255,0.8);">
+        💬 <strong style="color:var(--blue);">When they reply — use these in order.</strong> Each step moves them closer to signing up. Don't skip ahead.
+      </div>
+      ${convo.map((c,i)=>`
+        <div class="msg-block" ${c.isLink?'style="border-color:rgba(0,230,118,0.3);background:rgba(0,230,118,0.04);"':''}>
+          <div class="msg-header">
+            <span class="msg-tag ${c.isLink?'t-link':'t-sms'}">${c.label}</span>
+          </div>
+          <div class="msg-text">"${(c.txt||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}"</div>
+          <div class="msg-actions">
+            <button class="btn btn-ghost btn-sm" onclick="cp(this,${JSON.stringify(c.txt)})">Copy</button>
+            ${c.isLink?'<button class="btn btn-green btn-sm" onclick="markSent()">✓ Link Sent</button>':''}
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- OBJECTIONS -->
+    <div id="${id}-obj" class="panel">
+      <div style="background:var(--red-dim);border:1px solid var(--red-border);border-radius:5px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:rgba(255,61,87,0.7);">
+        🛡 <strong style="color:var(--red);">Never argue.</strong> These keep the conversation alive without being pushy.
+      </div>
+      <div class="obj-grid">
+        ${objs.map(o=>`
+          <div class="obj-block">
+            <div class="obj-trigger">They say: ${o.trigger}</div>
+            <div class="obj-reply">"${(o.txt||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}"</div>
+            <button class="btn btn-ghost btn-sm" onclick="cp(this,${JSON.stringify(o.txt)})">Copy</button>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- META ADS -->
+    <div id="${id}-ads" class="panel">
+      <div class="ads-tip">
+        📣 <strong>Meta Ads strategy:</strong> Don't run ads until you have 3+ paying clients and proof it works. Use these headlines and copy for Facebook/Instagram ads targeting local service business owners in your city. Budget: start at $10/day, run for 7 days, see what converts.
+      </div>
+      ${msgBlocks(metaAds.map(m=>({...m,tag:'t-ads'})))}
+    </div>
+
+    <!-- GMB -->
+    <div id="${id}-gmb" class="panel">
+      <div class="gmb-tip">
+        📍 <strong>Google My Business outreach:</strong> Find local businesses on Google Maps, look at their reviews, and use these messages. Businesses with 3-4 star ratings and complaints about slow responses are your hottest leads.
+      </div>
+      ${msgBlocks(gmbMsgs.map(m=>({...m,tag:'t-gmb'})))}
+    </div>
+
+    <!-- INSTAGRAM -->
+    <div id="${id}-ig" class="panel">
+      <div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:5px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:rgba(0,230,118,0.8);">
+        📸 <strong style="color:var(--green);">Instagram outreach:</strong> Find the business on Instagram, like 2-3 of their posts first, then send the DM. Comment outreach works too — ask a genuine question on their recent post.
+      </div>
+      ${msgBlocks(igDMs.map(m=>({...m,tag:'t-ig'})))}
+    </div>
+
   </div>`;
 }
-function switchTab(leadId,tab,el){
-  const card=el.closest('.messages-col');
-  card.querySelectorAll('.msg-tab').forEach(t=>t.classList.remove('active'));
-  card.querySelectorAll('.msg-content').forEach(c=>c.classList.remove('active'));
+
+function sw(id,panel,el){
+  const card=el.closest('.lead-card');
+  card.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  card.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   el.classList.add('active');
-  document.getElementById(leadId+'-'+tab).classList.add('active');
+  const t=document.getElementById(id+'-'+panel);
+  if(t){t.style.display='block';t.classList.add('active');}
 }
-function copyMsg(leadId,tab,btn){
-  const el=document.getElementById(leadId+'-'+tab);
-  const msgEl=el?.querySelector('.msg-text');
-  if(msgEl){
-    navigator.clipboard.writeText(msgEl.innerText);
+
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const o=btn.textContent;
     btn.textContent='✓ Copied!';
     btn.style.color='var(--green)';
-    setTimeout(()=>{btn.textContent='Copy';btn.style.color='';},2000);
-  }
-}
-async function sendSMS(phone,leadId,tab){
-  const el=document.getElementById(leadId+'-'+tab);
-  const msgEl=el?.querySelector('.msg-text');
-  const resultEl=document.getElementById(leadId+'-'+tab+'-result');
-  if(!msgEl||!resultEl)return;
-  const message=msgEl.innerText;
-  resultEl.style.display='block';
-  resultEl.textContent='Sending...';
-  resultEl.style.color='var(--orange)';
-  try{
-    const res=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:phone,message})});
-    const data=await res.json();
-    if(data.success){
-      resultEl.textContent=data.mock?'✓ Mock sent (add Twilio keys to send real SMS)':'✓ SMS sent!';
-      resultEl.style.color='var(--green)';
-    }else{throw new Error(data.error);}
-  }catch(err){
-    resultEl.textContent='✗ '+err.message;
-    resultEl.style.color='var(--red)';
-  }
+    setTimeout(()=>{btn.textContent=o;btn.style.color='';},2000);
+  });
 }
 </script>
 </body>
