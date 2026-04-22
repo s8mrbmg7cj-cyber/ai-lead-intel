@@ -1,4 +1,4 @@
-// api/lead-submit.js — v3
+// api/lead-submit.js — v4
 // Handles form submissions from landing page
 // - Sends ntfy push notification to Andrew's phone
 // - Sends email notification to Andrew
@@ -19,15 +19,16 @@ function normalizePhone(raw) {
 
 async function sendNtfyNotification({ name, phone, business_type }) {
   try {
-    const body = `Business: ${business_type || "Not specified"}
-Phone: ${phone}
+    const body = `New Lead!
 Name: ${name}
+Business: ${business_type || "Not specified"}
+Phone: ${phone}
 Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Chicago" })}`;
 
     const res = await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
       method: "POST",
       headers: {
-        "Title": `🔥 New Lead: ${name}`,
+        "Title": `New Lead: ${name}`,
         "Priority": "high",
         "Tags": "bell,rotating_light",
         "Click": `tel:${phone}`,
@@ -62,7 +63,7 @@ async function notifyOwnerEmail({ name, phone, business_type }) {
     await resend.emails.send({
       from: "AI Lead Intel <onboarding@resend.dev>",
       to: NOTIFY_EMAIL,
-      subject: `🔥 New Lead: ${name} (${business_type})`,
+      subject: `New Lead: ${name} (${business_type})`,
       html: `
         <div style="font-family:sans-serif;max-width:500px;background:#0d1422;color:#f0f4ff;padding:28px;border-radius:10px;">
           <h2 style="color:#ff8c00;margin:0 0 16px;">New Inbound Lead!</h2>
@@ -102,7 +103,6 @@ async function saveLeadToSupabase({ name, phone, business_type }) {
         business_type,
         source: "aileadintel.com",
         status: "new",
-        created_at: new Date().toISOString(),
       }),
     });
 
