@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Client Setup — AI Lead Intel</title>
+<meta name="description" content="Complete your AI Lead Intel setup. Your 24/7 AI front desk goes live within 24 hours." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:           #0a0a0b;
+    --bg-elev:      #111113;
+    --bg-card:      #131316;
+    --bg-input:     #17171b;
+    --border:       #1f1f24;
+    --border-hover: #2a2a31;
+    --border-focus: #3d3d47;
+    --text:         #f5f5f7;
+    --text-muted:   #8a8a93;
+    --text-subtle:  #5a5a63;
+    --accent:       #d4ff3a;
+    --accent-dim:   #9cc22b;
+    --danger:       #ff5c5c;
+    --radius:       14px;
+    --radius-sm:    8px;
+    --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 255, 58, 0.08), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 10% 110%, rgba(212, 255, 58, 0.04), transparent 60%);
+    background-attachment: fixed;
+  }
+  .page { max-width: 720px; margin: 0 auto; padding: 80px 24px 120px; }
+  @media (max-width: 640px) { .page { padding: 40px 18px 80px; } }
+
+  /* ═══ PAID CLIENT BANNER ═══ */
+  .paid-banner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    background: rgba(212, 255, 58, 0.06);
+    border: 1px solid rgba(212, 255, 58, 0.2);
+    border-radius: var(--radius-sm);
+    margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .paid-banner svg { flex-shrink: 0; stroke: var(--accent); }
+  .paid-banner strong { color: var(--text); font-weight: 500; }
+  .paid-banner a { color: var(--accent); text-decoration: none; }
+  .paid-banner a:hover { text-decoration: underline; }
+
+  /* ═══ HEADER ═══ */
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 14px 8px 10px;
+    border: 1px solid var(--border); border-radius: 999px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.02em; color: var(--text-muted); margin-bottom: 40px;
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .brand-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 12px var(--accent); }
+    50%      { opacity: 0.5; box-shadow: 0 0 4px var(--accent); }
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 400;
+    font-size: clamp(38px, 6vw, 56px); line-height: 1.02;
+    letter-spacing: -0.025em; color: var(--text); margin-bottom: 20px;
+  }
+  .hero h1 em { font-style: italic; font-weight: 300; color: var(--accent); }
+  .hero p {
+    font-size: 17px; color: var(--text-muted);
+    max-width: 580px; line-height: 1.6; margin-bottom: 40px;
+  }
+  .hero p strong { color: var(--text); font-weight: 500; }
+
+  /* ═══ WHAT HAPPENS NEXT ═══ */
+  .next-steps {
+    background: linear-gradient(180deg, rgba(212, 255, 58, 0.04), rgba(212, 255, 58, 0.01));
+    border: 1px solid rgba(212, 255, 58, 0.15);
+    border-radius: var(--radius); padding: 22px 26px; margin-bottom: 48px;
+  }
+  .next-steps-label {
+    font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 14px; font-weight: 500;
+  }
+  .next-steps-list { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+  .next-steps-list li {
+    display: flex; align-items: flex-start; gap: 14px;
+    font-size: 14px; color: var(--text); line-height: 1.55;
+    padding: 6px 0; counter-increment: step;
+  }
+  .next-steps-list li::before {
+    content: counter(step);
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(212, 255, 58, 0.1);
+    border: 1px solid rgba(212, 255, 58, 0.3); color: var(--accent);
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+  .next-steps-list li strong { color: var(--accent); font-weight: 500; }
+
+  /* ═══ PROGRESS ═══ */
+  .progress {
+    position: sticky; top: 0;
+    background: rgba(10, 10, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 0; margin-bottom: 20px; z-index: 10;
+    border-bottom: 1px solid transparent;
+    transition: border-color 200ms var(--ease);
+  }
+  .progress.scrolled { border-bottom-color: var(--border); }
+  .progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; font-family: 'Geist Mono', monospace;
+    font-size: 11px; color: var(--text-subtle);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .progress-pct { color: var(--text); font-weight: 500; }
+  .progress-bar {
+    height: 3px; background: var(--border);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 400ms var(--ease);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  /* ═══ SECTIONS ═══ */
+  .section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px; margin-bottom: 20px;
+    transition: border-color 280ms var(--ease);
+  }
+  .section:hover { border-color: var(--border-hover); }
+  @media (max-width: 640px) { .section { padding: 26px 22px; } }
+
+  .section-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 28px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-number {
+    font-family: 'Geist Mono', monospace; font-size: 12px;
+    color: var(--accent); letter-spacing: 0.08em; font-weight: 500;
+  }
+  .section-title {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 500;
+    font-size: 22px; letter-spacing: -0.01em; color: var(--text);
+  }
+  .section-subtitle {
+    display: block; font-size: 13px; color: var(--text-muted);
+    margin-top: 6px; line-height: 1.5; font-family: 'Geist', sans-serif;
+    font-style: normal; font-weight: 400; letter-spacing: 0;
+  }
+
+  /* ═══ FIELDS ═══ */
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+  @media (max-width: 640px) { .field-row { grid-template-columns: 1fr; gap: 22px; } }
+
+  label {
+    display: block; font-size: 13px; font-weight: 500;
+    color: var(--text); margin-bottom: 8px; letter-spacing: -0.005em;
+  }
+  .label-hint { font-weight: 400; color: var(--text-subtle); margin-left: 6px; }
+  .required-mark { color: var(--accent); margin-left: 3px; }
+  .field-help {
+    font-size: 13px; color: var(--text-muted);
+    margin-top: 8px; line-height: 1.5;
+  }
+  .field-help strong { color: var(--text); font-weight: 500; }
+
+  input[type="text"], input[type="tel"], input[type="email"], input[type="url"],
+  select, textarea {
+    width: 100%; padding: 13px 14px; font-family: inherit; font-size: 15px;
+    color: var(--text); background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    transition: border-color 180ms var(--ease), background 180ms var(--ease);
+    -webkit-appearance: none; appearance: none;
+  }
+  input::placeholder, textarea::placeholder { color: var(--text-subtle); }
+  input:hover, select:hover, textarea:hover { border-color: var(--border-hover); }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--border-focus); background: var(--bg-elev);
+  }
+  input:disabled { opacity: 0.5; cursor: not-allowed; }
+  input.error, select.error, textarea.error { border-color: var(--danger); }
+  textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+  select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3e%3cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238a8a93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 40px; cursor: pointer;
+  }
+
+  input.mono { font-family: 'Geist Mono', monospace; letter-spacing: 0.02em; }
+
+  /* ═══ INLINE CHECKBOX ═══ */
+  .inline-checkbox {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px; cursor: pointer; user-select: none;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .inline-checkbox:hover { color: var(--text); }
+  .inline-checkbox input {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border-hover);
+    border-radius: 3px;
+    background: var(--bg-input);
+    cursor: pointer; flex-shrink: 0;
+    transition: all 160ms var(--ease);
+    position: relative;
+  }
+  .inline-checkbox input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .inline-checkbox input:checked::after {
+    content: ''; position: absolute; left: 3px; top: 0;
+    width: 4px; height: 8px; border: solid #0a0a0b;
+    border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+
+  /* ═══ OPTIONS ═══ */
+  .option-group { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px; background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 160ms var(--ease), background 160ms var(--ease);
+  }
+  .option:hover { border-color: var(--border-hover); }
+  .option input {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px; border: 1.5px solid var(--border-hover);
+    background: transparent; cursor: pointer; flex-shrink: 0;
+    transition: all 160ms var(--ease); position: relative;
+  }
+  .option input[type="checkbox"] { border-radius: 4px; }
+  .option input[type="radio"]    { border-radius: 50%; }
+  .option input:checked { background: var(--accent); border-color: var(--accent); }
+  .option input[type="checkbox"]:checked::after {
+    content: ''; position: absolute; left: 4px; top: 1px;
+    width: 5px; height: 9px; border: solid #0a0a0b;
+    border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .option input[type="radio"]:checked::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); width: 6px; height: 6px;
+    border-radius: 50%; background: #0a0a0b;
+  }
+  .option:has(input:checked) {
+    border-color: var(--accent-dim);
+    background: rgba(212, 255, 58, 0.04);
+  }
+  .option-label { font-size: 15px; color: var(--text); user-select: none; }
+  .option-sub {
+    display: block; font-size: 12px; color: var(--text-muted); margin-top: 3px;
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: -0.005em;
+  }
+
+  .other-input { margin-top: 10px; margin-left: 30px; max-width: calc(100% - 30px); }
+  .other-input input { padding: 10px 12px; font-size: 14px; }
+
+  .conditional {
+    max-height: 0; overflow: hidden;
+    transition: max-height 400ms var(--ease), opacity 300ms var(--ease);
+    opacity: 0;
+  }
+  .conditional.active { max-height: 400px; opacity: 1; margin-top: 16px; }
+
+  /* ═══ INFO CALLOUT (AI explainer) ═══ */
+  .info-callout {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 22px;
+    font-size: 13px; color: var(--text-muted); line-height: 1.55;
+  }
+  .info-callout svg {
+    flex-shrink: 0; stroke: var(--accent); margin-top: 1px;
+  }
+  .info-callout strong { color: var(--text); font-weight: 500; }
+
+  /* ═══ TRUST NOTICES ═══ */
+  .trust-notice {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: rgba(212, 255, 58, 0.04);
+    border: 1px solid rgba(212, 255, 58, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px; margin-top: 16px;
+    font-size: 13px; color: var(--text-muted); line-height: 1.55;
+  }
+  .trust-notice svg { flex-shrink: 0; stroke: var(--accent); margin-top: 2px; }
+  .trust-notice strong { color: var(--text); font-weight: 500; }
+  .trust-notice p + p { margin-top: 8px; }
+
+  .trust-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  }
+  .trust-tag {
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.02em;
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  /* ═══ SUBMIT ═══ */
+  .submit-wrap { margin-top: 40px; }
+  .submit-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 18px 28px;
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    letter-spacing: -0.005em; color: #0a0a0b; background: var(--accent);
+    border: none; border-radius: var(--radius-sm); cursor: pointer;
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease), background 160ms var(--ease);
+    box-shadow: 0 0 0 0 rgba(212, 255, 58, 0);
+  }
+  .submit-btn:hover {
+    background: #e0ff5a;
+    box-shadow: 0 10px 40px -10px rgba(212, 255, 58, 0.5);
+    transform: translateY(-1px);
+  }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .submit-btn svg { transition: transform 200ms var(--ease); }
+  .submit-btn:hover svg { transform: translateX(3px); }
+  .submit-note {
+    text-align: center; font-size: 13px;
+    color: var(--text-subtle); margin-top: 16px;
+  }
+  .submit-legal {
+    text-align: center; font-size: 12px;
+    color: var(--text-subtle); margin-top: 20px;
+    line-height: 1.6;
+  }
+  .submit-legal a {
+    color: var(--text-muted); text-decoration: underline;
+    text-underline-offset: 2px; text-decoration-color: var(--border-hover);
+    transition: color 160ms var(--ease);
+  }
+  .submit-legal a:hover { color: var(--accent); }
+
+  /* ═══ SAVE INDICATOR ═══ */
+  .save-indicator {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 999px; padding: 8px 14px;
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.05em;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+    z-index: 20; pointer-events: none;
+  }
+  .save-indicator.visible { opacity: 1; transform: translateY(0); }
+  .save-indicator::before {
+    content: '✓'; color: var(--accent); margin-right: 6px;
+  }
+
+  /* ═══ ERRORS ═══ */
+  .error-msg {
+    display: none; font-size: 12px; color: var(--danger);
+    margin-top: 6px; font-family: 'Geist Mono', monospace;
+    letter-spacing: -0.005em;
+  }
+  .field.has-error .error-msg { display: block; }
+
+  /* ═══ SUCCESS ═══ */
+  .success-screen {
+    display: none; text-align: center; padding: 60px 24px 40px;
+    animation: fadeUp 600ms var(--ease) forwards;
+  }
+  .success-screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .success-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(212, 255, 58, 0.08);
+    border: 1px solid rgba(212, 255, 58, 0.3); margin-bottom: 32px;
+    animation: iconPop 500ms var(--ease) 200ms backwards;
+  }
+  @keyframes iconPop {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .success-icon svg { stroke: var(--accent); }
+  .success-screen h2 {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 400;
+    font-size: clamp(32px, 5vw, 44px); letter-spacing: -0.02em; margin-bottom: 16px;
+  }
+  .success-screen h2 em { font-style: italic; color: var(--accent); }
+  .success-screen p {
+    font-size: 16px; color: var(--text-muted);
+    max-width: 480px; margin: 0 auto 32px; line-height: 1.6;
+  }
+  .success-timeline {
+    display: flex; flex-direction: column; gap: 14px;
+    max-width: 420px; margin: 0 auto 36px;
+    text-align: left;
+  }
+  .success-timeline-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .success-timeline-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(212, 255, 58, 0.08);
+    border: 1px solid rgba(212, 255, 58, 0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    color: var(--accent);
+  }
+  .success-timeline-text {
+    font-size: 14px; color: var(--text); line-height: 1.4;
+  }
+  .success-timeline-text span {
+    display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px;
+  }
+  .success-meta {
+    display: inline-block; font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--text-subtle);
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px;
+  }
+
+  .hidden { display: none !important; }
+  .form-container {
+    transition: opacity 400ms var(--ease), transform 400ms var(--ease);
+  }
+  .form-container.submitting {
+    opacity: 0; transform: translateY(-8px); pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="form-container" id="formContainer">
+
+    <div class="paid-banner">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M13 4.5L6 11.5L3 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <strong>Welcome, paid client.</strong>
+        &nbsp;This form is for clients who've completed payment. Need to sign up? &nbsp;<a href="/">Go to aileadintel.com →</a>
+      </div>
+    </div>
+
+    <div class="brand">
+      <span class="brand-dot"></span>
+      AI LEAD INTEL / CLIENT ONBOARDING
+    </div>
+
+    <div class="hero">
+      <h1>Let's get your<br/><em>AI front desk live.</em></h1>
+      <p>Your AI answers calls <strong>24/7</strong> — never a missed call, never a lost lead. Fill this out and we'll have your system configured within 24 hours. Takes about six minutes. Your answers save automatically as you go.</p>
+    </div>
+
+    <div class="next-steps">
+      <div class="next-steps-label">WHAT HAPPENS NEXT</div>
+      <ol class="next-steps-list">
+        <li>We register your business with Twilio and provision your <strong>dedicated phone number</strong></li>
+        <li>Your <strong>24/7 AI front desk</strong> goes live within 24 hours, configured to your specs</li>
+        <li>You start capturing every missed call as a lead — automatically</li>
+      </ol>
+    </div>
+
+    <div class="progress" id="progress">
+      <div class="progress-header">
+        <span>SETUP PROGRESS</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <form id="onboardingForm" novalidate>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">01</span>
+            <h2 class="section-title">Business information</h2>
+            <span class="section-subtitle">Basic info about your business as customers know it.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="businessName">Business name (DBA)<span class="required-mark">*</span></label>
+          <input type="text" id="businessName" name="businessName" placeholder="e.g. Sunrise Dental" required />
+          <div class="field-help">The name your customers know you by — what your AI will say when answering calls.</div>
+          <div class="error-msg">Please enter your business name.</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="industry">Industry<span class="required-mark">*</span></label>
+            <select id="industry" name="industry" required>
+              <option value="" disabled selected>Select industry…</option>
+              <option value="self-storage">Self Storage</option>
+              <option value="home-services">Home Services (HVAC, Plumbing, Electrical)</option>
+              <option value="auto">Auto Repair / Detailing</option>
+              <option value="medical-dental">Medical / Dental</option>
+              <option value="salon-spa">Salon / Spa</option>
+              <option value="legal">Legal</option>
+              <option value="real-estate">Real Estate</option>
+              <option value="restaurant">Restaurant / Hospitality</option>
+              <option value="fitness">Fitness / Gym</option>
+              <option value="contractor">Contractor / Construction</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="error-msg">Please select your industry.</div>
+          </div>
+          <div class="field">
+            <label for="businessPhone">Current main phone<span class="required-mark">*</span></label>
+            <input type="tel" id="businessPhone" name="businessPhone" placeholder="(555) 123-4567" required />
+            <div class="error-msg">Please enter a valid phone number.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Do you have a website?<span class="required-mark">*</span></label>
+          <div class="option-group">
+            <label class="option">
+              <input type="radio" name="hasWebsite" value="yes" required />
+              <span class="option-label">Yes, I have a website
+                <span class="option-sub">We'll link to it from your SMS follow-ups</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="hasWebsite" value="no" />
+              <span class="option-label">No website yet
+                <span class="option-sub">No problem — we can help you set one up</span>
+              </span>
+            </label>
+          </div>
+          <div class="conditional" id="websiteUrlWrap">
+            <div class="field" style="margin-top: 16px;">
+              <label for="website">Website URL</label>
+              <input type="url" id="website" name="website" placeholder="https://yourbusiness.com" />
+            </div>
+          </div>
+          <div class="error-msg">Please choose one.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">02</span>
+            <h2 class="section-title">Legal business info</h2>
+            <span class="section-subtitle">Required by US carriers to send automated SMS on your behalf. Same info you'd give Stripe or Shopify.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="legalName">Legal business name<span class="required-mark">*</span></label>
+          <input type="text" id="legalName" name="legalName" placeholder="e.g. Sunrise Dental LLC" required />
+          <div class="field-help">The name on your IRS paperwork. Usually includes "LLC," "Inc.," etc.</div>
+          <label class="inline-checkbox">
+            <input type="checkbox" id="sameAsDBA" />
+            <span>Same as my business name above</span>
+          </label>
+          <div class="error-msg">Please enter your legal business name.</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="ein">EIN (Tax ID)<span class="required-mark">*</span></label>
+            <input type="text" id="ein" name="ein" class="mono" placeholder="12-3456789" maxlength="10" required />
+            <div class="field-help">Federal EIN only — never your SSN.</div>
+            <div class="error-msg">Please enter a valid EIN (XX-XXXXXXX).</div>
+          </div>
+          <div class="field">
+            <label for="entityType">Business entity type<span class="required-mark">*</span></label>
+            <select id="entityType" name="entityType" required>
+              <option value="" disabled selected>Select type…</option>
+              <option value="llc">LLC</option>
+              <option value="corp">Corporation (C-Corp, S-Corp)</option>
+              <option value="partnership">Partnership</option>
+              <option value="sole-prop">Sole Proprietorship</option>
+              <option value="non-profit">Non-Profit</option>
+            </select>
+            <div class="error-msg">Please select entity type.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="legalAddress">Legal business address<span class="required-mark">*</span></label>
+          <input type="text" id="legalAddress" name="legalAddress" placeholder="123 Main Street" required />
+          <div class="error-msg">Please enter your street address.</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="legalCity">City<span class="required-mark">*</span></label>
+            <input type="text" id="legalCity" name="legalCity" placeholder="Austin" required />
+            <div class="error-msg">Required.</div>
+          </div>
+          <div class="field">
+            <label for="legalState">State<span class="required-mark">*</span></label>
+            <input type="text" id="legalState" name="legalState" placeholder="TX" maxlength="2" required style="text-transform: uppercase;" />
+            <div class="error-msg">Use 2-letter code.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="legalZip">ZIP code<span class="required-mark">*</span></label>
+          <input type="text" id="legalZip" name="legalZip" class="mono" placeholder="78701" maxlength="10" required />
+          <div class="error-msg">Please enter a valid ZIP.</div>
+        </div>
+
+        <div class="trust-notice">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 1.5L2.5 4.5V9C2.5 12.5 5.5 15.5 9 16.5C12.5 15.5 15.5 12.5 15.5 9V4.5L9 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M6.5 9L8 10.5L11.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p><strong>Your info is safe.</strong> This is standard business registration data — the same info you'd provide to Stripe, Shopify, or any US SMS platform.</p>
+            <p>US carriers (AT&amp;T, Verizon, T-Mobile) require A2P 10DLC registration for every business sending automated SMS. We handle the registration so your texts actually reach your customers instead of getting flagged as spam.</p>
+            <div class="trust-tags">
+              <span class="trust-tag">ENCRYPTED STORAGE</span>
+              <span class="trust-tag">NEVER SOLD</span>
+              <span class="trust-tag">USED ONLY FOR CARRIER REGISTRATION</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">03</span>
+            <h2 class="section-title">Call handling</h2>
+            <span class="section-subtitle">Your AI handles every call. If a caller wants a real person, where should we transfer them?</span>
+          </div>
+        </div>
+
+        <div class="info-callout">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5V8.5M8 11V11.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div><strong>How transfers work:</strong> Your AI answers first and handles most calls on its own. If the caller specifically asks for a human — or the AI decides the situation needs one — we'll ring these numbers in order.</div>
+        </div>
+
+        <div class="field">
+          <label for="forwardNumber">Primary transfer number<span class="required-mark">*</span></label>
+          <input type="tel" id="forwardNumber" name="forwardNumber" placeholder="(555) 123-4567" required />
+          <div class="field-help">The first number we'll try. Usually your cell or main office line.</div>
+          <div class="error-msg">Please enter a valid phone number.</div>
+        </div>
+
+        <div class="field">
+          <label for="backupNumber">Backup transfer number <span class="label-hint">optional</span></label>
+          <input type="tel" id="backupNumber" name="backupNumber" placeholder="(555) 123-4568" />
+          <div class="field-help">Rings if the primary doesn't answer within 20 seconds.</div>
+        </div>
+
+        <div class="field">
+          <label for="voicemailEmail">Email for message &amp; voicemail alerts<span class="required-mark">*</span></label>
+          <input type="email" id="voicemailEmail" name="voicemailEmail" placeholder="you@yourbusiness.com" required />
+          <div class="field-help">When the AI takes a message or a caller leaves voicemail, we email you transcripts + audio here.</div>
+          <div class="error-msg">Please enter a valid email.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">04</span>
+            <h2 class="section-title">Transfer hours</h2>
+            <span class="section-subtitle">When are you actually available to take transferred calls? Outside these hours, the AI handles everything solo.</span>
+          </div>
+        </div>
+
+        <div class="info-callout">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 4V8L10.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div><strong>Your AI is always on.</strong> These hours just tell us when it's okay to ring your phone for live transfers. Outside these hours, the AI takes messages, answers questions, and emails you so you can follow up when you're back.</div>
+        </div>
+
+        <div class="field">
+          <label for="businessHours">When can we transfer calls to you?<span class="required-mark">*</span></label>
+          <input type="text" id="businessHours" name="businessHours" placeholder="Mon–Fri 9am–6pm, Sat 10am–4pm (CST)" required />
+          <div class="field-help">Free-form is fine. Example: "Weekdays 8–5, closed Sunday." Include your timezone if it's not obvious.</div>
+          <div class="error-msg">Please enter your hours.</div>
+        </div>
+
+        <div class="field">
+          <label>When the AI can't transfer (outside hours, or no one picks up)<span class="required-mark">*</span></label>
+          <div class="option-group">
+            <label class="option">
+              <input type="radio" name="afterHours" value="message" required />
+              <span class="option-label">AI takes a detailed message
+                <span class="option-sub">Who called, what they need, contact info — all emailed to you</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="afterHours" value="handle" />
+              <span class="option-label">AI handles the request fully
+                <span class="option-sub">Answers questions, books appointments, sends info — all on its own</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="afterHours" value="both" />
+              <span class="option-label">Both — handle what it can, message you what it can't
+                <span class="option-sub">Recommended. Maximum coverage for every caller.</span>
+              </span>
+            </label>
+          </div>
+          <div class="error-msg">Please choose one.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">05</span>
+            <h2 class="section-title">Common customer requests</h2>
+            <span class="section-subtitle">Helps the AI know what to expect and how to respond.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>What do customers usually call about? <span class="label-hint">select all that apply</span></label>
+          <div class="option-group">
+            <label class="option">
+              <input type="checkbox" name="callReasons" value="new-customer" />
+              <span class="option-label">New customer / booking / inquiry</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" name="callReasons" value="payments" />
+              <span class="option-label">Payments / billing</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" name="callReasons" value="support" />
+              <span class="option-label">Customer support</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" name="callReasons" value="cancellation" />
+              <span class="option-label">Cancellation / move out</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" name="callReasons" value="other" id="callReasonOther" />
+              <span class="option-label">Other</span>
+            </label>
+          </div>
+          <div class="other-input hidden" id="callReasonOtherWrap">
+            <input type="text" id="callReasonOtherText" name="callReasonOtherText" placeholder="Describe the other request type…" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">06</span>
+            <h2 class="section-title">How customers reach you</h2>
+            <span class="section-subtitle">Required for SMS compliance. Tells carriers how customers consent to receive texts.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>How do customers typically contact you first?<span class="required-mark">*</span></label>
+          <div class="option-group">
+            <label class="option">
+              <input type="radio" name="contactMethod" value="form" required />
+              <span class="option-label">They fill out a contact form on my website</span>
+            </label>
+            <label class="option">
+              <input type="radio" name="contactMethod" value="call" />
+              <span class="option-label">They call my business</span>
+            </label>
+            <label class="option">
+              <input type="radio" name="contactMethod" value="walkin" />
+              <span class="option-label">They walk in / visit in person</span>
+            </label>
+            <label class="option">
+              <input type="radio" name="contactMethod" value="multiple" />
+              <span class="option-label">A mix of the above</span>
+            </label>
+          </div>
+          <div class="error-msg">Please choose one.</div>
+        </div>
+
+        <div class="field">
+          <label for="sampleMessage">Sample text you'd want customers to receive</label>
+          <textarea id="sampleMessage" name="sampleMessage" placeholder="e.g. Hi {name}, thanks for calling us — sorry we missed you! How can we help?"></textarea>
+          <div class="field-help">Used as a reference when we register your SMS campaign. You can update this later.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">07</span>
+            <h2 class="section-title">Important links</h2>
+            <span class="section-subtitle">Links your AI can text to customers when asked.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="paymentLink">Payment link <span class="label-hint">optional</span></label>
+          <input type="url" id="paymentLink" name="paymentLink" placeholder="https://pay.yourbusiness.com" />
+          <div class="field-help">Stripe, Square, PayPal, etc.</div>
+        </div>
+
+        <div class="field">
+          <label for="bookingLink">Booking / scheduling link <span class="label-hint">optional</span></label>
+          <input type="url" id="bookingLink" name="bookingLink" placeholder="https://calendly.com/yourbusiness" />
+        </div>
+
+        <div class="field">
+          <label for="infoLink">FAQ / info page <span class="label-hint">optional</span></label>
+          <input type="url" id="infoLink" name="infoLink" placeholder="https://yourbusiness.com/faq" />
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">08</span>
+            <h2 class="section-title">AI personality</h2>
+            <span class="section-subtitle">How your AI front desk should sound to customers.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Pick a voice<span class="required-mark">*</span></label>
+          <div class="option-group">
+            <label class="option">
+              <input type="radio" name="tone" value="warm" required />
+              <span class="option-label">Warm &amp; conversational
+                <span class="option-sub">"Hey! Thanks for reaching out — what can I help you with?"</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="tone" value="professional" />
+              <span class="option-label">Polished &amp; professional
+                <span class="option-sub">"Thank you for contacting us. How may we help you today?"</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="tone" value="direct" />
+              <span class="option-label">Direct &amp; efficient
+                <span class="option-sub">"Hi — sorry we missed your call. What do you need?"</span>
+              </span>
+            </label>
+            <label class="option">
+              <input type="radio" name="tone" value="other" id="toneOther" />
+              <span class="option-label">Other (I'll describe)</span>
+            </label>
+          </div>
+          <div class="other-input hidden" id="toneOtherWrap">
+            <input type="text" id="toneOtherText" name="toneOtherText" placeholder="Describe the tone you want…" />
+          </div>
+          <div class="error-msg">Please choose a tone.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <span class="section-number">09</span>
+            <h2 class="section-title">Anything else?</h2>
+            <span class="section-subtitle">The more you tell us, the better your AI handles customers.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="notes">Extra notes <span class="label-hint">optional</span></label>
+          <textarea id="notes" name="notes" placeholder="Common questions customers ask, pricing you'd like us to share, things your AI should NEVER say, special instructions for angry callers, anything we should know…"></textarea>
+        </div>
+      </section>
+
+      <div class="submit-wrap">
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span>Submit &amp; launch setup</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8H13M13 8L8.5 3.5M13 8L8.5 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <p class="submit-note">We'll have your system configured within 24 hours.</p>
+        <p class="submit-legal">
+          By submitting, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.<br/>
+          Your business info is used only for carrier registration and service setup.
+        </p>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M8 16.5L13.5 22L24 11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>You're <em>all set.</em></h2>
+    <p>We got everything. Here's what happens from here — we'll email you each step along the way.</p>
+    <div class="success-timeline">
+      <div class="success-timeline-item">
+        <div class="success-timeline-icon">1</div>
+        <div class="success-timeline-text">Business registration submitted
+          <span>Usually approved within a few hours</span>
+        </div>
+      </div>
+      <div class="success-timeline-item">
+        <div class="success-timeline-icon">2</div>
+        <div class="success-timeline-text">Phone number provisioned
+          <span>You'll get your new number via email</span>
+        </div>
+      </div>
+      <div class="success-timeline-item">
+        <div class="success-timeline-icon">3</div>
+        <div class="success-timeline-text">24/7 AI front desk goes live
+          <span>Within 24 hours of submission</span>
+        </div>
+      </div>
+    </div>
+    <div class="success-meta" id="successMeta">REF: — · STATUS: RECEIVED</div>
+  </div>
+</div>
+
+<div class="save-indicator" id="saveIndicator">Saved</div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'aileadintel_onboarding_v5';
+  const form          = document.getElementById('onboardingForm');
+  const container     = document.getElementById('formContainer');
+  const success       = document.getElementById('successScreen');
+  const successMeta   = document.getElementById('successMeta');
+  const submitBtn     = document.getElementById('submitBtn');
+  const progressFill  = document.getElementById('progressFill');
+  const progressPct   = document.getElementById('progressPct');
+  const progressEl    = document.getElementById('progress');
+  const saveIndicator = document.getElementById('saveIndicator');
+
+  const saveToStorage = () => {
+    try {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          data[el.id || (el.name + ':' + el.value)] = el.checked;
+        } else if (el.id) {
+          data[el.id] = el.value;
+        }
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, savedAt: Date.now() }));
+      showSaveIndicator();
+    } catch (e) {}
+  };
+
+  const loadFromStorage = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const { data } = JSON.parse(raw);
+      if (!data) return;
+      form.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          const key = el.id || (el.name + ':' + el.value);
+          if (data[key]) el.checked = true;
+        } else if (el.id && data[el.id]) {
+          el.value = data[el.id];
+        }
+      });
+      document.querySelectorAll('input[name="hasWebsite"]').forEach(r => r.dispatchEvent(new Event('change')));
+      if (document.getElementById('callReasonOther').checked) {
+        document.getElementById('callReasonOtherWrap').classList.remove('hidden');
+      }
+      if (document.getElementById('toneOther').checked) {
+        document.getElementById('toneOtherWrap').classList.remove('hidden');
+      }
+      if (document.getElementById('sameAsDBA').checked) {
+        handleSameAsDBA();
+      }
+      updateProgress();
+    } catch (e) {}
+  };
+
+  let saveTimeout;
+  const debouncedSave = () => {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveToStorage, 600);
+  };
+
+  let saveIndicatorTimeout;
+  const showSaveIndicator = () => {
+    saveIndicator.classList.add('visible');
+    clearTimeout(saveIndicatorTimeout);
+    saveIndicatorTimeout = setTimeout(() => {
+      saveIndicator.classList.remove('visible');
+    }, 1500);
+  };
+
+  const updateProgress = () => {
+    const required = form.querySelectorAll('[required]');
+    const uniqueKeys = new Set();
+    const filledKeys = new Set();
+
+    required.forEach(el => {
+      const key = el.type === 'radio' ? 'radio:' + el.name : 'field:' + el.id;
+      uniqueKeys.add(key);
+      if (el.type === 'radio') {
+        if (form.querySelector('input[name="' + el.name + '"]:checked')) filledKeys.add(key);
+      } else if (el.value.trim()) {
+        filledKeys.add(key);
+      }
+    });
+
+    const hasWebsite = form.querySelector('input[name="hasWebsite"]:checked')?.value;
+    if (hasWebsite === 'yes') {
+      uniqueKeys.add('field:website');
+      const websiteVal = document.getElementById('website').value.trim();
+      if (websiteVal) filledKeys.add('field:website');
+    }
+
+    const pct = uniqueKeys.size === 0 ? 0 : Math.round((filledKeys.size / uniqueKeys.size) * 100);
+    progressFill.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+  };
+
+  window.addEventListener('scroll', () => {
+    progressEl.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  const toggleConditional = (triggerName, triggerValue, wrapId) => {
+    document.querySelectorAll('input[name="' + triggerName + '"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const wrap = document.getElementById(wrapId);
+        const matches = form.querySelector('input[name="' + triggerName + '"]:checked')?.value === triggerValue;
+        wrap.classList.toggle('active', matches);
+        updateProgress();
+      });
+    });
+  };
+  toggleConditional('hasWebsite', 'yes', 'websiteUrlWrap');
+
+  const toggleOther = (triggerId, wrapId, inputId) => {
+    const trigger = document.getElementById(triggerId);
+    const wrap    = document.getElementById(wrapId);
+    const input   = document.getElementById(inputId);
+    const update = () => {
+      if (trigger.checked) { wrap.classList.remove('hidden'); }
+      else { wrap.classList.add('hidden'); input.value = ''; }
+    };
+    if (trigger.type === 'radio') {
+      document.querySelectorAll('input[name="' + trigger.name + '"]').forEach(r => {
+        r.addEventListener('change', update);
+      });
+    } else {
+      trigger.addEventListener('change', update);
+    }
+  };
+  toggleOther('callReasonOther', 'callReasonOtherWrap', 'callReasonOtherText');
+  toggleOther('toneOther',       'toneOtherWrap',       'toneOtherText');
+
+  const businessName = document.getElementById('businessName');
+  const legalName    = document.getElementById('legalName');
+  const sameAsDBA    = document.getElementById('sameAsDBA');
+
+  const handleSameAsDBA = () => {
+    if (sameAsDBA.checked) {
+      legalName.value = businessName.value;
+      legalName.disabled = true;
+    } else {
+      legalName.disabled = false;
+    }
+    updateProgress();
+  };
+
+  sameAsDBA.addEventListener('change', handleSameAsDBA);
+  businessName.addEventListener('input', () => {
+    if (sameAsDBA.checked) {
+      legalName.value = businessName.value;
+    }
+  });
+
+  const einInput = document.getElementById('ein');
+  einInput.addEventListener('input', (e) => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 9);
+    if (v.length > 2) v = v.slice(0, 2) + '-' + v.slice(2);
+    e.target.value = v;
+  });
+
+  document.getElementById('legalState').addEventListener('input', (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+  });
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRe = /^[\d\s()+\-.]{7,}$/;
+  const einRe   = /^\d{2}-\d{7}$/;
+  const zipRe   = /^\d{5}(-\d{4})?$/;
+
+  const setError = (field, hasError) => {
+    const fieldWrap = field.closest('.field');
+    if (!fieldWrap) return;
+    fieldWrap.classList.toggle('has-error', hasError);
+    field.classList.toggle('error', hasError);
+  };
+
+  const validate = () => {
+    let ok = true;
+    ['businessName', 'industry', 'legalName', 'entityType', 'legalAddress', 'legalCity', 'legalState', 'businessHours'].forEach(id => {
+      const el = document.getElementById(id);
+      const bad = !el.value.trim();
+      setError(el, bad);
+      if (bad) ok = false;
+    });
+    ['businessPhone', 'forwardNumber'].forEach(id => {
+      const el = document.getElementById(id);
+      const bad = !phoneRe.test(el.value.trim());
+      setError(el, bad);
+      if (bad) ok = false;
+    });
+    const ein = document.getElementById('ein');
+    const einBad = !einRe.test(ein.value.trim());
+    setError(ein, einBad);
+    if (einBad) ok = false;
+    const zip = document.getElementById('legalZip');
+    const zipBad = !zipRe.test(zip.value.trim());
+    setError(zip, zipBad);
+    if (zipBad) ok = false;
+    const email = document.getElementById('voicemailEmail');
+    const emailBad = !emailRe.test(email.value.trim());
+    setError(email, emailBad);
+    if (emailBad) ok = false;
+    const radioGroups = ['hasWebsite', 'afterHours', 'contactMethod', 'tone'];
+    radioGroups.forEach(name => {
+      const checked = form.querySelector('input[name="' + name + '"]:checked');
+      const wrap = form.querySelector('input[name="' + name + '"]').closest('.field');
+      wrap.classList.toggle('has-error', !checked);
+      if (!checked) ok = false;
+    });
+    return ok;
+  };
+
+  form.querySelectorAll('input, select, textarea').forEach(el => {
+    const handler = () => {
+      setError(el, false);
+      updateProgress();
+      debouncedSave();
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+
+  const collectData = () => {
+    const fd = new FormData(form);
+    const callReasons = fd.getAll('callReasons');
+    return {
+      business: {
+        name:       fd.get('businessName')?.trim(),
+        industry:   fd.get('industry'),
+        phone:      fd.get('businessPhone')?.trim(),
+        hasWebsite: fd.get('hasWebsite'),
+        website:    fd.get('website')?.trim() || null,
+      },
+      legal: {
+        legalName:     fd.get('legalName')?.trim(),
+        sameAsDBA:     sameAsDBA.checked,
+        ein:           fd.get('ein')?.trim(),
+        entityType:    fd.get('entityType'),
+        address:       fd.get('legalAddress')?.trim(),
+        city:          fd.get('legalCity')?.trim(),
+        state:         fd.get('legalState')?.trim()?.toUpperCase(),
+        zip:           fd.get('legalZip')?.trim(),
+      },
+      callHandling: {
+        forwardNumber:  fd.get('forwardNumber')?.trim(),
+        backupNumber:   fd.get('backupNumber')?.trim() || null,
+        voicemailEmail: fd.get('voicemailEmail')?.trim(),
+      },
+      hours: {
+        transferHours:  fd.get('businessHours')?.trim(),
+        outsideHours:   fd.get('afterHours'),
+      },
+      callReasons: {
+        selected: callReasons,
+        other:    callReasons.includes('other') ? (fd.get('callReasonOtherText')?.trim() || null) : null,
+      },
+      smsCompliance: {
+        contactMethod: fd.get('contactMethod'),
+        sampleMessage: fd.get('sampleMessage')?.trim() || null,
+      },
+      links: {
+        payment: fd.get('paymentLink')?.trim() || null,
+        booking: fd.get('bookingLink')?.trim() || null,
+        info:    fd.get('infoLink')?.trim()    || null,
+      },
+      tone: {
+        selected: fd.get('tone'),
+        other:    fd.get('tone') === 'other' ? (fd.get('toneOtherText')?.trim() || null) : null,
+      },
+      notes: fd.get('notes')?.trim() || null,
+      meta: {
+        submittedAt: new Date().toISOString(),
+        userAgent:   navigator.userAgent,
+        version:     'v5',
+      },
+    };
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate()) {
+      const firstError = form.querySelector('.has-error');
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.querySelector('span').textContent = 'Submitting…';
+    const data = collectData();
+    console.log('[AI Lead Intel] Client onboarding submission:', data);
+    try {
+      await fetch('/api/onboarding-submit', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(data),
+      }).catch(() => {});
+    } catch (_) {}
+    setTimeout(() => {
+      container.classList.add('submitting');
+      setTimeout(() => {
+        container.style.display = 'none';
+        success.classList.add('active');
+        const ref = 'AIL-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+        successMeta.textContent = 'REF: ' + ref + ' · STATUS: RECEIVED';
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 400);
+    }, 600);
+  });
+
+  loadFromStorage();
+  updateProgress();
+})();
+</script>
+</body>
+</html>
