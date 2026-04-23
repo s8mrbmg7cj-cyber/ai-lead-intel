@@ -20,13 +20,11 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,rgba(255,106,0,0.09) 0%,transparent 65%);pointer-events:none;z-index:0;}
 h1,h2,h3{font-family:'Bebas Neue',sans-serif;letter-spacing:0.03em;line-height:1;}
 a{text-decoration:none;color:inherit;}
-
 /* URGENCY BAR */
 .urgency-bar{background:linear-gradient(90deg,rgba(255,106,0,0.15),rgba(255,149,0,0.1),rgba(255,106,0,0.15));border-bottom:1px solid var(--orange-border);padding:10px 20px;text-align:center;font-size:13px;color:var(--orange2);font-weight:500;position:relative;z-index:101;}
 .urgency-bar strong{color:#fff;}
 .urgency-dot{display:inline-block;width:6px;height:6px;background:var(--orange);border-radius:50%;margin-right:8px;animation:blink 1s infinite;vertical-align:middle;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
-
 /* NAV */
 nav{position:fixed;top:36px;left:0;right:0;z-index:100;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s;}
 nav.scrolled{background:rgba(5,8,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);top:0;}
@@ -37,7 +35,6 @@ nav.scrolled{background:rgba(5,8,15,0.95);backdrop-filter:blur(20px);border-bott
 .nav-demo:hover{color:var(--text);}
 .nav-cta{background:var(--orange);color:#fff;padding:9px 22px;border-radius:6px;font-size:14px;font-weight:600;transition:all 0.2s;box-shadow:0 0 20px rgba(255,106,0,0.25);}
 .nav-cta:hover{background:var(--orange2);transform:translateY(-1px);}
-
 /* HERO */
 .hero{min-height:100vh;display:flex;align-items:center;padding:120px 40px 60px;position:relative;z-index:1;}
 .hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 440px;gap:64px;align-items:center;}
@@ -55,7 +52,6 @@ h1 em{font-style:normal;color:var(--orange);}
 .btn-demo{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);padding:15px 24px;border-radius:6px;font-size:15px;font-weight:500;border:1px solid var(--border2);transition:all 0.2s;}
 .btn-demo:hover{background:rgba(255,255,255,0.05);border-color:var(--border2);}
 .hero-note{font-size:12px;color:var(--dim);margin-top:14px;}
-
 /* FORM CARD */
 .form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden;}
 .form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),var(--orange2),var(--orange));}
@@ -68,6 +64,11 @@ h1 em{font-style:normal;color:var(--orange);}
 .form-group input:focus,.form-group select:focus{border-color:var(--orange-border);}
 .form-group input::placeholder{color:var(--dim);}
 .form-group select option{background:#0f1520;}
+/* SMS consent box (A2P compliance) */
+.consent-box{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5;transition:border-color 0.2s;}
+.consent-box:hover{border-color:var(--border2);}
+.consent-box input{margin-top:2px;flex-shrink:0;cursor:pointer;accent-color:var(--orange);}
+.consent-box a{color:var(--orange2);text-decoration:underline;}
 .form-submit{width:100%;padding:13px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:4px;box-shadow:0 0 20px rgba(255,106,0,0.2);}
 .form-submit:hover{background:var(--orange2);transform:translateY(-1px);}
 .form-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
@@ -76,14 +77,12 @@ h1 em{font-style:normal;color:var(--orange);}
 .form-success .success-icon{width:56px;height:56px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;}
 .form-success h4{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);margin-bottom:8px;letter-spacing:0.06em;}
 .form-success p{font-size:14px;color:var(--muted);}
-
 /* STATS STRIP */
 .stats{padding:40px;background:var(--dark);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;z-index:1;}
 .stats-inner{max-width:900px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:24px;}
 .stat{text-align:center;}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--orange);line-height:1;margin-bottom:4px;letter-spacing:0.02em;}
 .stat-label{font-size:13px;color:var(--dim);}
-
 /* DEMO CALL SECTION */
 .demo-call{padding:80px 40px;position:relative;z-index:1;}
 .demo-call-inner{max-width:1000px;margin:0 auto;}
@@ -104,7 +103,6 @@ h2{font-size:clamp(36px,5vw,62px);color:#fff;margin-bottom:16px;}
 .play-btn:hover{transform:scale(1.1);box-shadow:0 0 50px rgba(255,106,0,0.6);}
 .video-label{font-size:13px;color:var(--dim);position:relative;z-index:1;}
 .video-caption{padding:16px 20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);}
-
 /* ROI CALCULATOR */
 .roi{padding:80px 40px;background:var(--dark);position:relative;z-index:1;}
 .roi-inner{max-width:1000px;margin:0 auto;}
@@ -127,7 +125,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .roi-big-box{margin-top:16px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:18px;text-align:center;}
 .roi-big-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--green);line-height:1;margin-bottom:4px;}
 .roi-big-label{font-size:12px;color:rgba(0,230,118,0.6);}
-
 /* HOW IT WORKS */
 .how{padding:80px 40px;position:relative;z-index:1;}
 .how-inner{max-width:1000px;margin:0 auto;}
@@ -139,7 +136,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .step p{font-size:14px;color:var(--muted);line-height:1.65;}
 .step-arrow{position:absolute;top:50%;right:-14px;transform:translateY(-50%);width:28px;height:28px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;z-index:2;box-shadow:0 0 12px rgba(255,106,0,0.4);}
 .step:last-child .step-arrow{display:none;}
-
 /* CONVERSATION */
 .convo{padding:80px 40px;background:var(--dark);position:relative;z-index:1;}
 .convo-inner{max-width:760px;margin:0 auto;}
@@ -155,7 +151,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cmsg.user{background:var(--orange);color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
 .cmsg-time{font-size:10px;color:var(--dim);margin-top:3px;}
 .cmsg-tag{display:inline-block;font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);padding:2px 7px;border-radius:3px;margin-left:8px;vertical-align:middle;}
-
 /* SOCIAL PROOF */
 .proof{padding:80px 40px;position:relative;z-index:1;}
 .proof-inner{max-width:1000px;margin:0 auto;}
@@ -173,7 +168,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .result-stat .rs-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--green);line-height:1;margin-bottom:4px;}
 .result-stat .rs-label{font-size:13px;color:var(--dim);}
 .proof-note{text-align:center;font-size:12px;color:var(--dim);margin-top:14px;font-style:italic;}
-
 /* PRICING */
 .pricing{padding:80px 40px;background:var(--dark);position:relative;z-index:1;}
 .pricing-inner{max-width:1000px;margin:0 auto;text-align:center;}
@@ -195,17 +189,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .pcard-btn.g:hover{border-color:var(--border2);background:rgba(255,255,255,0.04);}
 .roi-promise{background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:18px 24px;margin-top:24px;text-align:center;font-size:14px;color:rgba(0,230,118,0.85);}
 .roi-promise strong{color:var(--green);}
-
 /* FINAL CTA */
 .final-cta{padding:80px 40px;position:relative;z-index:1;text-align:center;}
 .final-cta-inner{max-width:700px;margin:0 auto;}
 .final-cta h2{font-size:clamp(40px,6vw,72px);color:#fff;margin-bottom:16px;}
 .final-cta p{font-size:17px;color:var(--muted);margin-bottom:36px;font-weight:300;}
-
 /* FOOTER */
-footer{padding:28px 40px;border-top:1px solid var(--border);text-align:center;position:relative;z-index:1;}
-footer p{font-size:13px;color:var(--dim);}
-
+footer{padding:36px 40px;border-top:1px solid var(--border);text-align:center;position:relative;z-index:1;}
+footer p{font-size:13px;color:var(--dim);margin-bottom:10px;}
+footer .footer-links{font-size:12px;}
+footer .footer-links a{color:var(--muted);margin:0 10px;transition:color 0.2s;}
+footer .footer-links a:hover{color:var(--orange2);}
 @media(max-width:900px){
   nav{padding:14px 20px;top:36px;}
   nav.scrolled{top:0;}
@@ -218,13 +212,11 @@ footer p{font-size:13px;color:var(--dim);}
 </style>
 </head>
 <body>
-
 <!-- URGENCY BAR -->
 <div class="urgency-bar">
   <span class="urgency-dot"></span>
   <strong>Only 3 spots left</strong> this month in your area — we limit onboarding to ensure quality setup
 </div>
-
 <!-- NAV -->
 <nav id="navbar">
   <div class="nav-logo">AI <span>Lead</span> Intel</div>
@@ -233,7 +225,6 @@ footer p{font-size:13px;color:var(--dim);}
     <a href="#get-started" class="nav-cta">Get Started Free</a>
   </div>
 </nav>
-
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
@@ -253,7 +244,6 @@ footer p{font-size:13px;color:var(--dim);}
       </div>
       <p class="hero-note">No contracts · Setup in 48 hrs · Cancel anytime</p>
     </div>
-
     <!-- FORM -->
     <div class="form-card" id="get-started">
       <div class="spots-left">🔴 Only 3 spots left this month</div>
@@ -282,8 +272,12 @@ footer p{font-size:13px;color:var(--dim);}
             <option value="other">Other</option>
           </select>
         </div>
+        <label class="consent-box">
+          <input type="checkbox" id="fconsent">
+          <span>I agree to receive SMS messages from AI Lead Intel at the number provided about my inquiry and setup. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to unsubscribe, HELP for help. See our <a href="/privacy">Privacy Policy</a> &amp; <a href="/terms">Terms</a>.</span>
+        </label>
         <button class="form-submit" onclick="submitLead()">Claim My Free Setup →</button>
-        <p class="form-privacy">🔒 No spam. We'll text you within 5 minutes to get everything set up.</p>
+        <p class="form-privacy">Consent to receive SMS is not a condition of purchase. We'll text you within 5 minutes to get everything set up.</p>
       </div>
       <div class="form-success" id="formSuccess">
         <div class="success-icon">✓</div>
@@ -293,7 +287,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- STATS -->
 <div class="stats">
   <div class="stats-inner">
@@ -303,7 +296,6 @@ footer p{font-size:13px;color:var(--dim);}
     <div class="stat"><div class="stat-num">48 hrs</div><div class="stat-label">from signup to fully live</div></div>
   </div>
 </div>
-
 <!-- LIVE DEMO NUMBER -->
 <section class="demo-call" id="demo">
   <div class="demo-call-inner">
@@ -332,7 +324,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- ROI CALCULATOR -->
 <section class="roi">
   <div class="roi-inner">
@@ -373,7 +364,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- HOW IT WORKS -->
 <section class="how">
   <div class="how-inner">
@@ -401,7 +391,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- EXAMPLE CONVERSATION -->
 <section class="convo">
   <div class="convo-inner">
@@ -430,7 +419,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- SOCIAL PROOF -->
 <section class="proof">
   <div class="proof-inner">
@@ -481,7 +469,6 @@ footer p{font-size:13px;color:var(--dim);}
     <p class="proof-note">* Replace with real testimonials from your first clients before running ads</p>
   </div>
 </section>
-
 <!-- PRICING -->
 <section class="pricing">
   <div class="pricing-inner">
@@ -535,7 +522,6 @@ footer p{font-size:13px;color:var(--dim);}
     </div>
   </div>
 </section>
-
 <!-- FINAL CTA -->
 <section class="final-cta">
   <div class="final-cta-inner">
@@ -546,17 +532,17 @@ footer p{font-size:13px;color:var(--dim);}
     <p style="font-size:13px;color:var(--dim);margin-top:16px;">Only 3 spots left this month · No contracts · Cancel anytime</p>
   </div>
 </section>
-
 <footer>
   <p>© 2026 AI Lead Intel. Built for local service businesses.</p>
+  <p class="footer-links">
+    <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> · <a href="mailto:hello@aileadintel.com">Contact</a>
+  </p>
 </footer>
-
 <script>
 // Nav scroll effect
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
 });
-
 // ROI Calculator
 function calcROI() {
   const calls = +document.getElementById('s1').value;
@@ -571,13 +557,14 @@ function calcROI() {
   document.getElementById('rr3').textContent = '$' + Math.round(wk).toLocaleString();
 }
 calcROI();
-
-// Form submit
+// Form submit (with SMS consent check for A2P compliance)
 async function submitLead() {
   const name = document.getElementById('fname').value.trim();
   const phone = document.getElementById('fphone').value.trim();
   const biz = document.getElementById('fbiz').value;
+  const consent = document.getElementById('fconsent').checked;
   if (!name || !phone || !biz) { alert('Please fill out all fields.'); return; }
+  if (!consent) { alert('Please check the SMS consent box to continue.'); return; }
   const btn = document.querySelector('.form-submit');
   btn.textContent = 'Setting up...';
   btn.disabled = true;
@@ -585,7 +572,13 @@ async function submitLead() {
     const res = await fetch('/api/lead-submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, business_type: biz }),
+      body: JSON.stringify({
+        name,
+        phone,
+        business_type: biz,
+        sms_consent: true,
+        consented_at: new Date().toISOString()
+      }),
     });
     const data = await res.json();
     if (data.success) {
