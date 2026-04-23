@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Terms of Service — AI Lead Intel</title>
+<meta name="description" content="AI Lead Intel Terms of Service. The rules and responsibilities of using our AI-powered missed-call recovery service." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #0a0a0b;
+    --bg-card:     #131316;
+    --border:      #1f1f24;
+    --text:        #f5f5f7;
+    --text-muted:  #8a8a93;
+    --text-subtle: #5a5a63;
+    --accent:      #d4ff3a;
+    --radius:      14px;
+    --radius-sm:   8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(212, 255, 58, 0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+  .page { max-width: 780px; margin: 0 auto; padding: 80px 24px 120px; }
+  @media (max-width: 640px) { .page { padding: 48px 20px 80px; } }
+
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 14px 8px 10px;
+    border: 1px solid var(--border); border-radius: 999px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.02em; color: var(--text-muted); margin-bottom: 40px;
+    text-decoration: none;
+  }
+  .brand:hover { border-color: #2a2a31; color: var(--text); }
+  .brand-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent);
+  }
+
+  h1 {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 400;
+    font-size: clamp(40px, 6vw, 56px); line-height: 1.05;
+    letter-spacing: -0.025em; color: var(--text); margin-bottom: 8px;
+  }
+  .meta {
+    font-family: 'Geist Mono', monospace; font-size: 12px;
+    color: var(--text-subtle); letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 500;
+    font-size: 24px; letter-spacing: -0.01em;
+    color: var(--text); margin-top: 48px; margin-bottom: 16px;
+    scroll-margin-top: 20px;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  h3 {
+    font-family: 'Geist', sans-serif; font-weight: 600;
+    font-size: 16px; color: var(--text);
+    margin-top: 28px; margin-bottom: 10px;
+  }
+
+  p { color: var(--text-muted); font-size: 15px; margin-bottom: 16px; }
+  p strong { color: var(--text); font-weight: 500; }
+
+  ul { margin: 0 0 16px 20px; color: var(--text-muted); font-size: 15px; }
+  ul li { margin-bottom: 8px; }
+  ul li strong { color: var(--text); font-weight: 500; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .highlight-box {
+    background: rgba(212, 255, 58, 0.04);
+    border: 1px solid rgba(212, 255, 58, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 20px 22px; margin: 24px 0;
+  }
+  .highlight-box p { color: var(--text); font-size: 15px; }
+  .highlight-box p:last-child { margin-bottom: 0; }
+  .highlight-box strong { color: var(--accent); }
+
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px; margin-bottom: 48px;
+  }
+  .toc-label {
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    color: var(--accent); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 12px; font-weight: 500;
+  }
+  .toc ol {
+    margin: 0; padding: 0; list-style: none;
+    counter-reset: section;
+  }
+  .toc li {
+    counter-increment: section;
+    padding: 6px 0;
+    font-size: 14px;
+  }
+  .toc li::before {
+    content: counter(section, decimal-leading-zero) "  ";
+    font-family: 'Geist Mono', monospace;
+    color: var(--text-subtle); font-size: 12px;
+  }
+  .toc li a {
+    color: var(--text-muted);
+    transition: color 160ms ease;
+  }
+  .toc li a:hover { color: var(--accent); text-decoration: none; }
+
+  .footer {
+    margin-top: 80px; padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
+    font-size: 13px; color: var(--text-subtle);
+  }
+  .footer a { color: var(--text-muted); }
+  .footer a:hover { color: var(--accent); text-decoration: none; }
+  .footer-divider { color: var(--border); }
+
+  .contact-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px 22px; margin: 24px 0;
+    font-family: 'Geist Mono', monospace; font-size: 13px;
+    color: var(--text-muted);
+  }
+  .contact-block strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <a href="/" class="brand">
+    <span class="brand-dot"></span>
+    AI LEAD INTEL
+  </a>
+
+  <h1>Terms of Service</h1>
+  <div class="meta">LAST UPDATED: APRIL 22, 2026</div>
+
+  <div class="toc">
+    <div class="toc-label">CONTENTS</div>
+    <ol>
+      <li><a href="#agreement">Agreement to terms</a></li>
+      <li><a href="#services">Our services</a></li>
+      <li><a href="#eligibility">Eligibility</a></li>
+      <li><a href="#accounts">Accounts &amp; responsibilities</a></li>
+      <li><a href="#sms">SMS communications</a></li>
+      <li><a href="#payment">Payment &amp; billing</a></li>
+      <li><a href="#acceptable-use">Acceptable use</a></li>
+      <li><a href="#client-content">Your content &amp; data</a></li>
+      <li><a href="#termination">Termination</a></li>
+      <li><a href="#disclaimer">Disclaimers</a></li>
+      <li><a href="#liability">Limitation of liability</a></li>
+      <li><a href="#indemnification">Indemnification</a></li>
+      <li><a href="#changes">Changes to terms</a></li>
+      <li><a href="#governing-law">Governing law</a></li>
+      <li><a href="#contact">Contact us</a></li>
+    </ol>
+  </div>
+
+  <h2 id="agreement">Agreement to terms</h2>
+  <p>These Terms of Service ("Terms") govern your use of AI Lead Intel's services, website at <a href="https://aileadintel.com">aileadintel.com</a>, and any related products or features (collectively, "Services").</p>
+  <p>By using our Services, you agree to be bound by these Terms. If you do not agree, do not use our Services.</p>
+
+  <h2 id="services">Our services</h2>
+  <p>AI Lead Intel provides an AI-powered missed-call recovery and customer communication platform for small businesses. Our Services include:</p>
+  <ul>
+    <li>A 24/7 AI front desk that answers inbound calls to a dedicated business phone number</li>
+    <li>Automated SMS follow-ups for missed callers (where applicable and compliant with carrier requirements)</li>
+    <li>Call routing, voicemail, and transcription</li>
+    <li>Lead capture, notification, and management tools</li>
+    <li>Related business phone system features</li>
+  </ul>
+
+  <h2 id="eligibility">Eligibility</h2>
+  <p>To use our Services, you must:</p>
+  <ul>
+    <li>Be at least 18 years old</li>
+    <li>Have the legal authority to bind your business to these Terms</li>
+    <li>Operate a legitimate US-based business</li>
+    <li>Provide accurate, current, and complete information during signup and onboarding</li>
+    <li>Comply with all applicable laws in your jurisdiction</li>
+  </ul>
+
+  <h2 id="accounts">Accounts &amp; responsibilities</h2>
+  <p>When you create an account with us, you are responsible for:</p>
+  <ul>
+    <li>Maintaining the confidentiality of your account credentials</li>
+    <li>All activities that occur under your account</li>
+    <li>Providing accurate business information, including legal name, EIN, address, and contact details</li>
+    <li>Keeping your account information up to date</li>
+    <li>Notifying us immediately of any unauthorized access to your account</li>
+  </ul>
+
+  <h2 id="sms">SMS communications</h2>
+
+  <div class="highlight-box">
+    <p><strong>Consent to receive SMS is not a condition of purchase.</strong></p>
+    <p>You may use our Services without opting in to receive SMS messages. SMS-related features are optional and opt-in only.</p>
+  </div>
+
+  <h3>Your consent</h3>
+  <p>By providing your phone number and opting in, you consent to receive automated and non-automated text messages from AI Lead Intel related to your inquiry, onboarding, service updates, and account notifications. Message frequency varies. Message and data rates may apply.</p>
+
+  <h3>Opting out</h3>
+  <p>You may opt out at any time by replying <strong>STOP</strong> to any message. Reply <strong>HELP</strong> for help. For support, contact <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>.</p>
+
+  <h3>SMS features for your customers</h3>
+  <p>If you use our platform to send SMS to your own customers (as part of your paid service), you are responsible for:</p>
+  <ul>
+    <li>Obtaining proper consent from your customers before sending them messages</li>
+    <li>Complying with the Telephone Consumer Protection Act (TCPA), CAN-SPAM Act, and all applicable state and federal laws</li>
+    <li>Honoring opt-out requests immediately</li>
+    <li>Providing accurate business information for A2P 10DLC carrier registration</li>
+    <li>Ensuring message content complies with our <a href="#acceptable-use">Acceptable Use Policy</a></li>
+  </ul>
+  <p>We may suspend or terminate your access to SMS features if we believe you are violating these requirements.</p>
+
+  <h2 id="payment">Payment &amp; billing</h2>
+  <p>Our Services are offered on a paid subscription basis. By subscribing, you agree to:</p>
+  <ul>
+    <li>Pay all fees associated with your selected plan</li>
+    <li>Provide valid payment information and keep it current</li>
+    <li>Authorize us to charge your payment method on a recurring basis</li>
+  </ul>
+  <p><strong>Refunds:</strong> Fees are generally non-refundable, except as required by law or at our sole discretion. If you believe you've been charged in error, contact us within 30 days.</p>
+  <p><strong>Price changes:</strong> We may change our pricing with at least 30 days' notice. Continued use after price changes constitutes acceptance of the new pricing.</p>
+
+  <h2 id="acceptable-use">Acceptable use</h2>
+  <p>You agree NOT to use our Services for any of the following:</p>
+  <ul>
+    <li>Sending spam, unsolicited marketing, or unwanted messages</li>
+    <li>Illegal activities, including fraud, phishing, or harassment</li>
+    <li>Sending messages that contain hate speech, threats, or discriminatory content</li>
+    <li>Sending messages related to restricted content (firearms, illegal drugs, adult content, gambling where prohibited, etc.)</li>
+    <li>Impersonating any person, business, or entity</li>
+    <li>Circumventing or attempting to circumvent carrier SMS filtering or compliance rules</li>
+    <li>Reverse engineering, copying, or reselling our Services</li>
+    <li>Using our Services to compete with AI Lead Intel</li>
+    <li>Uploading viruses, malicious code, or attempting to disrupt our infrastructure</li>
+  </ul>
+  <p>Violation of these rules may result in immediate suspension or termination of your account, with no refund.</p>
+
+  <h2 id="client-content">Your content &amp; data</h2>
+  <p>You retain ownership of all content and data you provide to us ("Your Content"), including business information, customer data, recordings, and transcripts.</p>
+  <p>By using our Services, you grant us a limited, non-exclusive license to use Your Content solely to:</p>
+  <ul>
+    <li>Provide, maintain, and improve our Services for you</li>
+    <li>Register your business with carriers (A2P 10DLC)</li>
+    <li>Generate aggregated, anonymized analytics</li>
+    <li>Comply with legal obligations</li>
+  </ul>
+  <p>We will not sell Your Content or use it for marketing purposes outside of the services you've signed up for.</p>
+
+  <h2 id="termination">Termination</h2>
+  <p><strong>By you:</strong> You may cancel your subscription at any time by contacting us at <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>. Cancellation takes effect at the end of your current billing period.</p>
+  <p><strong>By us:</strong> We may suspend or terminate your access to our Services immediately, without notice, if you:</p>
+  <ul>
+    <li>Violate these Terms or our <a href="#acceptable-use">Acceptable Use Policy</a></li>
+    <li>Fail to pay fees</li>
+    <li>Engage in fraudulent or illegal activity</li>
+    <li>Cause harm to our platform, other users, or third parties</li>
+  </ul>
+  <p>Upon termination, we may delete your account and data after a reasonable grace period, except where retention is required by law.</p>
+
+  <h2 id="disclaimer">Disclaimers</h2>
+  <p>Our Services are provided on an "AS IS" and "AS AVAILABLE" basis. To the fullest extent permitted by law, we disclaim all warranties, express or implied, including but not limited to:</p>
+  <ul>
+    <li>Warranties of merchantability, fitness for a particular purpose, and non-infringement</li>
+    <li>Warranties that our Services will be uninterrupted, error-free, or completely secure</li>
+    <li>Warranties regarding the accuracy of AI-generated responses or transcriptions</li>
+    <li>Warranties regarding third-party services (Twilio, carriers, etc.) that may affect our platform</li>
+  </ul>
+  <p>You use our Services at your own risk. You are responsible for reviewing AI-generated communications and exercising independent business judgment.</p>
+
+  <h2 id="liability">Limitation of liability</h2>
+  <p>To the maximum extent permitted by law, AI Lead Intel and its owners, employees, and partners shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:</p>
+  <ul>
+    <li>Loss of profits, revenue, data, or business opportunities</li>
+    <li>Missed calls, missed leads, or lost customers</li>
+    <li>Damages resulting from SMS delivery failures or carrier issues</li>
+    <li>Damages resulting from AI-generated responses or misunderstandings</li>
+    <li>Service interruptions, downtime, or technical errors</li>
+  </ul>
+  <p>In no event shall our total liability to you exceed the amount you paid us in the 3 months preceding the claim.</p>
+
+  <h2 id="indemnification">Indemnification</h2>
+  <p>You agree to indemnify, defend, and hold harmless AI Lead Intel and its owners, employees, and partners from any claims, damages, losses, liabilities, and expenses (including reasonable legal fees) arising from:</p>
+  <ul>
+    <li>Your use of our Services</li>
+    <li>Your violation of these Terms</li>
+    <li>Your violation of applicable laws, including TCPA, CAN-SPAM, and carrier SMS requirements</li>
+    <li>Your Content or communications sent through our platform</li>
+    <li>Any dispute between you and your customers</li>
+  </ul>
+
+  <h2 id="changes">Changes to terms</h2>
+  <p>We may update these Terms from time to time. When we make material changes, we will update the "Last Updated" date and notify active clients by email or SMS.</p>
+  <p>Your continued use of our Services after changes become effective constitutes acceptance of the revised Terms. If you do not agree to the revised Terms, stop using our Services.</p>
+
+  <h2 id="governing-law">Governing law</h2>
+  <p>These Terms are governed by the laws of the State of Utah, United States, without regard to its conflict of law principles. Any disputes arising under these Terms shall be resolved in the state or federal courts located in Utah.</p>
+
+  <h2 id="contact">Contact us</h2>
+  <p>If you have questions about these Terms, contact us:</p>
+
+  <div class="contact-block">
+    <strong>AI Lead Intel</strong><br/>
+    Email: <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a><br/>
+    Website: <a href="https://aileadintel.com">aileadintel.com</a>
+  </div>
+
+  <div class="footer">
+    <a href="/">Home</a>
+    <span class="footer-divider">·</span>
+    <a href="/terms">Terms of Service</a>
+    <span class="footer-divider">·</span>
+    <a href="/privacy">Privacy Policy</a>
+  </div>
+
+</div>
+
+</body>
+</html>
