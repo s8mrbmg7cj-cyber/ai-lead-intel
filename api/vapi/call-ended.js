@@ -14,15 +14,15 @@ export default async function handler(req, res) {
 
   try {
     const payload = req.body;
-    
+
     // Vapi sends different message types - we only care about end-of-call reports
     const messageType = payload?.message?.type;
-    
+
     if (messageType !== 'end-of-call-report' && messageType !== 'status-update') {
       // Acknowledge other webhook types silently
       return res.status(200).json({ received: true });
     }
-    
+
     // Only process actual end-of-call reports
     if (messageType !== 'end-of-call-report') {
       return res.status(200).json({ received: true });
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     const call = message.call || {};
     const customer = call.customer || {};
     const assistant = call.assistant || {};
-    
+
     // Extract the data we want
     const callData = {
       vapi_call_id: call.id,
@@ -69,7 +69,6 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({ success: true, callId: call.id });
-
   } catch (error) {
     console.error('call-ended webhook error:', error);
     // Always return 200 so Vapi doesn't retry endlessly
@@ -92,27 +91,27 @@ function formatTranscript(messages) {
 // Analyze the transcript to score the lead
 function analyzeLead(transcript) {
   const t = (transcript || '').toLowerCase();
-  
+
   const hotSignals = [
     'want to book', 'want to rent', 'lock it in', 'reserve',
     'sign up', 'i\'ll take', 'let\'s do it', 'sounds good let\'s',
     'ready to', 'when can i come', 'how do i sign'
   ];
-  
+
   const warmSignals = [
     'price', 'pricing', 'how much', 'cost', 'monthly',
     'discount', 'promo', 'deal', 'available', 'availability',
     'when', 'hours', 'open', 'tomorrow', 'today', 'this week',
     'looking for', 'need', 'thinking about'
   ];
-  
+
   const askedForTransfer = /speak to|talk to|representative|real person|someone|human|manager|owner/i.test(t);
   const askedForPricing = /price|pricing|how much|cost|monthly|rate|quote/i.test(t);
-  
+
   // Score the lead
   let score = 'COLD';
   let outcome = 'Information call';
-  
+
   for (const signal of hotSignals) {
     if (t.includes(signal)) {
       score = 'HOT';
@@ -120,7 +119,7 @@ function analyzeLead(transcript) {
       break;
     }
   }
-  
+
   if (score !== 'HOT') {
     let warmCount = 0;
     for (const signal of warmSignals) {
@@ -131,17 +130,17 @@ function analyzeLead(transcript) {
       outcome = 'Interested customer - asking questions';
     }
   }
-  
+
   if (askedForTransfer) {
     if (score === 'COLD') score = 'WARM';
     outcome = (score === 'HOT' ? outcome + ' - ' : '') + 'Asked for human';
   }
-  
+
   if (!t || t.length < 50) {
     score = 'NONE';
     outcome = 'Very short call - possibly hangup';
   }
-  
+
   return {
     score,
     outcome,
@@ -153,7 +152,7 @@ function analyzeLead(transcript) {
 // Save the call to Supabase
 async function saveToSupabase(callData) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/calls`;
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -164,7 +163,7 @@ async function saveToSupabase(callData) {
     },
     body: JSON.stringify(callData),
   });
-  
+
   if (!response.ok) {
     const errorText = await response.text();
     console.error('Supabase save failed:', response.status, errorText);
@@ -175,18 +174,18 @@ async function saveToSupabase(callData) {
 // Send the email summary using Resend
 async function sendEmailSummary(callData, leadAnalysis) {
   const resendKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.NOTIFY_EMAIL || 'andrew3333422@gmail.com';
-  
+  const toEmail = process.env.NOTIFY_EMAIL || 'andrewyoung02@icloud.com';
+
   if (!resendKey) {
     console.error('No RESEND_API_KEY set');
     return;
   }
-  
+
   // Format duration nicely
   const minutes = Math.floor(callData.duration_seconds / 60);
   const seconds = callData.duration_seconds % 60;
   const durationStr = `${minutes}m ${seconds}s`;
-  
+
   // Lead score emoji
   const scoreEmojis = {
     HOT: '🔥',
@@ -195,7 +194,7 @@ async function sendEmailSummary(callData, leadAnalysis) {
     NONE: '⚪',
   };
   const scoreEmoji = scoreEmojis[leadAnalysis.score] || '⚪';
-  
+
   // Time
   const callTime = new Date().toLocaleString('en-US', {
     timeZone: 'America/Chicago',
@@ -205,10 +204,10 @@ async function sendEmailSummary(callData, leadAnalysis) {
     month: 'short',
     day: 'numeric',
   });
-  
+
   // Format the email
   const subject = `${scoreEmoji} ${leadAnalysis.score} Lead - Call from ${callData.caller_number}`;
-  
+
   const html = `
 <!DOCTYPE html>
 <html>
@@ -238,64 +237,58 @@ async function sendEmailSummary(callData, leadAnalysis) {
     <h1>${scoreEmoji} ${leadAnalysis.score} Lead</h1>
     <span class="badge badge-${leadAnalysis.score.toLowerCase()}">${leadAnalysis.outcome}</span>
   </div>
-
   <div class="card">
     <h2>Call Details</h2>
     <div class="info-row">
-      <div class="info-label">📞 Caller</div>
+      <div class="info-label">Caller</div>
       <div class="info-value"><a href="tel:${callData.caller_number}">${callData.caller_number}</a></div>
     </div>
     <div class="info-row">
-      <div class="info-label">⏰ Time</div>
+      <div class="info-label">Time</div>
       <div class="info-value">${callTime}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">⌛ Duration</div>
+      <div class="info-label">Duration</div>
       <div class="info-value">${durationStr}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">🎯 Outcome</div>
+      <div class="info-label">Outcome</div>
       <div class="info-value">${leadAnalysis.outcome}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">📊 Transferred</div>
-      <div class="info-value">${leadAnalysis.askedForTransfer ? '✅ Yes' : '❌ No'}</div>
+      <div class="info-label">Transferred</div>
+      <div class="info-value">${leadAnalysis.askedForTransfer ? 'Yes' : 'No'}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">💰 Asked Pricing</div>
-      <div class="info-value">${leadAnalysis.askedForPricing ? '✅ Yes' : '❌ No'}</div>
+      <div class="info-label">Asked Pricing</div>
+      <div class="info-value">${leadAnalysis.askedForPricing ? 'Yes' : 'No'}</div>
     </div>
   </div>
-
   ${callData.summary ? `
   <div class="card">
-    <h2>📝 Summary</h2>
+    <h2>Summary</h2>
     <div class="summary">${escapeHtml(callData.summary)}</div>
   </div>
   ` : ''}
-
   ${callData.transcript ? `
   <div class="card">
-    <h2>💬 Full Transcript</h2>
+    <h2>Full Transcript</h2>
     <div class="transcript">${escapeHtml(callData.transcript)}</div>
   </div>
   ` : ''}
-
   ${callData.recording_url ? `
   <div class="card">
-    <h2>🎵 Audio Recording</h2>
-    <a href="${callData.recording_url}" class="action-button">▶ Listen to Recording</a>
+    <h2>Audio Recording</h2>
+    <a href="${callData.recording_url}" class="action-button">Listen to Recording</a>
   </div>
   ` : ''}
-
   ${leadAnalysis.score === 'HOT' || leadAnalysis.score === 'WARM' ? `
   <div class="card" style="background: #fff7ed; border: 2px solid #ff6a00;">
-    <h2 style="color: #ff6a00;">⚡ Recommended Action</h2>
+    <h2 style="color: #ff6a00;">Recommended Action</h2>
     <p style="margin: 0; font-size: 15px;">Call this customer back ${leadAnalysis.score === 'HOT' ? 'within 1 hour' : 'within 24 hours'} for the best chance of closing.</p>
-    <a href="tel:${callData.caller_number}" class="action-button">📞 Call Back Now</a>
+    <a href="tel:${callData.caller_number}" class="action-button">Call Back Now</a>
   </div>
   ` : ''}
-
   <div class="footer">
     Powered by AI Lead Intel<br>
     Call ID: ${callData.vapi_call_id || 'unknown'}
@@ -303,7 +296,7 @@ async function sendEmailSummary(callData, leadAnalysis) {
 </body>
 </html>
   `;
-  
+
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -317,7 +310,7 @@ async function sendEmailSummary(callData, leadAnalysis) {
       html: html,
     }),
   });
-  
+
   if (!response.ok) {
     const errorText = await response.text();
     console.error('Resend email failed:', response.status, errorText);
@@ -328,16 +321,16 @@ async function sendEmailSummary(callData, leadAnalysis) {
 async function sendPushNotification(callData) {
   const ntfyTopic = process.env.NTFY_TOPIC;
   if (!ntfyTopic) return;
-  
+
   try {
     await fetch(`https://ntfy.sh/${ntfyTopic}`, {
       method: 'POST',
       headers: {
-        'Title': '🔥 HOT LEAD - Call Back Now!',
+        'Title': 'HOT LEAD - Call Back Now',
         'Priority': 'high',
         'Tags': 'fire,phone',
       },
-      body: `Caller ${callData.caller_number} is ready to buy! Call them back ASAP.`,
+      body: `Caller ${callData.caller_number} is ready to buy. Call them back ASAP.`,
     });
   } catch (error) {
     console.error('Push notification failed:', error);
