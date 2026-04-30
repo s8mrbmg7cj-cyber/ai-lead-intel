@@ -7,23 +7,18 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  // Only accept POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
     const payload = req.body;
-
-    // Vapi sends different message types - we only care about end-of-call reports
     const messageType = payload?.message?.type;
 
     if (messageType !== 'end-of-call-report' && messageType !== 'status-update') {
-      // Acknowledge other webhook types silently
       return res.status(200).json({ received: true });
     }
 
-    // Only process actual end-of-call reports
     if (messageType !== 'end-of-call-report') {
       return res.status(200).json({ received: true });
     }
@@ -33,7 +28,6 @@ export default async function handler(req, res) {
     const customer = call.customer || {};
     const assistant = call.assistant || {};
 
-    // Extract the data we want
     const callData = {
       vapi_call_id: call.id,
       assistant_id: call.assistantId || assistant.id,
@@ -49,21 +43,16 @@ export default async function handler(req, res) {
       raw_payload: payload,
     };
 
-    // Score the lead based on conversation content
     const leadAnalysis = analyzeLead(callData.transcript || '');
     callData.lead_score = leadAnalysis.score;
     callData.outcome = leadAnalysis.outcome;
     callData.asked_for_transfer = leadAnalysis.askedForTransfer;
     callData.asked_for_pricing = leadAnalysis.askedForPricing;
-    callData.client_id = 'prime_vault'; // Hardcoded for now
+    callData.client_id = 'prime_vault';
 
-    // Save to Supabase
     await saveToSupabase(callData);
-
-    // Send email summary
     await sendEmailSummary(callData, leadAnalysis);
 
-    // Send push notification for hot leads
     if (leadAnalysis.score === 'HOT') {
       await sendPushNotification(callData);
     }
@@ -71,12 +60,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, callId: call.id });
   } catch (error) {
     console.error('call-ended webhook error:', error);
-    // Always return 200 so Vapi doesn't retry endlessly
     return res.status(200).json({ error: error.message });
   }
 }
 
-// Format transcript from messages array if needed
 function formatTranscript(messages) {
   if (!messages || !Array.isArray(messages)) return '';
   return messages
@@ -88,7 +75,6 @@ function formatTranscript(messages) {
     .join('\n');
 }
 
-// Analyze the transcript to score the lead
 function analyzeLead(transcript) {
   const t = (transcript || '').toLowerCase();
 
@@ -108,7 +94,6 @@ function analyzeLead(transcript) {
   const askedForTransfer = /speak to|talk to|representative|real person|someone|human|manager|owner/i.test(t);
   const askedForPricing = /price|pricing|how much|cost|monthly|rate|quote/i.test(t);
 
-  // Score the lead
   let score = 'COLD';
   let outcome = 'Information call';
 
@@ -149,7 +134,6 @@ function analyzeLead(transcript) {
   };
 }
 
-// Save the call to Supabase
 async function saveToSupabase(callData) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/calls`;
 
@@ -171,7 +155,6 @@ async function saveToSupabase(callData) {
   }
 }
 
-// Send the email summary using Resend
 async function sendEmailSummary(callData, leadAnalysis) {
   const resendKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.NOTIFY_EMAIL || 'andrewyoung02@icloud.com';
@@ -181,12 +164,10 @@ async function sendEmailSummary(callData, leadAnalysis) {
     return;
   }
 
-  // Format duration nicely
   const minutes = Math.floor(callData.duration_seconds / 60);
   const seconds = callData.duration_seconds % 60;
   const durationStr = `${minutes}m ${seconds}s`;
 
-  // Lead score emoji
   const scoreEmojis = {
     HOT: '🔥',
     WARM: '🟡',
@@ -195,7 +176,6 @@ async function sendEmailSummary(callData, leadAnalysis) {
   };
   const scoreEmoji = scoreEmojis[leadAnalysis.score] || '⚪';
 
-  // Time
   const callTime = new Date().toLocaleString('en-US', {
     timeZone: 'America/Chicago',
     hour: 'numeric',
@@ -205,7 +185,6 @@ async function sendEmailSummary(callData, leadAnalysis) {
     day: 'numeric',
   });
 
-  // Format the email
   const subject = `${scoreEmoji} ${leadAnalysis.score} Lead - Call from ${callData.caller_number}`;
 
   const html = `
@@ -239,60 +218,18 @@ async function sendEmailSummary(callData, leadAnalysis) {
   </div>
   <div class="card">
     <h2>Call Details</h2>
-    <div class="info-row">
-      <div class="info-label">Caller</div>
-      <div class="info-value"><a href="tel:${callData.caller_number}">${callData.caller_number}</a></div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Time</div>
-      <div class="info-value">${callTime}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Duration</div>
-      <div class="info-value">${durationStr}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Outcome</div>
-      <div class="info-value">${leadAnalysis.outcome}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Transferred</div>
-      <div class="info-value">${leadAnalysis.askedForTransfer ? 'Yes' : 'No'}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Asked Pricing</div>
-      <div class="info-value">${leadAnalysis.askedForPricing ? 'Yes' : 'No'}</div>
-    </div>
+    <div class="info-row"><div class="info-label">Caller</div><div class="info-value"><a href="tel:${callData.caller_number}">${callData.caller_number}</a></div></div>
+    <div class="info-row"><div class="info-label">Time</div><div class="info-value">${callTime}</div></div>
+    <div class="info-row"><div class="info-label">Duration</div><div class="info-value">${durationStr}</div></div>
+    <div class="info-row"><div class="info-label">Outcome</div><div class="info-value">${leadAnalysis.outcome}</div></div>
+    <div class="info-row"><div class="info-label">Transferred</div><div class="info-value">${leadAnalysis.askedForTransfer ? 'Yes' : 'No'}</div></div>
+    <div class="info-row"><div class="info-label">Asked Pricing</div><div class="info-value">${leadAnalysis.askedForPricing ? 'Yes' : 'No'}</div></div>
   </div>
-  ${callData.summary ? `
-  <div class="card">
-    <h2>Summary</h2>
-    <div class="summary">${escapeHtml(callData.summary)}</div>
-  </div>
-  ` : ''}
-  ${callData.transcript ? `
-  <div class="card">
-    <h2>Full Transcript</h2>
-    <div class="transcript">${escapeHtml(callData.transcript)}</div>
-  </div>
-  ` : ''}
-  ${callData.recording_url ? `
-  <div class="card">
-    <h2>Audio Recording</h2>
-    <a href="${callData.recording_url}" class="action-button">Listen to Recording</a>
-  </div>
-  ` : ''}
-  ${leadAnalysis.score === 'HOT' || leadAnalysis.score === 'WARM' ? `
-  <div class="card" style="background: #fff7ed; border: 2px solid #ff6a00;">
-    <h2 style="color: #ff6a00;">Recommended Action</h2>
-    <p style="margin: 0; font-size: 15px;">Call this customer back ${leadAnalysis.score === 'HOT' ? 'within 1 hour' : 'within 24 hours'} for the best chance of closing.</p>
-    <a href="tel:${callData.caller_number}" class="action-button">Call Back Now</a>
-  </div>
-  ` : ''}
-  <div class="footer">
-    Powered by AI Lead Intel<br>
-    Call ID: ${callData.vapi_call_id || 'unknown'}
-  </div>
+  ${callData.summary ? `<div class="card"><h2>Summary</h2><div class="summary">${escapeHtml(callData.summary)}</div></div>` : ''}
+  ${callData.transcript ? `<div class="card"><h2>Full Transcript</h2><div class="transcript">${escapeHtml(callData.transcript)}</div></div>` : ''}
+  ${callData.recording_url ? `<div class="card"><h2>Audio Recording</h2><a href="${callData.recording_url}" class="action-button">Listen to Recording</a></div>` : ''}
+  ${leadAnalysis.score === 'HOT' || leadAnalysis.score === 'WARM' ? `<div class="card" style="background: #fff7ed; border: 2px solid #ff6a00;"><h2 style="color: #ff6a00;">Recommended Action</h2><p style="margin: 0; font-size: 15px;">Call this customer back ${leadAnalysis.score === 'HOT' ? 'within 1 hour' : 'within 24 hours'} for the best chance of closing.</p><a href="tel:${callData.caller_number}" class="action-button">Call Back Now</a></div>` : ''}
+  <div class="footer">Powered by AI Lead Intel<br>Call ID: ${callData.vapi_call_id || 'unknown'}</div>
 </body>
 </html>
   `;
@@ -317,7 +254,6 @@ async function sendEmailSummary(callData, leadAnalysis) {
   }
 }
 
-// Send push notification for hot leads
 async function sendPushNotification(callData) {
   const ntfyTopic = process.env.NTFY_TOPIC;
   if (!ntfyTopic) return;
@@ -337,7 +273,6 @@ async function sendPushNotification(callData) {
   }
 }
 
-// Helper: escape HTML to prevent injection
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
