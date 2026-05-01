@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — AI Lead Intel</title>
+  <meta name="description" content="Sign in to your AI Lead Intel dashboard" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card-hover: #1a1a1a;
+      --border: #262626;
+      --border-focus: #ff6a00;
+      --text: #fafafa;
+      --text-dim: #a1a1a1;
+      --text-faint: #525252;
+      --accent: #ff6a00;
+      --accent-hover: #ff8c33;
+      --error-bg: rgba(220, 38, 38, 0.1);
+      --error-border: rgba(220, 38, 38, 0.3);
+      --error-text: #fca5a5;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background gradient */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255, 106, 0, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 154, 0, 0.05) 0%, transparent 40%);
+      animation: float 20s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(2%, -2%) rotate(2deg); }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 44px 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 106, 0, 0.05);
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ff6a00 0%, #ff9a00 50%, #ffaf33 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease-in-out infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #d4d4d4;
+    }
+
+    .forgot-link {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .forgot-link:hover { color: var(--accent); }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background: #1f1f1f;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+    }
+
+    input::placeholder { color: var(--text-faint); }
+
+    .password-input {
+      padding-right: 44px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 4px;
+      width: auto;
+      font-size: 18px;
+      transition: color 0.15s;
+    }
+    .toggle-password:hover { color: var(--text); }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    button.primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    button.primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button.primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+      animation: shake 0.4s ease-out;
+    }
+
+    .error.visible { display: block; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer a:hover { color: var(--accent); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: var(--text-faint);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span { padding: 0 12px; }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px; }
+      .logo { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">AI Lead Intel</div>
+    <div class="subtitle">Welcome back — sign in to your dashboard</div>
+
+    <div class="error" id="error"></div>
+
+    <div class="form-group">
+      <div class="label-row">
+        <label for="email">Email</label>
+      </div>
+      <div class="input-wrapper">
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email" autofocus />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="label-row">
+        <label for="password">Password</label>
+        <a href="#" class="forgot-link" onclick="forgotPassword(event)">Forgot password?</a>
+      </div>
+      <div class="input-wrapper">
+        <input type="password" id="password" class="password-input" placeholder="••••••••" autocomplete="current-password" />
+        <button class="toggle-password" type="button" onclick="togglePassword()" aria-label="Show password">👁</button>
+      </div>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="remember" checked />
+      <label for="remember">Keep me signed in</label>
+    </div>
+
+    <button class="primary" id="signin-btn" onclick="signIn()">Sign in</button>
+
+    <div class="footer">
+      Need access? <a href="mailto:andrewyoung02@icloud.com">Contact us</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // If already logged in, redirect straight to dashboard
+    supabaseClient.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        window.location.href = '/dashboard/';
+      }
+    });
+
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const btn = document.querySelector('.toggle-password');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('visible');
+    }
+
+    function clearError() {
+      document.getElementById('error').classList.remove('visible');
+    }
+
+    async function signIn() {
+      const btn = document.getElementById('signin-btn');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      clearError();
+
+      if (!email || !password) {
+        showError('Please enter your email and password');
+        return;
+      }
+
+      if (!email.includes('@')) {
+        showError('Please enter a valid email address');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        // Friendly error messages
+        let friendly = error.message;
+        if (error.message.includes('Invalid login credentials')) {
+          friendly = 'Wrong email or password. Try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          friendly = 'Please confirm your email before signing in.';
+        } else if (error.message.includes('Too many requests')) {
+          friendly = 'Too many attempts. Try again in a few minutes.';
+        }
+        showError(friendly);
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+        return;
+      }
+
+      // Success — redirect to dashboard
+      window.location.href = '/dashboard/';
+    }
+
+    async function forgotPassword(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim();
+
+      if (!email) {
+        showError('Enter your email above first, then click "Forgot password"');
+        document.getElementById('email').focus();
+        return;
+      }
+
+      clearError();
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/dashboard/login.html',
+      });
+
+      if (error) {
+        showError(error.message);
+      } else {
+        showError('Check your email for a password reset link');
+        // Re-style the error to look like success
+        const errorDiv = document.getElementById('error');
+        errorDiv.style.background = 'rgba(34, 197, 94, 0.1)';
+        errorDiv.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+        errorDiv.style.color = '#86efac';
+      }
+    }
+
+    // Submit on Enter from password field
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') signIn();
+    });
+    document.getElementById('email').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('password').focus();
+      }
+    });
+  </script>
+</body>
+</html>
