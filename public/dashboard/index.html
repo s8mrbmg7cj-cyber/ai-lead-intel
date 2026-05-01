@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — AI Lead Intel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-elevated: #111111;
+      --card: #141414;
+      --card-hover: #1a1a1a;
+      --border: #262626;
+      --border-hover: #333;
+      --text: #fafafa;
+      --text-dim: #a1a1a1;
+      --text-faint: #525252;
+      --accent: #ff6a00;
+      --accent-hover: #ff8c33;
+      --hot-bg: rgba(220, 38, 38, 0.15);
+      --hot-border: rgba(220, 38, 38, 0.4);
+      --hot-text: #fca5a5;
+      --warm-bg: rgba(234, 179, 8, 0.15);
+      --warm-border: rgba(234, 179, 8, 0.4);
+      --warm-text: #fde047;
+      --cold-bg: rgba(59, 130, 246, 0.15);
+      --cold-border: rgba(59, 130, 246, 0.4);
+      --cold-text: #93c5fd;
+      --none-bg: rgba(115, 115, 115, 0.15);
+      --none-border: rgba(115, 115, 115, 0.4);
+      --none-text: #a3a3a3;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOP NAVBAR */
+    .navbar {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ff6a00 0%, #ff9a00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-business {
+      font-size: 13px;
+      color: var(--text-dim);
+      padding-left: 24px;
+      border-left: 1px solid var(--border);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-email {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .signout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .signout-btn:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+    }
+
+    /* MAIN CONTENT */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 28px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .refresh-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .refresh-btn:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+      background: var(--card-hover);
+    }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.15s;
+    }
+    .stat-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-value.hot { color: var(--hot-text); }
+    .stat-value.accent { color: var(--accent); }
+
+    /* CALLS TABLE */
+    .calls-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+    .filter-btn:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .calls-table {
+      width: 100%;
+    }
+
+    .calls-table th {
+      text-align: left;
+      padding: 14px 24px;
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+    }
+
+    .calls-table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .calls-table tr:last-child td { border-bottom: none; }
+
+    .calls-table tr.call-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .calls-table tr.call-row:hover {
+      background: var(--card-hover);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid;
+    }
+    .badge.hot { background: var(--hot-bg); border-color: var(--hot-border); color: var(--hot-text); }
+    .badge.warm { background: var(--warm-bg); border-color: var(--warm-border); color: var(--warm-text); }
+    .badge.cold { background: var(--cold-bg); border-color: var(--cold-border); color: var(--cold-text); }
+    .badge.none { background: var(--none-bg); border-color: var(--none-border); color: var(--none-text); }
+
+    .phone-cell {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 13px;
+    }
+
+    .duration-cell {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .time-cell {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .outcome-cell {
+      color: var(--text-dim);
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .expand-row td {
+      background: var(--bg-elevated);
+      padding: 0;
+    }
+
+    .expand-content {
+      padding: 24px;
+      animation: slideDown 0.2s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .expand-section {
+      margin-bottom: 20px;
+    }
+
+    .expand-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .expand-value {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .transcript-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 320px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .transcript-box::-webkit-scrollbar { width: 6px; }
+    .transcript-box::-webkit-scrollbar-track { background: transparent; }
+    .transcript-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .actions-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .action-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .action-btn:hover {
+      background: var(--card-hover);
+      border-color: var(--border-hover);
+    }
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .action-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .empty-text {
+      color: var(--text-dim);
+      font-size: 14px;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* LOADING SKELETON */
+    .skeleton {
+      background: linear-gradient(90deg, var(--card) 0%, var(--card-hover) 50%, var(--card) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+      height: 16px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .navbar { padding: 12px 16px; }
+      .nav-business { display: none; }
+      .container { padding: 20px 16px; }
+      .page-title { font-size: 22px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .stat-value { font-size: 22px; }
+      .calls-table th:nth-child(3),
+      .calls-table td:nth-child(3),
+      .calls-table th:nth-child(5),
+      .calls-table td:nth-child(5) { display: none; }
+      .filters { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="nav-logo">AI Lead Intel</div>
+      <div class="nav-business" id="business-name">Loading...</div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-email" id="user-email"></div>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Dashboard</h1>
+      <button class="refresh-btn" onclick="loadCalls()">↻ Refresh</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Calls</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Hot Leads</div>
+        <div class="stat-value hot" id="stat-hot">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Week</div>
+        <div class="stat-value" id="stat-week">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Duration</div>
+        <div class="stat-value accent" id="stat-duration">—</div>
+      </div>
+    </div>
+
+    <!-- CALLS TABLE -->
+    <div class="calls-section">
+      <div class="section-header">
+        <div class="section-title">Recent Calls</div>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+          <button class="filter-btn" data-filter="HOT" onclick="setFilter('HOT')">Hot</button>
+          <button class="filter-btn" data-filter="WARM" onclick="setFilter('WARM')">Warm</button>
+          <button class="filter-btn" data-filter="COLD" onclick="setFilter('COLD')">Cold</button>
+        </div>
+      </div>
+      <div id="calls-container">
+        <div style="padding: 60px; text-align: center; color: var(--text-dim);">Loading calls...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allCalls = [];
+    let currentFilter = 'all';
+    let expandedRow = null;
+
+    // CHECK AUTH ON LOAD
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = '/dashboard/login.html';
+        return;
+      }
+
+      // Show user email
+      document.getElementById('user-email').textContent = session.user.email;
+
+      // Load client info
+      const { data: clients } = await supabaseClient
+        .from('clients')
+        .select('business_name')
+        .eq('owner_user_id', session.user.id)
+        .limit(1);
+
+      if (clients && clients.length > 0) {
+        document.getElementById('business-name').textContent = clients[0].business_name;
+      } else {
+        document.getElementById('business-name').textContent = 'No business assigned';
+      }
+
+      // Load calls
+      loadCalls();
+    }
+
+    async function loadCalls() {
+      const container = document.getElementById('calls-container');
+      container.innerHTML = '<div style="padding: 60px; text-align: center; color: var(--text-dim);">Loading calls...</div>';
+
+      const { data: calls, error } = await supabaseClient
+        .from('calls')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) {
+        container.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-dim);">Error loading: ${error.message}</div>`;
+        return;
+      }
+
+      allCalls = calls || [];
+      updateStats();
+      renderCalls();
+    }
+
+    function updateStats() {
+      const total = allCalls.length;
+      const hot = allCalls.filter(c => c.lead_score === 'HOT').length;
+
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const thisWeek = allCalls.filter(c => new Date(c.created_at) >= oneWeekAgo).length;
+
+      const totalDuration = allCalls.reduce((sum, c) => sum + (c.duration_seconds || 0), 0);
+      const avgDuration = total > 0 ? Math.round(totalDuration / total) : 0;
+      const avgMin = Math.floor(avgDuration / 60);
+      const avgSec = avgDuration % 60;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-hot').textContent = hot;
+      document.getElementById('stat-week').textContent = thisWeek;
+      document.getElementById('stat-duration').textContent = total > 0 ? `${avgMin}:${String(avgSec).padStart(2, '0')}` : '—';
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderCalls();
+    }
+
+    function renderCalls() {
+      const container = document.getElementById('calls-container');
+      const filtered = currentFilter === 'all' ? allCalls : allCalls.filter(c => c.lead_score === currentFilter);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📞</div>
+            <div class="empty-title">No calls yet</div>
+            <div class="empty-text">${currentFilter === 'all' ? 'Calls will appear here as soon as customers start ringing in.' : `No ${currentFilter.toLowerCase()} leads found.`}</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <table class="calls-table">
+          <thead>
+            <tr>
+              <th>Caller</th>
+              <th>Lead</th>
+              <th>Outcome</th>
+              <th>Time</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      filtered.forEach((call, idx) => {
+        const score = call.lead_score || 'NONE';
+        const minutes = Math.floor((call.duration_seconds || 0) / 60);
+        const seconds = (call.duration_seconds || 0) % 60;
+        const duration = `${minutes}:${String(seconds).padStart(2, '0')}`;
+
+        html += `
+          <tr class="call-row" data-id="${idx}" onclick="toggleExpand(${idx})">
+            <td class="phone-cell">${escapeHtml(call.caller_number || 'Unknown')}</td>
+            <td><span class="badge ${score.toLowerCase()}">${score}</span></td>
+            <td class="outcome-cell">${escapeHtml(call.outcome || '—')}</td>
+            <td class="time-cell">${formatTime(call.created_at)}</td>
+            <td class="duration-cell">${duration}</td>
+          </tr>
+          <tr class="expand-row" id="expand-${idx}" style="display: none;">
+            <td colspan="5">
+              <div class="expand-content">
+                ${call.summary ? `
+                  <div class="expand-section">
+                    <div class="expand-label">Summary</div>
+                    <div class="expand-value">${escapeHtml(call.summary)}</div>
+                  </div>
+                ` : ''}
+                ${call.transcript ? `
+                  <div class="expand-section">
+                    <div class="expand-label">Transcript</div>
+                    <div class="transcript-box">${escapeHtml(call.transcript)}</div>
+                  </div>
+                ` : '<div class="expand-section"><div class="expand-label">Transcript</div><div class="expand-value" style="color: var(--text-dim);">No transcript available</div></div>'}
+                <div class="actions-row">
+                  ${call.recording_url ? `<a href="${escapeAttr(call.recording_url)}" target="_blank" class="action-btn">▶ Listen to recording</a>` : ''}
+                  <a href="tel:${escapeAttr(call.caller_number)}" class="action-btn primary">📞 Call back</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function toggleExpand(idx) {
+      const row = document.getElementById(`expand-${idx}`);
+      if (expandedRow !== null && expandedRow !== idx) {
+        document.getElementById(`expand-${expandedRow}`).style.display = 'none';
+      }
+      if (row.style.display === 'none') {
+        row.style.display = 'table-row';
+        expandedRow = idx;
+      } else {
+        row.style.display = 'none';
+        expandedRow = null;
+      }
+    }
+
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHr = Math.floor(diffMs / 3600000);
+      const diffDay = Math.floor(diffMs / 86400000);
+
+      if (diffMin < 1) return 'just now';
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHr < 24) return `${diffHr}h ago`;
+      if (diffDay < 7) return `${diffDay}d ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/"/g, '&quot;');
+    }
+
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '/dashboard/login.html';
+    }
+
+    init();
+  </script>
+</body>
+</html>
