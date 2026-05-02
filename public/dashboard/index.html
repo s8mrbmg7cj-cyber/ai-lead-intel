@@ -42,7 +42,7 @@
       overflow-x: hidden;
     }
 
-    /* Subtle grid background */
+    /* GRID BACKGROUND */
     body::before {
       content: '';
       position: fixed;
@@ -56,7 +56,7 @@
       mask-image: radial-gradient(ellipse at center, black 0%, transparent 80%);
     }
 
-    /* Ambient glow */
+    /* AMBIENT GLOW */
     body::after {
       content: '';
       position: fixed;
@@ -65,7 +65,7 @@
       width: 600px;
       height: 600px;
       background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
-      opacity: 0.15;
+      opacity: 0.18;
       pointer-events: none;
       z-index: 0;
       animation: drift 20s ease-in-out infinite;
@@ -133,22 +133,22 @@
 
     .nav-right { display: flex; align-items: center; gap: 14px; }
 
-    .live-indicator {
+    /* STATUS CONSTELLATION (top right) */
+    .status-cluster {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 5px 11px;
-      border: 1px solid rgba(0, 255, 136, 0.2);
+      gap: 8px;
+      padding: 5px 12px;
+      border: 1px solid rgba(0, 255, 136, 0.18);
       border-radius: 99px;
-      background: rgba(0, 255, 136, 0.05);
+      background: rgba(0, 255, 136, 0.04);
       font-family: 'Geist Mono', monospace;
       font-size: 10px;
-      font-weight: 600;
       color: var(--live);
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-    .live-dot {
+    .status-cluster .live-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
@@ -156,6 +156,13 @@
       box-shadow: 0 0 8px var(--live);
       animation: pulse 2s ease-in-out infinite;
     }
+    .status-divider {
+      width: 1px;
+      height: 10px;
+      background: rgba(0, 255, 136, 0.2);
+    }
+    .status-cluster .dim { color: rgba(0, 255, 136, 0.5); }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(1.3); }
@@ -206,11 +213,11 @@
       margin-bottom: 6px;
     }
     .page-title {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 600;
       letter-spacing: -0.03em;
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .page-title .accent {
       background: linear-gradient(135deg, var(--brand) 0%, #ffaa55 100%);
@@ -298,10 +305,42 @@
     }
     .btn.primary:hover { box-shadow: 0 0 0 1px rgba(255,106,0,0.3), 0 6px 24px var(--brand-glow); }
 
+    /* TIME TOGGLE */
+    .time-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 3px;
+      margin-bottom: 24px;
+    }
+    .time-pill {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .time-pill:hover { color: var(--text); }
+    .time-pill.active {
+      background: var(--surface-elevated);
+      color: var(--brand);
+      box-shadow: inset 0 0 0 1px rgba(255, 106, 0, 0.3), 0 0 12px rgba(255, 106, 0, 0.1);
+    }
+
     /* EXECUTIVE SUMMARY */
     .exec-summary {
       background: linear-gradient(135deg, rgba(255, 106, 0, 0.08) 0%, rgba(255, 154, 0, 0.03) 100%);
-      border: 1px solid rgba(255, 106, 0, 0.15);
+      border: 1px solid rgba(255, 106, 0, 0.18);
       border-radius: 14px;
       padding: 18px 22px;
       margin-bottom: 24px;
@@ -318,14 +357,14 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.4), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.5), transparent);
     }
     .exec-icon {
       width: 38px;
       height: 38px;
       border-radius: 10px;
       background: linear-gradient(135deg, var(--brand) 0%, #ff9a00 100%);
-      box-shadow: 0 0 20px var(--brand-glow);
+      box-shadow: 0 0 24px var(--brand-glow);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -356,13 +395,96 @@
     .exec-text .num-hot { color: var(--hot); }
     .exec-text .num-warn { color: var(--warm); }
 
-    /* STATS GRID — now 5 cards */
-    .stats-grid {
+    /* HERO METRIC + SUB METRICS */
+    .metrics-block {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 14px;
       margin-bottom: 24px;
     }
+
+    .hero-stat {
+      position: relative;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255, 106, 0, 0.08) 0%, transparent 60%),
+        var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 26px;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-stat:hover {
+      border-color: rgba(255, 106, 0, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(255, 106, 0, 0.08);
+    }
+    .hero-stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.6), transparent);
+    }
+    .hero-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hero-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    .hero-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand) 0%, #ff9a00 100%);
+      box-shadow: 0 0 16px var(--brand-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .hero-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .hero-value {
+      font-family: 'Geist Mono', monospace;
+      font-size: 56px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--text);
+      background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-meta {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+    .hero-meta .moon {
+      color: var(--cold);
+    }
+    .hero-spark {
+      width: 100%;
+      height: 44px;
+      display: block;
+    }
+
     .stat {
       position: relative;
       background: var(--surface);
@@ -385,7 +507,6 @@
     }
     .stat[data-color="hot"] { --accent-color: var(--hot); }
     .stat[data-color="brand"] { --accent-color: var(--brand); }
-    .stat[data-color="won"] { --accent-color: var(--won); }
     .stat[data-color="followup"] { --accent-color: var(--followup); }
     .stat-head {
       display: flex;
@@ -414,7 +535,7 @@
     }
     .stat-value {
       font-family: 'Geist Mono', monospace;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 500;
       letter-spacing: -0.03em;
       line-height: 1;
@@ -422,12 +543,12 @@
     }
     .stat-value.colored { color: var(--accent-color); }
     .stat-spark {
-      margin-top: 12px;
+      margin-top: 14px;
       height: 24px;
       width: 100%;
     }
 
-    /* FOLLOW-UP PRIORITY SECTION */
+    /* FOLLOW-UP PRIORITY */
     .priority-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -495,6 +616,7 @@
     .priority-item:hover {
       border-color: var(--border-strong);
       background: var(--surface-elevated);
+      transform: translateX(2px);
     }
     .priority-rank {
       width: 26px;
@@ -536,17 +658,6 @@
       border: 1px solid rgba(255, 106, 0, 0.25);
       color: var(--brand);
       white-space: nowrap;
-    }
-    .priority-empty {
-      padding: 32px 16px;
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
-    .priority-empty .priority-empty-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-      opacity: 0.5;
     }
 
     /* CHART */
@@ -599,7 +710,7 @@
     }
     .chart-svg {
       width: 100%;
-      height: 140px;
+      height: 160px;
       display: block;
     }
 
@@ -693,8 +804,16 @@
     /* Priority left border */
     .ctable tbody tr.priority-hot td:first-child { box-shadow: inset 3px 0 0 var(--hot); }
     .ctable tbody tr.priority-warm td:first-child { box-shadow: inset 3px 0 0 var(--warm); }
-    .ctable tbody tr.priority-cold td:first-child { box-shadow: inset 3px 0 0 transparent; }
     .ctable tbody tr.priority-followup td:first-child { box-shadow: inset 3px 0 0 var(--followup); }
+
+    /* New call pulse animation */
+    @keyframes newCallPulse {
+      0% { background: rgba(255, 106, 0, 0.18); }
+      100% { background: transparent; }
+    }
+    .ctable tbody tr.is-new {
+      animation: newCallPulse 3s ease-out;
+    }
 
     .ctable tbody td {
       padding: 14px 24px;
@@ -850,7 +969,7 @@
     .empty-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
     .empty-sub { color: var(--text-dim); font-size: 13px; max-width: 360px; margin: 0 auto; line-height: 1.5; }
 
-    /* Skeleton loaders */
+    /* Skeleton */
     .skeleton-row {
       display: flex;
       align-items: center;
@@ -907,10 +1026,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    .panel-head h3 {
-      font-size: 14px;
-      font-weight: 500;
-    }
+    .panel-head h3 { font-size: 14px; font-weight: 500; }
     .panel-head .panel-meta {
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
@@ -1025,10 +1141,7 @@
       border-radius: 10px;
       padding: 12px;
     }
-    .audio-shell audio {
-      width: 100%;
-      height: 36px;
-    }
+    .audio-shell audio { width: 100%; height: 36px; }
 
     .transcript-shell {
       background: var(--bg);
@@ -1054,6 +1167,54 @@
       background: var(--surface);
     }
     .panel-actions .btn { flex: 1; justify-content: center; }
+
+    /* FLOATING ACTIVITY BUBBLE (bottom-left) */
+    .activity-bubble {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      z-index: 99;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .activity-bubble.visible {
+      display: flex;
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .activity-bubble .pulse-ring {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--live);
+      box-shadow: 0 0 12px var(--live);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .activity-bubble .label {
+      color: var(--text-dim);
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .activity-bubble .value {
+      color: var(--text);
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+    }
 
     /* TOAST */
     .toast {
@@ -1084,19 +1245,62 @@
     }
     .toast.success .toast-dot { background: var(--won); box-shadow: 0 0 8px var(--won); }
 
+    /* FOOTER */
+    .dashboard-footer {
+      max-width: 1400px;
+      margin: 40px auto 0;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-faint);
+      flex-wrap: wrap;
+    }
+    .dashboard-footer .footer-left {
+      font-family: 'Geist Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dashboard-footer .footer-left .footer-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, var(--brand) 0%, #ff9a00 100%);
+      box-shadow: 0 0 10px var(--brand-glow);
+    }
+    .dashboard-footer .footer-links {
+      display: flex;
+      gap: 18px;
+    }
+    .dashboard-footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .dashboard-footer a:hover { color: var(--text); }
+
     /* MOBILE */
     @media (max-width: 1100px) {
-      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .metrics-block { grid-template-columns: 1fr 1fr 1fr; }
+      .hero-stat { grid-column: 1 / -1; }
     }
 
     @media (max-width: 900px) {
       .container { padding: 24px 16px 60px; }
       .topnav { padding: 12px 16px; }
-      .business-tag, .nav-divider { display: none; }
+      .business-tag, .nav-divider, .status-cluster { display: none; }
       .page-header { flex-direction: column; align-items: stretch; }
       .header-actions { flex-wrap: wrap; }
       .search-shell { width: 100%; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .metrics-block { grid-template-columns: 1fr 1fr; }
+      .hero-stat { grid-column: 1 / -1; }
+      .hero-value { font-size: 44px; }
       .stat-value { font-size: 24px; }
       .panel { width: 100%; }
       .ctable thead th:nth-child(4),
@@ -1108,6 +1312,8 @@
         gap: 8px 12px;
       }
       .priority-action { grid-column: 1 / -1; justify-self: start; }
+      .activity-bubble { left: 12px; bottom: 12px; }
+      .dashboard-footer { padding: 20px 16px; flex-direction: column; align-items: flex-start; }
     }
 
     @media (max-width: 600px) {
@@ -1115,8 +1321,9 @@
       .ctable tbody td:nth-child(5),
       .ctable thead th:nth-child(6),
       .ctable tbody td:nth-child(6) { display: none; }
-      .page-title { font-size: 26px; }
+      .page-title { font-size: 28px; }
       .exec-text { font-size: 14px; }
+      .hero-value { font-size: 38px; }
     }
   </style>
 </head>
@@ -1133,9 +1340,12 @@
       </div>
     </div>
     <div class="nav-right">
-      <div class="live-indicator">
+      <div class="status-cluster" id="status-cluster">
         <div class="live-dot"></div>
-        <span>Live</span>
+        <span>AI Online</span>
+        <div class="status-divider"></div>
+        <span class="dim">Last call:</span>
+        <span id="last-call-time">—</span>
       </div>
       <div class="nav-email" id="user-email"></div>
       <button class="icon-btn" onclick="signOut()" title="Sign out">
@@ -1170,28 +1380,39 @@
       </div>
     </div>
 
+    <!-- TIME RANGE TOGGLE -->
+    <div class="time-toggle">
+      <button class="time-pill" data-range="today" onclick="setTimeRange('today')">Today</button>
+      <button class="time-pill" data-range="week" onclick="setTimeRange('week')">7 Days</button>
+      <button class="time-pill" data-range="month" onclick="setTimeRange('month')">30 Days</button>
+      <button class="time-pill active" data-range="all" onclick="setTimeRange('all')">All Time</button>
+    </div>
+
     <!-- EXECUTIVE SUMMARY -->
     <div class="exec-summary" id="exec-summary" style="display:none;">
       <div class="exec-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
       <div class="exec-content">
-        <div class="exec-label">Today's Snapshot</div>
+        <div class="exec-label">Snapshot</div>
         <div class="exec-text" id="exec-text">—</div>
       </div>
     </div>
 
-    <!-- STATS GRID -->
-    <div class="stats-grid">
-      <div class="stat" data-color="brand">
-        <div class="stat-head">
-          <div class="stat-label">Calls Handled</div>
-          <div class="stat-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <!-- METRICS: HERO + 3 SUB -->
+    <div class="metrics-block">
+      <div class="hero-stat">
+        <div class="hero-head">
+          <div class="hero-label">Calls Handled</div>
+          <div class="hero-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </div>
         </div>
-        <div class="stat-value mono" id="stat-total" data-target="0">0</div>
-        <svg class="stat-spark" id="spark-total" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
+        <div class="hero-value-row">
+          <div class="hero-value mono" id="stat-total" data-target="0">0</div>
+        </div>
+        <div class="hero-meta" id="hero-meta">—</div>
+        <svg class="hero-spark" id="spark-total" viewBox="0 0 100 44" preserveAspectRatio="none"></svg>
       </div>
 
       <div class="stat" data-color="hot">
@@ -1214,17 +1435,6 @@
         </div>
         <div class="stat-value mono colored" id="stat-followup" data-target="0">0</div>
         <svg class="stat-spark" id="spark-followup" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
-      </div>
-
-      <div class="stat" data-color="won">
-        <div class="stat-head">
-          <div class="stat-label">Booked / Won</div>
-          <div class="stat-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-        </div>
-        <div class="stat-value mono colored" id="stat-won" data-target="0">0</div>
-        <svg class="stat-spark" id="spark-won" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
 
       <div class="stat" data-color="brand">
@@ -1268,7 +1478,7 @@
           <span>Total <b id="chart-total">0</b></span>
         </div>
       </div>
-      <svg class="chart-svg" id="main-chart" viewBox="0 0 1000 140" preserveAspectRatio="none"></svg>
+      <svg class="chart-svg" id="main-chart" viewBox="0 0 1000 160" preserveAspectRatio="none"></svg>
     </div>
 
     <!-- CALLS TABLE -->
@@ -1285,12 +1495,6 @@
             <button class="pill warm" data-filter="WARM" onclick="setFilter('WARM')">Warm</button>
             <button class="pill cold" data-filter="COLD" onclick="setFilter('COLD')">Cold</button>
           </div>
-          <div class="filter-group">
-            <button class="pill" data-date="today" onclick="setDateFilter('today')">Today</button>
-            <button class="pill" data-date="week" onclick="setDateFilter('week')">7d</button>
-            <button class="pill" data-date="month" onclick="setDateFilter('month')">30d</button>
-            <button class="pill active" data-date="all" onclick="setDateFilter('all')">All</button>
-          </div>
         </div>
       </div>
       <div class="table-wrap" id="calls-container">
@@ -1301,6 +1505,19 @@
         </div>
       </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer class="dashboard-footer">
+      <div class="footer-left">
+        <div class="footer-mark"></div>
+        <span>Powered by AI Lead Intel</span>
+      </div>
+      <div class="footer-links">
+        <a href="/privacy" target="_blank">Privacy</a>
+        <a href="/terms" target="_blank">Terms</a>
+        <a href="mailto:andrew3333422@gmail.com">Support</a>
+      </div>
+    </footer>
   </div>
 
   <!-- DETAIL PANEL -->
@@ -1319,6 +1536,15 @@
     <div class="panel-actions" id="panel-actions"></div>
   </aside>
 
+  <!-- ACTIVITY BUBBLE (bottom-left, real-time) -->
+  <div class="activity-bubble" id="activity-bubble">
+    <div class="pulse-ring"></div>
+    <div>
+      <div class="label">Last Call</div>
+      <div class="value" id="activity-time">—</div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">
     <div class="toast-dot"></div>
     <span id="toast-text"></span>
@@ -1332,9 +1558,10 @@
 
     let allCalls = [];
     let currentFilter = 'all';
-    let dateFilter = 'all';
+    let timeRange = 'all';
     let selectedId = null;
     let realtimeChannel = null;
+    let newCallIds = new Set();
 
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
@@ -1347,13 +1574,19 @@
       await loadCalls();
       setupRealtime();
       setupKeyboard();
+      // Update last-call time every 30 seconds
+      setInterval(updateLastCallTime, 30000);
     }
 
     function setupRealtime() {
       if (realtimeChannel) return;
       realtimeChannel = sb.channel('calls-changes')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls' },
-          () => { loadCalls(); showToast('New call received', 'success'); })
+          (payload) => {
+            if (payload.new && payload.new.id) newCallIds.add(payload.new.id);
+            loadCalls();
+            showToast('New call received', 'success');
+          })
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calls' },
           () => { loadCalls(); })
         .subscribe();
@@ -1380,73 +1613,41 @@
       updateStats();
       updatePriority();
       updateChart();
+      updateLastCallTime();
       renderCalls();
     }
 
     /* ============================================================
-       LEAD ANALYSIS — uses real call data only
+       LEAD ANALYSIS
        ============================================================ */
 
-    // Determines if a call needs follow-up action
     function needsFollowUp(call) {
       const status = call.lead_status || 'NEW';
       const score = call.lead_score || 'NONE';
       const closed = status === 'CLOSED_WON' || status === 'CLOSED_LOST';
       if (closed) return false;
-
-      // HOT or WARM lead not yet closed = needs follow-up
       if (score === 'HOT' || score === 'WARM') return true;
-
-      // Asked for human transfer = needs follow-up
       if (call.asked_for_transfer === true) return true;
-      if ((call.outcome || '').toLowerCase().includes('asked for human')) return true;
-      if ((call.outcome || '').toLowerCase().includes('asked for transfer')) return true;
-      if ((call.outcome || '').toLowerCase().includes('requested callback')) return true;
-
+      const out = (call.outcome || '').toLowerCase();
+      if (out.includes('asked for human') || out.includes('asked for transfer') || out.includes('requested callback')) return true;
       return false;
     }
 
-    // Returns recommended action for a call based on real data
     function getRecommendedAction(call) {
       const status = call.lead_status || 'NEW';
       const score = call.lead_score || 'NONE';
-
-      if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') {
-        return { label: 'No Action Needed', type: 'none' };
-      }
-
-      if (score === 'HOT') {
-        return { label: 'Call Back Now', type: 'urgent' };
-      }
-
-      const askedTransfer = call.asked_for_transfer === true ||
-        (call.outcome || '').toLowerCase().includes('asked for human') ||
-        (call.outcome || '').toLowerCase().includes('asked for transfer');
-
-      if (askedTransfer && status !== 'CONTACTED') {
-        return { label: 'Call Back', type: 'followup' };
-      }
-
-      const askedPricing = call.asked_for_pricing === true ||
-        (call.outcome || '').toLowerCase().includes('pricing') ||
-        (call.outcome || '').toLowerCase().includes('quote');
-
-      if (score === 'WARM' && askedPricing) {
-        return { label: 'Send Booking Link', type: 'send' };
-      }
-
-      if (score === 'WARM') {
-        return { label: 'Call Back', type: 'followup' };
-      }
-
-      if (status === 'CONTACTED') {
-        return { label: 'No Action Needed', type: 'none' };
-      }
-
+      if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') return { label: 'No Action Needed', type: 'none' };
+      if (score === 'HOT') return { label: 'Call Back Now', type: 'urgent' };
+      const out = (call.outcome || '').toLowerCase();
+      const askedTransfer = call.asked_for_transfer === true || out.includes('asked for human') || out.includes('asked for transfer');
+      if (askedTransfer && status !== 'CONTACTED') return { label: 'Call Back', type: 'followup' };
+      const askedPricing = call.asked_for_pricing === true || out.includes('pricing') || out.includes('quote');
+      if (score === 'WARM' && askedPricing) return { label: 'Send Booking Link', type: 'send' };
+      if (score === 'WARM') return { label: 'Call Back', type: 'followup' };
+      if (status === 'CONTACTED') return { label: 'No Action Needed', type: 'none' };
       return { label: 'Review Call', type: 'review' };
     }
 
-    // Returns priority class for table row left border
     function getPriorityClass(call) {
       const status = call.lead_status || 'NEW';
       const score = call.lead_score || 'NONE';
@@ -1457,20 +1658,49 @@
       return '';
     }
 
-    // Returns brief reason text for priority queue
     function getPriorityReason(call) {
       const score = call.lead_score || 'NONE';
-      const askedTransfer = call.asked_for_transfer === true ||
-        (call.outcome || '').toLowerCase().includes('asked for human');
-
+      const askedTransfer = call.asked_for_transfer === true || (call.outcome || '').toLowerCase().includes('asked for human');
       if (score === 'HOT') return 'Hot lead — ready to buy';
       if (askedTransfer) return 'Asked to speak with someone';
       if (score === 'WARM') return 'Warm lead — interested';
       return call.outcome || 'Recent call';
     }
 
+    // Determines if a call was outside business hours (8am-6pm local)
+    function isAfterHours(call) {
+      const d = new Date(call.created_at);
+      const hour = d.getHours();
+      const day = d.getDay(); // 0 = Sun, 6 = Sat
+      if (day === 0 || day === 6) return true; // weekend
+      if (hour < 8 || hour >= 18) return true; // before 8am or after 6pm
+      return false;
+    }
+
     /* ============================================================
-       EXECUTIVE SUMMARY — dynamic, real data only
+       TIME RANGE FILTER
+       ============================================================ */
+
+    function getCallsInRange(range) {
+      if (range === 'all') return allCalls;
+      const now = new Date();
+      let cutoff;
+      if (range === 'today') { cutoff = new Date(now); cutoff.setHours(0,0,0,0); }
+      else if (range === 'week') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7); }
+      else if (range === 'month') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30); }
+      return allCalls.filter(c => new Date(c.created_at) >= cutoff);
+    }
+
+    function setTimeRange(range) {
+      timeRange = range;
+      document.querySelectorAll('.time-pill').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+      updateExecSummary();
+      updateStats();
+      updatePriority();
+    }
+
+    /* ============================================================
+       EXECUTIVE SUMMARY
        ============================================================ */
 
     function updateExecSummary() {
@@ -1482,56 +1712,38 @@
         return;
       }
 
-      // Today's calls
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const todayCalls = allCalls.filter(c => new Date(c.created_at) >= todayStart);
-      const totalCount = todayCalls.length;
-
-      let scope = 'today';
-      let calls = todayCalls;
-
-      // If no calls today, fall back to last 7 days
-      if (totalCount === 0) {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - 7);
-        calls = allCalls.filter(c => new Date(c.created_at) >= weekStart);
-        scope = 'this week';
-      }
-
-      // If still nothing, fall back to all-time
+      const calls = getCallsInRange(timeRange);
       if (calls.length === 0) {
-        calls = allCalls;
-        scope = 'all time';
+        summaryEl.style.display = 'none';
+        return;
       }
+
+      const scopeLabel = {
+        today: 'today',
+        week: 'this week',
+        month: 'this month',
+        all: 'in total'
+      }[timeRange];
 
       const handled = calls.length;
       const hotCount = calls.filter(c => c.lead_score === 'HOT').length;
       const followupCount = calls.filter(c => needsFollowUp(c)).length;
-      const wonCount = calls.filter(c => c.lead_status === 'CLOSED_WON').length;
 
-      // Build summary sentence dynamically
       const parts = [];
-      parts.push(`Your AI handled <span class="num">${handled}</span> ${handled === 1 ? 'call' : 'calls'} ${scope}`);
+      parts.push(`Your AI handled <span class="num">${handled}</span> ${handled === 1 ? 'call' : 'calls'} ${scopeLabel}`);
 
       if (hotCount > 0) {
         parts.push(`identified <span class="num num-hot">${hotCount}</span> ready-to-buy ${hotCount === 1 ? 'lead' : 'leads'}`);
       }
 
       if (followupCount > 0) {
-        parts.push(`flagged <span class="num num-warn">${followupCount}</span> ${followupCount === 1 ? 'call' : 'calls'} for follow-up`);
-      }
-
-      if (wonCount > 0) {
-        parts.push(`and booked <span class="num">${wonCount}</span>`);
+        parts.push(`flagged <span class="num num-warn">${followupCount}</span> for follow-up`);
       }
 
       let sentence;
-      if (parts.length === 1) {
-        sentence = parts[0] + '.';
-      } else if (parts.length === 2) {
-        sentence = parts.join(' and ') + '.';
-      } else {
+      if (parts.length === 1) sentence = parts[0] + '.';
+      else if (parts.length === 2) sentence = parts.join(' and ') + '.';
+      else {
         const last = parts.pop();
         sentence = parts.join(', ') + ', ' + last + '.';
       }
@@ -1546,7 +1758,7 @@
 
     function animateNumber(el, target) {
       const start = parseInt(el.dataset.target || '0', 10);
-      const duration = 600;
+      const duration = 700;
       const startTime = performance.now();
       function tick(t) {
         const p = Math.min((t - startTime) / duration, 1);
@@ -1560,17 +1772,16 @@
     }
 
     function updateStats() {
-      const total = allCalls.length;
-      const hot = allCalls.filter(c => c.lead_score === 'HOT').length;
-      const followup = allCalls.filter(c => needsFollowUp(c)).length;
-      const won = allCalls.filter(c => c.lead_status === 'CLOSED_WON').length;
-      const totalDur = allCalls.reduce((s, c) => s + (c.duration_seconds || 0), 0);
+      const calls = getCallsInRange(timeRange);
+      const total = calls.length;
+      const hot = calls.filter(c => c.lead_score === 'HOT').length;
+      const followup = calls.filter(c => needsFollowUp(c)).length;
+      const totalDur = calls.reduce((s, c) => s + (c.duration_seconds || 0), 0);
       const avg = total > 0 ? Math.round(totalDur / total) : 0;
 
       animateNumber(document.getElementById('stat-total'), total);
       animateNumber(document.getElementById('stat-hot'), hot);
       animateNumber(document.getElementById('stat-followup'), followup);
-      animateNumber(document.getElementById('stat-won'), won);
 
       const dur = document.getElementById('stat-duration');
       if (total > 0) {
@@ -1578,11 +1789,24 @@
         dur.textContent = `${m}:${String(s).padStart(2, '0')}`;
       } else dur.textContent = '—';
 
-      drawSparkline('spark-total', getDailyCounts(c => true), '#ff6a00');
-      drawSparkline('spark-hot', getDailyCounts(c => c.lead_score === 'HOT'), '#ef4444');
-      drawSparkline('spark-followup', getDailyCounts(c => needsFollowUp(c)), '#f59e0b');
-      drawSparkline('spark-won', getDailyCounts(c => c.lead_status === 'CLOSED_WON'), '#10b981');
-      drawSparkline('spark-duration', getDailyDurations(), '#ff6a00');
+      // Hero meta — show after-hours info
+      const heroMeta = document.getElementById('hero-meta');
+      if (total > 0) {
+        const afterHours = calls.filter(c => isAfterHours(c)).length;
+        if (afterHours > 0) {
+          const pct = Math.round((afterHours / total) * 100);
+          heroMeta.innerHTML = `<span class="moon">🌙</span> ${afterHours} answered after hours · ${pct}% of total`;
+        } else {
+          heroMeta.innerHTML = `All calls within business hours`;
+        }
+      } else {
+        heroMeta.textContent = 'No calls yet in this period';
+      }
+
+      drawSparkline('spark-total', getDailyCounts(c => true), '#ff6a00', 44);
+      drawSparkline('spark-hot', getDailyCounts(c => c.lead_score === 'HOT'), '#ef4444', 24);
+      drawSparkline('spark-followup', getDailyCounts(c => needsFollowUp(c)), '#f59e0b', 24);
+      drawSparkline('spark-duration', getDailyDurations(), '#ff6a00', 24);
     }
 
     function getDailyCounts(filterFn) {
@@ -1615,15 +1839,14 @@
       return days;
     }
 
-    function drawSparkline(id, data, color) {
+    function drawSparkline(id, data, color, height) {
       const svg = document.getElementById(id);
       if (!svg) return;
-      const w = 100, h = 24;
+      const w = 100, h = height || 24;
       const max = Math.max(...data, 1);
-      const min = 0;
       const points = data.map((v, i) => {
         const x = (i / (data.length - 1)) * w;
-        const y = h - ((v - min) / (max - min || 1)) * (h - 4) - 2;
+        const y = h - (v / max) * (h - 4) - 2;
         return [x, y];
       });
       const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
@@ -1642,44 +1865,35 @@
     }
 
     /* ============================================================
-       FOLLOW-UP PRIORITY — top 3 calls ranked by urgency
+       FOLLOW-UP PRIORITY
        ============================================================ */
 
     function updatePriority() {
       const card = document.getElementById('priority-card');
       const list = document.getElementById('priority-list');
 
-      // Score each call for priority ranking
       function priorityScore(c) {
         let score = 0;
         const status = c.lead_status || 'NEW';
         if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') return -999;
-
         if (c.lead_score === 'HOT') score += 100;
         if (c.lead_score === 'WARM') score += 40;
-
-        const askedTransfer = c.asked_for_transfer === true ||
-          (c.outcome || '').toLowerCase().includes('asked for human');
+        const askedTransfer = c.asked_for_transfer === true || (c.outcome || '').toLowerCase().includes('asked for human');
         if (askedTransfer) score += 50;
-
-        // Boost for longer calls (more engaged)
         const dur = c.duration_seconds || 0;
         if (dur > 60) score += 10;
         if (dur > 180) score += 10;
-
-        // Boost for recency (calls from last 24h)
         const ageHours = (Date.now() - new Date(c.created_at).getTime()) / (1000 * 60 * 60);
         if (ageHours < 24) score += 20;
         else if (ageHours < 72) score += 10;
-        else if (ageHours > 168) score -= 20; // older than 7 days = stale
-
-        // Skip if already contacted (still show but lower priority)
+        else if (ageHours > 168) score -= 20;
         if (status === 'CONTACTED') score -= 30;
-
         return score;
       }
 
-      const ranked = allCalls
+      const callsInRange = timeRange === 'all' ? allCalls : getCallsInRange(timeRange);
+
+      const ranked = callsInRange
         .filter(c => needsFollowUp(c))
         .map(c => ({ call: c, score: priorityScore(c) }))
         .filter(x => x.score > 0)
@@ -1712,12 +1926,32 @@
     }
 
     /* ============================================================
+       LAST CALL TIMER (status cluster + activity bubble)
+       ============================================================ */
+
+    function updateLastCallTime() {
+      const lastCallEl = document.getElementById('last-call-time');
+      const activityBubble = document.getElementById('activity-bubble');
+      const activityTime = document.getElementById('activity-time');
+      if (!allCalls.length) {
+        lastCallEl.textContent = '—';
+        activityBubble.classList.remove('visible');
+        return;
+      }
+      const last = allCalls[0];
+      const ago = formatTime(last.created_at);
+      lastCallEl.textContent = ago;
+      activityTime.textContent = ago;
+      activityBubble.classList.add('visible');
+    }
+
+    /* ============================================================
        CHART
        ============================================================ */
 
     function updateChart() {
       const svg = document.getElementById('main-chart');
-      const W = 1000, H = 140;
+      const W = 1000, H = 160;
       const days = [];
       const today = new Date(); today.setHours(0,0,0,0);
       for (let i = 29; i >= 0; i--) {
@@ -1736,14 +1970,13 @@
       document.getElementById('chart-avg').textContent = avg;
       document.getElementById('chart-total').textContent = total;
 
-      const padX = 12, padY = 14;
+      const padX = 12, padY = 18;
       const points = days.map((d, i) => {
         const x = padX + (i / (days.length - 1)) * (W - padX * 2);
         const y = H - padY - (d.count / max) * (H - padY * 2);
         return [x, y, d];
       });
 
-      // Smooth curve
       let path = `M${points[0][0]},${points[0][1]}`;
       for (let i = 1; i < points.length; i++) {
         const [x1, y1] = points[i - 1];
@@ -1766,7 +1999,7 @@
       svg.innerHTML = `
         <defs>
           <linearGradient id="chart-grad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#ff6a00" stop-opacity="0.4"/>
+            <stop offset="0%" stop-color="#ff6a00" stop-opacity="0.5"/>
             <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
           </linearGradient>
         </defs>
@@ -1787,23 +2020,10 @@
       document.querySelectorAll('.pill[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
       renderCalls();
     }
-    function setDateFilter(f) {
-      dateFilter = f;
-      document.querySelectorAll('.pill[data-date]').forEach(b => b.classList.toggle('active', b.dataset.date === f));
-      renderCalls();
-    }
 
     function getFiltered() {
-      let f = allCalls;
+      let f = getCallsInRange(timeRange);
       if (currentFilter !== 'all') f = f.filter(c => c.lead_score === currentFilter);
-      if (dateFilter !== 'all') {
-        const now = new Date();
-        let cutoff;
-        if (dateFilter === 'today') { cutoff = new Date(now); cutoff.setHours(0,0,0,0); }
-        else if (dateFilter === 'week') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7); }
-        else if (dateFilter === 'month') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30); }
-        f = f.filter(c => new Date(c.created_at) >= cutoff);
-      }
       const q = document.getElementById('search-input').value.trim().toLowerCase();
       if (q) f = f.filter(c => (c.caller_number || '').toLowerCase().includes(q) || (c.outcome || '').toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q));
       return f;
@@ -1814,7 +2034,6 @@
       const filtered = getFiltered();
       document.getElementById('calls-count').textContent = filtered.length;
 
-      // No data at all
       if (allCalls.length === 0) {
         container.innerHTML = `
           <div class="empty">
@@ -1827,7 +2046,6 @@
         return;
       }
 
-      // Filtered down to nothing
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty">
@@ -1850,9 +2068,10 @@
         const initials = num.replace(/\D/g, '').slice(-2) || '??';
         const isSelected = selectedId === call.id ? 'selected' : '';
         const priority = getPriorityClass(call);
+        const isNew = newCallIds.has(call.id) ? 'is-new' : '';
         const action = getRecommendedAction(call);
         html += `
-          <tr class="${isSelected} ${priority}" onclick="openPanel('${call.id}')">
+          <tr class="${isSelected} ${priority} ${isNew}" onclick="openPanel('${call.id}')">
             <td>
               <div class="caller">
                 <div class="caller-avatar mono">${initials}</div>
@@ -1870,6 +2089,9 @@
       });
       html += '</tbody></table>';
       container.innerHTML = html;
+
+      // Clear new call markers after render so they only animate once
+      setTimeout(() => { newCallIds.clear(); }, 3500);
     }
 
     /* ============================================================
@@ -1957,7 +2179,6 @@
         </a>` : ''}
       `;
 
-      // Notes auto-save
       const ta = document.getElementById(`notes-${call.id}`);
       if (ta) {
         let timeout;
