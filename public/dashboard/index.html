@@ -28,6 +28,7 @@
       --cold: #3b82f6;
       --won: #10b981;
       --live: #00ff88;
+      --followup: #f59e0b;
     }
 
     html, body { height: 100%; }
@@ -193,7 +194,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       gap: 16px;
     }
     .page-title-block .eyebrow {
@@ -209,12 +210,28 @@
       font-weight: 600;
       letter-spacing: -0.03em;
       line-height: 1;
+      margin-bottom: 8px;
     }
     .page-title .accent {
       background: linear-gradient(135deg, var(--brand) 0%, #ffaa55 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+    .page-microcopy {
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-microcopy .live-tiny {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+      box-shadow: 0 0 6px var(--live);
+      animation: pulse 2s ease-in-out infinite;
     }
 
     .header-actions { display: flex; gap: 8px; align-items: center; }
@@ -270,6 +287,7 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.15s;
+      text-decoration: none;
     }
     .btn:hover { background: var(--surface-elevated); border-color: var(--border-strong); }
     .btn.primary {
@@ -280,11 +298,69 @@
     }
     .btn.primary:hover { box-shadow: 0 0 0 1px rgba(255,106,0,0.3), 0 6px 24px var(--brand-glow); }
 
-    /* STATS GRID */
+    /* EXECUTIVE SUMMARY */
+    .exec-summary {
+      background: linear-gradient(135deg, rgba(255, 106, 0, 0.08) 0%, rgba(255, 154, 0, 0.03) 100%);
+      border: 1px solid rgba(255, 106, 0, 0.15);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .exec-summary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.4), transparent);
+    }
+    .exec-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand) 0%, #ff9a00 100%);
+      box-shadow: 0 0 20px var(--brand-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .exec-content { flex: 1; }
+    .exec-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+    .exec-text {
+      font-size: 15px;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+    .exec-text .num {
+      color: var(--brand);
+      font-family: 'Geist Mono', monospace;
+      font-weight: 600;
+    }
+    .exec-text .num-hot { color: var(--hot); }
+    .exec-text .num-warn { color: var(--warm); }
+
+    /* STATS GRID — now 5 cards */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
       margin-bottom: 24px;
     }
     .stat {
@@ -292,7 +368,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 20px;
+      padding: 18px;
       overflow: hidden;
       transition: all 0.2s;
     }
@@ -310,6 +386,7 @@
     .stat[data-color="hot"] { --accent-color: var(--hot); }
     .stat[data-color="brand"] { --accent-color: var(--brand); }
     .stat[data-color="won"] { --accent-color: var(--won); }
+    .stat[data-color="followup"] { --accent-color: var(--followup); }
     .stat-head {
       display: flex;
       justify-content: space-between;
@@ -318,15 +395,15 @@
     }
     .stat-label {
       font-family: 'Geist Mono', monospace;
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-faint);
       text-transform: uppercase;
       letter-spacing: 0.12em;
     }
     .stat-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -337,7 +414,7 @@
     }
     .stat-value {
       font-family: 'Geist Mono', monospace;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 500;
       letter-spacing: -0.03em;
       line-height: 1;
@@ -345,9 +422,131 @@
     }
     .stat-value.colored { color: var(--accent-color); }
     .stat-spark {
-      margin-top: 14px;
-      height: 28px;
+      margin-top: 12px;
+      height: 24px;
       width: 100%;
+    }
+
+    /* FOLLOW-UP PRIORITY SECTION */
+    .priority-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .priority-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent);
+    }
+    .priority-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .priority-title-row { display: flex; align-items: center; gap: 10px; }
+    .priority-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .priority-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: var(--warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .priority-sub {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .priority-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .priority-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .priority-item:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-elevated);
+    }
+    .priority-rank {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    .priority-info { min-width: 0; }
+    .priority-caller {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .priority-reason {
+      font-size: 12px;
+      color: var(--text-dim);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .priority-action {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: rgba(255, 106, 0, 0.1);
+      border: 1px solid rgba(255, 106, 0, 0.25);
+      color: var(--brand);
+      white-space: nowrap;
+    }
+    .priority-empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .priority-empty .priority-empty-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      opacity: 0.5;
     }
 
     /* CHART */
@@ -485,10 +684,18 @@
       cursor: pointer;
       transition: background 0.12s;
       border-bottom: 1px solid var(--border);
+      position: relative;
     }
     .ctable tbody tr:last-child { border-bottom: none; }
     .ctable tbody tr:hover { background: var(--surface-elevated); }
     .ctable tbody tr.selected { background: rgba(255, 106, 0, 0.04); }
+
+    /* Priority left border */
+    .ctable tbody tr.priority-hot td:first-child { box-shadow: inset 3px 0 0 var(--hot); }
+    .ctable tbody tr.priority-warm td:first-child { box-shadow: inset 3px 0 0 var(--warm); }
+    .ctable tbody tr.priority-cold td:first-child { box-shadow: inset 3px 0 0 transparent; }
+    .ctable tbody tr.priority-followup td:first-child { box-shadow: inset 3px 0 0 var(--followup); }
+
     .ctable tbody td {
       padding: 14px 24px;
       font-size: 13px;
@@ -562,10 +769,51 @@
     .stage-pill.closed_won { color: var(--won); border-color: rgba(16, 185, 129, 0.2); }
     .stage-pill.closed_lost { color: var(--text-faint); }
 
+    /* Recommended action chip */
+    .action-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid;
+    }
+    .action-chip.urgent {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: var(--hot);
+    }
+    .action-chip.followup {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: var(--warm);
+    }
+    .action-chip.send {
+      background: rgba(255, 106, 0, 0.08);
+      border-color: rgba(255, 106, 0, 0.25);
+      color: var(--brand);
+    }
+    .action-chip.review {
+      background: rgba(59, 130, 246, 0.06);
+      border-color: rgba(59, 130, 246, 0.2);
+      color: var(--cold);
+    }
+    .action-chip.none {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-faint);
+    }
+
     .outcome-cell {
       color: var(--text-dim);
       font-size: 13px;
-      max-width: 280px;
+      max-width: 240px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -599,8 +847,27 @@
       font-size: 22px;
       opacity: 0.6;
     }
-    .empty-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-    .empty-sub { color: var(--text-dim); font-size: 13px; }
+    .empty-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+    .empty-sub { color: var(--text-dim); font-size: 13px; max-width: 360px; margin: 0 auto; line-height: 1.5; }
+
+    /* Skeleton loaders */
+    .skeleton-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .skeleton-box {
+      background: linear-gradient(90deg, var(--surface-elevated) 0%, var(--surface-hover) 50%, var(--surface-elevated) 100%);
+      background-size: 200% 100%;
+      border-radius: 6px;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
 
     /* SLIDE PANEL */
     .panel-overlay {
@@ -818,6 +1085,10 @@
     .toast.success .toast-dot { background: var(--won); box-shadow: 0 0 8px var(--won); }
 
     /* MOBILE */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
     @media (max-width: 900px) {
       .container { padding: 24px 16px 60px; }
       .topnav { padding: 12px 16px; }
@@ -826,25 +1097,26 @@
       .header-actions { flex-wrap: wrap; }
       .search-shell { width: 100%; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stat-value { font-size: 26px; }
+      .stat-value { font-size: 24px; }
       .panel { width: 100%; }
       .ctable thead th:nth-child(4),
       .ctable tbody td:nth-child(4) { display: none; }
+      .exec-summary { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .priority-item {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        gap: 8px 12px;
+      }
+      .priority-action { grid-column: 1 / -1; justify-self: start; }
     }
 
     @media (max-width: 600px) {
       .ctable thead th:nth-child(5),
-      .ctable tbody td:nth-child(5) { display: none; }
+      .ctable tbody td:nth-child(5),
+      .ctable thead th:nth-child(6),
+      .ctable tbody td:nth-child(6) { display: none; }
       .page-title { font-size: 26px; }
-    }
-
-    /* Loading skeleton */
-    .skeleton {
-      animation: shimmer 1.5s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.7; }
+      .exec-text { font-size: 14px; }
     }
   </style>
 </head>
@@ -877,6 +1149,10 @@
       <div class="page-title-block">
         <div class="eyebrow">Mission Control</div>
         <h1 class="page-title">Live <span class="accent">Calls</span></h1>
+        <div class="page-microcopy">
+          <span class="live-tiny"></span>
+          <span>Live call data from your AI front desk · Updated automatically</span>
+        </div>
       </div>
       <div class="header-actions">
         <div class="search-shell">
@@ -888,58 +1164,98 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export
         </button>
-        <button class="btn" onclick="loadCalls()">
+        <button class="btn" onclick="loadCalls()" title="Refresh">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
       </div>
     </div>
 
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="exec-summary" id="exec-summary" style="display:none;">
+      <div class="exec-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="exec-content">
+        <div class="exec-label">Today's Snapshot</div>
+        <div class="exec-text" id="exec-text">—</div>
+      </div>
+    </div>
+
+    <!-- STATS GRID -->
     <div class="stats-grid">
       <div class="stat" data-color="brand">
         <div class="stat-head">
-          <div class="stat-label">Total Calls</div>
+          <div class="stat-label">Calls Handled</div>
           <div class="stat-icon">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </div>
         </div>
         <div class="stat-value mono" id="stat-total" data-target="0">0</div>
-        <svg class="stat-spark" id="spark-total" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
+        <svg class="stat-spark" id="spark-total" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
 
       <div class="stat" data-color="hot">
         <div class="stat-head">
-          <div class="stat-label">Hot Leads</div>
+          <div class="stat-label">Ready-to-Buy</div>
           <div class="stat-icon">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
           </div>
         </div>
         <div class="stat-value mono colored" id="stat-hot" data-target="0">0</div>
-        <svg class="stat-spark" id="spark-hot" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
+        <svg class="stat-spark" id="spark-hot" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
+      </div>
+
+      <div class="stat" data-color="followup">
+        <div class="stat-head">
+          <div class="stat-label">Needs Follow-Up</div>
+          <div class="stat-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+        </div>
+        <div class="stat-value mono colored" id="stat-followup" data-target="0">0</div>
+        <svg class="stat-spark" id="spark-followup" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
 
       <div class="stat" data-color="won">
         <div class="stat-head">
-          <div class="stat-label">Closed Won</div>
+          <div class="stat-label">Booked / Won</div>
           <div class="stat-icon">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </div>
         <div class="stat-value mono colored" id="stat-won" data-target="0">0</div>
-        <svg class="stat-spark" id="spark-won" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
+        <svg class="stat-spark" id="spark-won" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
 
       <div class="stat" data-color="brand">
         <div class="stat-head">
-          <div class="stat-label">Avg Duration</div>
+          <div class="stat-label">Avg Call Time</div>
           <div class="stat-icon">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
         <div class="stat-value mono" id="stat-duration">—</div>
-        <svg class="stat-spark" id="spark-duration" viewBox="0 0 100 28" preserveAspectRatio="none"></svg>
+        <svg class="stat-spark" id="spark-duration" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
     </div>
 
+    <!-- FOLLOW-UP PRIORITY -->
+    <div class="priority-card" id="priority-card" style="display:none;">
+      <div class="priority-head">
+        <div class="priority-title-row">
+          <div class="priority-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <div class="priority-title">Follow-Up Priority</div>
+            <div class="priority-sub">Call these back first</div>
+          </div>
+        </div>
+      </div>
+      <div class="priority-list" id="priority-list"></div>
+    </div>
+
+    <!-- CHART -->
     <div class="chart-card">
       <div class="chart-head">
         <div>
@@ -955,10 +1271,11 @@
       <svg class="chart-svg" id="main-chart" viewBox="0 0 1000 140" preserveAspectRatio="none"></svg>
     </div>
 
+    <!-- CALLS TABLE -->
     <div class="calls-card">
       <div class="calls-head">
         <div class="calls-title-row">
-          <div class="calls-title">Calls</div>
+          <div class="calls-title">All Calls</div>
           <div class="calls-count mono" id="calls-count">0</div>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -977,7 +1294,11 @@
         </div>
       </div>
       <div class="table-wrap" id="calls-container">
-        <div class="empty"><div class="empty-glyph">⏳</div><div class="empty-title skeleton">Loading...</div></div>
+        <div>
+          <div class="skeleton-row"><div class="skeleton-box" style="width:28px;height:28px;"></div><div class="skeleton-box" style="width:120px;height:14px;"></div><div class="skeleton-box" style="width:60px;height:14px;margin-left:auto;"></div></div>
+          <div class="skeleton-row"><div class="skeleton-box" style="width:28px;height:28px;"></div><div class="skeleton-box" style="width:140px;height:14px;"></div><div class="skeleton-box" style="width:60px;height:14px;margin-left:auto;"></div></div>
+          <div class="skeleton-row"><div class="skeleton-box" style="width:28px;height:28px;"></div><div class="skeleton-box" style="width:100px;height:14px;"></div><div class="skeleton-box" style="width:60px;height:14px;margin-left:auto;"></div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1033,6 +1354,8 @@
       realtimeChannel = sb.channel('calls-changes')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls' },
           () => { loadCalls(); showToast('New call received', 'success'); })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calls' },
+          () => { loadCalls(); })
         .subscribe();
     }
 
@@ -1053,10 +1376,173 @@
         return;
       }
       allCalls = calls || [];
+      updateExecSummary();
       updateStats();
+      updatePriority();
       updateChart();
       renderCalls();
     }
+
+    /* ============================================================
+       LEAD ANALYSIS — uses real call data only
+       ============================================================ */
+
+    // Determines if a call needs follow-up action
+    function needsFollowUp(call) {
+      const status = call.lead_status || 'NEW';
+      const score = call.lead_score || 'NONE';
+      const closed = status === 'CLOSED_WON' || status === 'CLOSED_LOST';
+      if (closed) return false;
+
+      // HOT or WARM lead not yet closed = needs follow-up
+      if (score === 'HOT' || score === 'WARM') return true;
+
+      // Asked for human transfer = needs follow-up
+      if (call.asked_for_transfer === true) return true;
+      if ((call.outcome || '').toLowerCase().includes('asked for human')) return true;
+      if ((call.outcome || '').toLowerCase().includes('asked for transfer')) return true;
+      if ((call.outcome || '').toLowerCase().includes('requested callback')) return true;
+
+      return false;
+    }
+
+    // Returns recommended action for a call based on real data
+    function getRecommendedAction(call) {
+      const status = call.lead_status || 'NEW';
+      const score = call.lead_score || 'NONE';
+
+      if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') {
+        return { label: 'No Action Needed', type: 'none' };
+      }
+
+      if (score === 'HOT') {
+        return { label: 'Call Back Now', type: 'urgent' };
+      }
+
+      const askedTransfer = call.asked_for_transfer === true ||
+        (call.outcome || '').toLowerCase().includes('asked for human') ||
+        (call.outcome || '').toLowerCase().includes('asked for transfer');
+
+      if (askedTransfer && status !== 'CONTACTED') {
+        return { label: 'Call Back', type: 'followup' };
+      }
+
+      const askedPricing = call.asked_for_pricing === true ||
+        (call.outcome || '').toLowerCase().includes('pricing') ||
+        (call.outcome || '').toLowerCase().includes('quote');
+
+      if (score === 'WARM' && askedPricing) {
+        return { label: 'Send Booking Link', type: 'send' };
+      }
+
+      if (score === 'WARM') {
+        return { label: 'Call Back', type: 'followup' };
+      }
+
+      if (status === 'CONTACTED') {
+        return { label: 'No Action Needed', type: 'none' };
+      }
+
+      return { label: 'Review Call', type: 'review' };
+    }
+
+    // Returns priority class for table row left border
+    function getPriorityClass(call) {
+      const status = call.lead_status || 'NEW';
+      const score = call.lead_score || 'NONE';
+      if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') return '';
+      if (score === 'HOT') return 'priority-hot';
+      if (needsFollowUp(call)) return 'priority-followup';
+      if (score === 'WARM') return 'priority-warm';
+      return '';
+    }
+
+    // Returns brief reason text for priority queue
+    function getPriorityReason(call) {
+      const score = call.lead_score || 'NONE';
+      const askedTransfer = call.asked_for_transfer === true ||
+        (call.outcome || '').toLowerCase().includes('asked for human');
+
+      if (score === 'HOT') return 'Hot lead — ready to buy';
+      if (askedTransfer) return 'Asked to speak with someone';
+      if (score === 'WARM') return 'Warm lead — interested';
+      return call.outcome || 'Recent call';
+    }
+
+    /* ============================================================
+       EXECUTIVE SUMMARY — dynamic, real data only
+       ============================================================ */
+
+    function updateExecSummary() {
+      const summaryEl = document.getElementById('exec-summary');
+      const textEl = document.getElementById('exec-text');
+
+      if (allCalls.length === 0) {
+        summaryEl.style.display = 'none';
+        return;
+      }
+
+      // Today's calls
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayCalls = allCalls.filter(c => new Date(c.created_at) >= todayStart);
+      const totalCount = todayCalls.length;
+
+      let scope = 'today';
+      let calls = todayCalls;
+
+      // If no calls today, fall back to last 7 days
+      if (totalCount === 0) {
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - 7);
+        calls = allCalls.filter(c => new Date(c.created_at) >= weekStart);
+        scope = 'this week';
+      }
+
+      // If still nothing, fall back to all-time
+      if (calls.length === 0) {
+        calls = allCalls;
+        scope = 'all time';
+      }
+
+      const handled = calls.length;
+      const hotCount = calls.filter(c => c.lead_score === 'HOT').length;
+      const followupCount = calls.filter(c => needsFollowUp(c)).length;
+      const wonCount = calls.filter(c => c.lead_status === 'CLOSED_WON').length;
+
+      // Build summary sentence dynamically
+      const parts = [];
+      parts.push(`Your AI handled <span class="num">${handled}</span> ${handled === 1 ? 'call' : 'calls'} ${scope}`);
+
+      if (hotCount > 0) {
+        parts.push(`identified <span class="num num-hot">${hotCount}</span> ready-to-buy ${hotCount === 1 ? 'lead' : 'leads'}`);
+      }
+
+      if (followupCount > 0) {
+        parts.push(`flagged <span class="num num-warn">${followupCount}</span> ${followupCount === 1 ? 'call' : 'calls'} for follow-up`);
+      }
+
+      if (wonCount > 0) {
+        parts.push(`and booked <span class="num">${wonCount}</span>`);
+      }
+
+      let sentence;
+      if (parts.length === 1) {
+        sentence = parts[0] + '.';
+      } else if (parts.length === 2) {
+        sentence = parts.join(' and ') + '.';
+      } else {
+        const last = parts.pop();
+        sentence = parts.join(', ') + ', ' + last + '.';
+      }
+
+      textEl.innerHTML = sentence;
+      summaryEl.style.display = 'flex';
+    }
+
+    /* ============================================================
+       STATS
+       ============================================================ */
 
     function animateNumber(el, target) {
       const start = parseInt(el.dataset.target || '0', 10);
@@ -1076,12 +1562,14 @@
     function updateStats() {
       const total = allCalls.length;
       const hot = allCalls.filter(c => c.lead_score === 'HOT').length;
+      const followup = allCalls.filter(c => needsFollowUp(c)).length;
       const won = allCalls.filter(c => c.lead_status === 'CLOSED_WON').length;
       const totalDur = allCalls.reduce((s, c) => s + (c.duration_seconds || 0), 0);
       const avg = total > 0 ? Math.round(totalDur / total) : 0;
 
       animateNumber(document.getElementById('stat-total'), total);
       animateNumber(document.getElementById('stat-hot'), hot);
+      animateNumber(document.getElementById('stat-followup'), followup);
       animateNumber(document.getElementById('stat-won'), won);
 
       const dur = document.getElementById('stat-duration');
@@ -1092,6 +1580,7 @@
 
       drawSparkline('spark-total', getDailyCounts(c => true), '#ff6a00');
       drawSparkline('spark-hot', getDailyCounts(c => c.lead_score === 'HOT'), '#ef4444');
+      drawSparkline('spark-followup', getDailyCounts(c => needsFollowUp(c)), '#f59e0b');
       drawSparkline('spark-won', getDailyCounts(c => c.lead_status === 'CLOSED_WON'), '#10b981');
       drawSparkline('spark-duration', getDailyDurations(), '#ff6a00');
     }
@@ -1129,7 +1618,7 @@
     function drawSparkline(id, data, color) {
       const svg = document.getElementById(id);
       if (!svg) return;
-      const w = 100, h = 28;
+      const w = 100, h = 24;
       const max = Math.max(...data, 1);
       const min = 0;
       const points = data.map((v, i) => {
@@ -1151,6 +1640,80 @@
         <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       `;
     }
+
+    /* ============================================================
+       FOLLOW-UP PRIORITY — top 3 calls ranked by urgency
+       ============================================================ */
+
+    function updatePriority() {
+      const card = document.getElementById('priority-card');
+      const list = document.getElementById('priority-list');
+
+      // Score each call for priority ranking
+      function priorityScore(c) {
+        let score = 0;
+        const status = c.lead_status || 'NEW';
+        if (status === 'CLOSED_WON' || status === 'CLOSED_LOST') return -999;
+
+        if (c.lead_score === 'HOT') score += 100;
+        if (c.lead_score === 'WARM') score += 40;
+
+        const askedTransfer = c.asked_for_transfer === true ||
+          (c.outcome || '').toLowerCase().includes('asked for human');
+        if (askedTransfer) score += 50;
+
+        // Boost for longer calls (more engaged)
+        const dur = c.duration_seconds || 0;
+        if (dur > 60) score += 10;
+        if (dur > 180) score += 10;
+
+        // Boost for recency (calls from last 24h)
+        const ageHours = (Date.now() - new Date(c.created_at).getTime()) / (1000 * 60 * 60);
+        if (ageHours < 24) score += 20;
+        else if (ageHours < 72) score += 10;
+        else if (ageHours > 168) score -= 20; // older than 7 days = stale
+
+        // Skip if already contacted (still show but lower priority)
+        if (status === 'CONTACTED') score -= 30;
+
+        return score;
+      }
+
+      const ranked = allCalls
+        .filter(c => needsFollowUp(c))
+        .map(c => ({ call: c, score: priorityScore(c) }))
+        .filter(x => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+
+      if (ranked.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+
+      card.style.display = 'block';
+      list.innerHTML = ranked.map((x, i) => {
+        const c = x.call;
+        const action = getRecommendedAction(c);
+        const reason = getPriorityReason(c);
+        const num = c.caller_number || 'Unknown';
+        return `
+          <div class="priority-item" onclick="openPanel('${c.id}')">
+            <div class="priority-rank">${i + 1}</div>
+            <div class="priority-info">
+              <div class="priority-caller">${escapeHtml(num)}</div>
+              <div class="priority-reason">${escapeHtml(reason)}</div>
+            </div>
+            <span class="badge ${(c.lead_score || 'NONE').toLowerCase()}"><span class="badge-dot"></span>${c.lead_score || 'NONE'}</span>
+            <span class="priority-action">${action.label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ============================================================
+       CHART
+       ============================================================ */
 
     function updateChart() {
       const svg = document.getElementById('main-chart');
@@ -1190,13 +1753,11 @@
       }
       const areaPath = `${path} L${points[points.length-1][0]},${H} L${points[0][0]},${H} Z`;
 
-      // Grid lines
       const gridLines = [0.25, 0.5, 0.75].map(p => {
         const y = padY + p * (H - padY * 2);
         return `<line x1="${padX}" y1="${y}" x2="${W - padX}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="2 4"/>`;
       }).join('');
 
-      // Date labels (every 5 days)
       const labels = points.filter((_, i) => i % 5 === 0 || i === points.length - 1).map(p => {
         const dateStr = p[2].date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         return `<text x="${p[0]}" y="${H - 2}" font-family="Geist Mono, monospace" font-size="9" fill="#555" text-anchor="middle">${dateStr}</text>`;
@@ -1216,6 +1777,10 @@
         ${labels}
       `;
     }
+
+    /* ============================================================
+       FILTERS / TABLE
+       ============================================================ */
 
     function setFilter(f) {
       currentFilter = f;
@@ -1249,12 +1814,33 @@
       const filtered = getFiltered();
       document.getElementById('calls-count').textContent = filtered.length;
 
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty"><div class="empty-glyph">📞</div><div class="empty-title">No calls match</div><div class="empty-sub">Try adjusting your filters or search.</div></div>`;
+      // No data at all
+      if (allCalls.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-glyph">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="empty-title">No calls yet</div>
+            <div class="empty-sub">Once your AI front desk starts answering, call activity will appear here in real time.</div>
+          </div>`;
         return;
       }
 
-      let html = `<table class="ctable"><thead><tr><th>Caller</th><th>Lead</th><th>Stage</th><th>Outcome</th><th>Time</th><th style="text-align:right">Duration</th></tr></thead><tbody>`;
+      // Filtered down to nothing
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-glyph">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="empty-title">No calls match these filters</div>
+            <div class="empty-sub">Try adjusting your filters or search to see more calls.</div>
+          </div>`;
+        return;
+      }
+
+      let html = `<table class="ctable"><thead><tr><th>Caller</th><th>Lead</th><th>Stage</th><th>Outcome</th><th>Recommended</th><th>Time</th><th style="text-align:right">Duration</th></tr></thead><tbody>`;
       filtered.forEach(call => {
         const score = call.lead_score || 'NONE';
         const status = call.lead_status || 'NEW';
@@ -1263,8 +1849,10 @@
         const num = call.caller_number || 'Unknown';
         const initials = num.replace(/\D/g, '').slice(-2) || '??';
         const isSelected = selectedId === call.id ? 'selected' : '';
+        const priority = getPriorityClass(call);
+        const action = getRecommendedAction(call);
         html += `
-          <tr class="${isSelected}" onclick="openPanel('${call.id}')">
+          <tr class="${isSelected} ${priority}" onclick="openPanel('${call.id}')">
             <td>
               <div class="caller">
                 <div class="caller-avatar mono">${initials}</div>
@@ -1274,6 +1862,7 @@
             <td><span class="badge ${score.toLowerCase()}"><span class="badge-dot"></span>${score}</span></td>
             <td>${status === 'NEW' ? '<span class="stage-pill">New</span>' : `<span class="stage-pill ${status.toLowerCase()}">${formatStage(status)}</span>`}</td>
             <td class="outcome-cell">${escapeHtml(call.outcome || '—')}</td>
+            <td><span class="action-chip ${action.type}">${action.label}</span></td>
             <td class="time-cell">${formatTime(call.created_at)}</td>
             <td class="duration-cell" style="text-align:right">${dur}</td>
           </tr>
@@ -1282,6 +1871,10 @@
       html += '</tbody></table>';
       container.innerHTML = html;
     }
+
+    /* ============================================================
+       DETAIL PANEL
+       ============================================================ */
 
     function openPanel(callId) {
       const call = allCalls.find(c => c.id === callId);
@@ -1294,6 +1887,7 @@
       const m = Math.floor((call.duration_seconds || 0) / 60), s = (call.duration_seconds || 0) % 60;
       const dur = `${m}:${String(s).padStart(2, '0')}`;
       const dateStr = new Date(call.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      const action = getRecommendedAction(call);
 
       document.getElementById('panel-title').textContent = call.caller_number || 'Unknown';
       document.getElementById('panel-meta').innerHTML = `${dateStr} · <span style="color:var(--text-dim)">${dur}</span>`;
@@ -1308,8 +1902,8 @@
               <div class="meta-item-value"><span class="badge ${score.toLowerCase()}"><span class="badge-dot"></span>${score}</span></div>
             </div>
             <div class="meta-item">
-              <div class="meta-item-label">Duration</div>
-              <div class="meta-item-value">${dur}</div>
+              <div class="meta-item-label">Recommended</div>
+              <div class="meta-item-value"><span class="action-chip ${action.type}">${action.label}</span></div>
             </div>
           </div>
         </div>
@@ -1390,8 +1984,10 @@
       if (error) { showToast('Update failed'); return; }
       const call = allCalls.find(c => c.id === callId);
       if (call) call.lead_status = newStatus;
+      updateExecSummary();
       updateStats();
-      openPanel(callId); // re-render panel
+      updatePriority();
+      openPanel(callId);
       showToast('Stage updated', 'success');
     }
 
@@ -1408,17 +2004,21 @@
     function exportCSV() {
       const filtered = getFiltered();
       if (!filtered.length) { showToast('No calls to export'); return; }
-      const headers = ['Date', 'Caller', 'Duration (s)', 'Lead Score', 'Stage', 'Outcome', 'Summary', 'Notes'];
-      const rows = filtered.map(c => [
-        new Date(c.created_at).toISOString(),
-        c.caller_number || '',
-        c.duration_seconds || 0,
-        c.lead_score || '',
-        c.lead_status || 'NEW',
-        c.outcome || '',
-        (c.summary || '').replace(/\n/g, ' '),
-        (c.notes || '').replace(/\n/g, ' '),
-      ]);
+      const headers = ['Date', 'Caller', 'Duration (s)', 'Lead Score', 'Stage', 'Outcome', 'Recommended Action', 'Summary', 'Notes'];
+      const rows = filtered.map(c => {
+        const action = getRecommendedAction(c);
+        return [
+          new Date(c.created_at).toISOString(),
+          c.caller_number || '',
+          c.duration_seconds || 0,
+          c.lead_score || '',
+          c.lead_status || 'NEW',
+          c.outcome || '',
+          action.label,
+          (c.summary || '').replace(/\n/g, ' '),
+          (c.notes || '').replace(/\n/g, ' '),
+        ];
+      });
       const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
