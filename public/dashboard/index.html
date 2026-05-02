@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Mission Control — AI Lead Intel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1789,16 +1789,16 @@
         dur.textContent = `${m}:${String(s).padStart(2, '0')}`;
       } else dur.textContent = '—';
 
-      // Hero meta — show after-hours info
+      // Hero meta — show total context based on time range
       const heroMeta = document.getElementById('hero-meta');
       if (total > 0) {
-        const afterHours = calls.filter(c => isAfterHours(c)).length;
-        if (afterHours > 0) {
-          const pct = Math.round((afterHours / total) * 100);
-          heroMeta.innerHTML = `<span class="moon">🌙</span> ${afterHours} answered after hours · ${pct}% of total`;
-        } else {
-          heroMeta.innerHTML = `All calls within business hours`;
-        }
+        const rangeLabel = {
+          today: 'today',
+          week: 'in the last 7 days',
+          month: 'in the last 30 days',
+          all: 'all time'
+        }[timeRange];
+        heroMeta.textContent = `${total} ${total === 1 ? 'call' : 'calls'} ${rangeLabel}`;
       } else {
         heroMeta.textContent = 'No calls yet in this period';
       }
