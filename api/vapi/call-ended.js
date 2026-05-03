@@ -1,6 +1,5 @@
 // /api/vapi/call-ended.js
-// Webhook endpoint that Vapi calls when a phone call ends
-// Saves call to Supabase, scores the lead, and emails a summary
+// Saves Vapi call to Supabase, scores lead, emails summary, and sends SMS follow-up
 
 export const config = {
   maxDuration: 30,
@@ -14,10 +13,6 @@ export default async function handler(req, res) {
   try {
     const payload = req.body;
     const messageType = payload?.message?.type;
-
-    if (messageType !== 'end-of-call-report' && messageType !== 'status-update') {
-      return res.status(200).json({ received: true });
-    }
 
     if (messageType !== 'end-of-call-report') {
       return res.status(200).json({ received: true });
@@ -44,6 +39,7 @@ export default async function handler(req, res) {
     };
 
     const leadAnalysis = analyzeLead(callData.transcript || '');
+
     callData.lead_score = leadAnalysis.score;
     callData.outcome = leadAnalysis.outcome;
     callData.asked_for_transfer = leadAnalysis.askedForTransfer;
@@ -57,11 +53,90 @@ export default async function handler(req, res) {
       await sendPushNotification(callData);
     }
 
-    return res.status(200).json({ success: true, callId: call.id });
+    // SMS follow-up should never break webhook
+    try {
+      if (shouldSendFollowUpText(callData)) {
+        await sendMissedCallText(callData.caller_number);
+      }
+    } catch (smsError) {
+      console.error('SMS follow-up failed but webhook continued:', smsError);
+    }
+
+    return res.status(200).json({
+      success: true,
+      callId: call.id,
+      smsAttempted: shouldSendFollowUpText(callData),
+    });
   } catch (error) {
     console.error('call-ended webhook error:', error);
     return res.status(200).json({ error: error.message });
   }
+}
+
+function shouldSendFollowUpText(callData) {
+  if (process.env.SMS_FOLLOWUP_ENABLED !== 'true') return false;
+  if (!callData?.caller_number) return false;
+  if (callData.caller_number === 'Unknown') return false;
+  if (!callData.caller_number.startsWith('+')) return false;
+
+  const transcript = (callData.transcript || '').toLowerCase();
+
+  // Do not text people who opted out
+  if (
+    transcript.includes('stop') ||
+    transcript.includes('unsubscribe') ||
+    transcript.includes('do not text')
+  ) {
+    return false;
+  }
+
+  // Avoid texting obvious accidental calls
+  if (callData.duration_seconds < 5) return false;
+
+  return true;
+}
+
+async function sendMissedCallText(to) {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_TOLL_FREE_NUMBER;
+
+  if (!accountSid || !authToken || !from) {
+    console.log('Missing Twilio SMS env vars. Skipping SMS.');
+    return;
+  }
+
+  const message =
+    'Prime Vault Self Storage: Thanks for calling. If we missed you, reply here and we’ll help with rentals, payments, or questions. Reply STOP to opt out.';
+
+  const auth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+
+  const body = new URLSearchParams({
+    To: to,
+    From: from,
+    Body: message,
+  });
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${auth}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('Twilio SMS failed:', data);
+    return;
+  }
+
+  console.log('SMS follow-up sent:', data.sid);
 }
 
 function formatTranscript(messages) {
@@ -80,7 +155,7 @@ function analyzeLead(transcript) {
 
   const hotSignals = [
     'want to book', 'want to rent', 'lock it in', 'reserve',
-    'sign up', 'i\'ll take', 'let\'s do it', 'sounds good let\'s',
+    'sign up', "i'll take", "let's do it", "sounds good let's",
     'ready to', 'when can i come', 'how do i sign'
   ];
 
@@ -140,10 +215,10 @@ async function saveToSupabase(callData) {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'apikey': process.env.SUPABASE_SERVICE_KEY,
-      'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      apikey: process.env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': 'return=minimal,resolution=merge-duplicates',
+      Prefer: 'return=minimal,resolution=merge-duplicates',
     },
     body: JSON.stringify(callData),
   });
@@ -216,6 +291,7 @@ async function sendEmailSummary(callData, leadAnalysis) {
     <h1>${scoreEmoji} ${leadAnalysis.score} Lead</h1>
     <span class="badge badge-${leadAnalysis.score.toLowerCase()}">${leadAnalysis.outcome}</span>
   </div>
+
   <div class="card">
     <h2>Call Details</h2>
     <div class="info-row"><div class="info-label">Caller</div><div class="info-value"><a href="tel:${callData.caller_number}">${callData.caller_number}</a></div></div>
@@ -225,10 +301,19 @@ async function sendEmailSummary(callData, leadAnalysis) {
     <div class="info-row"><div class="info-label">Transferred</div><div class="info-value">${leadAnalysis.askedForTransfer ? 'Yes' : 'No'}</div></div>
     <div class="info-row"><div class="info-label">Asked Pricing</div><div class="info-value">${leadAnalysis.askedForPricing ? 'Yes' : 'No'}</div></div>
   </div>
+
   ${callData.summary ? `<div class="card"><h2>Summary</h2><div class="summary">${escapeHtml(callData.summary)}</div></div>` : ''}
   ${callData.transcript ? `<div class="card"><h2>Full Transcript</h2><div class="transcript">${escapeHtml(callData.transcript)}</div></div>` : ''}
   ${callData.recording_url ? `<div class="card"><h2>Audio Recording</h2><a href="${callData.recording_url}" class="action-button">Listen to Recording</a></div>` : ''}
-  ${leadAnalysis.score === 'HOT' || leadAnalysis.score === 'WARM' ? `<div class="card" style="background: #fff7ed; border: 2px solid #ff6a00;"><h2 style="color: #ff6a00;">Recommended Action</h2><p style="margin: 0; font-size: 15px;">Call this customer back ${leadAnalysis.score === 'HOT' ? 'within 1 hour' : 'within 24 hours'} for the best chance of closing.</p><a href="tel:${callData.caller_number}" class="action-button">Call Back Now</a></div>` : ''}
+
+  ${leadAnalysis.score === 'HOT' || leadAnalysis.score === 'WARM' ? `
+    <div class="card" style="background: #fff7ed; border: 2px solid #ff6a00;">
+      <h2 style="color: #ff6a00;">Recommended Action</h2>
+      <p style="margin: 0; font-size: 15px;">Call this customer back ${leadAnalysis.score === 'HOT' ? 'within 1 hour' : 'within 24 hours'} for the best chance of closing.</p>
+      <a href="tel:${callData.caller_number}" class="action-button">Call Back Now</a>
+    </div>
+  ` : ''}
+
   <div class="footer">Powered by AI Lead Intel<br>Call ID: ${callData.vapi_call_id || 'unknown'}</div>
 </body>
 </html>
@@ -237,14 +322,14 @@ async function sendEmailSummary(callData, leadAnalysis) {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${resendKey}`,
+      Authorization: `Bearer ${resendKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       from: 'AI Lead Intel <onboarding@resend.dev>',
       to: [toEmail],
-      subject: subject,
-      html: html,
+      subject,
+      html,
     }),
   });
 
@@ -262,9 +347,9 @@ async function sendPushNotification(callData) {
     await fetch(`https://ntfy.sh/${ntfyTopic}`, {
       method: 'POST',
       headers: {
-        'Title': 'HOT LEAD - Call Back Now',
-        'Priority': 'high',
-        'Tags': 'fire,phone',
+        Title: 'HOT LEAD - Call Back Now',
+        Priority: 'high',
+        Tags: 'fire,phone',
       },
       body: `Caller ${callData.caller_number} is ready to buy. Call them back ASAP.`,
     });
