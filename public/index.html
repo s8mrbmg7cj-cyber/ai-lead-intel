@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Lead Intel — AI Front Desk That Answers Every Call</title>
-<meta name="description" content="AI front desk for local service businesses. Answers every call 24/7, books leads, sends instant alerts. Live in 5-7 days.">
+<meta name="description" content="AI front desk for local service businesses. Answers every call 24/7, captures every lead, emails you instantly. Live in 5-7 days.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
 <style>
@@ -44,9 +44,10 @@ nav.scrolled{background:rgba(5,8,15,0.95);backdrop-filter:blur(20px);border-bott
 .hero-badge .live{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s infinite;}
 h1{font-size:clamp(54px,7.5vw,96px);line-height:0.92;color:#fff;margin-bottom:20px;letter-spacing:0.02em;}
 h1 em{font-style:normal;color:var(--orange);text-shadow:0 0 40px rgba(255,106,0,0.3);}
-.hero-kicker{font-size:18px;color:var(--muted);margin-bottom:14px;font-weight:300;max-width:540px;}
+.hero-hook{font-size:19px;color:#fff;margin-bottom:14px;font-weight:600;max-width:540px;line-height:1.4;letter-spacing:-0.01em;}
+.hero-hook .arrow{color:var(--orange);font-weight:700;}
+.hero-kicker{font-size:16px;color:var(--muted);margin-bottom:28px;font-weight:300;max-width:540px;}
 .hero-kicker strong{color:var(--orange2);font-weight:600;}
-.hero-sub{font-size:16px;color:var(--muted);margin-bottom:32px;max-width:500px;font-weight:300;line-height:1.7;}
 .hero-bullets{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
 .hero-bullet{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted);}
 .bullet-check{width:22px;height:22px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);flex-shrink:0;}
@@ -72,10 +73,6 @@ h1 em{font-style:normal;color:var(--orange);text-shadow:0 0 40px rgba(255,106,0,
 .form-group input.invalid{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,82,82,0.1);}
 .form-group input::placeholder{color:var(--dim);}
 .form-group select option{background:#0f1520;}
-.consent-box{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5;transition:border-color 0.2s;}
-.consent-box:hover{border-color:var(--border2);}
-.consent-box input{margin-top:2px;flex-shrink:0;cursor:pointer;accent-color:var(--orange);}
-.consent-box a{color:var(--orange2);text-decoration:underline;}
 .form-submit{width:100%;padding:15px;background:linear-gradient(135deg,var(--orange) 0%,var(--orange2) 100%);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:4px;box-shadow:0 10px 30px rgba(255,106,0,0.25),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;}
 .form-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 0%,rgba(255,255,255,0.15) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.5s;}
 .form-submit:hover{transform:translateY(-1px);box-shadow:0 15px 45px rgba(255,106,0,0.4),inset 0 1px 0 rgba(255,255,255,0.2);}
@@ -230,7 +227,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .pcard-tagline{font-size:15px;color:var(--muted);margin-bottom:18px;}
 .pcard-price{font-family:'Bebas Neue',sans-serif;font-size:64px;color:#fff;line-height:1;margin-bottom:4px;}
 .pcard-price span{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:400;color:var(--muted);}
-/* NEW — missed-caller subline under price */
 .pcard-subline{font-size:14px;color:var(--text);font-weight:500;line-height:1.5;margin-top:8px;margin-bottom:0;}
 .pcard-subline .arrow{color:var(--orange);font-weight:700;}
 .pcard-desc{font-size:13px;color:var(--muted);margin-top:16px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border);}
@@ -238,7 +234,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .pcard li{font-size:14px;color:var(--muted);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
 .pcard li::before{content:"✓";color:var(--orange);font-weight:700;flex-shrink:0;margin-top:1px;}
 .pcard li strong{color:#fff;font-weight:500;}
-/* NEW — highlighted top bullet */
 .pcard li.highlight{background:rgba(255,106,0,0.06);border:1px solid var(--orange-border);border-radius:8px;padding:10px 12px;margin-bottom:4px;}
 .pcard li.highlight::before{content:"⚡";color:var(--orange2);}
 .pcard li.highlight strong{color:#fff;font-weight:600;}
@@ -305,23 +300,24 @@ footer .footer-links a:hover{color:var(--orange2);}
     <div>
       <div class="hero-badge"><span class="live"></span> AI Front Desk · Built for Local Service Businesses</div>
       <h1>Never miss another<br/><em>paying customer.</em></h1>
+      <p class="hero-hook">Every call answered <span class="arrow">→</span> every lead captured <span class="arrow">→</span> emailed to you instantly.</p>
       <p class="hero-kicker">Built for local service businesses — <strong>HVAC, plumbing, landscaping, self storage, salon, auto detailing</strong>, and more.</p>
       <div class="hero-bullets">
         <div class="hero-bullet"><div class="bullet-check">✓</div>Answers every call 24/7 in your brand's voice</div>
-        <div class="hero-bullet"><div class="bullet-check">✓</div>Captures every lead with instant alerts</div>
-        <div class="hero-bullet"><div class="bullet-check">✓</div>Full transcript &amp; recording for every call</div>
+        <div class="hero-bullet"><div class="bullet-check">✓</div>Captures every lead with full transcripts</div>
+        <div class="hero-bullet"><div class="bullet-check">✓</div>Instant email alert the second a call ends</div>
         <div class="hero-bullet"><div class="bullet-check">✓</div>Works while you sleep, drive, or work</div>
       </div>
       <div class="hero-ctas">
         <a href="#get-started" class="btn-primary">Get My AI Setup →</a>
         <a href="#live-demo" class="btn-demo">See it in action ↓</a>
       </div>
-      <p class="hero-note">Takes 30 seconds. We'll text you right after.</p>
+      <p class="hero-note">Takes 30 seconds. We'll reach out within 1 business day.</p>
     </div>
     <div class="form-card" id="get-started">
       <div class="spots-left">🔴 Founding client pricing — limited slots</div>
       <div class="form-card-title">Get My AI Setup</div>
-      <p class="form-card-sub">Takes 30 seconds. We'll text you right after.</p>
+      <p class="form-card-sub">Takes 30 seconds. We'll reach out within 1 business day.</p>
       <div id="formContent">
         <div class="form-error-msg" id="formErrorMsg"></div>
         <div class="form-group">
@@ -331,6 +327,10 @@ footer .footer-links a:hover{color:var(--orange2);}
         <div class="form-group">
           <label>Phone Number</label>
           <input type="tel" id="fphone" class="phone-input" placeholder="385-600-8134" inputmode="numeric" maxlength="12" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="femail" placeholder="you@yourbusiness.com" autocomplete="email">
         </div>
         <div class="form-group">
           <label>Business Type</label>
@@ -350,21 +350,16 @@ footer .footer-links a:hover{color:var(--orange2);}
             <option value="other">Other Service Business</option>
           </select>
         </div>
-        <label class="consent-box">
-          <input type="checkbox" id="fconsent">
-          <span>I agree to receive text messages from AI Lead Intel about my inquiry/setup. Message &amp; data rates may apply. Reply STOP to opt out, HELP for support. See our <a href="/privacy">Privacy Policy</a> &amp; <a href="/terms">Terms</a>.</span>
-        </label>
         <button class="form-submit" onclick="submitLead()">Get My AI Setup →</button>
         <p class="form-privacy">
-          Takes 30 seconds. We'll text you right after.<br/>
-          Consent to receive SMS is not a condition of purchase.<br/>
+          Takes 30 seconds. We'll reach out within 1 business day.<br/>
           <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a>
         </p>
       </div>
       <div class="form-success" id="formSuccess">
         <div class="success-icon">✓</div>
         <h4>You're In!</h4>
-        <p>Check your phone — we're texting you right now to get your AI front desk set up.</p>
+        <p>Got it — we'll reach out within 1 business day to start your AI front desk setup.</p>
       </div>
     </div>
   </div>
@@ -410,11 +405,11 @@ footer .footer-links a:hover{color:var(--orange2);}
       <div class="cap-card">
         <div class="cap-icon">⚡</div>
         <h3>Alerts you instantly</h3>
-        <p>The second a call ends, you get an email with the lead score, summary, and next step. Hot leads also trigger a push notification so you can call back fast.</p>
+        <p>The second a call ends, you get an email with the lead score, summary, transcript, and recording. Hot leads stand out so you can call back fast.</p>
         <ul class="cap-features">
-          <li>Email summary every call</li>
-          <li>Push notifications for hot leads</li>
+          <li>Email alert seconds after every call</li>
           <li>Lead scoring (Hot / Warm / Cold)</li>
+          <li>Full transcript &amp; recording included</li>
           <li>Caller info captured automatically</li>
         </ul>
       </div>
@@ -447,12 +442,12 @@ footer .footer-links a:hover{color:var(--orange2);}
     <span class="section-tag">See it happen in real time</span>
     <div class="live-demo-grid">
       <div class="live-demo-text">
-        <h2>What your customer sees <em style="color:var(--orange);font-style:normal;">60 seconds</em> after they hang up</h2>
+        <h2>What your customer hears <em style="color:var(--orange);font-style:normal;">in 2 seconds</em></h2>
         <p>No human on the other end. No delay. No lost lead. Just your AI front desk doing the work — while you're on a job, driving, or asleep.</p>
         <div class="live-demo-steps">
           <div class="ld-step">
             <div class="ld-step-num">1</div>
-            <div class="ld-step-text"><strong>Customer calls, you miss it</strong><span>Happens 5-15 times a week to most businesses</span></div>
+            <div class="ld-step-text"><strong>Customer calls, you can't answer</strong><span>Happens 5-15 times a week to most businesses</span></div>
           </div>
           <div class="ld-step">
             <div class="ld-step-num">2</div>
@@ -460,7 +455,7 @@ footer .footer-links a:hover{color:var(--orange2);}
           </div>
           <div class="ld-step">
             <div class="ld-step-num">3</div>
-            <div class="ld-step-text"><strong>You get an instant lead alert</strong><span>Email + push notification with full transcript</span></div>
+            <div class="ld-step-text"><strong>You get an instant email alert</strong><span>Lead score, transcript, recording, and recommended action</span></div>
           </div>
         </div>
       </div>
@@ -518,7 +513,7 @@ footer .footer-links a:hover{color:var(--orange2);}
         <ul class="vs-list">
           <li><span class="vs-icon good">✓</span>Answers every call 24/7</li>
           <li><span class="vs-icon good">✓</span>Sounds like YOUR business</li>
-          <li><span class="vs-icon good">✓</span>Instant lead alerts to your phone</li>
+          <li><span class="vs-icon good">✓</span>Instant email alerts on every call</li>
           <li><span class="vs-icon good">✓</span>Full transcript &amp; recording per call</li>
           <li><span class="vs-icon good">✓</span>Live dashboard with sales pipeline</li>
         </ul>
@@ -588,7 +583,7 @@ footer .footer-links a:hover{color:var(--orange2);}
       <div class="step">
         <div class="step-num">03</div>
         <h3>You Get Notified</h3>
-        <p>Instant email + push notification with the lead score, transcript, and recording. Hot leads stand out. You just call back to close.</p>
+        <p>Instant email with the lead score, transcript, and recording. Hot leads stand out. You just call back to close.</p>
       </div>
     </div>
   </div>
@@ -693,17 +688,17 @@ footer .footer-links a:hover{color:var(--orange2);}
         <div class="pcard-tier">AI Front Desk</div>
         <p class="pcard-tagline">Full voice AI receptionist</p>
         <div class="pcard-price">$299<span>/mo</span></div>
-        <p class="pcard-subline">Miss a call <span class="arrow">→</span> they get a text <span class="arrow">→</span> you still get the lead.</p>
-        <p class="pcard-desc">Your phone gets answered 24/7 — even when you can't. And every missed caller gets an instant text follow-up.</p>
+        <p class="pcard-subline">Every call answered <span class="arrow">→</span> every lead captured <span class="arrow">→</span> emailed to you instantly.</p>
+        <p class="pcard-desc">Your phone gets answered 24/7 — even when you can't. Every call captured with full transcript, recording, and lead score.</p>
         <ul>
-          <li class="highlight"><strong>Instantly texts missed callers so you don't lose the lead</strong></li>
+          <li class="highlight"><strong>Answers calls in under 2 seconds — even at 2am</strong></li>
           <li><strong>AI voice answers every call</strong> in your brand's tone</li>
           <li>Handles pricing, hours, availability questions</li>
           <li>Qualifies leads &amp; captures all booking details</li>
           <li>Transfers to you only when truly needed</li>
           <li>Live dashboard with full call history</li>
           <li>Recordings, transcripts &amp; lead scoring</li>
-          <li>Email + push notification on every call</li>
+          <li>Instant email alert on every call</li>
           <li>Done-for-you setup &amp; tuning</li>
           <li>Priority support — text the founder direct</li>
         </ul>
@@ -748,6 +743,10 @@ footer .footer-links a:hover{color:var(--orange2);}
       <div class="faq-a"><div class="faq-a-inner">Yes. Your dashboard shows every call with full transcripts, recordings, lead score, and pipeline status. You can search by phone number, filter by date, and export everything to CSV anytime.</div></div>
     </div>
     <div class="faq-item">
+      <div class="faq-q">Does the AI text my customers?</div>
+      <div class="faq-a"><div class="faq-a-inner">Not right now. AI Lead Intel is currently a voice-only product — every call is answered, captured, and emailed to you instantly. SMS follow-ups are on our roadmap and will be added once carrier verification is complete.</div></div>
+    </div>
+    <div class="faq-item">
       <div class="faq-q">Is my customer data safe?</div>
       <div class="faq-a"><div class="faq-a-inner">Yes. Conversations are encrypted in transit and at rest, data is stored securely on US-based infrastructure, and we never share or sell any customer information. See our <a href="/privacy" style="color:var(--orange2);text-decoration:underline;">Privacy Policy</a> for full details.</div></div>
     </div>
@@ -764,12 +763,12 @@ footer .footer-links a:hover{color:var(--orange2);}
     <h2>Stop Giving Jobs Away</h2>
     <p>Every day you wait is more missed calls, more lost jobs, more money going to your competitors. Live in 5-7 days — one recovered job covers the cost.</p>
     <a href="#get-started" class="btn-primary" style="font-size:17px;padding:17px 36px;">Get My AI Setup →</a>
-    <p style="font-size:13px;color:var(--dim);margin-top:16px;">Takes 30 seconds. We'll text you right after.</p>
+    <p style="font-size:13px;color:var(--dim);margin-top:16px;">Takes 30 seconds. We'll reach out within 1 business day.</p>
   </div>
 </section>
 
 <footer>
-  <p>© 2026 AI Lead Intel. Built for local service businesses.</p>
+  <p>© 2026 AI Lead Intel · Apex Growth Investments LLC</p>
   <p class="footer-links">
     <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> · <a href="mailto:hello@aileadintel.com">Contact</a>
   </p>
@@ -780,11 +779,7 @@ footer .footer-links a:hover{color:var(--orange2);}
 </div>
 
 <script>
-/* ============================================================
-   PHONE FORMATTER — auto-formats .phone-input fields as user types
-   ============================================================
-   3856008134 → 385-600-8134 (live, while typing)
-*/
+/* PHONE FORMATTER */
 function formatPhoneValue(raw) {
   var digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
   if (digits.length === 0) return '';
@@ -815,18 +810,13 @@ function attachPhoneFormatter(input) {
   });
   input.addEventListener('blur', function () {
     input.value = formatPhoneValue(input.value);
-    if (input.value && !isValidPhone(input.value)) {
-      input.classList.add('invalid');
-    } else {
-      input.classList.remove('invalid');
-    }
+    if (input.value && !isValidPhone(input.value)) input.classList.add('invalid');
+    else input.classList.remove('invalid');
   });
 }
 document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
 
-/* ============================================================
-   STICKY NAV + MOBILE CTA
-   ============================================================ */
+/* STICKY NAV */
 window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
   document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60);
@@ -835,9 +825,7 @@ window.addEventListener('scroll', () => {
   else mobileCta.classList.remove('visible');
 });
 
-/* ============================================================
-   ROI CALCULATOR
-   ============================================================ */
+/* ROI CALC */
 function calcROI() {
   const calls = +document.getElementById('s1').value;
   const job   = +document.getElementById('s2').value;
@@ -852,9 +840,7 @@ function calcROI() {
 }
 calcROI();
 
-/* ============================================================
-   CONVERSATION TABS
-   ============================================================ */
+/* CONVO TABS */
 document.querySelectorAll('.convo-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const target = tab.dataset.tab;
@@ -865,26 +851,20 @@ document.querySelectorAll('.convo-tab').forEach(tab => {
   });
 });
 
-/* ============================================================
-   FAQ ACCORDION
-   ============================================================ */
+/* FAQ */
 document.querySelectorAll('.faq-item').forEach(item => {
   item.querySelector('.faq-q').addEventListener('click', () => {
     item.classList.toggle('open');
   });
 });
 
-/* ============================================================
-   SCROLL REVEALS
-   ============================================================ */
+/* REVEAL */
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-/* ============================================================
-   PHONE MOCKUP DEMO
-   ============================================================ */
+/* PHONE DEMO */
 const phoneMessages = [
   { type: 'incoming', text: "Hey, thanks for calling ProCool HVAC. This is Sam — how can I help? 🔧" },
   { type: 'outgoing', text: "Hi, my water heater isn't getting hot" },
@@ -907,9 +887,7 @@ function renderPhone() {
 }
 renderPhone();
 
-/* ============================================================
-   FORM SUBMIT — same backend (/api/lead-submit), better validation
-   ============================================================ */
+/* FORM SUBMIT */
 function showFormError(msg) {
   const el = document.getElementById('formErrorMsg');
   el.textContent = msg;
@@ -921,8 +899,8 @@ async function submitLead() {
   const name = document.getElementById('fname').value.trim();
   const phoneEl = document.getElementById('fphone');
   const phone = phoneEl.value.trim();
+  const email = document.getElementById('femail').value.trim();
   const biz = document.getElementById('fbiz').value;
-  const consent = document.getElementById('fconsent').checked;
 
   if (!name) { showFormError('Please enter your name.'); return; }
   if (!isValidPhone(phone)) {
@@ -930,8 +908,8 @@ async function submitLead() {
     phoneEl.classList.add('invalid');
     return;
   }
+  if (!email || !email.includes('@')) { showFormError('Please enter a valid email.'); return; }
   if (!biz) { showFormError('Please pick your business type.'); return; }
-  if (!consent) { showFormError('Please check the SMS consent box to continue.'); return; }
 
   const btn = document.querySelector('.form-submit');
   btn.textContent = 'Setting up...';
@@ -941,9 +919,8 @@ async function submitLead() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name, phone, business_type: biz,
-        sms_consent: true,
-        consented_at: new Date().toISOString()
+        name, phone, email, business_type: biz,
+        submitted_at: new Date().toISOString()
       }),
     });
     const data = await res.json();
