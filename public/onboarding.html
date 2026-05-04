@@ -43,8 +43,6 @@
       background-size: 56px 56px; pointer-events: none; z-index: 0;
       mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
     }
-    .mono { font-family: 'Geist Mono', monospace; font-feature-settings: 'tnum' 1; }
-    .serif { font-family: 'Instrument Serif', serif; font-style: italic; }
     .topnav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(10, 10, 12, 0.7);
@@ -267,6 +265,37 @@
     .field-textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
     .field-hint { font-size: 12px; color: var(--text-faint); margin-top: 8px; line-height: 1.45; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .consent-block {
+      margin-top: 18px;
+      padding: 16px 18px;
+      background: var(--surface-input);
+      border: 1px solid var(--border-input);
+      border-radius: 12px;
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; transition: all 0.18s; user-select: none;
+    }
+    .consent-block:hover { border-color: rgba(255, 255, 255, 0.16); }
+    .consent-block.checked { border-color: var(--brand); background: var(--brand-tint); }
+    .consent-block input { display: none; }
+    .consent-checkbox {
+      width: 20px; height: 20px; border-radius: 5px;
+      border: 1.5px solid var(--border-strong);
+      flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s;
+    }
+    .consent-block.checked .consent-checkbox {
+      background: var(--brand); border-color: var(--brand);
+    }
+    .consent-block.checked .consent-checkbox::after {
+      content: ''; width: 10px; height: 6px;
+      border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+    .consent-text {
+      flex: 1; font-size: 13px; color: var(--text-soft); line-height: 1.55;
+    }
+    .consent-text strong { color: var(--text); font-weight: 600; }
     .legal-links {
       margin-top: 20px; padding-top: 14px;
       border-top: 1px solid var(--border);
@@ -644,12 +673,11 @@
           <div class="rail-mini-fill" id="rail-mini-fill"></div>
         </div>
       </div>
-
       <div class="rail-list" id="rail-list">
         <div class="rail-item active" data-step="1">
           <div class="rail-num"><span>1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="rail-content">
-            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9h.01M9 12h.01M9 15h.01M9 18h.01"/></svg></span>
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>
             <span class="rail-label">Business</span>
           </div>
         </div>
@@ -670,21 +698,21 @@
         <div class="rail-item" data-step="4">
           <div class="rail-num"><span>4</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="rail-content">
-            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg></span>
             <span class="rail-label">Links</span>
           </div>
         </div>
         <div class="rail-item" data-step="5">
           <div class="rail-num"><span>5</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="rail-content">
-            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="13" y1="10" x2="13.01" y2="10"/><line x1="17" y1="10" x2="17.01" y2="10"/></svg></span>
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
             <span class="rail-label">Personality</span>
           </div>
         </div>
         <div class="rail-item" data-step="6">
           <div class="rail-num"><span>6</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="rail-content">
-            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
             <span class="rail-label">Notes</span>
           </div>
         </div>
@@ -725,10 +753,9 @@
         <div class="step active" data-step="1">
           <div class="field">
             <label class="field-label" for="business_name">Business name</label>
-            <input type="text" class="field-input" id="business_name" placeholder="Prime Vault Self Storage" autofocus />
+            <input type="text" class="field-input" id="business_name" placeholder="Your Business Name" autofocus />
             <div class="field-hint">This is what your AI will say when it answers.</div>
           </div>
-
           <div class="field-row">
             <div class="field">
               <label class="field-label" for="industry">Industry</label>
@@ -753,22 +780,9 @@
             </div>
             <div class="field">
               <label class="field-label" for="business_phone">Main phone</label>
-              <input type="tel" class="field-input phone-input" id="business_phone" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
+              <input type="tel" class="field-input phone-input" id="business_phone" placeholder="(555) 123-4567" inputmode="numeric" maxlength="14" />
             </div>
           </div>
-
-          <div class="field">
-            <label class="field-label" for="business_hours">Business hours</label>
-            <select class="field-select" id="business_hours">
-              <option value="">When are you open?</option>
-              <option value="24_7">24/7 — always open</option>
-              <option value="standard">Standard — Mon-Fri 9am-5pm</option>
-              <option value="extended">Extended — Mon-Sat 8am-7pm</option>
-              <option value="custom">Custom (specify in notes)</option>
-            </select>
-            <div class="field-hint">The AI will tell callers if you're open or closed when relevant.</div>
-          </div>
-
           <div class="ai-preview" id="ai-preview-1">
             <div class="ai-preview-icon">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
@@ -780,45 +794,42 @@
           </div>
         </div>
 
-        <!-- STEP 2 — CALL HANDLING (voice-only, no SMS consent) -->
+        <!-- STEP 2 — CALL HANDLING (5 visible fields) -->
         <div class="step" data-step="2">
           <div class="field">
-            <label class="field-label" for="transfer_primary">Primary transfer number</label>
-            <input type="tel" class="field-input phone-input" id="transfer_primary" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
-            <div class="field-hint">Your cell or main staff line. We'll forward to this when a real person is needed.</div>
+            <label class="field-label" for="transfer_primary">Primary transfer phone number</label>
+            <input type="tel" class="field-input phone-input" id="transfer_primary" placeholder="(555) 123-4567" inputmode="numeric" maxlength="14" required />
+            <div class="field-hint">Where we route calls when someone needs a real person.</div>
           </div>
 
           <div class="field">
             <label class="field-label" for="transfer_backup">
-              Backup transfer number
+              Backup transfer phone number
               <span class="optional">Optional</span>
             </label>
-            <input type="tel" class="field-input phone-input" id="transfer_backup" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
-            <div class="field-hint">Tried if the primary doesn't pick up.</div>
+            <input type="tel" class="field-input phone-input" id="transfer_backup" placeholder="(555) 123-4567" inputmode="numeric" maxlength="14" />
+            <div class="field-hint">Optional. Used if the first number does not answer.</div>
           </div>
 
           <div class="field">
             <label class="field-label" for="notify_email">Notification email</label>
-            <input type="email" class="field-input" id="notify_email" placeholder="you@yourbusiness.com" />
-            <div class="field-hint">Where call summaries and lead alerts get sent.</div>
+            <input type="email" class="field-input" id="notify_email" placeholder="hello@aileadintel.com" required />
+            <div class="field-hint">Where call summaries, lead alerts, and setup updates should go.</div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="emergency_calls">Do you handle emergency calls?</label>
-            <select class="field-select" id="emergency_calls">
-              <option value="">Pick one</option>
-              <option value="no">No — standard hours only</option>
-              <option value="yes_same">Yes — transfer emergencies to my main number anytime</option>
-              <option value="yes_separate">Yes — I have a separate after-hours emergency line</option>
-            </select>
-            <div class="field-hint">For HVAC, plumbing, locksmith, etc. — emergency calls bypass closed-hours rules.</div>
+            <label class="field-label" for="transfer_hours">Business hours / transfer hours</label>
+            <input type="text" class="field-input" id="transfer_hours" placeholder="Mon-Fri 9am-6pm" required />
+            <div class="field-hint">When it is okay to ring your phone for live transfers.</div>
           </div>
 
-          <div class="field" id="emergency_phone_field" style="display: none;">
-            <label class="field-label" for="emergency_phone">After-hours emergency number</label>
-            <input type="tel" class="field-input phone-input" id="emergency_phone" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
-            <div class="field-hint">Used only when the AI determines a call is urgent and you're closed.</div>
-          </div>
+          <label class="consent-block" id="sms-consent-block">
+            <input type="checkbox" id="sms_consent" required />
+            <div class="consent-checkbox"></div>
+            <div class="consent-text">
+              I agree to receive text messages from <strong>AI Lead Intel</strong> about my inquiry/setup. Message &amp; data rates may apply. Reply STOP to opt out.
+            </div>
+          </label>
 
           <div class="legal-links">
             By continuing you agree to our
@@ -869,23 +880,17 @@
         <!-- STEP 4 -->
         <div class="step" data-step="4">
           <div class="field">
-            <label class="field-label" for="booking_link">
-              Booking link <span class="optional">Optional</span>
-            </label>
+            <label class="field-label" for="booking_link">Booking link <span class="optional">Optional</span></label>
             <input type="url" class="field-input" id="booking_link" placeholder="https://calendly.com/yourbusiness" />
             <div class="field-hint">If a customer wants to book, the AI can mention this link verbally during the call.</div>
           </div>
           <div class="field">
-            <label class="field-label" for="payment_link">
-              Payment link <span class="optional">Optional</span>
-            </label>
+            <label class="field-label" for="payment_link">Payment link <span class="optional">Optional</span></label>
             <input type="url" class="field-input" id="payment_link" placeholder="https://pay.yourbusiness.com" />
             <div class="field-hint">For payment requests over the phone.</div>
           </div>
           <div class="field">
-            <label class="field-label" for="website">
-              Website <span class="optional">Optional</span>
-            </label>
+            <label class="field-label" for="website">Website <span class="optional">Optional</span></label>
             <input type="url" class="field-input" id="website" placeholder="https://yourbusiness.com" />
           </div>
         </div>
@@ -899,7 +904,7 @@
               <div class="radio-content">
                 <div class="radio-label">Warm &amp; Conversational</div>
                 <div class="radio-desc">Friendly, approachable, talks like a real person. Best for service businesses and trades.</div>
-                <div class="radio-sample">"Hey! Thanks for calling Prime Vault. What can I do for you today?"</div>
+                <div class="radio-sample">"Hey! Thanks for calling. What can I do for you today?"</div>
               </div>
             </label>
             <label class="radio-card" data-value="professional">
@@ -908,7 +913,7 @@
               <div class="radio-content">
                 <div class="radio-label">Professional</div>
                 <div class="radio-desc">Polished and corporate. Best for medical, legal, or higher-end services.</div>
-                <div class="radio-sample">"Good afternoon. Thank you for calling Prime Vault. How may I assist you?"</div>
+                <div class="radio-sample">"Good afternoon. Thank you for calling. How may I assist you?"</div>
               </div>
             </label>
             <label class="radio-card" data-value="direct">
@@ -917,13 +922,13 @@
               <div class="radio-content">
                 <div class="radio-label">Direct</div>
                 <div class="radio-desc">Efficient and to-the-point. Best for high-volume or repeat customers.</div>
-                <div class="radio-sample">"Prime Vault, this is your AI assistant. How can I help?"</div>
+                <div class="radio-sample">"Thanks for calling. How can I help?"</div>
               </div>
             </label>
           </div>
         </div>
 
-        <!-- STEP 6 — Pricing rules + notes -->
+        <!-- STEP 6 -->
         <div class="step" data-step="6">
           <div class="field">
             <label class="field-label" for="pricing_rule">Should the AI give pricing on calls?</label>
@@ -934,30 +939,17 @@
               <option value="no_quote">No — say "I'll have someone send you a quote"</option>
               <option value="no_transfer">No — transfer pricing questions to me</option>
             </select>
-            <div class="field-hint">This is critical. If the AI doesn't know your pricing rules, it might make up prices.</div>
+            <div class="field-hint">If the AI doesn't know your pricing rules, it might make up prices.</div>
           </div>
-
           <div class="field">
-            <label class="field-label" for="pricing_examples">
-              Common prices the AI should know <span class="optional">Optional</span>
-            </label>
-            <textarea class="field-textarea" id="pricing_examples" placeholder="e.g. Diagnostic fee: $89&#10;Standard tune-up: $149&#10;5x10 storage unit: $89/mo"></textarea>
+            <label class="field-label" for="pricing_examples">Common prices the AI should know <span class="optional">Optional</span></label>
+            <textarea class="field-textarea" id="pricing_examples" placeholder="e.g. Diagnostic fee: $89&#10;Standard tune-up: $149"></textarea>
             <div class="field-hint">List any prices the AI should be confident quoting. One per line.</div>
           </div>
-
           <div class="field">
-            <label class="field-label" for="notes">
-              Anything else we should know? <span class="optional">Optional</span>
-            </label>
-            <textarea class="field-textarea" id="notes" placeholder="Special hours, common questions, things the AI should never say. Skip if nothing comes to mind."></textarea>
-            <div class="field-hint">e.g. "We're closed Sundays. Don't quote prices over the phone. Ask if it's urgent before transferring."</div>
-          </div>
-
-          <div class="field">
-            <label class="field-label" for="best_contact_time">
-              Best time to reach you <span class="optional">Optional</span>
-            </label>
-            <input type="text" class="field-input" id="best_contact_time" placeholder="Weekdays 9am-5pm CT" />
+            <label class="field-label" for="notes">Anything else we should know? <span class="optional">Optional</span></label>
+            <textarea class="field-textarea" id="notes" placeholder="Special hours, common questions, things the AI should never say."></textarea>
+            <div class="field-hint">e.g. "We're closed Sundays. Don't quote prices over the phone."</div>
           </div>
         </div>
 
@@ -985,6 +977,7 @@
           </button>
         </div>
 
+        <!-- SUCCESS -->
         <div class="step" data-step="success">
           <div class="success-screen">
             <div class="success-glyph">
@@ -994,7 +987,6 @@
             </div>
             <h1 class="success-title">Setup <span class="accent">received</span></h1>
             <p class="success-subtitle">Setup received. We'll review your info and contact you before anything goes live.</p>
-
             <div class="success-steps">
               <div class="success-steps-label">What happens next</div>
               <div class="success-step">
@@ -1010,7 +1002,6 @@
                 <div>Your AI <strong>goes live within 5-7 business days</strong> — answering calls 24/7.</div>
               </div>
             </div>
-
             <a href="/" class="btn btn-back" style="display: inline-flex;">← Back to home</a>
           </div>
         </div>
@@ -1034,7 +1025,10 @@
   </div>
 
   <script>
-    /* PHONE FORMATTER */
+    /* ============================================================
+       PHONE FORMATTER — auto-formats .phone-input fields
+       Format: XXX-XXX-XXXX (live as user types)
+       ============================================================ */
     function formatPhoneValue(raw) {
       const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
       if (digits.length === 0) return '';
@@ -1042,10 +1036,13 @@
       if (digits.length <= 6) return digits.slice(0, 3) + '-' + digits.slice(3);
       return digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6, 10);
     }
+    function isValidPhone(value) {
+      return String(value || '').replace(/\D/g, '').length === 10;
+    }
     function attachPhoneFormatter(input) {
       if (!input || input.dataset.phoneFormatted === '1') return;
       input.dataset.phoneFormatted = '1';
-      input.addEventListener('input', (e) => {
+      input.addEventListener('input', () => {
         const before = input.value;
         const cursorPos = input.selectionStart || before.length;
         const formatted = formatPhoneValue(before);
@@ -1064,17 +1061,17 @@
       });
     }
     document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
-    function isValidPhone(value) {
-      return String(value || '').replace(/\D/g, '').length === 10;
-    }
 
+    /* ============================================================
+       ONBOARDING FLOW
+       ============================================================ */
     const TOTAL_STEPS = 7;
     let currentStep = 1;
     let completedSteps = new Set();
 
     const stepHeaders = {
       1: { eyebrow: 'Step 1 — Business', title: 'Tell us about your <span class="accent">business</span>', subtitle: 'Just the basics. Your AI will use this when it answers calls.' },
-      2: { eyebrow: 'Step 2 — Call Handling', title: 'Where should we send <span class="accent">important calls?</span>', subtitle: 'If someone needs a real person, we\'ll route the call to this number instantly.' },
+      2: { eyebrow: 'Step 2 — Call Handling', title: 'Where should we send <span class="accent">important calls?</span>', subtitle: 'When the AI needs a real person, we\'ll route the call to this number.' },
       3: { eyebrow: 'Step 3 — Topics', title: 'What do customers <span class="accent">call about?</span>', subtitle: 'Pick all that apply. We\'ll train the AI for these.' },
       4: { eyebrow: 'Step 4 — Links', title: 'Got <span class="accent">links</span> to share?', subtitle: 'When customers ask to book or pay, the AI can mention these on the call.' },
       5: { eyebrow: 'Step 5 — Personality', title: 'How should your AI <span class="accent">sound?</span>', subtitle: 'Pick the tone that fits your brand. You can change this later.' },
@@ -1089,21 +1086,6 @@
       roofing: 'Roofing', locksmith: 'Locksmith', real_estate: 'Real Estate',
       dental: 'Dental / Medical', other: 'Other',
     };
-    const businessHoursLabels = {
-      '24_7': '24/7 — always open', standard: 'Mon-Fri 9am-5pm',
-      extended: 'Mon-Sat 8am-7pm', custom: 'Custom (in notes)',
-    };
-    const emergencyLabels = {
-      no: 'No — standard hours only',
-      yes_same: 'Yes — transfer to main number',
-      yes_separate: 'Yes — separate after-hours line',
-    };
-    const pricingLabels = {
-      yes_specific: 'Yes — exact prices',
-      yes_ranges: 'Yes — ranges only',
-      no_quote: 'No — promise a quote',
-      no_transfer: 'No — transfer pricing calls to me',
-    };
     const topicLabels = {
       new_customer: 'New customer / booking', payments: 'Payments / billing',
       support: 'Customer support', other: 'Other',
@@ -1111,20 +1093,23 @@
     const personalityLabels = {
       warm: 'Warm & Conversational', professional: 'Professional', direct: 'Direct',
     };
+    const pricingLabels = {
+      yes_specific: 'Yes — exact prices', yes_ranges: 'Yes — ranges only',
+      no_quote: 'No — promise a quote', no_transfer: 'No — transfer pricing calls',
+    };
 
+    /* All Step 2 fields included in formData */
     const formData = {
-      business_name: '', industry: '', business_phone: '', business_hours: '',
-      transfer_primary: '', transfer_backup: '', notify_email: '',
-      emergency_calls: '', emergency_phone: '',
+      business_name: '', industry: '', business_phone: '',
+      transfer_primary: '', transfer_backup: '', notify_email: '', transfer_hours: '', sms_consent: false,
       topics: [],
       booking_link: '', payment_link: '', website: '',
       personality: '',
-      pricing_rule: '', pricing_examples: '',
-      notes: '', best_contact_time: '',
+      pricing_rule: '', pricing_examples: '', notes: '',
     };
 
     try {
-      const saved = localStorage.getItem('aileadintel_onboarding_v6');
+      const saved = localStorage.getItem('aileadintel_onboarding_v7');
       if (saved) {
         Object.assign(formData, JSON.parse(saved));
         restoreFields();
@@ -1132,14 +1117,14 @@
     } catch (e) {}
 
     function restoreFields() {
-      ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','emergency_phone','booking_link','payment_link','website','pricing_examples','notes','best_contact_time'].forEach(k => {
+      ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(k => {
         const el = document.getElementById(k);
         if (el && formData[k]) {
           el.value = formData[k];
           if (el.classList.contains('phone-input')) el.value = formatPhoneValue(el.value);
         }
       });
-      ['industry','business_hours','emergency_calls','pricing_rule'].forEach(k => {
+      ['industry','pricing_rule'].forEach(k => {
         const el = document.getElementById(k);
         if (el && formData[k]) el.value = formData[k];
       });
@@ -1159,13 +1144,18 @@
           if (r) r.checked = true;
         }
       }
-      toggleEmergencyPhone();
+      if (formData.sms_consent) {
+        const block = document.getElementById('sms-consent-block');
+        const cb = document.getElementById('sms_consent');
+        if (block) block.classList.add('checked');
+        if (cb) cb.checked = true;
+      }
       updateAIPreview();
     }
 
     function autoSave() {
       try {
-        localStorage.setItem('aileadintel_onboarding_v6', JSON.stringify(formData));
+        localStorage.setItem('aileadintel_onboarding_v7', JSON.stringify(formData));
         flashSavePill();
       } catch (e) {}
     }
@@ -1188,13 +1178,6 @@
           txt.textContent = 'Auto-saved';
         }, 1200);
       }, 500);
-    }
-
-    function toggleEmergencyPhone() {
-      const select = document.getElementById('emergency_calls');
-      const field = document.getElementById('emergency_phone_field');
-      if (!select || !field) return;
-      field.style.display = (select.value === 'yes_separate') ? 'block' : 'none';
     }
 
     function updateRail() {
@@ -1295,10 +1278,10 @@
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Name</div>${renderValue(formData.business_name)}</div>
             <div class="review-row"><div class="review-row-label">Industry</div>${renderValue(industryLabels[formData.industry] || formData.industry)}</div>
-            <div class="review-row"><div class="review-row-label">Phone</div>${renderValue(formData.business_phone)}</div>
-            <div class="review-row"><div class="review-row-label">Hours</div>${renderValue(businessHoursLabels[formData.business_hours] || formData.business_hours)}</div>
+            <div class="review-row full"><div class="review-row-label">Main phone</div>${renderValue(formData.business_phone)}</div>
           </div>
         </div>
+
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1311,10 +1294,11 @@
             <div class="review-row"><div class="review-row-label">Primary transfer</div>${renderValue(formData.transfer_primary)}</div>
             <div class="review-row"><div class="review-row-label">Backup transfer</div>${renderValue(formData.transfer_backup)}</div>
             <div class="review-row full"><div class="review-row-label">Notification email</div>${renderValue(formData.notify_email)}</div>
-            <div class="review-row full"><div class="review-row-label">Emergency calls</div>${renderValue(emergencyLabels[formData.emergency_calls] || formData.emergency_calls)}</div>
-            ${formData.emergency_phone ? `<div class="review-row full"><div class="review-row-label">After-hours emergency line</div><span class="review-row-value">${escapeHtml(formData.emergency_phone)}</span></div>` : ''}
+            <div class="review-row full"><div class="review-row-label">Transfer hours</div>${renderValue(formData.transfer_hours)}</div>
+            <div class="review-row full"><div class="review-row-label">SMS consent</div><span class="review-row-value">${formData.sms_consent ? 'Yes' : 'No'}</span></div>
           </div>
         </div>
+
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1329,6 +1313,7 @@
             </div>
           </div>
         </div>
+
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1343,10 +1328,11 @@
             <div class="review-row full"><div class="review-row-label">Website</div>${renderValue(formData.website)}</div>
           </div>
         </div>
+
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
-              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="13" y1="10" x2="13.01" y2="10"/><line x1="17" y1="10" x2="17.01" y2="10"/></svg></span>
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
               Personality
             </div>
             <button class="review-edit" data-edit="5">Edit</button>
@@ -1355,10 +1341,11 @@
             <div class="review-row full">${renderValue(personalityLabels[formData.personality] || formData.personality)}</div>
           </div>
         </div>
+
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
-              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></span>
               Pricing & Notes
             </div>
             <button class="review-edit" data-edit="6">Edit</button>
@@ -1367,10 +1354,10 @@
             <div class="review-row full"><div class="review-row-label">Pricing rule</div>${renderValue(pricingLabels[formData.pricing_rule] || formData.pricing_rule)}</div>
             <div class="review-row full"><div class="review-row-label">Common prices</div>${renderValue(formData.pricing_examples)}</div>
             <div class="review-row full"><div class="review-row-label">Notes</div>${renderValue(formData.notes)}</div>
-            <div class="review-row full"><div class="review-row-label">Best contact time</div>${renderValue(formData.best_contact_time)}</div>
           </div>
         </div>
       `;
+
       reviewEl.querySelectorAll('.review-edit').forEach(btn => {
         btn.addEventListener('click', () => {
           const targetStep = parseInt(btn.dataset.edit, 10);
@@ -1389,38 +1376,40 @@
       document.getElementById('form-error').classList.remove('visible');
     }
 
+    /* ============================================================
+       VALIDATION
+       Step 2 checks: transfer_primary, notify_email, transfer_hours, sms_consent
+       transfer_backup is optional but must be valid 10 digits if filled.
+       ============================================================ */
     function validateStep(step) {
       hideError();
       if (step === 1) {
         const name = document.getElementById('business_name').value.trim();
         const industry = document.getElementById('industry').value;
         const phone = document.getElementById('business_phone').value.trim();
-        const hours = document.getElementById('business_hours').value;
         if (!name) { showError('Please enter your business name.'); return false; }
         if (!industry) { showError('Please pick your industry.'); return false; }
         if (!isValidPhone(phone)) { showError('Enter a valid 10-digit phone number.'); return false; }
-        if (!hours) { showError('Please pick your business hours.'); return false; }
         formData.business_name = name;
         formData.industry = industry;
         formData.business_phone = phone;
-        formData.business_hours = hours;
       }
       if (step === 2) {
         const trans = document.getElementById('transfer_primary').value.trim();
         const backup = document.getElementById('transfer_backup').value.trim();
         const email = document.getElementById('notify_email').value.trim();
-        const emerg = document.getElementById('emergency_calls').value;
-        const emergPhone = document.getElementById('emergency_phone').value.trim();
-        if (!isValidPhone(trans)) { showError('Enter a valid 10-digit phone number for the transfer line.'); return false; }
-        if (backup && !isValidPhone(backup)) { showError('Enter a valid 10-digit phone number for the backup line, or leave it blank.'); return false; }
-        if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return false; }
-        if (!emerg) { showError('Please pick how the AI should handle emergency calls.'); return false; }
-        if (emerg === 'yes_separate' && !isValidPhone(emergPhone)) { showError('Please enter a valid 10-digit emergency number.'); return false; }
+        const hours = document.getElementById('transfer_hours').value.trim();
+        const consent = document.getElementById('sms_consent').checked;
+        if (!isValidPhone(trans)) { showError('Enter a valid 10-digit primary transfer number.'); return false; }
+        if (backup && !isValidPhone(backup)) { showError('Backup number must be a valid 10-digit number, or leave it blank.'); return false; }
+        if (!email || !email.includes('@')) { showError('Please enter a valid notification email.'); return false; }
+        if (!hours) { showError('Please enter your business hours / transfer hours.'); return false; }
+        if (!consent) { showError('Please agree to receive setup-related text messages.'); return false; }
         formData.transfer_primary = trans;
         formData.transfer_backup = backup;
         formData.notify_email = email;
-        formData.emergency_calls = emerg;
-        formData.emergency_phone = emergPhone;
+        formData.transfer_hours = hours;
+        formData.sms_consent = consent;
       }
       if (step === 3) {
         const checked = document.querySelectorAll('#topics-grid .check-card.selected');
@@ -1443,7 +1432,6 @@
         formData.pricing_rule = rule;
         formData.pricing_examples = document.getElementById('pricing_examples').value.trim();
         formData.notes = document.getElementById('notes').value.trim();
-        formData.best_contact_time = document.getElementById('best_contact_time').value.trim();
       }
       autoSave();
       return true;
@@ -1481,14 +1469,15 @@
       autoSave();
     });
 
-    ['business_phone','transfer_primary','transfer_backup','notify_email','emergency_phone','booking_link','payment_link','website','pricing_examples','notes','best_contact_time'].forEach(id => {
+    /* All Step 2 fields wired into autosave */
+    ['business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', () => {
         formData[id] = el.value;
         autoSave();
       });
     });
-    ['industry','business_hours','pricing_rule'].forEach(id => {
+    ['industry','pricing_rule'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', (e) => {
         formData[id] = e.target.value;
@@ -1496,11 +1485,18 @@
       });
     });
 
-    document.getElementById('emergency_calls').addEventListener('change', (e) => {
-      formData.emergency_calls = e.target.value;
-      toggleEmergencyPhone();
-      autoSave();
-    });
+    /* SMS consent toggle */
+    const consentBlock = document.getElementById('sms-consent-block');
+    const consentCb = document.getElementById('sms_consent');
+    if (consentBlock && consentCb) {
+      consentBlock.addEventListener('click', (e) => {
+        e.preventDefault();
+        consentCb.checked = !consentCb.checked;
+        consentBlock.classList.toggle('checked', consentCb.checked);
+        formData.sms_consent = consentCb.checked;
+        autoSave();
+      });
+    }
 
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -1545,7 +1541,7 @@
       } catch (err) {
         console.error('Network error:', err);
       }
-      try { localStorage.removeItem('aileadintel_onboarding_v6'); } catch (e) {}
+      try { localStorage.removeItem('aileadintel_onboarding_v7'); } catch (e) {}
       showSuccess();
     }
 
@@ -1581,7 +1577,6 @@
     updateHeader();
     updateRail();
     updateAIPreview();
-    toggleEmergencyPhone();
   </script>
 </body>
 </html>
