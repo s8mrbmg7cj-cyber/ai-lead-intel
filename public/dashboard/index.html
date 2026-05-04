@@ -34,6 +34,8 @@
       --live: #10b981;
       --live-glow: rgba(16, 185, 129, 0.3);
       --followup: #d97706;
+      --sms: #0891b2;
+      --sms-soft: rgba(8, 145, 178, 0.08);
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
       --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
       --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.03);
@@ -51,7 +53,6 @@
       overflow-x: hidden;
     }
 
-    /* Subtle warm glow at top right */
     body::before {
       content: '';
       position: fixed;
@@ -64,7 +65,6 @@
       z-index: 0;
     }
 
-    /* Soft grid pattern */
     body::after {
       content: '';
       position: fixed;
@@ -80,7 +80,6 @@
 
     .mono { font-family: 'Geist Mono', monospace; font-feature-settings: 'tnum' 1; }
 
-    /* TOP NAV */
     .topnav {
       position: sticky;
       top: 0;
@@ -118,11 +117,7 @@
       inset: 0;
       background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.25) 100%);
     }
-    .nav-divider {
-      width: 1px;
-      height: 18px;
-      background: var(--border);
-    }
+    .nav-divider { width: 1px; height: 18px; background: var(--border); }
     .business-tag {
       display: flex;
       align-items: center;
@@ -136,7 +131,6 @@
 
     .nav-right { display: flex; align-items: center; gap: 14px; }
 
-    /* STATUS CONSTELLATION */
     .status-cluster {
       display: flex;
       align-items: center;
@@ -160,11 +154,7 @@
       box-shadow: 0 0 8px var(--live-glow);
       animation: pulse 2s ease-in-out infinite;
     }
-    .status-divider {
-      width: 1px;
-      height: 10px;
-      background: rgba(16, 185, 129, 0.25);
-    }
+    .status-divider { width: 1px; height: 10px; background: rgba(16, 185, 129, 0.25); }
     .status-cluster .dim { color: rgba(4, 120, 87, 0.6); }
 
     @keyframes pulse {
@@ -172,11 +162,7 @@
       50% { opacity: 0.5; transform: scale(1.3); }
     }
 
-    .nav-email {
-      font-size: 12px;
-      color: var(--text-dim);
-      font-family: 'Geist Mono', monospace;
-    }
+    .nav-email { font-size: 12px; color: var(--text-dim); font-family: 'Geist Mono', monospace; }
     .icon-btn {
       width: 32px;
       height: 32px;
@@ -193,7 +179,6 @@
     }
     .icon-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-hover); }
 
-    /* CONTAINER */
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -313,7 +298,6 @@
     }
     .btn.primary:hover { box-shadow: 0 1px 3px rgba(255,106,0,0.25), 0 6px 24px var(--brand-glow); }
 
-    /* TIME TOGGLE */
     .time-toggle {
       display: inline-flex;
       align-items: center;
@@ -346,7 +330,6 @@
       box-shadow: inset 0 0 0 1px rgba(255, 106, 0, 0.25);
     }
 
-    /* EXECUTIVE SUMMARY */
     .exec-summary {
       background:
         linear-gradient(135deg, rgba(255, 106, 0, 0.04) 0%, rgba(255, 154, 0, 0.02) 100%),
@@ -406,11 +389,12 @@
     }
     .exec-text .num-hot { color: var(--hot); }
     .exec-text .num-warn { color: var(--warm); }
+    .exec-text .num-sms { color: var(--sms); }
 
-    /* HERO METRIC + SUB METRICS */
+    /* METRICS — hero + 4 stats */
     .metrics-block {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
       gap: 14px;
       margin-bottom: 24px;
     }
@@ -523,6 +507,7 @@
     .stat[data-color="hot"] { --accent-color: var(--hot); }
     .stat[data-color="brand"] { --accent-color: var(--brand); }
     .stat[data-color="followup"] { --accent-color: var(--followup); }
+    .stat[data-color="sms"] { --accent-color: var(--sms); }
     .stat-head {
       display: flex;
       justify-content: space-between;
@@ -550,20 +535,27 @@
     }
     .stat-value {
       font-family: 'Geist Mono', monospace;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 600;
       letter-spacing: -0.03em;
       line-height: 1;
       color: var(--text);
     }
     .stat-value.colored { color: var(--accent-color); }
+    .stat-sub {
+      font-family: 'Geist Mono', monospace;
+      font-size: 9px;
+      color: var(--text-faint);
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
     .stat-spark {
-      margin-top: 14px;
+      margin-top: 10px;
       height: 24px;
       width: 100%;
     }
 
-    /* FOLLOW-UP PRIORITY */
     .priority-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -590,10 +582,7 @@
       margin-bottom: 16px;
     }
     .priority-title-row { display: flex; align-items: center; gap: 10px; }
-    .priority-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
+    .priority-title { font-size: 14px; font-weight: 600; }
     .priority-icon {
       width: 26px;
       height: 26px;
@@ -678,7 +667,6 @@
       white-space: nowrap;
     }
 
-    /* CHART */
     .chart-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -704,11 +692,7 @@
       align-items: flex-start;
       margin-bottom: 18px;
     }
-    .chart-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
+    .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
     .chart-sub {
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
@@ -723,17 +707,9 @@
       font-size: 11px;
       color: var(--text-dim);
     }
-    .chart-stats span b {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .chart-svg {
-      width: 100%;
-      height: 160px;
-      display: block;
-    }
+    .chart-stats span b { color: var(--text); font-weight: 600; }
+    .chart-svg { width: 100%; height: 160px; display: block; }
 
-    /* CALLS SECTION */
     .calls-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -751,10 +727,7 @@
       flex-wrap: wrap;
     }
     .calls-title-row { display: flex; align-items: center; gap: 12px; }
-    .calls-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
+    .calls-title { font-size: 14px; font-weight: 600; }
     .calls-count {
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
@@ -797,7 +770,6 @@
     .pill.active.warm { color: var(--warm); }
     .pill.active.cold { color: var(--cold); }
 
-    /* TABLE */
     .table-wrap { overflow-x: auto; }
     .ctable { width: 100%; border-collapse: collapse; }
     .ctable thead th {
@@ -821,20 +793,15 @@
     .ctable tbody tr:last-child { border-bottom: none; }
     .ctable tbody tr:hover { background: var(--surface-hover); }
     .ctable tbody tr.selected { background: var(--brand-soft); }
-
-    /* Priority left border */
     .ctable tbody tr.priority-hot td:first-child { box-shadow: inset 3px 0 0 var(--hot); }
     .ctable tbody tr.priority-warm td:first-child { box-shadow: inset 3px 0 0 var(--warm); }
     .ctable tbody tr.priority-followup td:first-child { box-shadow: inset 3px 0 0 var(--followup); }
 
-    /* New call pulse */
     @keyframes newCallPulse {
       0% { background: rgba(255, 106, 0, 0.12); }
       100% { background: transparent; }
     }
-    .ctable tbody tr.is-new {
-      animation: newCallPulse 3s ease-out;
-    }
+    .ctable tbody tr.is-new { animation: newCallPulse 3s ease-out; }
 
     .ctable tbody td {
       padding: 14px 24px;
@@ -843,11 +810,7 @@
       color: var(--text);
     }
 
-    .caller {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .caller { display: flex; align-items: center; gap: 10px; }
     .caller-avatar {
       width: 28px;
       height: 28px;
@@ -863,11 +826,7 @@
       flex-shrink: 0;
       font-weight: 600;
     }
-    .caller-num {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-    }
+    .caller-num { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; }
 
     .badge {
       display: inline-flex;
@@ -912,7 +871,6 @@
     .stage-pill.closed_won { color: var(--won); border-color: rgba(5, 150, 105, 0.2); background: var(--won-soft); }
     .stage-pill.closed_lost { color: var(--text-faint); }
 
-    /* Recommended action chip */
     .action-chip {
       display: inline-flex;
       align-items: center;
@@ -927,31 +885,11 @@
       white-space: nowrap;
       border: 1px solid;
     }
-    .action-chip.urgent {
-      background: var(--hot-soft);
-      border-color: rgba(220, 38, 38, 0.2);
-      color: var(--hot);
-    }
-    .action-chip.followup {
-      background: var(--warm-soft);
-      border-color: rgba(217, 119, 6, 0.2);
-      color: var(--warm);
-    }
-    .action-chip.send {
-      background: var(--brand-soft);
-      border-color: rgba(255, 106, 0, 0.2);
-      color: var(--brand);
-    }
-    .action-chip.review {
-      background: var(--cold-soft);
-      border-color: rgba(37, 99, 235, 0.2);
-      color: var(--cold);
-    }
-    .action-chip.none {
-      background: var(--bg);
-      border-color: var(--border);
-      color: var(--text-faint);
-    }
+    .action-chip.urgent { background: var(--hot-soft); border-color: rgba(220, 38, 38, 0.2); color: var(--hot); }
+    .action-chip.followup { background: var(--warm-soft); border-color: rgba(217, 119, 6, 0.2); color: var(--warm); }
+    .action-chip.send { background: var(--brand-soft); border-color: rgba(255, 106, 0, 0.2); color: var(--brand); }
+    .action-chip.review { background: var(--cold-soft); border-color: rgba(37, 99, 235, 0.2); color: var(--cold); }
+    .action-chip.none { background: var(--bg); border-color: var(--border); color: var(--text-faint); }
 
     .outcome-cell {
       color: var(--text-dim);
@@ -961,18 +899,9 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .time-cell {
-      font-family: 'Geist Mono', monospace;
-      font-size: 11px;
-      color: var(--text-faint);
-    }
-    .duration-cell {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
+    .time-cell { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); }
+    .duration-cell { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--text-dim); }
 
-    /* EMPTY */
     .empty {
       padding: 80px 24px;
       text-align: center;
@@ -993,7 +922,6 @@
     .empty-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
     .empty-sub { color: var(--text-dim); font-size: 13px; max-width: 360px; margin: 0 auto; line-height: 1.5; }
 
-    /* Skeleton */
     .skeleton-row {
       display: flex;
       align-items: center;
@@ -1012,7 +940,6 @@
       100% { background-position: -200% 0; }
     }
 
-    /* SLIDE PANEL */
     .panel-overlay {
       position: fixed;
       inset: 0;
@@ -1057,11 +984,7 @@
       color: var(--text-faint);
       margin-top: 2px;
     }
-    .panel-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-    }
+    .panel-body { flex: 1; overflow-y: auto; padding: 24px; }
     .panel-body::-webkit-scrollbar { width: 8px; }
     .panel-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
@@ -1187,6 +1110,57 @@
     .transcript-shell::-webkit-scrollbar { width: 6px; }
     .transcript-shell::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
+    /* Texts sent in panel */
+    .texts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .text-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .text-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .text-item-to {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .text-item-time {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+    }
+    .text-item-body {
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .text-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .text-status.delivered { background: var(--won-soft); color: var(--won); }
+    .text-status.sent { background: var(--sms-soft); color: var(--sms); }
+    .text-status.failed { background: var(--hot-soft); color: var(--hot); }
+    .text-status.pending { background: var(--bg); color: var(--text-faint); }
+
     .panel-actions {
       padding: 16px 24px;
       border-top: 1px solid var(--border);
@@ -1196,7 +1170,6 @@
     }
     .panel-actions .btn { flex: 1; justify-content: center; }
 
-    /* FLOATING ACTIVITY BUBBLE */
     .activity-bubble {
       position: fixed;
       bottom: 24px;
@@ -1244,7 +1217,6 @@
       font-weight: 600;
     }
 
-    /* TOAST */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -1274,7 +1246,6 @@
     }
     .toast.success .toast-dot { background: var(--won); }
 
-    /* FOOTER */
     .dashboard-footer {
       max-width: 1400px;
       margin: 40px auto 0;
@@ -1304,10 +1275,7 @@
       background: linear-gradient(135deg, var(--brand) 0%, #ff9a00 100%);
       box-shadow: 0 2px 6px var(--brand-glow);
     }
-    .dashboard-footer .footer-links {
-      display: flex;
-      gap: 18px;
-    }
+    .dashboard-footer .footer-links { display: flex; gap: 18px; }
     .dashboard-footer a {
       color: var(--text-dim);
       text-decoration: none;
@@ -1315,9 +1283,8 @@
     }
     .dashboard-footer a:hover { color: var(--text); }
 
-    /* MOBILE */
-    @media (max-width: 1100px) {
-      .metrics-block { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 1200px) {
+      .metrics-block { grid-template-columns: 1fr 1fr 1fr 1fr; }
       .hero-stat { grid-column: 1 / -1; }
     }
 
@@ -1404,13 +1371,12 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export
         </button>
-        <button class="btn" onclick="loadCalls()" title="Refresh">
+        <button class="btn" onclick="loadAll()" title="Refresh">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
       </div>
     </div>
 
-    <!-- TIME RANGE TOGGLE -->
     <div class="time-toggle">
       <button class="time-pill" data-range="today" onclick="setTimeRange('today')">Today</button>
       <button class="time-pill" data-range="week" onclick="setTimeRange('week')">7 Days</button>
@@ -1418,7 +1384,6 @@
       <button class="time-pill active" data-range="all" onclick="setTimeRange('all')">All Time</button>
     </div>
 
-    <!-- EXECUTIVE SUMMARY -->
     <div class="exec-summary" id="exec-summary" style="display:none;">
       <div class="exec-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -1429,7 +1394,7 @@
       </div>
     </div>
 
-    <!-- METRICS -->
+    <!-- METRICS: 1 hero + 4 sub -->
     <div class="metrics-block">
       <div class="hero-stat">
         <div class="hero-head">
@@ -1467,6 +1432,17 @@
         <svg class="stat-spark" id="spark-followup" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
       </div>
 
+      <div class="stat" data-color="sms">
+        <div class="stat-head">
+          <div class="stat-label">Texts Sent</div>
+          <div class="stat-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+        </div>
+        <div class="stat-value mono colored" id="stat-texts" data-target="0">0</div>
+        <svg class="stat-spark" id="spark-texts" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
+      </div>
+
       <div class="stat" data-color="brand">
         <div class="stat-head">
           <div class="stat-label">Avg Call Time</div>
@@ -1479,7 +1455,6 @@
       </div>
     </div>
 
-    <!-- FOLLOW-UP PRIORITY -->
     <div class="priority-card" id="priority-card" style="display:none;">
       <div class="priority-head">
         <div class="priority-title-row">
@@ -1495,7 +1470,6 @@
       <div class="priority-list" id="priority-list"></div>
     </div>
 
-    <!-- CHART -->
     <div class="chart-card">
       <div class="chart-head">
         <div>
@@ -1511,7 +1485,6 @@
       <svg class="chart-svg" id="main-chart" viewBox="0 0 1000 160" preserveAspectRatio="none"></svg>
     </div>
 
-    <!-- CALLS TABLE -->
     <div class="calls-card">
       <div class="calls-head">
         <div class="calls-title-row">
@@ -1536,7 +1509,6 @@
       </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="dashboard-footer">
       <div class="footer-left">
         <div class="footer-mark"></div>
@@ -1550,7 +1522,6 @@
     </footer>
   </div>
 
-  <!-- DETAIL PANEL -->
   <div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
   <aside class="panel" id="panel">
     <div class="panel-head">
@@ -1566,7 +1537,6 @@
     <div class="panel-actions" id="panel-actions"></div>
   </aside>
 
-  <!-- ACTIVITY BUBBLE -->
   <div class="activity-bubble" id="activity-bubble">
     <div class="pulse-ring"></div>
     <div>
@@ -1587,10 +1557,12 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let allCalls = [];
+    let allTexts = [];
     let currentFilter = 'all';
     let timeRange = 'all';
     let selectedId = null;
     let realtimeChannel = null;
+    let textsRealtimeChannel = null;
     let newCallIds = new Set();
 
     async function init() {
@@ -1601,24 +1573,34 @@
       const { data: clients } = await sb.from('clients').select('business_name').eq('owner_user_id', session.user.id).limit(1);
       if (clients?.length) document.getElementById('business-name').textContent = clients[0].business_name;
 
-      await loadCalls();
+      await loadAll();
       setupRealtime();
       setupKeyboard();
       setInterval(updateLastCallTime, 30000);
     }
 
     function setupRealtime() {
-      if (realtimeChannel) return;
-      realtimeChannel = sb.channel('calls-changes')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls' },
-          (payload) => {
-            if (payload.new && payload.new.id) newCallIds.add(payload.new.id);
-            loadCalls();
-            showToast('New call received', 'success');
-          })
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calls' },
-          () => { loadCalls(); })
-        .subscribe();
+      if (!realtimeChannel) {
+        realtimeChannel = sb.channel('calls-changes')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls' },
+            (payload) => {
+              if (payload.new && payload.new.id) newCallIds.add(payload.new.id);
+              loadAll();
+              showToast('New call received', 'success');
+            })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calls' },
+            () => { loadAll(); })
+          .subscribe();
+      }
+      // Also listen for text_messages inserts
+      if (!textsRealtimeChannel) {
+        textsRealtimeChannel = sb.channel('texts-changes')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'text_messages' },
+            () => { loadAll(); })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'text_messages' },
+            () => { loadAll(); })
+          .subscribe();
+      }
     }
 
     function setupKeyboard() {
@@ -1631,13 +1613,21 @@
       });
     }
 
-    async function loadCalls() {
-      const { data: calls, error } = await sb.from('calls').select('*').order('created_at', { ascending: false }).limit(200);
-      if (error) {
-        document.getElementById('calls-container').innerHTML = `<div class="empty"><div class="empty-glyph">⚠</div><div class="empty-title">${error.message}</div></div>`;
+    async function loadAll() {
+      // Load calls and texts in parallel
+      const [callsRes, textsRes] = await Promise.all([
+        sb.from('calls').select('*').order('created_at', { ascending: false }).limit(200),
+        sb.from('text_messages').select('*').order('created_at', { ascending: false }).limit(500),
+      ]);
+
+      if (callsRes.error) {
+        document.getElementById('calls-container').innerHTML = `<div class="empty"><div class="empty-glyph">⚠</div><div class="empty-title">${callsRes.error.message}</div></div>`;
         return;
       }
-      allCalls = calls || [];
+      allCalls = callsRes.data || [];
+      // text_messages may not exist or may have RLS restrictions; tolerate gracefully
+      allTexts = (textsRes && !textsRes.error) ? (textsRes.data || []) : [];
+
       updateExecSummary();
       updateStats();
       updatePriority();
@@ -1702,6 +1692,16 @@
       return allCalls.filter(c => new Date(c.created_at) >= cutoff);
     }
 
+    function getTextsInRange(range) {
+      if (range === 'all') return allTexts;
+      const now = new Date();
+      let cutoff;
+      if (range === 'today') { cutoff = new Date(now); cutoff.setHours(0,0,0,0); }
+      else if (range === 'week') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7); }
+      else if (range === 'month') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30); }
+      return allTexts.filter(t => new Date(t.created_at) >= cutoff);
+    }
+
     function setTimeRange(range) {
       timeRange = range;
       document.querySelectorAll('.time-pill').forEach(b => b.classList.toggle('active', b.dataset.range === range));
@@ -1720,7 +1720,9 @@
       }
 
       const calls = getCallsInRange(timeRange);
-      if (calls.length === 0) {
+      const texts = getTextsInRange(timeRange);
+
+      if (calls.length === 0 && texts.length === 0) {
         summaryEl.style.display = 'none';
         return;
       }
@@ -1735,12 +1737,17 @@
       const handled = calls.length;
       const hotCount = calls.filter(c => c.lead_score === 'HOT').length;
       const followupCount = calls.filter(c => needsFollowUp(c)).length;
+      const textsCount = texts.length;
 
       const parts = [];
       parts.push(`Your AI handled <span class="num">${handled}</span> ${handled === 1 ? 'call' : 'calls'} ${scopeLabel}`);
 
       if (hotCount > 0) {
         parts.push(`identified <span class="num num-hot">${hotCount}</span> ready-to-buy ${hotCount === 1 ? 'lead' : 'leads'}`);
+      }
+
+      if (textsCount > 0) {
+        parts.push(`sent <span class="num num-sms">${textsCount}</span> follow-up ${textsCount === 1 ? 'text' : 'texts'}`);
       }
 
       if (followupCount > 0) {
@@ -1776,15 +1783,18 @@
 
     function updateStats() {
       const calls = getCallsInRange(timeRange);
+      const texts = getTextsInRange(timeRange);
       const total = calls.length;
       const hot = calls.filter(c => c.lead_score === 'HOT').length;
       const followup = calls.filter(c => needsFollowUp(c)).length;
       const totalDur = calls.reduce((s, c) => s + (c.duration_seconds || 0), 0);
       const avg = total > 0 ? Math.round(totalDur / total) : 0;
+      const textCount = texts.length;
 
       animateNumber(document.getElementById('stat-total'), total);
       animateNumber(document.getElementById('stat-hot'), hot);
       animateNumber(document.getElementById('stat-followup'), followup);
+      animateNumber(document.getElementById('stat-texts'), textCount);
 
       const dur = document.getElementById('stat-duration');
       if (total > 0) {
@@ -1792,7 +1802,6 @@
         dur.textContent = `${m}:${String(s).padStart(2, '0')}`;
       } else dur.textContent = '—';
 
-      // Hero meta — clean total context
       const heroMeta = document.getElementById('hero-meta');
       if (total > 0) {
         const rangeLabel = {
@@ -1806,19 +1815,20 @@
         heroMeta.textContent = 'No calls yet in this period';
       }
 
-      drawSparkline('spark-total', getDailyCounts(c => true), '#ff6a00', 44);
-      drawSparkline('spark-hot', getDailyCounts(c => c.lead_score === 'HOT'), '#dc2626', 24);
-      drawSparkline('spark-followup', getDailyCounts(c => needsFollowUp(c)), '#d97706', 24);
+      drawSparkline('spark-total', getDailyCounts(allCalls, c => true), '#ff6a00', 44);
+      drawSparkline('spark-hot', getDailyCounts(allCalls, c => c.lead_score === 'HOT'), '#dc2626', 24);
+      drawSparkline('spark-followup', getDailyCounts(allCalls, c => needsFollowUp(c)), '#d97706', 24);
+      drawSparkline('spark-texts', getDailyCounts(allTexts, t => true), '#0891b2', 24);
       drawSparkline('spark-duration', getDailyDurations(), '#ff6a00', 24);
     }
 
-    function getDailyCounts(filterFn) {
+    function getDailyCounts(items, filterFn) {
       const days = [];
       const today = new Date(); today.setHours(0,0,0,0);
       for (let i = 13; i >= 0; i--) {
         const d = new Date(today); d.setDate(d.getDate() - i);
         const next = new Date(d); next.setDate(next.getDate() + 1);
-        days.push(allCalls.filter(c => {
+        days.push(items.filter(c => {
           const t = new Date(c.created_at);
           return t >= d && t < next && filterFn(c);
         }).length);
@@ -2080,6 +2090,10 @@
       setTimeout(() => { newCallIds.clear(); }, 3500);
     }
 
+    function getTextsForCall(callId) {
+      return allTexts.filter(t => t.call_id === callId);
+    }
+
     function openPanel(callId) {
       const call = allCalls.find(c => c.id === callId);
       if (!call) return;
@@ -2092,6 +2106,7 @@
       const dur = `${m}:${String(s).padStart(2, '0')}`;
       const dateStr = new Date(call.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
       const action = getRecommendedAction(call);
+      const callTexts = getTextsForCall(call.id);
 
       document.getElementById('panel-title').textContent = call.caller_number || 'Unknown';
       document.getElementById('panel-meta').innerHTML = `${dateStr} · <span style="color:var(--text-dim)">${dur}</span>`;
@@ -2128,6 +2143,26 @@
             <button class="stage-btn ${status === 'CLOSED_LOST' ? 'active closed_lost' : ''}" onclick="updateStatus('${call.id}', 'CLOSED_LOST')">Lost</button>
           </div>
         </div>
+
+        ${callTexts.length > 0 ? `
+          <div class="panel-section">
+            <div class="panel-section-label">Texts Sent (${callTexts.length})</div>
+            <div class="texts-list">
+              ${callTexts.map(t => `
+                <div class="text-item">
+                  <div class="text-item-head">
+                    <div>
+                      <span class="text-item-to">${escapeHtml(t.to_number || '')}</span>
+                      <span class="text-status ${t.status || 'sent'}">${t.status || 'sent'}</span>
+                    </div>
+                    <span class="text-item-time">${formatTime(t.created_at)}</span>
+                  </div>
+                  <div class="text-item-body">${escapeHtml(t.message_body || '')}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
 
         <div class="panel-section">
           <div class="panel-section-label">Notes</div>
@@ -2207,9 +2242,10 @@
     function exportCSV() {
       const filtered = getFiltered();
       if (!filtered.length) { showToast('No calls to export'); return; }
-      const headers = ['Date', 'Caller', 'Duration (s)', 'Lead Score', 'Stage', 'Outcome', 'Recommended Action', 'Summary', 'Notes'];
+      const headers = ['Date', 'Caller', 'Duration (s)', 'Lead Score', 'Stage', 'Outcome', 'Recommended Action', 'Texts Sent', 'Summary', 'Notes'];
       const rows = filtered.map(c => {
         const action = getRecommendedAction(c);
+        const callTexts = getTextsForCall(c.id);
         return [
           new Date(c.created_at).toISOString(),
           c.caller_number || '',
@@ -2218,6 +2254,7 @@
           c.lead_status || 'NEW',
           c.outcome || '',
           action.label,
+          callTexts.length,
           (c.summary || '').replace(/\n/g, ' '),
           (c.notes || '').replace(/\n/g, ' '),
         ];
@@ -2264,6 +2301,7 @@
 
     async function signOut() {
       if (realtimeChannel) sb.removeChannel(realtimeChannel);
+      if (textsRealtimeChannel) sb.removeChannel(textsRealtimeChannel);
       await sb.auth.signOut();
       window.location.href = '/dashboard/login.html';
     }
