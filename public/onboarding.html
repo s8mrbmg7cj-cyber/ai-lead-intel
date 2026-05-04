@@ -12,28 +12,31 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0e0e10;
-      --bg-elevated: #131316;
-      --surface: #18181b;
-      --surface-hover: #1f1f23;
+      --bg: #0a0a0c;
+      --bg-subtle: #0e0e10;
+      --surface: #141417;
+      --surface-elevated: #1a1a1e;
+      --surface-hover: #1f1f24;
       --surface-input: #131316;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.14);
-      --border-input: rgba(255, 255, 255, 0.1);
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.13);
+      --border-input: rgba(255, 255, 255, 0.09);
+
       --text: #fafafa;
-      --text-soft: #e4e4e7;
+      --text-soft: #d4d4d8;
       --text-dim: #a1a1aa;
       --text-faint: #71717a;
+      --text-muted: #52525b;
+
       --brand: #ff6a00;
       --brand-bright: #ff9a00;
       --brand-deep: #e55a00;
-      --brand-glow: rgba(255, 106, 0, 0.35);
+      --brand-glow: rgba(255, 106, 0, 0.32);
       --brand-soft: rgba(255, 106, 0, 0.1);
-      --brand-tint: rgba(255, 106, 0, 0.06);
-      --success: #10b981;
-      --success-soft: rgba(16, 185, 129, 0.12);
+      --brand-tint: rgba(255, 106, 0, 0.05);
+
       --error: #f87171;
-      --error-soft: rgba(248, 113, 113, 0.1);
+      --error-soft: rgba(248, 113, 113, 0.08);
     }
 
     html, body { height: 100%; }
@@ -47,31 +50,30 @@
       overflow-x: hidden;
     }
 
-    /* Subtle grid */
+    /* Subtle vertical gradient */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-      background-size: 56px 56px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 106, 0, 0.08), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 106, 0, 0.06), transparent 50%);
       pointer-events: none;
       z-index: 0;
-      mask-image: radial-gradient(ellipse at center, black 0%, transparent 80%);
     }
 
-    /* Ambient orange glow top right */
+    /* Subtle grid */
     body::after {
       content: '';
       position: fixed;
-      top: -300px;
-      right: -200px;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(255, 106, 0, 0.12) 0%, transparent 70%);
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 56px 56px;
       pointer-events: none;
       z-index: 0;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
     }
 
     .mono { font-family: 'Geist Mono', monospace; font-feature-settings: 'tnum' 1; }
@@ -82,7 +84,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(14, 14, 16, 0.7);
+      background: rgba(10, 10, 12, 0.7);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
@@ -134,53 +136,90 @@
       align-items: center;
       gap: 6px;
       padding: 5px 11px;
-      background: var(--success-soft);
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
       border-radius: 99px;
       font-family: 'Geist Mono', monospace;
       font-size: 10px;
-      color: var(--success);
+      color: var(--text-dim);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       font-weight: 600;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
     }
     .nav-save-pill .save-dot {
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+      background: var(--text-faint);
+      transition: all 0.2s;
     }
+    .nav-save-pill.saving { color: var(--brand); border-color: rgba(255, 106, 0, 0.25); }
+    .nav-save-pill.saving .save-dot { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
 
     /* LAYOUT */
     .layout {
       position: relative;
       z-index: 1;
-      max-width: 1100px;
+      max-width: 1140px;
       margin: 0 auto;
       padding: 48px 32px 80px;
       display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 56px;
+      grid-template-columns: 260px 1fr;
+      gap: 64px;
       align-items: start;
     }
 
-    /* STEP RAIL */
+    /* STEP RAIL — premium polished sidebar */
     .step-rail {
       position: sticky;
-      top: 100px;
-      padding-top: 8px;
+      top: 96px;
+      padding-top: 4px;
+    }
+    .rail-header {
+      margin-bottom: 22px;
     }
     .rail-eyebrow {
       font-family: 'Geist Mono', monospace;
       font-size: 10px;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--text-faint);
-      margin-bottom: 18px;
-      font-weight: 500;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
+    .rail-progress-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-family: 'Geist Mono', monospace;
+    }
+    .rail-progress-num {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .rail-progress-total {
+      font-size: 13px;
+      color: var(--text-faint);
+    }
+    .rail-mini-bar {
+      margin-top: 10px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+    .rail-mini-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand) 0%, var(--brand-bright) 100%);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 8px var(--brand-glow);
+    }
+
     .rail-list {
       display: flex;
       flex-direction: column;
@@ -190,9 +229,9 @@
     .rail-list::before {
       content: '';
       position: absolute;
-      top: 14px;
-      bottom: 14px;
-      left: 13px;
+      top: 18px;
+      bottom: 18px;
+      left: 17px;
       width: 1.5px;
       background: var(--border);
       border-radius: 99px;
@@ -200,8 +239,8 @@
     .rail-list::after {
       content: '';
       position: absolute;
-      top: 14px;
-      left: 13px;
+      top: 18px;
+      left: 17px;
       width: 1.5px;
       height: 0;
       background: linear-gradient(180deg, var(--brand) 0%, var(--brand-bright) 100%);
@@ -212,8 +251,8 @@
     .rail-item {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 8px 10px;
+      gap: 12px;
+      padding: 9px 10px;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.15s;
@@ -221,6 +260,8 @@
       z-index: 1;
     }
     .rail-item:hover { background: var(--surface); }
+    .rail-item.locked { cursor: default; opacity: 0.6; }
+    .rail-item.locked:hover { background: transparent; }
     .rail-item.active .rail-num {
       background: var(--brand);
       color: #fff;
@@ -231,14 +272,20 @@
       color: var(--text);
       font-weight: 600;
     }
+    .rail-item.active .rail-icon {
+      color: var(--brand);
+    }
     .rail-item.completed .rail-num {
       background: var(--brand);
       color: #fff;
       border-color: var(--brand);
     }
+    .rail-item.completed .rail-icon {
+      color: var(--text-dim);
+    }
     .rail-num {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--bg);
       border: 1.5px solid var(--border-strong);
@@ -255,6 +302,19 @@
     .rail-num svg { display: none; }
     .rail-item.completed .rail-num span { display: none; }
     .rail-item.completed .rail-num svg { display: block; }
+    .rail-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rail-icon {
+      color: var(--text-faint);
+      flex-shrink: 0;
+      transition: color 0.15s;
+      display: flex;
+    }
     .rail-label {
       font-size: 13px;
       color: var(--text-dim);
@@ -262,7 +322,7 @@
       transition: color 0.15s;
     }
 
-    /* Mobile rail */
+    /* MOBILE RAIL */
     .mobile-rail {
       display: none;
       gap: 6px;
@@ -295,17 +355,18 @@
     /* CONTENT */
     .content { min-width: 0; }
 
-    .content-header { margin-bottom: 24px; }
+    .content-header { margin-bottom: 28px; }
     .header-eyebrow {
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--brand);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      font-weight: 600;
     }
     .header-eyebrow .step-dot {
       width: 5px;
@@ -315,12 +376,12 @@
       box-shadow: 0 0 8px var(--brand-glow);
     }
     .header-title {
-      font-size: 36px;
+      font-size: 38px;
       font-weight: 600;
       letter-spacing: -0.03em;
-      line-height: 1.1;
+      line-height: 1.08;
       color: var(--text);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .header-title .accent {
       font-family: 'Instrument Serif', serif;
@@ -334,8 +395,8 @@
     .header-subtitle {
       font-size: 15px;
       color: var(--text-dim);
-      line-height: 1.55;
-      max-width: 520px;
+      line-height: 1.6;
+      max-width: 540px;
     }
 
     /* CARD */
@@ -343,8 +404,10 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 32px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      padding: 36px;
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.4),
+        0 12px 24px rgba(0, 0, 0, 0.3);
       position: relative;
       overflow: hidden;
     }
@@ -356,6 +419,15 @@
       right: 0;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 30%;
+      right: 30%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.4), transparent);
     }
 
     /* STEPS */
@@ -370,7 +442,7 @@
     }
 
     /* FORM FIELDS */
-    .field { margin-bottom: 20px; }
+    .field { margin-bottom: 22px; }
     .field:last-of-type { margin-bottom: 0; }
     .field-label {
       display: flex;
@@ -380,32 +452,36 @@
       font-weight: 600;
       color: var(--text);
       margin-bottom: 8px;
+      letter-spacing: -0.005em;
     }
     .field-label .optional {
       color: var(--text-faint);
       font-weight: 500;
-      font-size: 11px;
+      font-size: 10px;
       font-family: 'Geist Mono', monospace;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .field-input,
     .field-select,
     .field-textarea {
       width: 100%;
-      padding: 13px 16px;
+      padding: 14px 16px;
       background: var(--surface-input);
       border: 1px solid var(--border-input);
       border-radius: 10px;
       color: var(--text);
       font-family: inherit;
-      font-size: 14px;
+      font-size: 15px;
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
       outline: none;
     }
     .field-input::placeholder,
-    .field-textarea::placeholder { color: var(--text-faint); font-weight: 400; }
+    .field-textarea::placeholder { color: var(--text-muted); font-weight: 400; }
     .field-input:hover,
     .field-select:hover,
     .field-textarea:hover {
@@ -416,7 +492,7 @@
     .field-textarea:focus {
       border-color: var(--brand);
       box-shadow: 0 0 0 4px var(--brand-tint);
-      background: var(--bg-elevated);
+      background: var(--bg-subtle);
     }
     .field-input.error,
     .field-select.error {
@@ -434,7 +510,7 @@
     }
 
     .field-textarea {
-      min-height: 110px;
+      min-height: 120px;
       resize: vertical;
       line-height: 1.55;
     }
@@ -442,8 +518,8 @@
     .field-hint {
       font-size: 12px;
       color: var(--text-faint);
-      margin-top: 7px;
-      line-height: 1.4;
+      margin-top: 8px;
+      line-height: 1.45;
     }
 
     .field-row {
@@ -456,23 +532,23 @@
     .check-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
     .check-card {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
+      gap: 14px;
+      padding: 16px 18px;
       background: var(--surface-input);
       border: 1px solid var(--border-input);
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.18s;
       user-select: none;
     }
     .check-card:hover {
       border-color: rgba(255, 255, 255, 0.18);
-      background: var(--bg-elevated);
+      background: var(--surface-elevated);
     }
     .check-card.selected {
       border-color: var(--brand);
@@ -481,15 +557,16 @@
     }
     .check-card input { display: none; }
     .check-box {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
       border: 1.5px solid var(--border-strong);
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.18s;
+      background: transparent;
     }
     .check-card.selected .check-box {
       border-color: var(--brand);
@@ -497,16 +574,16 @@
     }
     .check-card.selected .check-box::after {
       content: '';
-      width: 9px;
-      height: 5px;
+      width: 10px;
+      height: 6px;
       border-left: 2px solid #fff;
       border-bottom: 2px solid #fff;
       transform: rotate(-45deg) translate(1px, -1px);
     }
     .check-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
       background: var(--bg);
       border: 1px solid var(--border);
       display: flex;
@@ -532,23 +609,23 @@
     .radio-stack {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .radio-card {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      padding: 18px 20px;
+      gap: 16px;
+      padding: 20px 22px;
       background: var(--surface-input);
       border: 1px solid var(--border-input);
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
       transition: all 0.18s;
       user-select: none;
     }
     .radio-card:hover {
       border-color: rgba(255, 255, 255, 0.18);
-      background: var(--bg-elevated);
+      background: var(--surface-elevated);
     }
     .radio-card.selected {
       border-color: var(--brand);
@@ -557,8 +634,8 @@
     }
     .radio-card input { display: none; }
     .radio-dot {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border: 1.5px solid var(--border-strong);
       flex-shrink: 0;
@@ -571,8 +648,8 @@
     .radio-card.selected .radio-dot { border-color: var(--brand); }
     .radio-card.selected .radio-dot::after {
       content: '';
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--brand);
       box-shadow: 0 0 6px var(--brand-glow);
@@ -582,7 +659,7 @@
       font-size: 15px;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 5px;
       letter-spacing: -0.01em;
     }
     .radio-desc {
@@ -595,10 +672,11 @@
       font-style: italic;
       font-size: 14px;
       color: var(--text-soft);
-      margin-top: 8px;
+      margin-top: 10px;
       padding-left: 12px;
       border-left: 2px solid var(--border-strong);
       transition: border-color 0.18s;
+      line-height: 1.5;
     }
     .radio-card.selected .radio-sample {
       border-color: var(--brand);
@@ -606,7 +684,7 @@
 
     /* AI PREVIEW */
     .ai-preview {
-      margin-top: 24px;
+      margin-top: 28px;
       padding: 18px 20px;
       background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%);
       border: 1px solid rgba(255, 106, 0, 0.2);
@@ -633,15 +711,145 @@
       font-size: 10px;
       color: var(--brand);
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       font-weight: 600;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .ai-preview-text {
       font-size: 14px;
       color: var(--text);
       line-height: 1.55;
       font-style: italic;
+    }
+
+    /* REVIEW SCREEN */
+    .review-intro {
+      padding: 18px 20px;
+      background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%);
+      border: 1px solid rgba(255, 106, 0, 0.18);
+      border-radius: 12px;
+      margin-bottom: 26px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .review-intro-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
+      box-shadow: 0 4px 12px var(--brand-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .review-intro-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .review-section {
+      background: var(--surface-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      transition: border-color 0.15s;
+    }
+    .review-section:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+    .review-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .review-section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+    }
+    .review-section-title .review-icon-wrap {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+    }
+    .review-edit {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 5px;
+      transition: background 0.15s;
+      background: transparent;
+      border: none;
+    }
+    .review-edit:hover { background: var(--brand-soft); }
+
+    .review-data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+    }
+    .review-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .review-row.full { grid-column: 1 / -1; }
+    .review-row-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 9px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .review-row-value {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .review-row-value.empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .review-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .review-tag {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: 5px;
+      background: var(--brand-soft);
+      border: 1px solid rgba(255, 106, 0, 0.25);
+      color: var(--brand);
+      letter-spacing: 0.04em;
+      font-weight: 500;
     }
 
     /* BUTTONS */
@@ -659,7 +867,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 12px 20px;
+      padding: 12px 22px;
       border-radius: 10px;
       font-family: inherit;
       font-size: 14px;
@@ -671,7 +879,7 @@
       white-space: nowrap;
     }
     .btn-back {
-      background: var(--surface);
+      background: transparent;
       color: var(--text-dim);
       border-color: var(--border-strong);
     }
@@ -688,7 +896,10 @@
     .btn-next {
       background: linear-gradient(135deg, var(--brand) 0%, #ff8533 100%);
       color: #fff;
-      box-shadow: 0 1px 2px rgba(255, 106, 0, 0.3), 0 6px 16px var(--brand-glow);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        0 1px 2px rgba(255, 106, 0, 0.3),
+        0 6px 18px var(--brand-glow);
       position: relative;
       overflow: hidden;
     }
@@ -699,13 +910,16 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       transition: left 0.5s;
     }
     .btn-next:hover::before { left: 100%; }
     .btn-next:hover {
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(255, 106, 0, 0.3), 0 12px 28px var(--brand-glow);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 2px 4px rgba(255, 106, 0, 0.35),
+        0 12px 32px var(--brand-glow);
     }
     .btn-next:disabled {
       opacity: 0.6;
@@ -713,7 +927,7 @@
       transform: none;
     }
     .btn-launch {
-      padding: 14px 24px;
+      padding: 14px 28px;
       font-size: 15px;
     }
 
@@ -727,34 +941,34 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ERROR */
+    /* ERROR — clean and not scary */
     .form-error {
       background: var(--error-soft);
-      border: 1px solid rgba(248, 113, 113, 0.25);
+      border: 1px solid rgba(248, 113, 113, 0.2);
       color: var(--error);
       padding: 12px 14px;
       border-radius: 10px;
       font-size: 13px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       display: none;
-      animation: shake 0.4s ease-out;
+      animation: errEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       font-weight: 500;
     }
     .form-error.visible { display: flex; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
+    @keyframes errEnter {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .form-error svg { flex-shrink: 0; }
 
     /* TRUST */
     .trust-row {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
+      gap: 22px;
       margin-top: 32px;
       flex-wrap: wrap;
     }
@@ -768,20 +982,20 @@
       letter-spacing: 0.04em;
       font-weight: 500;
     }
-    .trust-item svg { color: var(--success); }
+    .trust-item svg { color: var(--brand); }
 
     /* SUCCESS */
     .success-screen {
       text-align: center;
-      padding: 24px 0 16px;
+      padding: 28px 0 20px;
     }
     .success-glyph {
-      width: 84px;
-      height: 84px;
-      margin: 0 auto 28px;
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 30px;
       border-radius: 24px;
       background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
-      box-shadow: 0 20px 50px var(--brand-glow), 0 0 0 8px var(--brand-soft);
+      box-shadow: 0 24px 50px var(--brand-glow), 0 0 0 8px var(--brand-soft);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -801,11 +1015,11 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .success-title {
-      font-size: 36px;
+      font-size: 38px;
       font-weight: 600;
       letter-spacing: -0.03em;
-      margin-bottom: 12px;
-      line-height: 1.1;
+      margin-bottom: 14px;
+      line-height: 1.08;
     }
     .success-title .accent {
       font-family: 'Instrument Serif', serif;
@@ -820,17 +1034,17 @@
       color: var(--text-dim);
       font-size: 15px;
       line-height: 1.6;
-      max-width: 440px;
-      margin: 0 auto 32px;
+      max-width: 460px;
+      margin: 0 auto 36px;
     }
     .success-steps {
-      background: var(--bg-elevated);
+      background: var(--bg-subtle);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 22px 24px;
+      padding: 24px 26px;
       text-align: left;
-      max-width: 460px;
-      margin: 0 auto 28px;
+      max-width: 480px;
+      margin: 0 auto 30px;
     }
     .success-steps-label {
       font-family: 'Geist Mono', monospace;
@@ -838,7 +1052,7 @@
       color: var(--text-faint);
       text-transform: uppercase;
       letter-spacing: 0.14em;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       font-weight: 600;
     }
     .success-step {
@@ -872,7 +1086,7 @@
     }
 
     /* MOBILE */
-    @media (max-width: 880px) {
+    @media (max-width: 940px) {
       .layout {
         grid-template-columns: 1fr;
         gap: 0;
@@ -889,11 +1103,12 @@
     @media (max-width: 600px) {
       .check-grid { grid-template-columns: 1fr; }
       .field-row { grid-template-columns: 1fr; gap: 0; }
-      .field-row .field { margin-bottom: 18px; }
+      .field-row .field { margin-bottom: 22px; }
       .actions { flex-direction: column-reverse; }
       .btn { width: 100%; }
       .header-title { font-size: 24px; }
       .success-title { font-size: 28px; }
+      .review-data { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -906,7 +1121,7 @@
     <div class="nav-right">
       <div class="nav-save-pill" id="save-pill">
         <div class="save-dot"></div>
-        <span>Auto-saved</span>
+        <span id="save-pill-text">Auto-saved</span>
       </div>
       <a href="mailto:andrew3333422@gmail.com" class="nav-help">Need help?</a>
     </div>
@@ -914,31 +1129,72 @@
 
   <div class="layout">
     <aside class="step-rail">
-      <div class="rail-eyebrow">Setup Progress</div>
+      <div class="rail-header">
+        <div class="rail-eyebrow">Setup Progress</div>
+        <div class="rail-progress-meta">
+          <span class="rail-progress-num" id="rail-current">1</span>
+          <span class="rail-progress-total">of <span id="rail-total">7</span></span>
+        </div>
+        <div class="rail-mini-bar">
+          <div class="rail-mini-fill" id="rail-mini-fill"></div>
+        </div>
+      </div>
+
       <div class="rail-list" id="rail-list">
         <div class="rail-item active" data-step="1">
           <div class="rail-num"><span>1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Business</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9h.01M9 12h.01M9 15h.01M9 18h.01"/></svg></span>
+            <span class="rail-label">Business</span>
+          </div>
         </div>
+
         <div class="rail-item" data-step="2">
           <div class="rail-num"><span>2</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Call Handling</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+            <span class="rail-label">Call Handling</span>
+          </div>
         </div>
+
         <div class="rail-item" data-step="3">
           <div class="rail-num"><span>3</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Topics</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="rail-label">Topics</span>
+          </div>
         </div>
+
         <div class="rail-item" data-step="4">
           <div class="rail-num"><span>4</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Links</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+            <span class="rail-label">Links</span>
+          </div>
         </div>
+
         <div class="rail-item" data-step="5">
           <div class="rail-num"><span>5</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Personality</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="13" y1="10" x2="13.01" y2="10"/><line x1="17" y1="10" x2="17.01" y2="10"/></svg></span>
+            <span class="rail-label">Personality</span>
+          </div>
         </div>
+
         <div class="rail-item" data-step="6">
           <div class="rail-num"><span>6</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="rail-label">Notes</div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+            <span class="rail-label">Notes</span>
+          </div>
+        </div>
+
+        <div class="rail-item" data-step="7">
+          <div class="rail-num"><span>7</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="rail-content">
+            <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            <span class="rail-label">Review & Launch</span>
+          </div>
         </div>
       </div>
     </aside>
@@ -949,8 +1205,9 @@
         <div class="mobile-rail-item" data-step="2">2. Calls</div>
         <div class="mobile-rail-item" data-step="3">3. Topics</div>
         <div class="mobile-rail-item" data-step="4">4. Links</div>
-        <div class="mobile-rail-item" data-step="5">5. Personality</div>
+        <div class="mobile-rail-item" data-step="5">5. Voice</div>
         <div class="mobile-rail-item" data-step="6">6. Notes</div>
+        <div class="mobile-rail-item" data-step="7">7. Review</div>
       </div>
 
       <div class="content-header">
@@ -965,7 +1222,7 @@
           <span id="form-error-text"></span>
         </div>
 
-        <!-- STEP 1 -->
+        <!-- STEP 1 — BUSINESS -->
         <div class="step active" data-step="1">
           <div class="field">
             <label class="field-label" for="business_name">Business name</label>
@@ -1013,16 +1270,19 @@
           </div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2 — CALL HANDLING (FIXED) -->
         <div class="step" data-step="2">
           <div class="field">
             <label class="field-label" for="transfer_primary">Primary transfer number</label>
             <input type="tel" class="field-input" id="transfer_primary" placeholder="(405) 555-1234" />
-            <div class="field-hint">Your cell or main staff line. Used when the AI needs a real person.</div>
+            <div class="field-hint">Your cell or main staff line. We'll forward to this when a real person is needed.</div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="transfer_backup">Backup number <span class="optional">Optional</span></label>
+            <label class="field-label" for="transfer_backup">
+              Backup transfer number
+              <span class="optional">Optional</span>
+            </label>
             <input type="tel" class="field-input" id="transfer_backup" placeholder="(405) 555-5678" />
             <div class="field-hint">Tried if the primary doesn't pick up.</div>
           </div>
@@ -1034,7 +1294,7 @@
           </div>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- STEP 3 — TOPICS -->
         <div class="step" data-step="3">
           <div class="check-grid" id="topics-grid">
             <label class="check-card" data-value="new_customer">
@@ -1075,27 +1335,36 @@
           </div>
         </div>
 
-        <!-- STEP 4 -->
+        <!-- STEP 4 — LINKS -->
         <div class="step" data-step="4">
           <div class="field">
-            <label class="field-label" for="booking_link">Booking link <span class="optional">Optional</span></label>
+            <label class="field-label" for="booking_link">
+              Booking link
+              <span class="optional">Optional</span>
+            </label>
             <input type="url" class="field-input" id="booking_link" placeholder="https://calendly.com/yourbusiness" />
             <div class="field-hint">If a customer wants to book, the AI will text them this.</div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="payment_link">Payment link <span class="optional">Optional</span></label>
+            <label class="field-label" for="payment_link">
+              Payment link
+              <span class="optional">Optional</span>
+            </label>
             <input type="url" class="field-input" id="payment_link" placeholder="https://pay.yourbusiness.com" />
             <div class="field-hint">For payment requests over the phone.</div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="website">Website <span class="optional">Optional</span></label>
+            <label class="field-label" for="website">
+              Website
+              <span class="optional">Optional</span>
+            </label>
             <input type="url" class="field-input" id="website" placeholder="https://yourbusiness.com" />
           </div>
         </div>
 
-        <!-- STEP 5 -->
+        <!-- STEP 5 — PERSONALITY -->
         <div class="step" data-step="5">
           <div class="radio-stack" id="personality-stack">
             <label class="radio-card" data-value="warm">
@@ -1130,25 +1399,57 @@
           </div>
         </div>
 
-        <!-- STEP 6 -->
+        <!-- STEP 6 — NOTES -->
         <div class="step" data-step="6">
           <div class="field">
-            <label class="field-label" for="notes">Anything we should know? <span class="optional">Optional</span></label>
+            <label class="field-label" for="notes">
+              Anything we should know?
+              <span class="optional">Optional</span>
+            </label>
             <textarea class="field-textarea" id="notes" placeholder="Special hours, common questions, things the AI should never say. Skip if nothing comes to mind."></textarea>
             <div class="field-hint">e.g. "We're closed Sundays. Don't quote prices over the phone. Ask if it's an emergency before transferring."</div>
           </div>
 
           <div class="field">
-            <label class="field-label" for="best_contact_time">Best time to reach you <span class="optional">Optional</span></label>
+            <label class="field-label" for="best_contact_time">
+              Best time to reach you
+              <span class="optional">Optional</span>
+            </label>
             <input type="text" class="field-input" id="best_contact_time" placeholder="Weekdays 9am–5pm CT" />
           </div>
         </div>
 
-        <!-- SUCCESS -->
+        <!-- STEP 7 — REVIEW & LAUNCH -->
+        <div class="step" data-step="7">
+          <div class="review-intro">
+            <div class="review-intro-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="review-intro-text">
+              <strong>Almost there.</strong> Quick review of what you entered. Click any section to edit.
+            </div>
+          </div>
+
+          <div id="review-content"></div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions" id="actions">
+          <button class="btn btn-back" id="btn-back" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <button class="btn btn-next" id="btn-next">
+            <span id="btn-next-label">Continue</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="btn-next-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- SUCCESS (separate, replaces card content) -->
         <div class="step" data-step="success">
           <div class="success-screen">
             <div class="success-glyph">
-              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
@@ -1174,17 +1475,6 @@
             <a href="/" class="btn btn-back" style="display: inline-flex;">← Back to home</a>
           </div>
         </div>
-
-        <div class="actions" id="actions">
-          <button class="btn btn-back" id="btn-back" disabled>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Back
-          </button>
-          <button class="btn btn-next" id="btn-next">
-            <span id="btn-next-label">Continue</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
       </div>
 
       <div class="trust-row" id="trust-row">
@@ -1205,17 +1495,33 @@
   </div>
 
   <script>
-    const TOTAL_STEPS = 6;
+    const TOTAL_STEPS = 7;
     let currentStep = 1;
     let completedSteps = new Set();
 
     const stepHeaders = {
       1: { eyebrow: 'Step 1 — Business', title: 'Tell us about your <span class="accent">business</span>', subtitle: 'Just the basics. Your AI will use this when it answers calls.' },
-      2: { eyebrow: 'Step 2 — Call Handling', title: 'When the AI needs a <span class="accent">human</span>, where does it go?', subtitle: 'Set your transfer numbers and where alerts get sent.' },
+      2: { eyebrow: 'Step 2 — Call Handling', title: 'Where should we forward <span class="accent">important calls?</span>', subtitle: 'If someone needs a real person, we\'ll call this number instantly.' },
       3: { eyebrow: 'Step 3 — Topics', title: 'What do customers <span class="accent">call about?</span>', subtitle: 'Pick all that apply. We\'ll train the AI for these.' },
       4: { eyebrow: 'Step 4 — Links', title: 'Got <span class="accent">links</span> to share?', subtitle: 'When customers want to book or pay, the AI can text them a link.' },
       5: { eyebrow: 'Step 5 — Personality', title: 'How should your AI <span class="accent">sound?</span>', subtitle: 'Pick the tone that fits your brand. You can change this later.' },
-      6: { eyebrow: 'Step 6 — Final Notes', title: 'Anything <span class="accent">else?</span>', subtitle: 'Special hours, common questions, things to avoid. Skip if nothing.' },
+      6: { eyebrow: 'Step 6 — Final Notes', title: 'Anything <span class="accent">else?</span>', subtitle: 'Special hours, common questions, things to avoid. Skip if nothing comes to mind.' },
+      7: { eyebrow: 'Step 7 — Review & Launch', title: 'Ready to <span class="accent">launch?</span>', subtitle: 'Last look before we set everything up.' },
+    };
+
+    const industryLabels = {
+      self_storage: 'Self Storage', hvac: 'HVAC', plumbing: 'Plumbing', electrician: 'Electrician',
+      landscaping: 'Landscaping / Lawn Care', auto_detailing: 'Auto Detailing', auto_repair: 'Auto Repair',
+      salon: 'Salon / Spa', pest_control: 'Pest Control', cleaning: 'Cleaning Services',
+      roofing: 'Roofing', locksmith: 'Locksmith', real_estate: 'Real Estate',
+      dental: 'Dental / Medical', other: 'Other',
+    };
+    const topicLabels = {
+      new_customer: 'New customer / booking', payments: 'Payments / billing',
+      support: 'Customer support', other: 'Other',
+    };
+    const personalityLabels = {
+      warm: 'Warm & Conversational', professional: 'Professional', direct: 'Direct',
     };
 
     const formData = {
@@ -1271,18 +1577,29 @@
     let saveFlashTimeout;
     function flashSavePill() {
       const pill = document.getElementById('save-pill');
-      if (!pill) return;
-      pill.style.opacity = '0.4';
+      const txt = document.getElementById('save-pill-text');
+      if (!pill || !txt) return;
+      pill.classList.add('saving');
+      txt.textContent = 'Saving';
       clearTimeout(saveFlashTimeout);
-      saveFlashTimeout = setTimeout(() => { pill.style.opacity = '1'; }, 250);
+      saveFlashTimeout = setTimeout(() => {
+        pill.classList.remove('saving');
+        txt.textContent = 'Auto-saved';
+      }, 600);
     }
 
     function updateRail() {
-      const list = document.getElementById('rail-list');
-      const items = list.querySelectorAll('.rail-item');
-      const itemHeight = 44;
-      const lastCompletedItem = Math.max(...completedSteps, 0);
-      const targetHeight = lastCompletedItem > 0 ? (lastCompletedItem - 1) * itemHeight + 14 : 0;
+      // Mini progress bar (top of rail)
+      const pct = (currentStep / TOTAL_STEPS) * 100;
+      document.getElementById('rail-mini-fill').style.width = pct + '%';
+      document.getElementById('rail-current').textContent = currentStep;
+      document.getElementById('rail-total').textContent = TOTAL_STEPS;
+
+      // Vertical line fill
+      const items = document.querySelectorAll('.rail-item');
+      const itemHeight = 50;
+      const lastCompleted = Math.max(...completedSteps, 0);
+      const targetHeight = lastCompleted > 0 ? (lastCompleted - 1) * itemHeight + 18 : 0;
 
       const styleId = 'rail-line-style';
       let styleEl = document.getElementById(styleId);
@@ -1295,9 +1612,10 @@
 
       items.forEach(item => {
         const step = parseInt(item.dataset.step, 10);
-        item.classList.remove('active', 'completed');
+        item.classList.remove('active', 'completed', 'locked');
         if (completedSteps.has(step)) item.classList.add('completed');
         if (step === currentStep) item.classList.add('active');
+        if (!completedSteps.has(step) && step > currentStep) item.classList.add('locked');
       });
 
       document.querySelectorAll('.mobile-rail-item').forEach(item => {
@@ -1336,21 +1654,26 @@
       const backBtn = document.getElementById('btn-back');
       const nextBtn = document.getElementById('btn-next');
       const nextLabel = document.getElementById('btn-next-label');
+      const nextArrow = document.getElementById('btn-next-arrow');
 
       backBtn.disabled = step <= 1;
 
       if (step === TOTAL_STEPS) {
         nextLabel.textContent = 'Launch My AI Front Desk';
         nextBtn.classList.add('btn-launch');
+        nextArrow.style.display = 'block';
       } else {
         nextLabel.textContent = 'Continue';
         nextBtn.classList.remove('btn-launch');
+        nextArrow.style.display = 'block';
       }
 
       currentStep = step;
       updateHeader();
       updateRail();
       hideError();
+
+      if (step === 7) buildReviewScreen();
 
       setTimeout(() => {
         const firstField = target?.querySelector('.field-input, .field-select, .field-textarea');
@@ -1360,6 +1683,149 @@
       }, 350);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function buildReviewScreen() {
+      const reviewEl = document.getElementById('review-content');
+      const empty = (v) => !v || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && v.length === 0);
+      const emptyTag = '<span class="review-row-value empty">Not provided</span>';
+
+      const renderValue = (v) => {
+        if (empty(v)) return emptyTag;
+        return `<span class="review-row-value">${escapeHtml(v)}</span>`;
+      };
+
+      reviewEl.innerHTML = `
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>
+              Business
+            </div>
+            <button class="review-edit" data-edit="1">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row">
+              <div class="review-row-label">Name</div>
+              ${renderValue(formData.business_name)}
+            </div>
+            <div class="review-row">
+              <div class="review-row-label">Industry</div>
+              ${renderValue(industryLabels[formData.industry] || formData.industry)}
+            </div>
+            <div class="review-row full">
+              <div class="review-row-label">Phone</div>
+              ${renderValue(formData.business_phone)}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+              Call Handling
+            </div>
+            <button class="review-edit" data-edit="2">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row">
+              <div class="review-row-label">Primary transfer</div>
+              ${renderValue(formData.transfer_primary)}
+            </div>
+            <div class="review-row">
+              <div class="review-row-label">Backup transfer</div>
+              ${renderValue(formData.transfer_backup)}
+            </div>
+            <div class="review-row full">
+              <div class="review-row-label">Notification email</div>
+              ${renderValue(formData.notify_email)}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              Topics
+            </div>
+            <button class="review-edit" data-edit="3">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row full">
+              ${formData.topics.length === 0 ? emptyTag : `<div class="review-tags">${formData.topics.map(t => `<span class="review-tag">${escapeHtml(topicLabels[t] || t)}</span>`).join('')}</div>`}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+              Links
+            </div>
+            <button class="review-edit" data-edit="4">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row full">
+              <div class="review-row-label">Booking link</div>
+              ${renderValue(formData.booking_link)}
+            </div>
+            <div class="review-row full">
+              <div class="review-row-label">Payment link</div>
+              ${renderValue(formData.payment_link)}
+            </div>
+            <div class="review-row full">
+              <div class="review-row-label">Website</div>
+              ${renderValue(formData.website)}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="13" y1="10" x2="13.01" y2="10"/><line x1="17" y1="10" x2="17.01" y2="10"/></svg></span>
+              Personality
+            </div>
+            <button class="review-edit" data-edit="5">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row full">
+              ${renderValue(personalityLabels[formData.personality] || formData.personality)}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-head">
+            <div class="review-section-title">
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+              Notes
+            </div>
+            <button class="review-edit" data-edit="6">Edit</button>
+          </div>
+          <div class="review-data">
+            <div class="review-row full">
+              <div class="review-row-label">Notes</div>
+              ${renderValue(formData.notes)}
+            </div>
+            <div class="review-row full">
+              <div class="review-row-label">Best contact time</div>
+              ${renderValue(formData.best_contact_time)}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Wire up edit buttons
+      reviewEl.querySelectorAll('.review-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetStep = parseInt(btn.dataset.edit, 10);
+          showStep(targetStep);
+        });
+      });
     }
 
     function showError(msg) {
@@ -1433,7 +1899,7 @@
     document.querySelectorAll('.rail-item').forEach(item => {
       item.addEventListener('click', () => {
         const step = parseInt(item.dataset.step, 10);
-        if (completedSteps.has(step) || step === currentStep || step <= currentStep) {
+        if (completedSteps.has(step) || step <= currentStep) {
           showStep(step);
         }
       });
@@ -1441,7 +1907,7 @@
     document.querySelectorAll('.mobile-rail-item').forEach(item => {
       item.addEventListener('click', () => {
         const step = parseInt(item.dataset.step, 10);
-        if (completedSteps.has(step) || step === currentStep || step <= currentStep) {
+        if (completedSteps.has(step) || step <= currentStep) {
           showStep(step);
         }
       });
@@ -1491,8 +1957,10 @@
     async function submitForm() {
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
+      const arrow = document.getElementById('btn-next-arrow');
       btn.disabled = true;
       label.innerHTML = '<span class="spinner"></span>';
+      if (arrow) arrow.style.display = 'none';
 
       try {
         const res = await fetch('/api/onboarding-submit', {
@@ -1520,7 +1988,8 @@
       document.getElementById('trust-row').style.display = 'none';
       document.querySelector('.content-header').style.display = 'none';
       document.getElementById('mobile-rail').style.display = 'none';
-      document.querySelector('.step-rail').style.display = 'none';
+      const railEl = document.querySelector('.step-rail');
+      if (railEl) railEl.style.display = 'none';
       document.querySelector('.layout').style.gridTemplateColumns = '1fr';
       document.getElementById('success-email').textContent = formData.notify_email || 'your inbox';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1535,6 +2004,11 @@
         }
       }
     });
+
+    function escapeHtml(str) {
+      if (!str && str !== 0) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     updateHeader();
     updateRail();
