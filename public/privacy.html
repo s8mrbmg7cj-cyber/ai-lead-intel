@@ -1,316 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Privacy Policy — AI Lead Intel</title>
-<meta name="description" content="AI Lead Intel Privacy Policy. How we collect, use, and protect your data — including SMS communications." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:          #0a0a0b;
-    --bg-card:     #131316;
-    --border:      #1f1f24;
-    --text:        #f5f5f7;
-    --text-muted:  #8a8a93;
-    --text-subtle: #5a5a63;
-    --accent:      #d4ff3a;
-    --radius:      14px;
-    --radius-sm:   8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 400; line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    min-height: 100vh;
-  }
-  body {
-    background-image:
-      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(212, 255, 58, 0.06), transparent 60%);
-    background-attachment: fixed;
-  }
-  .page { max-width: 780px; margin: 0 auto; padding: 80px 24px 120px; }
-  @media (max-width: 640px) { .page { padding: 48px 20px 80px; } }
-
-  .brand {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 8px 14px 8px 10px;
-    border: 1px solid var(--border); border-radius: 999px;
-    font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500;
-    letter-spacing: 0.02em; color: var(--text-muted); margin-bottom: 40px;
-    text-decoration: none;
-  }
-  .brand:hover { border-color: #2a2a31; color: var(--text); }
-  .brand-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 12px var(--accent);
-  }
-
-  h1 {
-    font-family: 'Fraunces', Georgia, serif; font-weight: 400;
-    font-size: clamp(40px, 6vw, 56px); line-height: 1.05;
-    letter-spacing: -0.025em; color: var(--text); margin-bottom: 8px;
-  }
-  .meta {
-    font-family: 'Geist Mono', monospace; font-size: 12px;
-    color: var(--text-subtle); letter-spacing: 0.05em;
-    text-transform: uppercase; margin-bottom: 48px;
-  }
-
-  h2 {
-    font-family: 'Fraunces', Georgia, serif; font-weight: 500;
-    font-size: 24px; letter-spacing: -0.01em;
-    color: var(--text); margin-top: 48px; margin-bottom: 16px;
-    scroll-margin-top: 20px;
-  }
-  h2:first-of-type { margin-top: 0; }
-
-  h3 {
-    font-family: 'Geist', sans-serif; font-weight: 600;
-    font-size: 16px; color: var(--text);
-    margin-top: 28px; margin-bottom: 10px;
-  }
-
-  p { color: var(--text-muted); font-size: 15px; margin-bottom: 16px; }
-  p strong { color: var(--text); font-weight: 500; }
-
-  ul { margin: 0 0 16px 20px; color: var(--text-muted); font-size: 15px; }
-  ul li { margin-bottom: 8px; }
-  ul li strong { color: var(--text); font-weight: 500; }
-
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  .highlight-box {
-    background: rgba(212, 255, 58, 0.04);
-    border: 1px solid rgba(212, 255, 58, 0.15);
-    border-radius: var(--radius-sm);
-    padding: 20px 22px; margin: 24px 0;
-  }
-  .highlight-box p { color: var(--text); font-size: 15px; }
-  .highlight-box p:last-child { margin-bottom: 0; }
-  .highlight-box strong { color: var(--accent); }
-
-  .toc {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 24px; margin-bottom: 48px;
-  }
-  .toc-label {
-    font-family: 'Geist Mono', monospace; font-size: 11px;
-    color: var(--accent); letter-spacing: 0.1em;
-    text-transform: uppercase; margin-bottom: 12px; font-weight: 500;
-  }
-  .toc ol {
-    margin: 0; padding: 0; list-style: none;
-    counter-reset: section;
-  }
-  .toc li {
-    counter-increment: section;
-    padding: 6px 0;
-    font-size: 14px;
-  }
-  .toc li::before {
-    content: counter(section, decimal-leading-zero) "  ";
-    font-family: 'Geist Mono', monospace;
-    color: var(--text-subtle); font-size: 12px;
-  }
-  .toc li a {
-    color: var(--text-muted);
-    transition: color 160ms ease;
-  }
-  .toc li a:hover { color: var(--accent); text-decoration: none; }
-
-  .footer {
-    margin-top: 80px; padding-top: 32px;
-    border-top: 1px solid var(--border);
-    display: flex; flex-wrap: wrap; gap: 24px; align-items: center;
-    font-size: 13px; color: var(--text-subtle);
-  }
-  .footer a { color: var(--text-muted); }
-  .footer a:hover { color: var(--accent); text-decoration: none; }
-  .footer-divider { color: var(--border); }
-
-  .contact-block {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 20px 22px; margin: 24px 0;
-    font-family: 'Geist Mono', monospace; font-size: 13px;
-    color: var(--text-muted);
-  }
-  .contact-block strong { color: var(--text); }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — AI Lead Intel</title>
+  <meta name="description" content="How AI Lead Intel collects, uses, and protects your data." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0c; --bg-subtle: #0e0e10; --surface: #141417;
+      --surface-elevated: #1a1a1e; --surface-hover: #1f1f24;
+      --border: rgba(255, 255, 255, 0.07); --border-strong: rgba(255, 255, 255, 0.13);
+      --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa;
+      --text-faint: #71717a; --text-muted: #52525b;
+      --brand: #ff6a00; --brand-bright: #ff9a00;
+      --brand-glow: rgba(255, 106, 0, 0.32); --brand-soft: rgba(255, 106, 0, 0.1);
+      --brand-tint: rgba(255, 106, 0, 0.05);
+    }
+    html, body { height: 100%; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      -webkit-font-smoothing: antialiased; letter-spacing: -0.011em;
+      overflow-x: hidden; line-height: 1.55;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 106, 0, 0.08), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 106, 0, 0.06), transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 56px 56px; pointer-events: none; z-index: 0;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+    }
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10, 10, 12, 0.7);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600; letter-spacing: -0.02em;
+      color: var(--text); text-decoration: none;
+    }
+    .logo-mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
+      box-shadow: 0 0 20px var(--brand-glow);
+      position: relative; overflow: hidden;
+    }
+    .logo-mark::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.25) 100%);
+    }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-link {
+      font-size: 13px; color: var(--text-dim);
+      text-decoration: none; transition: color 0.15s; font-weight: 500;
+    }
+    .nav-link:hover { color: var(--text); }
+    .layout {
+      position: relative; z-index: 1;
+      max-width: 1180px; margin: 0 auto;
+      padding: 56px 32px 80px;
+      display: grid; grid-template-columns: 240px 1fr;
+      gap: 64px; align-items: start;
+    }
+    .page-header {
+      grid-column: 1 / -1;
+      max-width: 720px; margin: 0 auto 40px;
+      text-align: center;
+    }
+    .page-eyebrow {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--brand);
+      margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 8px; font-weight: 600;
+    }
+    .page-eyebrow .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--brand); box-shadow: 0 0 8px var(--brand-glow);
+    }
+    .page-title {
+      font-size: 52px; font-weight: 600;
+      letter-spacing: -0.035em; line-height: 1.05;
+      color: var(--text); margin-bottom: 16px;
+    }
+    .page-title .accent {
+      font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-subtitle {
+      font-size: 16px; color: var(--text-dim);
+      line-height: 1.6; max-width: 580px; margin: 0 auto;
+    }
+    .updated-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 20px; padding: 6px 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px; color: var(--text-dim);
+      letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+    }
+    .updated-pill .updated-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+    }
+    .toc { position: sticky; top: 96px; padding-top: 4px; }
+    .toc-eyebrow {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-faint);
+      font-weight: 600; margin-bottom: 16px;
+    }
+    .toc-list {
+      display: flex; flex-direction: column; gap: 2px;
+      border-left: 1px solid var(--border); padding-left: 1px;
+    }
+    .toc-item {
+      display: block; padding: 8px 14px;
+      font-size: 13px; color: var(--text-dim);
+      text-decoration: none;
+      border-left: 2px solid transparent; margin-left: -1.5px;
+      transition: all 0.15s; font-weight: 500;
+    }
+    .toc-item:hover { color: var(--text); }
+    .toc-item.active {
+      color: var(--brand);
+      border-left-color: var(--brand);
+      background: linear-gradient(90deg, var(--brand-tint), transparent);
+    }
+    .content { min-width: 0; max-width: 760px; }
+    .section { margin-bottom: 48px; scroll-margin-top: 100px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .section-num {
+      font-family: 'Geist Mono', monospace; font-size: 11px;
+      color: var(--brand); letter-spacing: 0.06em;
+      padding: 3px 9px;
+      background: var(--brand-soft);
+      border: 1px solid rgba(255, 106, 0, 0.25);
+      border-radius: 5px; font-weight: 600;
+    }
+    .section-title {
+      font-size: 24px; font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.2; color: var(--text);
+    }
+    .section p {
+      font-size: 15px; color: var(--text-soft);
+      line-height: 1.65; margin-bottom: 14px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+    .section a {
+      color: var(--brand); text-decoration: none;
+      transition: color 0.15s; font-weight: 500;
+    }
+    .section a:hover { color: var(--brand-bright); text-decoration: underline; }
+    .section ul { list-style: none; padding-left: 0; margin-bottom: 16px; }
+    .section ul li {
+      position: relative; padding-left: 22px;
+      margin-bottom: 10px; font-size: 15px;
+      color: var(--text-soft); line-height: 1.65;
+    }
+    .section ul li::before {
+      content: ''; position: absolute;
+      left: 6px; top: 11px; width: 5px; height: 5px;
+      border-radius: 50%; background: var(--brand);
+      box-shadow: 0 0 4px var(--brand-glow);
+    }
+    .section ul li strong { color: var(--text); font-weight: 600; }
+    .section h3 {
+      font-size: 16px; font-weight: 600; color: var(--text);
+      margin: 22px 0 10px; letter-spacing: -0.01em;
+    }
+    .contact-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px 26px; margin-top: 16px;
+      display: flex; align-items: center; gap: 18px;
+      position: relative; overflow: hidden;
+    }
+    .contact-block::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+    }
+    .contact-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
+      box-shadow: 0 4px 16px var(--brand-glow);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; flex-shrink: 0;
+    }
+    .contact-text { flex: 1; min-width: 0; }
+    .contact-label {
+      font-family: 'Geist Mono', monospace; font-size: 10px;
+      color: var(--text-faint); text-transform: uppercase;
+      letter-spacing: 0.14em; margin-bottom: 4px; font-weight: 600;
+    }
+    .contact-email {
+      font-size: 17px; color: var(--text);
+      font-weight: 500; letter-spacing: -0.01em;
+      text-decoration: none; transition: color 0.15s;
+    }
+    .contact-email:hover { color: var(--brand); }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 56px 0;
+    }
+    .site-footer {
+      max-width: 1180px; margin: 0 auto;
+      padding: 24px 32px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 18px;
+      border-top: 1px solid var(--border); flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .footer-left {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px; color: var(--text-faint);
+      letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+    }
+    .footer-mark {
+      width: 18px; height: 18px; border-radius: 5px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
+      box-shadow: 0 0 10px var(--brand-glow);
+    }
+    .footer-links { display: flex; gap: 22px; }
+    .footer-links a {
+      font-size: 12px; color: var(--text-dim);
+      text-decoration: none; transition: color 0.15s; font-weight: 500;
+    }
+    .footer-links a:hover { color: var(--text); }
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; gap: 0; padding: 32px 20px 60px; }
+      .toc { display: none; }
+      .page-title { font-size: 38px; }
+      .page-subtitle { font-size: 15px; }
+      .topnav { padding: 12px 16px; }
+      .section-title { font-size: 20px; }
+      .contact-block { flex-direction: column; align-items: flex-start; text-align: left; }
+      .site-footer { padding: 24px 20px; }
+    }
+    @media (max-width: 600px) {
+      .page-title { font-size: 30px; }
+      .section { margin-bottom: 36px; }
+      .divider { margin: 36px 0; }
+    }
+  </style>
 </head>
 <body>
+  <nav class="topnav">
+    <a href="/" class="logo">
+      <div class="logo-mark"></div>
+      <span>AI Lead Intel</span>
+    </a>
+    <div class="nav-right">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/onboarding/" class="nav-link">Get started</a>
+      <a href="mailto:hello@aileadintel.com" class="nav-link">Contact</a>
+    </div>
+  </nav>
 
-<div class="page">
+  <div class="layout">
+    <header class="page-header">
+      <div class="page-eyebrow"><span class="dot"></span>Privacy Policy</div>
+      <h1 class="page-title">Your data, <span class="accent">handled right</span></h1>
+      <p class="page-subtitle">How AI Lead Intel collects, uses, stores, and protects your information. Plain language. No tricks.</p>
+      <div class="updated-pill">
+        <span class="updated-dot"></span>
+        Last updated · May 4, 2026
+      </div>
+    </header>
 
-  <a href="/" class="brand">
-    <span class="brand-dot"></span>
-    AI LEAD INTEL
-  </a>
+    <aside class="toc">
+      <div class="toc-eyebrow">On this page</div>
+      <nav class="toc-list">
+        <a href="#overview" class="toc-item">Overview</a>
+        <a href="#information-we-collect" class="toc-item">Information we collect</a>
+        <a href="#how-we-use" class="toc-item">How we use it</a>
+        <a href="#voice-recordings" class="toc-item">Voice calls &amp; recordings</a>
+        <a href="#sharing" class="toc-item">Sharing &amp; disclosure</a>
+        <a href="#cookies" class="toc-item">Cookies &amp; tracking</a>
+        <a href="#data-security" class="toc-item">Data security</a>
+        <a href="#retention" class="toc-item">Data retention</a>
+        <a href="#your-rights" class="toc-item">Your rights</a>
+        <a href="#children" class="toc-item">Children's privacy</a>
+        <a href="#updates" class="toc-item">Policy updates</a>
+        <a href="#contact" class="toc-item">Contact us</a>
+      </nav>
+    </aside>
 
-  <h1>Privacy Policy</h1>
-  <div class="meta">LAST UPDATED: APRIL 22, 2026</div>
+    <main class="content">
 
-  <div class="toc">
-    <div class="toc-label">CONTENTS</div>
-    <ol>
-      <li><a href="#who-we-are">Who we are</a></li>
-      <li><a href="#info-we-collect">Information we collect</a></li>
-      <li><a href="#how-we-use">How we use your information</a></li>
-      <li><a href="#sms">SMS/text messaging privacy</a></li>
-      <li><a href="#sharing">Information sharing</a></li>
-      <li><a href="#security">Data security</a></li>
-      <li><a href="#rights">Your rights</a></li>
-      <li><a href="#cookies">Cookies &amp; tracking</a></li>
-      <li><a href="#children">Children's privacy</a></li>
-      <li><a href="#changes">Changes to this policy</a></li>
-      <li><a href="#contact">Contact us</a></li>
-    </ol>
+      <section class="section" id="overview">
+        <div class="section-head">
+          <span class="section-num">01</span>
+          <h2 class="section-title">Overview</h2>
+        </div>
+        <p>AI Lead Intel ("we", "us", "our") provides AI-powered voice receptionist services to small businesses. Our service answers your business calls 24/7, captures leads, and delivers email summaries with transcripts and recordings.</p>
+        <p>This Privacy Policy explains what information we collect, how we use it, and the rights you have over your data. By using our website at aileadintel.com or our services, you agree to the practices described here.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="information-we-collect">
+        <div class="section-head">
+          <span class="section-num">02</span>
+          <h2 class="section-title">Information we collect</h2>
+        </div>
+        <p>We collect only what we need to deliver the service. There are three categories:</p>
+
+        <h3>Account and onboarding information</h3>
+        <ul>
+          <li><strong>Business details</strong> — business name, industry, website, business phone number, business hours.</li>
+          <li><strong>Contact info</strong> — your name, email address, and notification phone number.</li>
+          <li><strong>Configuration choices</strong> — call topics, AI personality, transfer numbers, pricing rules, emergency settings, and any setup notes you provide.</li>
+        </ul>
+
+        <h3>Call data</h3>
+        <ul>
+          <li><strong>Caller phone numbers</strong> received through our service.</li>
+          <li><strong>Call recordings, transcripts, and AI-generated summaries</strong> for calls answered by our AI.</li>
+          <li><strong>Call metadata</strong> — date, time, duration, and outcome of each call.</li>
+        </ul>
+
+        <h3>Technical and usage data</h3>
+        <ul>
+          <li><strong>Log data</strong> — IP address, browser type, device info, and pages visited.</li>
+          <li><strong>Cookies</strong> — see <a href="#cookies">Cookies &amp; tracking</a> below.</li>
+        </ul>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="how-we-use">
+        <div class="section-head">
+          <span class="section-num">03</span>
+          <h2 class="section-title">How we use it</h2>
+        </div>
+        <p>We use the information we collect to:</p>
+        <ul>
+          <li>Provide, operate, and improve the AI Lead Intel service.</li>
+          <li>Answer, transfer, and route calls on behalf of your business.</li>
+          <li>Send you call summaries, lead alerts, and service notifications via email.</li>
+          <li>Communicate with you about your account, billing, and support requests.</li>
+          <li>Detect, prevent, and address fraud, abuse, or technical issues.</li>
+          <li>Comply with legal obligations.</li>
+        </ul>
+        <p>We do not use call recordings or transcripts to train third-party AI models without your explicit consent.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="voice-recordings">
+        <div class="section-head">
+          <span class="section-num">04</span>
+          <h2 class="section-title">Voice calls &amp; recordings</h2>
+        </div>
+        <p>AI Lead Intel is currently a <strong>voice-only service</strong>. When the AI answers a call on behalf of your business, the conversation is recorded and transcribed so you can review it in your dashboard.</p>
+
+        <h3>What we record</h3>
+        <ul>
+          <li>Audio recordings of calls handled by your AI receptionist.</li>
+          <li>AI-generated transcripts of those calls.</li>
+          <li>Caller phone number and call metadata (date, time, duration).</li>
+        </ul>
+
+        <h3>How callers are notified</h3>
+        <p>Where required by law, the AI receptionist will inform callers at the start of a call that the conversation is being handled by an AI assistant and that the call may be recorded. Recording practices comply with applicable state and federal laws.</p>
+
+        <h3>SMS / text messaging</h3>
+        <p>AI Lead Intel does not currently send marketing or promotional SMS messages. We may occasionally send transactional service-related messages (such as account updates or setup confirmations) to phone numbers you provide. We do not sell, rent, share, or transfer phone numbers to third parties or affiliates for marketing purposes. Standard message and data rates may apply for any service-related messages we do send. If you ever receive a message from us and want to opt out, reply STOP. Reply HELP for support.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="sharing">
+        <div class="section-head">
+          <span class="section-num">05</span>
+          <h2 class="section-title">Sharing &amp; disclosure</h2>
+        </div>
+        <p>We share information only when needed to run the service or when legally required. Specifically:</p>
+        <ul>
+          <li><strong>Service providers</strong> — we work with vendors like Twilio (telephony), Vapi (voice AI), Supabase (database), Vercel (hosting), and Resend (email delivery). These providers process data on our behalf under their own privacy and security commitments.</li>
+          <li><strong>Legal compliance</strong> — we may disclose information if required by law, subpoena, or court order, or to protect the rights, property, or safety of AI Lead Intel, our users, or others.</li>
+          <li><strong>Business transfers</strong> — if we are involved in a merger, acquisition, or sale of assets, your data may transfer as part of that transaction.</li>
+        </ul>
+        <p>We never share your phone number or contact information with third-party marketing or advertising platforms, data brokers, lead aggregators, or affiliates for any purpose. We do not sell your personal information.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="cookies">
+        <div class="section-head">
+          <span class="section-num">06</span>
+          <h2 class="section-title">Cookies &amp; tracking</h2>
+        </div>
+        <p>We use a small number of cookies and similar technologies to keep the site working, remember your preferences, and understand how the site is used.</p>
+        <ul>
+          <li><strong>Essential cookies</strong> — required for login, sessions, and basic site function.</li>
+          <li><strong>Analytics cookies</strong> — help us measure traffic and improve the service. We use aggregated, non-identifying data wherever possible.</li>
+        </ul>
+        <p>Most browsers let you block or delete cookies through your settings. If you block essential cookies, parts of the site may not work.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="data-security">
+        <div class="section-head">
+          <span class="section-num">07</span>
+          <h2 class="section-title">Data security</h2>
+        </div>
+        <p>We use industry-standard practices to protect your data:</p>
+        <ul>
+          <li>HTTPS/TLS encryption for all web traffic.</li>
+          <li>Encryption at rest for databases and call recordings.</li>
+          <li>Access controls limiting who on our team can view sensitive data.</li>
+          <li>Regular review of our service providers' security practices.</li>
+        </ul>
+        <p>No system is perfectly secure. If we ever experience a breach affecting your data, we'll notify you as required by applicable law.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="retention">
+        <div class="section-head">
+          <span class="section-num">08</span>
+          <h2 class="section-title">Data retention</h2>
+        </div>
+        <p>We keep your data only as long as we need it to provide the service or comply with our legal obligations.</p>
+        <ul>
+          <li><strong>Account data</strong> — kept while your account is active. Deleted or anonymized within 90 days of account closure.</li>
+          <li><strong>Call recordings &amp; transcripts</strong> — kept for up to 12 months by default, unless you request earlier deletion or a different retention period.</li>
+          <li><strong>Billing &amp; tax records</strong> — kept as required by law (typically 7 years).</li>
+        </ul>
+        <p>You can request deletion of your data at any time — see <a href="#your-rights">Your rights</a>.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="your-rights">
+        <div class="section-head">
+          <span class="section-num">09</span>
+          <h2 class="section-title">Your rights</h2>
+        </div>
+        <p>Depending on where you live, you may have rights including:</p>
+        <ul>
+          <li><strong>Access</strong> — request a copy of the personal data we hold about you.</li>
+          <li><strong>Correction</strong> — ask us to fix inaccurate data.</li>
+          <li><strong>Deletion</strong> — ask us to delete your personal data.</li>
+          <li><strong>Restriction or objection</strong> — limit how we process your data.</li>
+          <li><strong>Portability</strong> — receive your data in a portable format.</li>
+          <li><strong>Withdraw consent</strong> — where processing is based on consent.</li>
+        </ul>
+        <p>To exercise any of these rights, email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>. We'll respond within 30 days.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="children">
+        <div class="section-head">
+          <span class="section-num">10</span>
+          <h2 class="section-title">Children's privacy</h2>
+        </div>
+        <p>AI Lead Intel is built for businesses and is not intended for children under 13. We don't knowingly collect personal information from children. If you believe a child has provided us with personal data, contact us at <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a> and we'll delete it.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="updates">
+        <div class="section-head">
+          <span class="section-num">11</span>
+          <h2 class="section-title">Policy updates</h2>
+        </div>
+        <p>We may update this policy from time to time. The "Last updated" date at the top of this page reflects the most recent change. Material changes will be communicated by email or through the service.</p>
+        <p>Continuing to use AI Lead Intel after a policy change means you accept the updated terms.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section class="section" id="contact">
+        <div class="section-head">
+          <span class="section-num">12</span>
+          <h2 class="section-title">Contact us</h2>
+        </div>
+        <p>Questions about this Privacy Policy or how we handle your data? We respond personally — usually within one business day.</p>
+
+        <div class="contact-block">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="contact-text">
+            <div class="contact-label">Privacy contact</div>
+            <a href="mailto:hello@aileadintel.com" class="contact-email">hello@aileadintel.com</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <h2 id="who-we-are">Who we are</h2>
-  <p>AI Lead Intel ("we," "us," or "our") provides an AI-powered missed-call recovery and customer communication service for small businesses. This Privacy Policy explains how we collect, use, and protect information when you use our services or interact with our website at <a href="https://aileadintel.com">aileadintel.com</a>.</p>
-  <p>By using our services, you agree to the collection and use of information in accordance with this policy.</p>
+  <footer class="site-footer">
+    <div class="footer-left">
+      <div class="footer-mark"></div>
+      <span>AI Lead Intel · Apex Growth Investments LLC</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="mailto:hello@aileadintel.com">Support</a>
+    </div>
+  </footer>
 
-  <h2 id="info-we-collect">Information we collect</h2>
-
-  <h3>Information you provide directly</h3>
-  <p>When you sign up, onboard, or use our services, we collect:</p>
-  <ul>
-    <li><strong>Contact information:</strong> name, phone number, email address</li>
-    <li><strong>Business information:</strong> business name (DBA), legal business name, EIN/tax ID, business address, entity type, industry, website URL</li>
-    <li><strong>Service configuration:</strong> business hours, call handling preferences, communication tone, sample messages, payment/booking links</li>
-    <li><strong>Communications:</strong> messages you send us, support requests, feedback</li>
-  </ul>
-
-  <h3>Information collected automatically</h3>
-  <p>When you use our services, we automatically collect:</p>
-  <ul>
-    <li><strong>Usage data:</strong> pages visited, time on site, clicks, form submissions</li>
-    <li><strong>Device data:</strong> browser type, operating system, IP address, device identifiers</li>
-    <li><strong>Call &amp; message metadata:</strong> call duration, transcripts, voicemail recordings, SMS delivery status (for the services we provide to you)</li>
-  </ul>
-
-  <h2 id="how-we-use">How we use your information</h2>
-  <p>We use the information we collect to:</p>
-  <ul>
-    <li>Provide, operate, and maintain our services</li>
-    <li>Register your business with telecommunications carriers for SMS compliance (A2P 10DLC)</li>
-    <li>Process payments and manage your account</li>
-    <li>Send you service-related communications, including onboarding updates, account notifications, and support responses</li>
-    <li>Respond to your inquiries, questions, and support requests</li>
-    <li>Improve our services, troubleshoot issues, and develop new features</li>
-    <li>Comply with legal obligations and enforce our Terms of Service</li>
-    <li>Protect the security and integrity of our services</li>
-  </ul>
-
-  <h2 id="sms">SMS/text messaging privacy</h2>
-
-  <div class="highlight-box">
-    <p><strong>Phone numbers collected through our website forms or inbound communications are used exclusively to communicate directly with you regarding your inquiry, account, and services from AI Lead Intel.</strong></p>
-    <p><strong>We DO NOT sell, rent, share, or transfer your phone number, SMS consent information, or opt-in data to any third party or affiliate for marketing purposes. Your mobile opt-in data will not be shared with anyone for any purpose, including affiliates or partners.</strong></p>
-  </div>
-
-  <h3>When you opt in to SMS</h3>
-  <p>By providing your phone number and checking the SMS consent box on our forms, you consent to receive automated and non-automated text messages from AI Lead Intel. These may include:</p>
-  <ul>
-    <li>Onboarding confirmations and updates</li>
-    <li>Service notifications (e.g., when your system goes live)</li>
-    <li>Account alerts (e.g., billing reminders, service status)</li>
-    <li>Support responses to your inquiries</li>
-  </ul>
-
-  <h3>Message frequency and rates</h3>
-  <p>Message frequency varies based on your activity with AI Lead Intel. Message and data rates may apply. Standard carrier rates for your mobile plan will apply to all messages sent and received.</p>
-
-  <h3>How to opt out</h3>
-  <p>You can opt out of SMS messages at any time by replying <strong>STOP</strong> to any message you receive from us. Once you opt out, you will receive no further SMS messages from us.</p>
-  <p>Reply <strong>HELP</strong> to any message for support, or contact us at <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>.</p>
-
-  <h3>Re-subscription</h3>
-  <p>If you have opted out and wish to resume receiving messages, reply <strong>START</strong> to our number, or contact our support team.</p>
-
-  <h2 id="sharing">Information sharing</h2>
-  <p>We do not sell your personal information. We share information only in the following limited circumstances:</p>
-
-  <h3>Service providers</h3>
-  <p>We work with trusted third-party service providers who help us operate our business, including:</p>
-  <ul>
-    <li><strong>Twilio</strong> — telecommunications infrastructure (voice, SMS)</li>
-    <li><strong>Supabase</strong> — database and authentication</li>
-    <li><strong>Vercel</strong> — website hosting</li>
-    <li><strong>Resend</strong> — transactional email delivery</li>
-    <li><strong>Anthropic</strong> — AI model provider</li>
-  </ul>
-  <p>These providers have access to your information only to perform specific tasks on our behalf and are contractually obligated to protect your data.</p>
-
-  <h3>Legal requirements</h3>
-  <p>We may disclose your information when required by law, court order, or government request, or when necessary to protect our rights, property, or safety, or the rights, property, or safety of others.</p>
-
-  <h3>Business transfers</h3>
-  <p>If AI Lead Intel is involved in a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction. We will notify you of any such change and provide you with choices regarding your information.</p>
-
-  <h2 id="security">Data security</h2>
-  <p>We implement industry-standard security measures to protect your information, including:</p>
-  <ul>
-    <li>Encrypted data storage (AES-256)</li>
-    <li>Encrypted data transmission (TLS 1.3)</li>
-    <li>Access controls and authentication on all systems</li>
-    <li>Regular security monitoring and audits</li>
-    <li>Service providers with SOC 2 certifications</li>
-  </ul>
-  <p>No method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.</p>
-
-  <h2 id="rights">Your rights</h2>
-  <p>Depending on your location, you may have certain rights regarding your personal information:</p>
-  <ul>
-    <li><strong>Access:</strong> Request a copy of the information we hold about you</li>
-    <li><strong>Correction:</strong> Request that we correct inaccurate information</li>
-    <li><strong>Deletion:</strong> Request that we delete your information (subject to legal retention requirements)</li>
-    <li><strong>Opt-out:</strong> Opt out of SMS messages, marketing communications, or data processing</li>
-    <li><strong>Portability:</strong> Request a copy of your data in a portable format</li>
-  </ul>
-  <p>To exercise any of these rights, contact us at <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>. We will respond within 30 days.</p>
-
-  <h2 id="cookies">Cookies &amp; tracking</h2>
-  <p>Our website uses essential cookies to maintain basic functionality (e.g., remembering form progress, session state). We do not use cookies for advertising or third-party tracking.</p>
-  <p>Your browser's onboarding form data is stored locally in your browser using localStorage, so your progress is saved if you close the tab. This data never leaves your device until you submit the form.</p>
-
-  <h2 id="children">Children's privacy</h2>
-  <p>Our services are not intended for individuals under 18 years of age. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us and we will promptly delete it.</p>
-
-  <h2 id="changes">Changes to this policy</h2>
-  <p>We may update this Privacy Policy from time to time. When we make changes, we will update the "Last Updated" date at the top of this page. For material changes, we will notify active clients by email or SMS.</p>
-  <p>Your continued use of our services after changes become effective constitutes acceptance of the revised policy.</p>
-
-  <h2 id="contact">Contact us</h2>
-  <p>If you have questions about this Privacy Policy, our data practices, or want to exercise your rights, contact us:</p>
-
-  <div class="contact-block">
-    <strong>AI Lead Intel</strong><br/>
-    Email: <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a><br/>
-    Website: <a href="https://aileadintel.com">aileadintel.com</a>
-  </div>
-
-  <div class="footer">
-    <a href="/">Home</a>
-    <span class="footer-divider">·</span>
-    <a href="/terms">Terms of Service</a>
-    <span class="footer-divider">·</span>
-    <a href="/privacy">Privacy Policy</a>
-  </div>
-
-</div>
-
+  <script>
+    const tocItems = document.querySelectorAll('.toc-item');
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tocItems.forEach(item => {
+            item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-100px 0px -60% 0px', threshold: 0 });
+    sections.forEach(s => observer.observe(s));
+    tocItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        const target = document.querySelector(item.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', item.getAttribute('href'));
+        }
+      });
+    });
+  </script>
 </body>
 </html>
