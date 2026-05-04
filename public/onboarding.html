@@ -10,222 +10,133 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0a0a0c;
-      --bg-subtle: #0e0e10;
-      --surface: #141417;
-      --surface-elevated: #1a1a1e;
-      --surface-hover: #1f1f24;
-      --surface-input: #131316;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-strong: rgba(255, 255, 255, 0.13);
+      --bg: #0a0a0c; --bg-subtle: #0e0e10; --surface: #141417;
+      --surface-elevated: #1a1a1e; --surface-hover: #1f1f24; --surface-input: #131316;
+      --border: rgba(255, 255, 255, 0.07); --border-strong: rgba(255, 255, 255, 0.13);
       --border-input: rgba(255, 255, 255, 0.09);
-
-      --text: #fafafa;
-      --text-soft: #d4d4d8;
-      --text-dim: #a1a1aa;
-      --text-faint: #71717a;
-      --text-muted: #52525b;
-
-      --brand: #ff6a00;
-      --brand-bright: #ff9a00;
-      --brand-deep: #e55a00;
-      --brand-glow: rgba(255, 106, 0, 0.32);
-      --brand-soft: rgba(255, 106, 0, 0.1);
+      --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa;
+      --text-faint: #71717a; --text-muted: #52525b;
+      --brand: #ff6a00; --brand-bright: #ff9a00; --brand-deep: #e55a00;
+      --brand-glow: rgba(255, 106, 0, 0.32); --brand-soft: rgba(255, 106, 0, 0.1);
       --brand-tint: rgba(255, 106, 0, 0.05);
-
-      --error: #f87171;
-      --error-soft: rgba(248, 113, 113, 0.08);
+      --error: #f87171; --error-soft: rgba(248, 113, 113, 0.08);
     }
-
     html, body { height: 100%; }
     body {
       font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      letter-spacing: -0.011em;
-      overflow-x: hidden;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      -webkit-font-smoothing: antialiased; letter-spacing: -0.011em; overflow-x: hidden;
     }
-
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content: ''; position: fixed; inset: 0;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 106, 0, 0.08), transparent 60%),
         radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 106, 0, 0.06), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
-
     body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content: ''; position: fixed; inset: 0;
       background-image:
         linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-      background-size: 56px 56px;
-      pointer-events: none;
-      z-index: 0;
+      background-size: 56px 56px; pointer-events: none; z-index: 0;
       mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
     }
-
     .mono { font-family: 'Geist Mono', monospace; font-feature-settings: 'tnum' 1; }
     .serif { font-family: 'Instrument Serif', serif; font-style: italic; }
-
     .topnav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
       background: rgba(10, 10, 12, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       padding: 14px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600; letter-spacing: -0.02em;
+      color: var(--text); text-decoration: none;
     }
     .logo-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 28px; height: 28px; border-radius: 8px;
       background: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 100%);
       box-shadow: 0 0 20px var(--brand-glow);
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .logo-mark::after {
-      content: '';
-      position: absolute;
-      inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.25) 100%);
     }
     .nav-right { display: flex; align-items: center; gap: 18px; }
     .nav-help {
-      font-size: 13px;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.15s;
-      font-weight: 500;
+      font-size: 13px; color: var(--text-dim);
+      text-decoration: none; transition: color 0.15s; font-weight: 500;
     }
     .nav-help:hover { color: var(--text); }
     .nav-save-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display: flex; align-items: center; gap: 6px;
       padding: 5px 11px;
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      font-family: 'Geist Mono', monospace;
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 600;
+      border: 1px solid var(--border); border-radius: 99px;
+      font-family: 'Geist Mono', monospace; font-size: 10px;
+      color: var(--text-dim); letter-spacing: 0.08em;
+      text-transform: uppercase; font-weight: 600;
       transition: all 0.2s;
     }
     .nav-save-pill .save-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--text-faint);
-      transition: all 0.2s;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--text-faint); transition: all 0.2s;
     }
     .nav-save-pill.saving { color: var(--brand); border-color: rgba(255, 106, 0, 0.3); }
     .nav-save-pill.saving .save-dot { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
     .nav-save-pill.saved { color: var(--brand); border-color: rgba(255, 106, 0, 0.25); }
     .nav-save-pill.saved .save-dot { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
-
     .layout {
-      position: relative;
-      z-index: 1;
-      max-width: 1140px;
-      margin: 0 auto;
+      position: relative; z-index: 1;
+      max-width: 1140px; margin: 0 auto;
       padding: 48px 32px 80px;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 64px;
-      align-items: start;
+      display: grid; grid-template-columns: 260px 1fr;
+      gap: 64px; align-items: start;
     }
-
     .step-rail { position: sticky; top: 96px; padding-top: 4px; }
     .rail-header { margin-bottom: 22px; }
     .rail-eyebrow {
-      font-family: 'Geist Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-family: 'Geist Mono', monospace; font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-faint); font-weight: 600; margin-bottom: 8px;
     }
     .rail-progress-meta { display: flex; align-items: baseline; gap: 6px; font-family: 'Geist Mono', monospace; }
     .rail-progress-num { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
     .rail-progress-total { font-size: 13px; color: var(--text-faint); }
     .rail-mini-bar {
-      margin-top: 10px;
-      height: 2px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
+      margin-top: 10px; height: 2px;
+      background: var(--border); border-radius: 99px; overflow: hidden;
     }
     .rail-mini-fill {
-      height: 100%;
+      height: 100%; width: 0%;
       background: linear-gradient(90deg, var(--brand) 0%, var(--brand-bright) 100%);
-      width: 0%;
       transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: 0 0 8px var(--brand-glow);
     }
-
     .rail-list { display: flex; flex-direction: column; gap: 2px; position: relative; }
     .rail-list::before {
-      content: '';
-      position: absolute;
-      top: 18px;
-      bottom: 18px;
-      left: 17px;
-      width: 1.5px;
-      background: var(--border);
-      border-radius: 99px;
+      content: ''; position: absolute;
+      top: 18px; bottom: 18px; left: 17px;
+      width: 1.5px; background: var(--border); border-radius: 99px;
     }
     .rail-list::after {
-      content: '';
-      position: absolute;
-      top: 18px;
-      left: 17px;
-      width: 1.5px;
-      height: 0;
+      content: ''; position: absolute;
+      top: 18px; left: 17px; width: 1.5px; height: 0;
       background: linear-gradient(180deg, var(--brand) 0%, var(--brand-bright) 100%);
       border-radius: 99px;
       transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: 0 0 8px var(--brand-glow);
     }
     .rail-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 9px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.15s;
-      position: relative;
-      z-index: 1;
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 10px; border-radius: 8px; cursor: pointer;
+      transition: all 0.15s; position: relative; z-index: 1;
     }
     .rail-item:hover { background: var(--surface); }
     .rail-item.locked { cursor: default; opacity: 0.6; }
@@ -243,8 +154,7 @@
       background: var(--bg);
       border: 1.5px solid var(--border-strong);
       color: var(--text-faint);
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px; font-weight: 600;
+      font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: all 0.2s;
     }
@@ -254,7 +164,6 @@
     .rail-content { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
     .rail-icon { color: var(--text-faint); flex-shrink: 0; transition: color 0.15s; display: flex; }
     .rail-label { font-size: 13px; color: var(--text-dim); font-weight: 500; transition: color 0.15s; }
-
     .mobile-rail {
       display: none; gap: 6px; margin-bottom: 24px; padding: 4px;
       background: var(--surface); border: 1px solid var(--border);
@@ -269,7 +178,6 @@
     }
     .mobile-rail-item.active { background: var(--brand-soft); color: var(--brand); }
     .mobile-rail-item.completed { color: var(--brand); }
-
     .content { min-width: 0; }
     .content-header { margin-bottom: 28px; }
     .header-eyebrow {
@@ -297,7 +205,6 @@
       font-size: 15px; color: var(--text-dim);
       line-height: 1.6; max-width: 540px;
     }
-
     .card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 18px; padding: 36px;
@@ -312,14 +219,12 @@
       content: ''; position: absolute; top: -1px; left: 30%; right: 30%; height: 1px;
       background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.4), transparent);
     }
-
     .step { display: none; animation: stepEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .step.active { display: block; }
     @keyframes stepEnter {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .field { margin-bottom: 22px; }
     .field:last-of-type { margin-bottom: 0; }
     .field-label {
@@ -333,10 +238,7 @@
       text-transform: uppercase; padding: 2px 7px;
       border-radius: 4px; background: rgba(255, 255, 255, 0.04);
     }
-
-    .field-input,
-    .field-select,
-    .field-textarea {
+    .field-input, .field-select, .field-textarea {
       width: 100%; padding: 14px 16px;
       background: var(--surface-input);
       border: 1px solid var(--border-input);
@@ -345,11 +247,8 @@
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
       outline: none;
     }
-    .field-input::placeholder,
-    .field-textarea::placeholder { color: var(--text-muted); font-weight: 400; }
-    .field-input:hover, .field-select:hover, .field-textarea:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-    }
+    .field-input::placeholder, .field-textarea::placeholder { color: var(--text-muted); font-weight: 400; }
+    .field-input:hover, .field-select:hover, .field-textarea:hover { border-color: rgba(255, 255, 255, 0.16); }
     .field-input:focus, .field-select:focus, .field-textarea:focus {
       border-color: var(--brand);
       box-shadow: 0 0 0 4px var(--brand-tint);
@@ -359,94 +258,27 @@
       border-color: var(--error);
       box-shadow: 0 0 0 4px var(--error-soft);
     }
-
     .field-select {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 14px center;
       padding-right: 38px; cursor: pointer;
     }
-
     .field-textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
     .field-hint { font-size: 12px; color: var(--text-faint); margin-top: 8px; line-height: 1.45; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-    /* SMS CONSENT CHECKBOX */
-    .consent-block {
-      margin-top: 18px;
-      padding: 16px 18px;
-      background: var(--surface-input);
-      border: 1px solid var(--border-input);
-      border-radius: 12px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      cursor: pointer;
-      transition: all 0.18s;
-      user-select: none;
-    }
-    .consent-block:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-    }
-    .consent-block.checked {
-      border-color: var(--brand);
-      background: var(--brand-tint);
-    }
-    .consent-block input { display: none; }
-    .consent-checkbox {
-      width: 20px;
-      height: 20px;
-      border-radius: 5px;
-      border: 1.5px solid var(--border-strong);
-      flex-shrink: 0;
-      margin-top: 1px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.18s;
-    }
-    .consent-block.checked .consent-checkbox {
-      background: var(--brand);
-      border-color: var(--brand);
-    }
-    .consent-block.checked .consent-checkbox::after {
-      content: '';
-      width: 10px;
-      height: 6px;
-      border-left: 2px solid #fff;
-      border-bottom: 2px solid #fff;
-      transform: rotate(-45deg) translate(1px, -1px);
-    }
-    .consent-text {
-      flex: 1;
-      font-size: 13px;
-      color: var(--text-soft);
-      line-height: 1.55;
-    }
-    .consent-text strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
     .legal-links {
-      margin-top: 14px;
-      padding-top: 14px;
+      margin-top: 20px; padding-top: 14px;
       border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--text-faint);
-      text-align: center;
-      line-height: 1.5;
+      font-size: 12px; color: var(--text-faint);
+      text-align: center; line-height: 1.5;
     }
     .legal-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.15s;
-      font-weight: 500;
+      color: var(--text-dim); text-decoration: none;
+      transition: color 0.15s; font-weight: 500;
     }
     .legal-links a:hover { color: var(--brand); }
     .legal-links .sep { margin: 0 8px; color: var(--text-muted); }
-
-    /* CHECK CARDS */
     .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .check-card {
       display: flex; align-items: center; gap: 14px;
@@ -490,7 +322,6 @@
       color: var(--brand);
     }
     .check-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
-
     .radio-stack { display: flex; flex-direction: column; gap: 12px; }
     .radio-card {
       display: flex; align-items: flex-start; gap: 16px;
@@ -536,7 +367,6 @@
       transition: border-color 0.18s; line-height: 1.5;
     }
     .radio-card.selected .radio-sample { border-color: var(--brand); }
-
     .ai-preview {
       margin-top: 28px; padding: 18px 20px;
       background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%);
@@ -558,7 +388,6 @@
       letter-spacing: 0.14em; font-weight: 600; margin-bottom: 5px;
     }
     .ai-preview-text { font-size: 14px; color: var(--text); line-height: 1.55; font-style: italic; }
-
     .review-intro {
       padding: 18px 20px;
       background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%);
@@ -574,7 +403,6 @@
       color: #fff; flex-shrink: 0;
     }
     .review-intro-text { font-size: 13px; color: var(--text); line-height: 1.5; }
-
     .review-section {
       background: var(--surface-input); border: 1px solid var(--border);
       border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
@@ -628,7 +456,6 @@
       border: 1px solid rgba(255, 106, 0, 0.25);
       color: var(--brand); letter-spacing: 0.04em; font-weight: 500;
     }
-
     .actions {
       display: flex; justify-content: space-between; align-items: center;
       margin-top: 32px; padding-top: 24px;
@@ -675,7 +502,6 @@
     }
     .btn-next:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-launch { padding: 14px 28px; font-size: 15px; }
-
     .spinner {
       width: 14px; height: 14px;
       border: 2px solid rgba(255, 255, 255, 0.3);
@@ -683,7 +509,6 @@
       animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .form-error {
       background: var(--error-soft);
       border: 1px solid rgba(248, 113, 113, 0.2);
@@ -699,7 +524,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .form-error svg { flex-shrink: 0; }
-
     .trust-row {
       display: flex; justify-content: center; align-items: center;
       gap: 22px; margin-top: 32px; flex-wrap: wrap;
@@ -711,7 +535,6 @@
       letter-spacing: 0.04em; font-weight: 500;
     }
     .trust-item svg { color: var(--brand); }
-
     .success-screen { text-align: center; padding: 28px 0 20px; }
     .success-glyph {
       width: 88px; height: 88px; margin: 0 auto 30px;
@@ -773,12 +596,8 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; margin-top: 1px;
     }
-
     @media (max-width: 940px) {
-      .layout {
-        grid-template-columns: 1fr; gap: 0;
-        padding: 24px 16px 60px;
-      }
+      .layout { grid-template-columns: 1fr; gap: 0; padding: 24px 16px 60px; }
       .step-rail { display: none; }
       .mobile-rail { display: flex; }
       .header-title { font-size: 28px; }
@@ -786,7 +605,6 @@
       .topnav { padding: 12px 16px; }
       .nav-save-pill { display: none; }
     }
-
     @media (max-width: 600px) {
       .check-grid { grid-template-columns: 1fr; }
       .field-row { grid-template-columns: 1fr; gap: 0; }
@@ -933,11 +751,22 @@
                 <option value="other">Other</option>
               </select>
             </div>
-
             <div class="field">
               <label class="field-label" for="business_phone">Main phone</label>
               <input type="tel" class="field-input phone-input" id="business_phone" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
             </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="business_hours">Business hours</label>
+            <select class="field-select" id="business_hours">
+              <option value="">When are you open?</option>
+              <option value="24_7">24/7 — always open</option>
+              <option value="standard">Standard — Mon-Fri 9am-5pm</option>
+              <option value="extended">Extended — Mon-Sat 8am-7pm</option>
+              <option value="custom">Custom (specify in notes)</option>
+            </select>
+            <div class="field-hint">The AI will tell callers if you're open or closed when relevant.</div>
           </div>
 
           <div class="ai-preview" id="ai-preview-1">
@@ -951,7 +780,7 @@
           </div>
         </div>
 
-        <!-- STEP 2 — CALL HANDLING -->
+        <!-- STEP 2 — CALL HANDLING (voice-only, no SMS consent) -->
         <div class="step" data-step="2">
           <div class="field">
             <label class="field-label" for="transfer_primary">Primary transfer number</label>
@@ -974,14 +803,22 @@
             <div class="field-hint">Where call summaries and lead alerts get sent.</div>
           </div>
 
-          <!-- SMS CONSENT -->
-          <label class="consent-block" id="sms-consent" data-consent>
-            <input type="checkbox" id="sms_consent_checkbox" />
-            <div class="consent-checkbox"></div>
-            <div class="consent-text">
-              I agree to receive text messages from <strong>AI Lead Intel</strong> about my inquiry/setup. Message &amp; data rates may apply. Reply STOP to opt out.
-            </div>
-          </label>
+          <div class="field">
+            <label class="field-label" for="emergency_calls">Do you handle emergency calls?</label>
+            <select class="field-select" id="emergency_calls">
+              <option value="">Pick one</option>
+              <option value="no">No — standard hours only</option>
+              <option value="yes_same">Yes — transfer emergencies to my main number anytime</option>
+              <option value="yes_separate">Yes — I have a separate after-hours emergency line</option>
+            </select>
+            <div class="field-hint">For HVAC, plumbing, locksmith, etc. — emergency calls bypass closed-hours rules.</div>
+          </div>
+
+          <div class="field" id="emergency_phone_field" style="display: none;">
+            <label class="field-label" for="emergency_phone">After-hours emergency number</label>
+            <input type="tel" class="field-input phone-input" id="emergency_phone" placeholder="385-600-8134" inputmode="numeric" maxlength="12" />
+            <div class="field-hint">Used only when the AI determines a call is urgent and you're closed.</div>
+          </div>
 
           <div class="legal-links">
             By continuing you agree to our
@@ -1036,7 +873,7 @@
               Booking link <span class="optional">Optional</span>
             </label>
             <input type="url" class="field-input" id="booking_link" placeholder="https://calendly.com/yourbusiness" />
-            <div class="field-hint">If a customer wants to book, the AI will text them this.</div>
+            <div class="field-hint">If a customer wants to book, the AI can mention this link verbally during the call.</div>
           </div>
           <div class="field">
             <label class="field-label" for="payment_link">
@@ -1086,15 +923,36 @@
           </div>
         </div>
 
-        <!-- STEP 6 -->
+        <!-- STEP 6 — Pricing rules + notes -->
         <div class="step" data-step="6">
           <div class="field">
+            <label class="field-label" for="pricing_rule">Should the AI give pricing on calls?</label>
+            <select class="field-select" id="pricing_rule">
+              <option value="">Pick one</option>
+              <option value="yes_specific">Yes — give exact prices when asked</option>
+              <option value="yes_ranges">Yes — give price ranges only</option>
+              <option value="no_quote">No — say "I'll have someone send you a quote"</option>
+              <option value="no_transfer">No — transfer pricing questions to me</option>
+            </select>
+            <div class="field-hint">This is critical. If the AI doesn't know your pricing rules, it might make up prices.</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="pricing_examples">
+              Common prices the AI should know <span class="optional">Optional</span>
+            </label>
+            <textarea class="field-textarea" id="pricing_examples" placeholder="e.g. Diagnostic fee: $89&#10;Standard tune-up: $149&#10;5x10 storage unit: $89/mo"></textarea>
+            <div class="field-hint">List any prices the AI should be confident quoting. One per line.</div>
+          </div>
+
+          <div class="field">
             <label class="field-label" for="notes">
-              Anything we should know? <span class="optional">Optional</span>
+              Anything else we should know? <span class="optional">Optional</span>
             </label>
             <textarea class="field-textarea" id="notes" placeholder="Special hours, common questions, things the AI should never say. Skip if nothing comes to mind."></textarea>
-            <div class="field-hint">e.g. "We're closed Sundays. Don't quote prices over the phone. Ask if it's an emergency before transferring."</div>
+            <div class="field-hint">e.g. "We're closed Sundays. Don't quote prices over the phone. Ask if it's urgent before transferring."</div>
           </div>
+
           <div class="field">
             <label class="field-label" for="best_contact_time">
               Best time to reach you <span class="optional">Optional</span>
@@ -1103,7 +961,7 @@
           </div>
         </div>
 
-        <!-- STEP 7 — REVIEW -->
+        <!-- STEP 7 -->
         <div class="step" data-step="7">
           <div class="review-intro">
             <div class="review-intro-icon">
@@ -1127,7 +985,6 @@
           </button>
         </div>
 
-        <!-- SUCCESS -->
         <div class="step" data-step="success">
           <div class="success-screen">
             <div class="success-glyph">
@@ -1146,11 +1003,11 @@
               </div>
               <div class="success-step">
                 <div class="success-step-num">2</div>
-                <div>We'll <strong>text or call you within 12 hours</strong> to finalize a few details.</div>
+                <div>We'll <strong>reach out within 1 business day</strong> to finalize a few details.</div>
               </div>
               <div class="success-step">
                 <div class="success-step-num">3</div>
-                <div>Your AI <strong>goes live within 24 hours</strong> — answering calls 24/7.</div>
+                <div>Your AI <strong>goes live within 5-7 business days</strong> — answering calls 24/7.</div>
               </div>
             </div>
 
@@ -1162,7 +1019,7 @@
       <div class="trust-row" id="trust-row">
         <div class="trust-item">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Live in 24 hours
+          Live in 5-7 days
         </div>
         <div class="trust-item">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1177,14 +1034,7 @@
   </div>
 
   <script>
-    /* ============================================================
-       PHONE FORMATTER — runs on any input with class "phone-input"
-       ============================================================
-       - Strips all non-numeric chars
-       - Caps at 10 digits
-       - Formats as XXX-XXX-XXXX live while typing
-       - Preserves cursor position so users can edit middle digits
-    */
+    /* PHONE FORMATTER */
     function formatPhoneValue(raw) {
       const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
       if (digits.length === 0) return '';
@@ -1192,18 +1042,14 @@
       if (digits.length <= 6) return digits.slice(0, 3) + '-' + digits.slice(3);
       return digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6, 10);
     }
-
     function attachPhoneFormatter(input) {
       if (!input || input.dataset.phoneFormatted === '1') return;
       input.dataset.phoneFormatted = '1';
-
       input.addEventListener('input', (e) => {
         const before = input.value;
         const cursorPos = input.selectionStart || before.length;
         const formatted = formatPhoneValue(before);
         input.value = formatted;
-
-        // Reposition cursor accounting for added/removed dashes
         const beforeDigits = before.slice(0, cursorPos).replace(/\D/g, '').length;
         let newPos = 0, count = 0;
         for (let i = 0; i < formatted.length; i++) {
@@ -1213,21 +1059,14 @@
         }
         try { input.setSelectionRange(newPos, newPos); } catch (_) {}
       });
-
       input.addEventListener('blur', () => {
         input.value = formatPhoneValue(input.value);
       });
     }
-
     document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
-
     function isValidPhone(value) {
       return String(value || '').replace(/\D/g, '').length === 10;
     }
-
-    /* ============================================================
-       ONBOARDING FLOW
-       ============================================================ */
 
     const TOTAL_STEPS = 7;
     let currentStep = 1;
@@ -1235,11 +1074,11 @@
 
     const stepHeaders = {
       1: { eyebrow: 'Step 1 — Business', title: 'Tell us about your <span class="accent">business</span>', subtitle: 'Just the basics. Your AI will use this when it answers calls.' },
-      2: { eyebrow: 'Step 2 — Call Handling', title: 'Where should we send <span class="accent">important calls?</span>', subtitle: 'If someone needs a real person, we\'ll call this number instantly.' },
+      2: { eyebrow: 'Step 2 — Call Handling', title: 'Where should we send <span class="accent">important calls?</span>', subtitle: 'If someone needs a real person, we\'ll route the call to this number instantly.' },
       3: { eyebrow: 'Step 3 — Topics', title: 'What do customers <span class="accent">call about?</span>', subtitle: 'Pick all that apply. We\'ll train the AI for these.' },
-      4: { eyebrow: 'Step 4 — Links', title: 'Got <span class="accent">links</span> to share?', subtitle: 'When customers want to book or pay, the AI can text them a link.' },
+      4: { eyebrow: 'Step 4 — Links', title: 'Got <span class="accent">links</span> to share?', subtitle: 'When customers ask to book or pay, the AI can mention these on the call.' },
       5: { eyebrow: 'Step 5 — Personality', title: 'How should your AI <span class="accent">sound?</span>', subtitle: 'Pick the tone that fits your brand. You can change this later.' },
-      6: { eyebrow: 'Step 6 — Final Notes', title: 'Anything <span class="accent">else?</span>', subtitle: 'Special hours, common questions, things to avoid. Skip if nothing comes to mind.' },
+      6: { eyebrow: 'Step 6 — Pricing & Notes', title: 'Pricing rules &amp; <span class="accent">final notes</span>', subtitle: 'Set the AI\'s pricing rules so it never makes up prices on calls.' },
       7: { eyebrow: 'Step 7 — Review & Launch', title: 'Ready to <span class="accent">launch?</span>', subtitle: 'Last look before we set everything up.' },
     };
 
@@ -1250,6 +1089,21 @@
       roofing: 'Roofing', locksmith: 'Locksmith', real_estate: 'Real Estate',
       dental: 'Dental / Medical', other: 'Other',
     };
+    const businessHoursLabels = {
+      '24_7': '24/7 — always open', standard: 'Mon-Fri 9am-5pm',
+      extended: 'Mon-Sat 8am-7pm', custom: 'Custom (in notes)',
+    };
+    const emergencyLabels = {
+      no: 'No — standard hours only',
+      yes_same: 'Yes — transfer to main number',
+      yes_separate: 'Yes — separate after-hours line',
+    };
+    const pricingLabels = {
+      yes_specific: 'Yes — exact prices',
+      yes_ranges: 'Yes — ranges only',
+      no_quote: 'No — promise a quote',
+      no_transfer: 'No — transfer pricing calls to me',
+    };
     const topicLabels = {
       new_customer: 'New customer / booking', payments: 'Payments / billing',
       support: 'Customer support', other: 'Other',
@@ -1259,17 +1113,18 @@
     };
 
     const formData = {
-      business_name: '', industry: '', business_phone: '',
+      business_name: '', industry: '', business_phone: '', business_hours: '',
       transfer_primary: '', transfer_backup: '', notify_email: '',
-      sms_consent: false,
+      emergency_calls: '', emergency_phone: '',
       topics: [],
       booking_link: '', payment_link: '', website: '',
       personality: '',
+      pricing_rule: '', pricing_examples: '',
       notes: '', best_contact_time: '',
     };
 
     try {
-      const saved = localStorage.getItem('aileadintel_onboarding');
+      const saved = localStorage.getItem('aileadintel_onboarding_v6');
       if (saved) {
         Object.assign(formData, JSON.parse(saved));
         restoreFields();
@@ -1277,15 +1132,17 @@
     } catch (e) {}
 
     function restoreFields() {
-      ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','booking_link','payment_link','website','notes','best_contact_time'].forEach(k => {
+      ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','emergency_phone','booking_link','payment_link','website','pricing_examples','notes','best_contact_time'].forEach(k => {
         const el = document.getElementById(k);
         if (el && formData[k]) {
           el.value = formData[k];
           if (el.classList.contains('phone-input')) el.value = formatPhoneValue(el.value);
         }
       });
-      const ind = document.getElementById('industry');
-      if (ind && formData.industry) ind.value = formData.industry;
+      ['industry','business_hours','emergency_calls','pricing_rule'].forEach(k => {
+        const el = document.getElementById(k);
+        if (el && formData[k]) el.value = formData[k];
+      });
       (formData.topics || []).forEach(v => {
         const card = document.querySelector(`#topics-grid .check-card[data-value="${v}"]`);
         if (card) {
@@ -1302,18 +1159,13 @@
           if (r) r.checked = true;
         }
       }
-      if (formData.sms_consent) {
-        const block = document.getElementById('sms-consent');
-        const cb = document.getElementById('sms_consent_checkbox');
-        if (block) block.classList.add('checked');
-        if (cb) cb.checked = true;
-      }
+      toggleEmergencyPhone();
       updateAIPreview();
     }
 
     function autoSave() {
       try {
-        localStorage.setItem('aileadintel_onboarding', JSON.stringify(formData));
+        localStorage.setItem('aileadintel_onboarding_v6', JSON.stringify(formData));
         flashSavePill();
       } catch (e) {}
     }
@@ -1338,17 +1190,22 @@
       }, 500);
     }
 
+    function toggleEmergencyPhone() {
+      const select = document.getElementById('emergency_calls');
+      const field = document.getElementById('emergency_phone_field');
+      if (!select || !field) return;
+      field.style.display = (select.value === 'yes_separate') ? 'block' : 'none';
+    }
+
     function updateRail() {
       const pct = (currentStep / TOTAL_STEPS) * 100;
       document.getElementById('rail-mini-fill').style.width = pct + '%';
       document.getElementById('rail-current').textContent = currentStep;
       document.getElementById('rail-total').textContent = TOTAL_STEPS;
-
       const items = document.querySelectorAll('.rail-item');
       const itemHeight = 50;
       const lastCompleted = Math.max(...completedSteps, 0);
       const targetHeight = lastCompleted > 0 ? (lastCompleted - 1) * itemHeight + 18 : 0;
-
       const styleId = 'rail-line-style';
       let styleEl = document.getElementById(styleId);
       if (!styleEl) {
@@ -1357,7 +1214,6 @@
         document.head.appendChild(styleEl);
       }
       styleEl.textContent = `.rail-list::after { height: ${targetHeight}px !important; }`;
-
       items.forEach(item => {
         const step = parseInt(item.dataset.step, 10);
         item.classList.remove('active', 'completed', 'locked');
@@ -1365,7 +1221,6 @@
         if (step === currentStep) item.classList.add('active');
         if (!completedSteps.has(step) && step > currentStep) item.classList.add('locked');
       });
-
       document.querySelectorAll('.mobile-rail-item').forEach(item => {
         const step = parseInt(item.dataset.step, 10);
         item.classList.remove('active', 'completed');
@@ -1394,18 +1249,14 @@
       if (step > currentStep) {
         for (let i = currentStep; i < step; i++) completedSteps.add(i);
       }
-
       document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
       const target = document.querySelector(`[data-step="${step}"]`);
       if (target) target.classList.add('active');
-
       const backBtn = document.getElementById('btn-back');
       const nextBtn = document.getElementById('btn-next');
       const nextLabel = document.getElementById('btn-next-label');
       const nextArrow = document.getElementById('btn-next-arrow');
-
       backBtn.disabled = step <= 1;
-
       if (step === TOTAL_STEPS) {
         nextLabel.textContent = 'Launch My AI Front Desk';
         nextBtn.classList.add('btn-launch');
@@ -1414,19 +1265,15 @@
         nextBtn.classList.remove('btn-launch');
       }
       if (nextArrow) nextArrow.style.display = 'block';
-
       currentStep = step;
       updateHeader();
       updateRail();
       hideError();
-
       if (step === 7) buildReviewScreen();
-
       setTimeout(() => {
         const firstField = target?.querySelector('.field-input, .field-select, .field-textarea');
         if (firstField && step !== TOTAL_STEPS) firstField.focus();
       }, 350);
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1448,10 +1295,10 @@
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Name</div>${renderValue(formData.business_name)}</div>
             <div class="review-row"><div class="review-row-label">Industry</div>${renderValue(industryLabels[formData.industry] || formData.industry)}</div>
-            <div class="review-row full"><div class="review-row-label">Phone</div>${renderValue(formData.business_phone)}</div>
+            <div class="review-row"><div class="review-row-label">Phone</div>${renderValue(formData.business_phone)}</div>
+            <div class="review-row"><div class="review-row-label">Hours</div>${renderValue(businessHoursLabels[formData.business_hours] || formData.business_hours)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1464,10 +1311,10 @@
             <div class="review-row"><div class="review-row-label">Primary transfer</div>${renderValue(formData.transfer_primary)}</div>
             <div class="review-row"><div class="review-row-label">Backup transfer</div>${renderValue(formData.transfer_backup)}</div>
             <div class="review-row full"><div class="review-row-label">Notification email</div>${renderValue(formData.notify_email)}</div>
-            <div class="review-row full"><div class="review-row-label">SMS consent</div><span class="review-row-value">${formData.sms_consent ? 'Yes' : 'No'}</span></div>
+            <div class="review-row full"><div class="review-row-label">Emergency calls</div>${renderValue(emergencyLabels[formData.emergency_calls] || formData.emergency_calls)}</div>
+            ${formData.emergency_phone ? `<div class="review-row full"><div class="review-row-label">After-hours emergency line</div><span class="review-row-value">${escapeHtml(formData.emergency_phone)}</span></div>` : ''}
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1482,11 +1329,10 @@
             </div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
-              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg></span>
               Links
             </div>
             <button class="review-edit" data-edit="4">Edit</button>
@@ -1497,7 +1343,6 @@
             <div class="review-row full"><div class="review-row-label">Website</div>${renderValue(formData.website)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1510,22 +1355,22 @@
             <div class="review-row full">${renderValue(personalityLabels[formData.personality] || formData.personality)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-              Notes
+              Pricing & Notes
             </div>
             <button class="review-edit" data-edit="6">Edit</button>
           </div>
           <div class="review-data">
+            <div class="review-row full"><div class="review-row-label">Pricing rule</div>${renderValue(pricingLabels[formData.pricing_rule] || formData.pricing_rule)}</div>
+            <div class="review-row full"><div class="review-row-label">Common prices</div>${renderValue(formData.pricing_examples)}</div>
             <div class="review-row full"><div class="review-row-label">Notes</div>${renderValue(formData.notes)}</div>
             <div class="review-row full"><div class="review-row-label">Best contact time</div>${renderValue(formData.best_contact_time)}</div>
           </div>
         </div>
       `;
-
       reviewEl.querySelectorAll('.review-edit').forEach(btn => {
         btn.addEventListener('click', () => {
           const targetStep = parseInt(btn.dataset.edit, 10);
@@ -1550,26 +1395,32 @@
         const name = document.getElementById('business_name').value.trim();
         const industry = document.getElementById('industry').value;
         const phone = document.getElementById('business_phone').value.trim();
+        const hours = document.getElementById('business_hours').value;
         if (!name) { showError('Please enter your business name.'); return false; }
         if (!industry) { showError('Please pick your industry.'); return false; }
         if (!isValidPhone(phone)) { showError('Enter a valid 10-digit phone number.'); return false; }
+        if (!hours) { showError('Please pick your business hours.'); return false; }
         formData.business_name = name;
         formData.industry = industry;
         formData.business_phone = phone;
+        formData.business_hours = hours;
       }
       if (step === 2) {
         const trans = document.getElementById('transfer_primary').value.trim();
         const backup = document.getElementById('transfer_backup').value.trim();
         const email = document.getElementById('notify_email').value.trim();
-        const consent = document.getElementById('sms_consent_checkbox').checked;
+        const emerg = document.getElementById('emergency_calls').value;
+        const emergPhone = document.getElementById('emergency_phone').value.trim();
         if (!isValidPhone(trans)) { showError('Enter a valid 10-digit phone number for the transfer line.'); return false; }
         if (backup && !isValidPhone(backup)) { showError('Enter a valid 10-digit phone number for the backup line, or leave it blank.'); return false; }
         if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return false; }
-        if (!consent) { showError('Please agree to receive setup-related text messages.'); return false; }
+        if (!emerg) { showError('Please pick how the AI should handle emergency calls.'); return false; }
+        if (emerg === 'yes_separate' && !isValidPhone(emergPhone)) { showError('Please enter a valid 10-digit emergency number.'); return false; }
         formData.transfer_primary = trans;
         formData.transfer_backup = backup;
         formData.notify_email = email;
-        formData.sms_consent = consent;
+        formData.emergency_calls = emerg;
+        formData.emergency_phone = emergPhone;
       }
       if (step === 3) {
         const checked = document.querySelectorAll('#topics-grid .check-card.selected');
@@ -1587,6 +1438,10 @@
         formData.personality = selected.dataset.value;
       }
       if (step === 6) {
+        const rule = document.getElementById('pricing_rule').value;
+        if (!rule) { showError('Please pick how the AI should handle pricing questions.'); return false; }
+        formData.pricing_rule = rule;
+        formData.pricing_examples = document.getElementById('pricing_examples').value.trim();
         formData.notes = document.getElementById('notes').value.trim();
         formData.best_contact_time = document.getElementById('best_contact_time').value.trim();
       }
@@ -1626,15 +1481,24 @@
       autoSave();
     });
 
-    ['business_phone','transfer_primary','transfer_backup','notify_email','booking_link','payment_link','website','notes','best_contact_time'].forEach(id => {
+    ['business_phone','transfer_primary','transfer_backup','notify_email','emergency_phone','booking_link','payment_link','website','pricing_examples','notes','best_contact_time'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', () => {
         formData[id] = el.value;
         autoSave();
       });
     });
-    document.getElementById('industry').addEventListener('change', (e) => {
-      formData.industry = e.target.value;
+    ['industry','business_hours','pricing_rule'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', (e) => {
+        formData[id] = e.target.value;
+        autoSave();
+      });
+    });
+
+    document.getElementById('emergency_calls').addEventListener('change', (e) => {
+      formData.emergency_calls = e.target.value;
+      toggleEmergencyPhone();
       autoSave();
     });
 
@@ -1661,19 +1525,6 @@
       });
     });
 
-    // SMS consent toggle
-    const consentBlock = document.getElementById('sms-consent');
-    const consentCb = document.getElementById('sms_consent_checkbox');
-    if (consentBlock && consentCb) {
-      consentBlock.addEventListener('click', (e) => {
-        e.preventDefault();
-        consentCb.checked = !consentCb.checked;
-        consentBlock.classList.toggle('checked', consentCb.checked);
-        formData.sms_consent = consentCb.checked;
-        autoSave();
-      });
-    }
-
     async function submitForm() {
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
@@ -1681,7 +1532,6 @@
       btn.disabled = true;
       label.innerHTML = '<span class="spinner"></span>';
       if (arrow) arrow.style.display = 'none';
-
       try {
         const res = await fetch('/api/onboarding-submit', {
           method: 'POST',
@@ -1695,9 +1545,7 @@
       } catch (err) {
         console.error('Network error:', err);
       }
-
-      try { localStorage.removeItem('aileadintel_onboarding'); } catch (e) {}
-
+      try { localStorage.removeItem('aileadintel_onboarding_v6'); } catch (e) {}
       showSuccess();
     }
 
@@ -1733,6 +1581,7 @@
     updateHeader();
     updateRail();
     updateAIPreview();
+    toggleEmergencyPhone();
   </script>
 </body>
 </html>
