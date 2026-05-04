@@ -69,6 +69,7 @@ h1 em{font-style:normal;color:var(--orange);text-shadow:0 0 40px rgba(255,106,0,
 .form-group input,.form-group select{width:100%;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:all 0.2s;}
 .form-group input:hover,.form-group select:hover{border-color:var(--border2);}
 .form-group input:focus,.form-group select:focus{border-color:var(--orange);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(255,106,0,0.1);}
+.form-group input.invalid{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,82,82,0.1);}
 .form-group input::placeholder{color:var(--dim);}
 .form-group select option{background:#0f1520;}
 .consent-box{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5;transition:border-color 0.2s;}
@@ -81,10 +82,14 @@ h1 em{font-style:normal;color:var(--orange);text-shadow:0 0 40px rgba(255,106,0,
 .form-submit:hover::before{transform:translateX(100%);}
 .form-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .form-privacy{text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6;}
+.form-privacy a{color:var(--muted);text-decoration:underline;transition:color 0.2s;}
+.form-privacy a:hover{color:var(--orange2);}
 .form-success{display:none;text-align:center;padding:24px 10px;}
 .form-success .success-icon{width:56px;height:56px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;}
 .form-success h4{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);margin-bottom:8px;letter-spacing:0.06em;}
 .form-success p{font-size:14px;color:var(--muted);}
+.form-error-msg{display:none;background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:10px;line-height:1.5;}
+.form-error-msg.visible{display:block;}
 .industries{padding:28px 40px;background:var(--black);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;z-index:1;}
 .industries-inner{max-width:1140px;margin:0 auto;text-align:center;}
 .industries-label{font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;}
@@ -225,11 +230,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .pcard-tagline{font-size:15px;color:var(--muted);margin-bottom:18px;}
 .pcard-price{font-family:'Bebas Neue',sans-serif;font-size:64px;color:#fff;line-height:1;margin-bottom:4px;}
 .pcard-price span{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:400;color:var(--muted);}
-.pcard-desc{font-size:13px;color:var(--muted);margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+/* NEW — missed-caller subline under price */
+.pcard-subline{font-size:14px;color:var(--text);font-weight:500;line-height:1.5;margin-top:8px;margin-bottom:0;}
+.pcard-subline .arrow{color:var(--orange);font-weight:700;}
+.pcard-desc{font-size:13px;color:var(--muted);margin-top:16px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border);}
 .pcard ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:28px;}
 .pcard li{font-size:14px;color:var(--muted);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
 .pcard li::before{content:"✓";color:var(--orange);font-weight:700;flex-shrink:0;margin-top:1px;}
 .pcard li strong{color:#fff;font-weight:500;}
+/* NEW — highlighted top bullet */
+.pcard li.highlight{background:rgba(255,106,0,0.06);border:1px solid var(--orange-border);border-radius:8px;padding:10px 12px;margin-bottom:4px;}
+.pcard li.highlight::before{content:"⚡";color:var(--orange2);}
+.pcard li.highlight strong{color:#fff;font-weight:600;}
 .pcard-btn{display:block;text-align:center;padding:15px;border-radius:8px;font-size:15px;font-weight:600;transition:all 0.2s;background:var(--orange);color:#fff;box-shadow:0 0 24px rgba(255,106,0,0.25);}
 .pcard-btn:hover{background:var(--orange2);transform:translateY(-1px);}
 .pcard-footer{font-size:11px;color:var(--dim);margin-top:12px;text-align:center;line-height:1.5;}
@@ -297,7 +309,7 @@ footer .footer-links a:hover{color:var(--orange2);}
       <div class="hero-bullets">
         <div class="hero-bullet"><div class="bullet-check">✓</div>Answers every call 24/7 in your brand's voice</div>
         <div class="hero-bullet"><div class="bullet-check">✓</div>Captures every lead with instant alerts</div>
-        <div class="hero-bullet"><div class="bullet-check">✓</div>Full transcript & recording for every call</div>
+        <div class="hero-bullet"><div class="bullet-check">✓</div>Full transcript &amp; recording for every call</div>
         <div class="hero-bullet"><div class="bullet-check">✓</div>Works while you sleep, drive, or work</div>
       </div>
       <div class="hero-ctas">
@@ -311,13 +323,14 @@ footer .footer-links a:hover{color:var(--orange2);}
       <div class="form-card-title">Get My AI Setup</div>
       <p class="form-card-sub">Takes 30 seconds. We'll text you right after.</p>
       <div id="formContent">
+        <div class="form-error-msg" id="formErrorMsg"></div>
         <div class="form-group">
           <label>Your Name</label>
           <input type="text" id="fname" placeholder="John Smith">
         </div>
         <div class="form-group">
           <label>Phone Number</label>
-          <input type="tel" id="fphone" placeholder="(801) 555-0100">
+          <input type="tel" id="fphone" class="phone-input" placeholder="385-600-8134" inputmode="numeric" maxlength="12" autocomplete="tel">
         </div>
         <div class="form-group">
           <label>Business Type</label>
@@ -339,10 +352,14 @@ footer .footer-links a:hover{color:var(--orange2);}
         </div>
         <label class="consent-box">
           <input type="checkbox" id="fconsent">
-          <span>I agree to receive SMS messages from AI Lead Intel at the number provided about my inquiry and setup. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to unsubscribe, HELP for help. See our <a href="/privacy">Privacy Policy</a> &amp; <a href="/terms">Terms</a>.</span>
+          <span>I agree to receive text messages from AI Lead Intel about my inquiry/setup. Message &amp; data rates may apply. Reply STOP to opt out, HELP for support. See our <a href="/privacy">Privacy Policy</a> &amp; <a href="/terms">Terms</a>.</span>
         </label>
         <button class="form-submit" onclick="submitLead()">Get My AI Setup →</button>
-        <p class="form-privacy">Takes 30 seconds. We'll text you right after.<br/>Consent to receive SMS is not a condition of purchase.</p>
+        <p class="form-privacy">
+          Takes 30 seconds. We'll text you right after.<br/>
+          Consent to receive SMS is not a condition of purchase.<br/>
+          <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a>
+        </p>
       </div>
       <div class="form-success" id="formSuccess">
         <div class="success-icon">✓</div>
@@ -676,8 +693,10 @@ footer .footer-links a:hover{color:var(--orange2);}
         <div class="pcard-tier">AI Front Desk</div>
         <p class="pcard-tagline">Full voice AI receptionist</p>
         <div class="pcard-price">$299<span>/mo</span></div>
-        <p class="pcard-desc">Your phone gets answered 24/7 — even when you can't.</p>
+        <p class="pcard-subline">Miss a call <span class="arrow">→</span> they get a text <span class="arrow">→</span> you still get the lead.</p>
+        <p class="pcard-desc">Your phone gets answered 24/7 — even when you can't. And every missed caller gets an instant text follow-up.</p>
         <ul>
+          <li class="highlight"><strong>Instantly texts missed callers so you don't lose the lead</strong></li>
           <li><strong>AI voice answers every call</strong> in your brand's tone</li>
           <li>Handles pricing, hours, availability questions</li>
           <li>Qualifies leads &amp; captures all booking details</li>
@@ -761,6 +780,53 @@ footer .footer-links a:hover{color:var(--orange2);}
 </div>
 
 <script>
+/* ============================================================
+   PHONE FORMATTER — auto-formats .phone-input fields as user types
+   ============================================================
+   3856008134 → 385-600-8134 (live, while typing)
+*/
+function formatPhoneValue(raw) {
+  var digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return digits.slice(0, 3) + '-' + digits.slice(3);
+  return digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6, 10);
+}
+function isValidPhone(value) {
+  return String(value || '').replace(/\D/g, '').length === 10;
+}
+function attachPhoneFormatter(input) {
+  if (!input || input.dataset.phoneFormatted === '1') return;
+  input.dataset.phoneFormatted = '1';
+  input.addEventListener('input', function () {
+    var before = input.value;
+    var cursorPos = input.selectionStart || before.length;
+    var formatted = formatPhoneValue(before);
+    input.value = formatted;
+    var beforeDigits = before.slice(0, cursorPos).replace(/\D/g, '').length;
+    var newPos = 0, count = 0;
+    for (var i = 0; i < formatted.length; i++) {
+      if (count === beforeDigits) { newPos = i; break; }
+      if (/\d/.test(formatted[i])) count++;
+      newPos = i + 1;
+    }
+    try { input.setSelectionRange(newPos, newPos); } catch (_) {}
+    input.classList.remove('invalid');
+  });
+  input.addEventListener('blur', function () {
+    input.value = formatPhoneValue(input.value);
+    if (input.value && !isValidPhone(input.value)) {
+      input.classList.add('invalid');
+    } else {
+      input.classList.remove('invalid');
+    }
+  });
+}
+document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
+
+/* ============================================================
+   STICKY NAV + MOBILE CTA
+   ============================================================ */
 window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
   document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60);
@@ -769,6 +835,9 @@ window.addEventListener('scroll', () => {
   else mobileCta.classList.remove('visible');
 });
 
+/* ============================================================
+   ROI CALCULATOR
+   ============================================================ */
 function calcROI() {
   const calls = +document.getElementById('s1').value;
   const job   = +document.getElementById('s2').value;
@@ -783,6 +852,9 @@ function calcROI() {
 }
 calcROI();
 
+/* ============================================================
+   CONVERSATION TABS
+   ============================================================ */
 document.querySelectorAll('.convo-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const target = tab.dataset.tab;
@@ -793,17 +865,26 @@ document.querySelectorAll('.convo-tab').forEach(tab => {
   });
 });
 
+/* ============================================================
+   FAQ ACCORDION
+   ============================================================ */
 document.querySelectorAll('.faq-item').forEach(item => {
   item.querySelector('.faq-q').addEventListener('click', () => {
     item.classList.toggle('open');
   });
 });
 
+/* ============================================================
+   SCROLL REVEALS
+   ============================================================ */
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
+/* ============================================================
+   PHONE MOCKUP DEMO
+   ============================================================ */
 const phoneMessages = [
   { type: 'incoming', text: "Hey, thanks for calling ProCool HVAC. This is Sam — how can I help? 🔧" },
   { type: 'outgoing', text: "Hi, my water heater isn't getting hot" },
@@ -826,13 +907,32 @@ function renderPhone() {
 }
 renderPhone();
 
+/* ============================================================
+   FORM SUBMIT — same backend (/api/lead-submit), better validation
+   ============================================================ */
+function showFormError(msg) {
+  const el = document.getElementById('formErrorMsg');
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => { el.classList.remove('visible'); }, 6000);
+}
+
 async function submitLead() {
   const name = document.getElementById('fname').value.trim();
-  const phone = document.getElementById('fphone').value.trim();
+  const phoneEl = document.getElementById('fphone');
+  const phone = phoneEl.value.trim();
   const biz = document.getElementById('fbiz').value;
   const consent = document.getElementById('fconsent').checked;
-  if (!name || !phone || !biz) { alert('Please fill out all fields.'); return; }
-  if (!consent) { alert('Please check the SMS consent box to continue.'); return; }
+
+  if (!name) { showFormError('Please enter your name.'); return; }
+  if (!isValidPhone(phone)) {
+    showFormError('Enter a valid 10-digit phone number.');
+    phoneEl.classList.add('invalid');
+    return;
+  }
+  if (!biz) { showFormError('Please pick your business type.'); return; }
+  if (!consent) { showFormError('Please check the SMS consent box to continue.'); return; }
+
   const btn = document.querySelector('.form-submit');
   btn.textContent = 'Setting up...';
   btn.disabled = true;
@@ -854,7 +954,7 @@ async function submitLead() {
   } catch (err) {
     btn.textContent = 'Get My AI Setup →';
     btn.disabled = false;
-    alert('Error: ' + err.message);
+    showFormError('Error: ' + err.message);
   }
 }
 </script>
