@@ -1233,7 +1233,7 @@
         for (let i = currentStep; i < step; i++) completedSteps.add(i);
       }
       document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-      const target = document.querySelector(`[data-step="${step}"]`);
+      const target = document.querySelector(`.step[data-step="${step}"]`);
       if (target) target.classList.add('active');
       const backBtn = document.getElementById('btn-back');
       const nextBtn = document.getElementById('btn-next');
