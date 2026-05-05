@@ -1547,7 +1547,7 @@
 
     function showSuccess() {
       document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-      document.querySelector('[data-step="success"]').classList.add('active');
+      document.querySelector('.step[data-step="success"]').classList.add('active');
       document.getElementById('actions').style.display = 'none';
       document.getElementById('trust-row').style.display = 'none';
       document.querySelector('.content-header').style.display = 'none';
