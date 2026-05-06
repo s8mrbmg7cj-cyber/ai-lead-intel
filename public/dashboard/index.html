@@ -922,6 +922,49 @@
     .empty-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
     .empty-sub { color: var(--text-dim); font-size: 13px; max-width: 360px; margin: 0 auto; line-height: 1.5; }
 
+    .no-client-card {
+      max-width: 540px;
+      margin: 80px auto;
+      padding: 60px 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .no-client-glyph {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 16px;
+      background: var(--brand-soft);
+      border: 1px solid rgba(255, 106, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+    }
+    .no-client-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .no-client-sub {
+      color: var(--text-dim);
+      font-size: 14px;
+      max-width: 380px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+    .no-client-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .skeleton-row {
       display: flex;
       align-items: center;
@@ -1352,6 +1395,26 @@
   </nav>
 
   <div class="container">
+    <!-- NO CLIENT LINKED STATE -->
+    <div id="no-client-state" style="display:none;">
+      <div class="no-client-card">
+        <div class="no-client-glyph">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9h.01M9 12h.01M9 15h.01M9 18h.01"/></svg>
+        </div>
+        <div class="no-client-title">No client account linked</div>
+        <div class="no-client-sub">Your login isn't connected to a business yet. We'll get you set up — usually within 1 business day. Reach out if this seems wrong and we'll fix it fast.</div>
+        <div class="no-client-actions">
+          <a href="mailto:hello@aileadintel.com" class="btn primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Contact support
+          </a>
+          <button class="btn" onclick="signOut()">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="main-state">
     <div class="page-header">
       <div class="page-title-block">
         <div class="eyebrow">Mission Control</div>
@@ -1508,6 +1571,7 @@
         </div>
       </div>
     </div>
+    </div><!-- /#main-state -->
 
     <footer class="dashboard-footer">
       <div class="footer-left">
@@ -1556,6 +1620,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let currentClientId = null;
     let allCalls = [];
     let allTexts = [];
     let currentFilter = 'all';
@@ -1565,13 +1630,32 @@
     let textsRealtimeChannel = null;
     let newCallIds = new Set();
 
+    function showNoClientState() {
+      document.getElementById('main-state').style.display = 'none';
+      document.getElementById('no-client-state').style.display = 'block';
+      document.getElementById('business-name').textContent = '—';
+    }
+
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = '/dashboard/login.html'; return; }
       document.getElementById('user-email').textContent = session.user.email;
 
-      const { data: clients } = await sb.from('clients').select('business_name').eq('owner_user_id', session.user.id).limit(1);
-      if (clients?.length) document.getElementById('business-name').textContent = clients[0].business_name;
+      // Fetch the client linked to this user
+      const { data: clients, error: clientError } = await sb
+        .from('clients')
+        .select('id, business_name')
+        .eq('owner_user_id', session.user.id)
+        .limit(1);
+
+      if (clientError || !clients || clients.length === 0) {
+        // No client linked — show clean empty state, do NOT load calls or subscribe to realtime
+        showNoClientState();
+        return;
+      }
+
+      currentClientId = clients[0].id;
+      document.getElementById('business-name').textContent = clients[0].business_name || '—';
 
       await loadAll();
       setupRealtime();
@@ -1580,25 +1664,37 @@
     }
 
     function setupRealtime() {
+      if (!currentClientId) return;
+
       if (!realtimeChannel) {
         realtimeChannel = sb.channel('calls-changes')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'calls' },
             (payload) => {
-              if (payload.new && payload.new.id) newCallIds.add(payload.new.id);
+              if (!payload.new || payload.new.client_uuid !== currentClientId) return;
+              if (payload.new.id) newCallIds.add(payload.new.id);
               loadAll();
               showToast('New call received', 'success');
             })
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calls' },
-            () => { loadAll(); })
+            (payload) => {
+              if (!payload.new || payload.new.client_uuid !== currentClientId) return;
+              loadAll();
+            })
           .subscribe();
       }
       // Also listen for text_messages inserts
       if (!textsRealtimeChannel) {
         textsRealtimeChannel = sb.channel('texts-changes')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'text_messages' },
-            () => { loadAll(); })
+            (payload) => {
+              if (!payload.new || payload.new.client_uuid !== currentClientId) return;
+              loadAll();
+            })
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'text_messages' },
-            () => { loadAll(); })
+            (payload) => {
+              if (!payload.new || payload.new.client_uuid !== currentClientId) return;
+              loadAll();
+            })
           .subscribe();
       }
     }
@@ -1607,17 +1703,28 @@
       document.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
           e.preventDefault();
-          document.getElementById('search-input').focus();
+          const searchEl = document.getElementById('search-input');
+          if (searchEl) searchEl.focus();
         }
         if (e.key === 'Escape') closePanel();
       });
     }
 
     async function loadAll() {
-      // Load calls and texts in parallel
+      if (!currentClientId) return;
+
+      // Load calls and texts in parallel — both filtered by current client
       const [callsRes, textsRes] = await Promise.all([
-        sb.from('calls').select('*').order('created_at', { ascending: false }).limit(200),
-        sb.from('text_messages').select('*').order('created_at', { ascending: false }).limit(500),
+        sb.from('calls')
+          .select('*')
+          .eq('client_uuid', currentClientId)
+          .order('created_at', { ascending: false })
+          .limit(200),
+        sb.from('text_messages')
+          .select('*')
+          .eq('client_uuid', currentClientId)
+          .order('created_at', { ascending: false })
+          .limit(500),
       ]);
 
       if (callsRes.error) {
@@ -2021,7 +2128,8 @@
     function getFiltered() {
       let f = getCallsInRange(timeRange);
       if (currentFilter !== 'all') f = f.filter(c => c.lead_score === currentFilter);
-      const q = document.getElementById('search-input').value.trim().toLowerCase();
+      const searchEl = document.getElementById('search-input');
+      const q = searchEl ? searchEl.value.trim().toLowerCase() : '';
       if (q) f = f.filter(c => (c.caller_number || '').toLowerCase().includes(q) || (c.outcome || '').toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q));
       return f;
     }
@@ -2218,7 +2326,12 @@
     }
 
     async function updateStatus(callId, newStatus) {
-      const { error } = await sb.from('calls').update({ lead_status: newStatus }).eq('id', callId);
+      if (!currentClientId) return;
+      const { error } = await sb
+        .from('calls')
+        .update({ lead_status: newStatus })
+        .eq('id', callId)
+        .eq('client_uuid', currentClientId);
       if (error) { showToast('Update failed'); return; }
       const call = allCalls.find(c => c.id === callId);
       if (call) call.lead_status = newStatus;
@@ -2230,12 +2343,17 @@
     }
 
     async function saveNotes(callId, notes) {
+      if (!currentClientId) return;
       const status = document.getElementById(`notes-status-${callId}`);
-      const { error } = await sb.from('calls').update({ notes, notes_updated_at: new Date().toISOString() }).eq('id', callId);
-      if (error) { status.textContent = '· Save failed'; return; }
+      const { error } = await sb
+        .from('calls')
+        .update({ notes, notes_updated_at: new Date().toISOString() })
+        .eq('id', callId)
+        .eq('client_uuid', currentClientId);
+      if (error) { if (status) status.textContent = '· Save failed'; return; }
       const call = allCalls.find(c => c.id === callId);
       if (call) call.notes = notes;
-      status.textContent = '· Saved';
+      if (status) status.textContent = '· Saved';
       setTimeout(() => { if (status) status.textContent = ''; }, 2000);
     }
 
