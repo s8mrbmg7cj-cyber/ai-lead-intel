@@ -113,8 +113,20 @@ img { max-width: 100%; display: block; }
 .nav-cta:hover {
   background: var(--surface-3); border-color: var(--border-3); transform: translateY(-1px);
 }
+.nav-signin {
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  transition: all 0.18s;
+}
+.nav-signin:hover {
+  background: var(--surface-2);
+  border-color: var(--border-2);
+  color: var(--text);
+}
 @media (max-width: 720px) {
   .nav-links .nav-link { display: none; }
+  .nav-links .nav-signin { display: inline-flex; }
 }
 
 .wrap { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
@@ -1045,6 +1057,7 @@ img { max-width: 100%; display: block; }
     <a href="#features" class="nav-link">Features</a>
     <a href="#pricing" class="nav-link">Pricing</a>
     <a href="#faq" class="nav-link">FAQ</a>
+    <a href="/dashboard/" class="nav-link nav-signin">Sign in</a>
     <a href="/onboarding/" class="nav-cta">Get started →</a>
   </div>
 </nav>
@@ -1734,13 +1747,15 @@ img { max-width: 100%; display: block; }
         <a href="#faq" class="footer-link">FAQ</a>
       </div>
       <div>
+        <div class="footer-col-title">For customers</div>
+        <a href="/dashboard/" class="footer-link">Sign in to dashboard</a>
+        <a href="/setup" class="footer-link">Setup help</a>
+        <a href="mailto:hello@aileadintel.com" class="footer-link">Customer support</a>
+      </div>
+      <div>
         <div class="footer-col-title">Company</div>
         <a href="/onboarding/" class="footer-link">Get started</a>
         <a href="mailto:hello@aileadintel.com" class="footer-link">Contact</a>
-        <a href="mailto:hello@aileadintel.com" class="footer-link">Support</a>
-      </div>
-      <div>
-        <div class="footer-col-title">Legal</div>
         <a href="/privacy" class="footer-link">Privacy</a>
         <a href="/terms" class="footer-link">Terms</a>
       </div>
