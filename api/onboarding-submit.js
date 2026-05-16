@@ -29,8 +29,29 @@ function normalizeData(data) {
     pricing_rule: data.pricing_rule || "",
     pricing_examples: data.pricing_examples || "",
     notes: data.notes || "",
+    plan: data.plan || "starter", // 'starter' or 'pro' - default to starter
     raw_data: data,
   };
+}
+
+/**
+ * Generate a URL-friendly slug from a business name.
+ * Adds a short random suffix to avoid collisions.
+ * Example: "Prime Vault Self Storage" -> "prime-vault-self-storage-x7k2"
+ */
+function generateSlug(businessName) {
+  const base = String(businessName || "client")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // strip punctuation
+    .replace(/\s+/g, "-")          // spaces to dashes
+    .replace(/-+/g, "-")           // collapse repeats
+    .slice(0, 40);                 // cap length
+
+  // 4-char random suffix for uniqueness
+  const suffix = Math.random().toString(36).slice(2, 6);
+
+  return `${base || "client"}-${suffix}`;
 }
 
 async function sendNtfyNotification(data) {
@@ -80,6 +101,7 @@ async function notifyOwnerEmail(data) {
         <p><strong>Name:</strong> ${escapeHtml(data.business_name)}</p>
         <p><strong>Industry:</strong> ${escapeHtml(data.industry)}</p>
         <p><strong>Main Phone:</strong> ${escapeHtml(data.business_phone)}</p>
+        <p><strong>Plan Requested:</strong> ${escapeHtml(data.plan)}</p>
 
         <h3>Call Handling</h3>
         <p><strong>Primary Transfer:</strong> ${escapeHtml(data.transfer_primary)}</p>
@@ -106,6 +128,7 @@ async function notifyOwnerEmail(data) {
 
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:24px 0;" />
         <p style="color:#aaa;font-size:12px;">Submitted ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}</p>
+        <p style="color:#aaa;font-size:12px;">View in admin: <a href="https://aileadintel.com/admin" style="color:#ff6a00;">aileadintel.com/admin</a></p>
       </div>
     `,
   });
@@ -113,23 +136,27 @@ async function notifyOwnerEmail(data) {
   console.log("EMAIL SENT to", notifyEmail);
 }
 
+/**
+ * Save the raw onboarding submission to the client_onboarding table.
+ * Returns the created row's ID (so we can link it to the clients row).
+ */
 async function saveOnboardingToSupabase(data) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     console.log("SUPABASE SKIPPED — missing keys");
-    return;
+    return null;
   }
 
   try {
-    await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
+    const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
-        Prefer: "return=minimal",
+        Prefer: "return=representation", // changed from minimal so we can get the inserted ID
       },
       body: JSON.stringify({
         business_name: data.business_name,
@@ -149,8 +176,95 @@ async function saveOnboardingToSupabase(data) {
         raw_data: data.raw_data,
       }),
     });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.log("SUPABASE onboarding INSERT failed:", res.status, text);
+      return null;
+    }
+
+    const rows = await res.json().catch(() => []);
+    return rows && rows[0] ? rows[0].id : null;
   } catch (error) {
-    console.log("SUPABASE ERROR:", error.message);
+    console.log("SUPABASE ONBOARDING ERROR:", error.message);
+    return null;
+  }
+}
+
+/**
+ * Create a row in the `clients` table so the customer appears in /admin.
+ * - status: 'trial' (they haven't paid yet)
+ * - plan: from form (defaults to 'starter')
+ * - active: true (they're a real prospect)
+ * - onboarding_id: links back to client_onboarding row for full context
+ */
+async function createClientRow(data, onboardingId) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.log("CLIENT ROW SKIPPED — missing Supabase keys");
+    return null;
+  }
+
+  // Force plan to one of the allowed values (CHECK constraint = 'starter' | 'pro')
+  const safePlan = data.plan === "pro" ? "pro" : "starter";
+
+  // Build a notes string with onboarding details so the admin row is useful at a glance
+  const adminNotes = [
+    `Industry: ${data.industry || "—"}`,
+    `Forward to: ${data.transfer_primary || "—"}`,
+    data.transfer_backup ? `Backup: ${data.transfer_backup}` : null,
+    `Hours: ${data.transfer_hours || "—"}`,
+    `Personality: ${data.personality || "—"}`,
+    `Pricing rule: ${data.pricing_rule || "—"}`,
+    data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const payload = {
+    business_name: data.business_name,
+    client_slug: generateSlug(data.business_name),
+    notify_email: data.notify_email,
+    phone_number: data.business_phone || null,
+    plan: safePlan,
+    status: "trial",
+    active: true,
+    notes: adminNotes,
+    onboarding_id: onboardingId || null,
+    // status_changed_at + created_at + updated_at use the column defaults
+    // owner_user_id stays null — you'll wire up an auth user manually for now
+    // assistant_id, vapi_phone_number_id, twilio_number stay null until you build the AI
+  };
+
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.log("CLIENT ROW INSERT failed:", res.status, text);
+      return null;
+    }
+
+    const rows = await res.json().catch(() => []);
+    const newClient = rows && rows[0] ? rows[0] : null;
+    if (newClient) {
+      console.log("CLIENT ROW CREATED:", newClient.id, newClient.client_slug);
+    }
+    return newClient;
+  } catch (error) {
+    console.log("CLIENT ROW ERROR:", error.message);
+    return null;
   }
 }
 
@@ -173,12 +287,21 @@ export default async function handler(req, res) {
     if (!data.business_name) {
       return res.status(400).json({ error: "Missing business name" });
     }
+    if (!data.notify_email) {
+      return res.status(400).json({ error: "Missing notification email" });
+    }
 
-    await Promise.all([
+    // Step 1 — Fire ntfy + owner email + onboarding insert in parallel.
+    // We need the onboarding row's ID to link to the clients row, so we await it.
+    const [, , onboardingId] = await Promise.all([
       sendNtfyNotification(data),
       notifyOwnerEmail(data),
       saveOnboardingToSupabase(data),
     ]);
+
+    // Step 2 — Create the clients row so they appear in /admin immediately.
+    // Runs after onboarding insert so we can link via onboarding_id.
+    await createClientRow(data, onboardingId);
 
     return res.status(200).json({ success: true });
   } catch (error) {
