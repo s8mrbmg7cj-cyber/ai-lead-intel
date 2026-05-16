@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Admin · AI Lead Intel</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a;
+  --surface: #111114;
+  --surface-2: #16161b;
+  --surface-3: #1c1c22;
+  --surface-input: #0d0d10;
+  --border: rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.10);
+  --border-3: rgba(255,255,255,0.14);
+  --text: #fafafa;
+  --text-soft: #d4d4d8;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
+  --text-muted: #52525b;
+  --brand: #ff6a00;
+  --brand-2: #ff9a00;
+  --brand-soft: rgba(255,106,0,0.10);
+  --brand-line: rgba(255,106,0,0.22);
+  --brand-glow: rgba(255,106,0,0.32);
+  --green: #34d399;
+  --green-soft: rgba(52,211,153,0.1);
+  --green-line: rgba(52,211,153,0.25);
+  --yellow: #f59e0b;
+  --yellow-soft: rgba(245,158,11,0.1);
+  --yellow-line: rgba(245,158,11,0.25);
+  --red: #ef4444;
+  --red-soft: rgba(239,68,68,0.1);
+  --red-line: rgba(239,68,68,0.25);
+  --blue: #3b82f6;
+  --blue-soft: rgba(59,130,246,0.1);
+  --blue-line: rgba(59,130,246,0.25);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; outline: none; }
+
+/* TOPNAV */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,10,0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
+.logo-mark {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 14px var(--brand-glow);
+}
+.admin-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: var(--red-soft);
+  border: 1px solid var(--red-line);
+  border-radius: 99px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+}
+.admin-pill .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 5px var(--red);
+}
+.nav-right { display: flex; align-items: center; gap: 14px; }
+.nav-email { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); }
+.btn-signout {
+  padding: 6px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  font-size: 12px; color: var(--text-dim);
+  transition: all 0.15s;
+}
+.btn-signout:hover { background: var(--surface-3); color: var(--text); }
+
+/* AUTH SCREEN */
+.auth-screen {
+  min-height: calc(100vh - 56px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 40px;
+  max-width: 420px; width: 100%;
+}
+.auth-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  padding: 5px 11px; border-radius: 99px;
+  font-weight: 600; margin-bottom: 18px;
+}
+.auth-eyebrow .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+}
+.auth-title {
+  font-size: 24px; font-weight: 600;
+  letter-spacing: -0.025em; margin-bottom: 8px;
+}
+.auth-sub {
+  font-size: 14px; color: var(--text-dim);
+  line-height: 1.55; margin-bottom: 24px;
+}
+.auth-field { margin-bottom: 14px; }
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  transition: border-color 0.15s;
+}
+.auth-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.btn-primary {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 14px var(--brand-glow);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--brand-glow); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.auth-error, .auth-success {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+}
+.auth-error {
+  background: var(--red-soft);
+  border: 1px solid var(--red-line);
+  color: var(--red);
+}
+.auth-success {
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  color: var(--green);
+}
+.access-denied {
+  text-align: center;
+  padding: 48px 24px;
+}
+.access-denied h2 { font-size: 22px; margin-bottom: 10px; }
+.access-denied p { color: var(--text-dim); font-size: 14px; }
+
+/* MAIN APP */
+.app { display: none; padding: 32px 24px 80px; max-width: 1400px; margin: 0 auto; }
+.app.visible { display: block; }
+
+.page-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
+}
+.page-title-block .eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-faint);
+  margin-bottom: 6px;
+}
+.page-title { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; }
+.refresh-btn {
+  padding: 8px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { background: var(--surface-3); color: var(--text); }
+
+/* STATS */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+  margin-bottom: 24px;
+}
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 11px; padding: 14px 16px;
+}
+.stat-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Geist Mono', monospace;
+  font-size: 22px; font-weight: 600;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.stat-value.trial { color: var(--blue); }
+.stat-value.active { color: var(--green); }
+.stat-value.paused { color: var(--yellow); }
+.stat-value.cancelled { color: var(--red); }
+@media (max-width: 760px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* FILTERS */
+.filters {
+  display: flex; gap: 8px; margin-bottom: 20px;
+  flex-wrap: wrap; align-items: center;
+}
+.filter-search {
+  flex: 1; min-width: 220px;
+  padding: 9px 14px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+}
+.filter-search:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.filter-pill {
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.filter-pill:hover { color: var(--text); border-color: var(--border-3); }
+.filter-pill.active {
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+  color: var(--brand);
+}
+
+/* CLIENTS TABLE */
+.clients-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.clients-table th {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+.clients-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.clients-table tr:last-child td { border-bottom: none; }
+.clients-table tr:hover td { background: var(--surface-2); }
+.client-name { font-weight: 600; color: var(--text); }
+.client-phone {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; color: var(--text-faint);
+  margin-top: 2px;
+}
+.client-id {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 5px;
+  white-space: nowrap;
+}
+.badge.trial { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-line); }
+.badge.active { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+.badge.paused { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-line); }
+.badge.cancelled { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
+.badge.plan-starter { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border-2); }
+.badge.plan-pro { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-line); }
+.metric-cell {
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.metric-cell.muted { color: var(--text-muted); }
+.row-actions {
+  display: flex; gap: 6px; align-items: center;
+  flex-wrap: wrap;
+}
+.action-btn {
+  padding: 5px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.action-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.action-btn.active { background: var(--green-soft); color: var(--green); border-color: var(--green-line); }
+.action-btn.pause { background: var(--yellow-soft); color: var(--yellow); border-color: var(--yellow-line); }
+.action-btn.cancel { background: var(--red-soft); color: var(--red); border-color: var(--red-line); }
+.empty-row td {
+  text-align: center; padding: 40px 16px;
+  color: var(--text-faint); font-size: 13px;
+}
+.loading-row td {
+  text-align: center; padding: 40px 16px;
+  color: var(--text-faint); font-size: 13px;
+}
+.spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: -2px; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .clients-table thead { display: none; }
+  .clients-table tr {
+    display: block; padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .clients-table td {
+    display: block; padding: 4px 0; border: none;
+  }
+  .clients-table td::before {
+    content: attr(data-label);
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-faint);
+    display: block; margin-bottom: 2px;
+  }
+}
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 200;
+  background: var(--surface-2);
+  border: 1px solid var(--border-3);
+  border-radius: 11px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; transform: translateY(10px);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+}
+.toast.visible { opacity: 1; transform: translateY(0); }
+.toast.success { border-color: var(--green-line); }
+.toast.success .toast-dot { background: var(--green); }
+.toast.error { border-color: var(--red-line); }
+.toast.error .toast-dot { background: var(--red); }
+.toast-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--brand);
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <span>AI Lead Intel</span>
+    <span class="admin-pill"><span class="dot"></span>Admin</span>
+  </div>
+  <div class="nav-right" id="nav-right" style="display:none;">
+    <span class="nav-email" id="nav-email"></span>
+    <button class="btn-signout" id="btn-signout">Sign out</button>
+  </div>
+</nav>
+
+<!-- AUTH -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-eyebrow"><span class="dot"></span>Internal · Admin Only</div>
+    <h2 class="auth-title">Sign in to admin</h2>
+    <p class="auth-sub">Magic-link sign-in. Only authorized accounts can access this page.</p>
+    <div class="auth-field">
+      <input type="email" class="auth-input" id="auth-email" placeholder="andrew3333422@gmail.com" autocomplete="email" />
+    </div>
+    <button class="btn-primary" id="btn-magic">Send magic link</button>
+    <div class="auth-error" id="auth-error" style="display:none;"></div>
+    <div class="auth-success" id="auth-success" style="display:none;">
+      Check your inbox. Click the link to sign in.
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS DENIED (for non-admin users) -->
+<div class="auth-screen" id="denied-screen" style="display:none;">
+  <div class="auth-card">
+    <div class="access-denied">
+      <h2>Access denied</h2>
+      <p id="denied-msg">This page is restricted to AI Lead Intel admins.</p>
+      <button class="btn-signout" id="btn-signout-2" style="margin-top:20px;">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<main class="app" id="app">
+  <div class="page-head">
+    <div class="page-title-block">
+      <div class="eyebrow">Internal · Mission Control</div>
+      <h1 class="page-title">All clients</h1>
+    </div>
+    <button class="refresh-btn" id="btn-refresh">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-label">Total Clients</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Trial</div>
+      <div class="stat-value trial" id="stat-trial">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Active</div>
+      <div class="stat-value active" id="stat-active">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Paused</div>
+      <div class="stat-value paused" id="stat-paused">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-value cancelled" id="stat-cancelled">—</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" class="filter-search" id="filter-search" placeholder="Search by business name or phone…" />
+    <button class="filter-pill active" data-filter="all">All</button>
+    <button class="filter-pill" data-filter="trial">Trial</button>
+    <button class="filter-pill" data-filter="active">Active</button>
+    <button class="filter-pill" data-filter="paused">Paused</button>
+    <button class="filter-pill" data-filter="cancelled">Cancelled</button>
+  </div>
+
+  <div class="clients-card">
+    <table class="clients-table">
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Status</th>
+          <th>Plan</th>
+          <th>Calls (30d)</th>
+          <th>Texts (30d)</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="clients-body">
+        <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading clients…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toast-text">Saved</span>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ============================================================
+// CONFIG — make sure these match your Supabase project
+// ============================================================
+const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+
+// ONLY these emails can access the admin page
+const ADMIN_EMAILS = [
+  'andrew3333422@gmail.com',
+];
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let allClients = [];
+let activeFilter = 'all';
+let searchQuery = '';
+
+// ============================================================
+// AUTH
+// ============================================================
+const authScreen = document.getElementById('auth-screen');
+const deniedScreen = document.getElementById('denied-screen');
+const app = document.getElementById('app');
+const navRight = document.getElementById('nav-right');
+const navEmail = document.getElementById('nav-email');
+
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    showAuth();
+    return;
+  }
+  currentUser = session.user;
+
+  if (!ADMIN_EMAILS.includes(currentUser.email)) {
+    showDenied();
+    return;
+  }
+
+  showApp();
+}
+
+function showAuth() {
+  authScreen.style.display = 'flex';
+  deniedScreen.style.display = 'none';
+  app.classList.remove('visible');
+  navRight.style.display = 'none';
+}
+function showDenied() {
+  authScreen.style.display = 'none';
+  deniedScreen.style.display = 'flex';
+  app.classList.remove('visible');
+  navRight.style.display = 'none';
+  document.getElementById('denied-msg').textContent =
+    `Account ${currentUser.email} isn't authorized for admin access.`;
+}
+function showApp() {
+  authScreen.style.display = 'none';
+  deniedScreen.style.display = 'none';
+  app.classList.add('visible');
+  navRight.style.display = 'flex';
+  navEmail.textContent = currentUser.email;
+  loadClients();
+}
+
+document.getElementById('btn-magic').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const errEl = document.getElementById('auth-error');
+  const okEl = document.getElementById('auth-success');
+  errEl.style.display = 'none';
+  okEl.style.display = 'none';
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Enter a valid email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const btn = document.getElementById('btn-magic');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  btn.disabled = false;
+  btn.textContent = 'Send magic link';
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    okEl.style.display = 'block';
+  }
+});
+
+async function signOut() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  showAuth();
+}
+document.getElementById('btn-signout').addEventListener('click', signOut);
+document.getElementById('btn-signout-2').addEventListener('click', signOut);
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    currentUser = session.user;
+    if (!ADMIN_EMAILS.includes(currentUser.email)) showDenied();
+    else showApp();
+  }
+});
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadClients() {
+  const tbody = document.getElementById('clients-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading clients…</td></tr>';
+
+  try {
+    const { data: clients, error } = await supabase
+      .from('clients')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allClients = clients || [];
+
+    // Fetch call counts and text counts in parallel
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const [callsResult, textsResult] = await Promise.all([
+      supabase
+        .from('calls')
+        .select('client_uuid', { count: 'exact', head: false })
+        .gte('created_at', thirtyDaysAgo),
+      supabase
+        .from('text_messages')
+        .select('client_uuid', { count: 'exact', head: false })
+        .gte('created_at', thirtyDaysAgo),
+    ]);
+
+    // Count per client
+    const callCounts = {};
+    const textCounts = {};
+    (callsResult.data || []).forEach(c => {
+      if (c.client_uuid) callCounts[c.client_uuid] = (callCounts[c.client_uuid] || 0) + 1;
+    });
+    (textsResult.data || []).forEach(t => {
+      if (t.client_uuid) textCounts[t.client_uuid] = (textCounts[t.client_uuid] || 0) + 1;
+    });
+
+    allClients = allClients.map(c => ({
+      ...c,
+      _calls_30d: callCounts[c.id] || 0,
+      _texts_30d: textCounts[c.id] || 0,
+    }));
+
+    renderStats();
+    renderClients();
+  } catch (err) {
+    console.error('Failed to load clients:', err);
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Failed to load: ${err.message || 'unknown error'}</td></tr>`;
+    showToast('Failed to load clients', 'error');
+  }
+}
+
+function renderStats() {
+  const counts = { trial: 0, active: 0, paused: 0, cancelled: 0 };
+  allClients.forEach(c => {
+    const s = c.status || 'trial';
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  document.getElementById('stat-total').textContent = allClients.length;
+  document.getElementById('stat-trial').textContent = counts.trial;
+  document.getElementById('stat-active').textContent = counts.active;
+  document.getElementById('stat-paused').textContent = counts.paused;
+  document.getElementById('stat-cancelled').textContent = counts.cancelled;
+}
+
+function renderClients() {
+  const tbody = document.getElementById('clients-body');
+  let filtered = allClients;
+  if (activeFilter !== 'all') {
+    filtered = filtered.filter(c => (c.status || 'trial') === activeFilter);
+  }
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(c =>
+      (c.business_name || '').toLowerCase().includes(q) ||
+      (c.business_phone || '').toLowerCase().includes(q) ||
+      (c.id || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No clients match this filter.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(c => {
+    const status = c.status || 'trial';
+    const plan = c.plan || 'starter';
+    const joined = c.created_at ? formatDate(c.created_at) : '—';
+    return `
+      <tr data-id="${escapeHtml(c.id)}">
+        <td data-label="Business">
+          <div class="client-name">${escapeHtml(c.business_name || 'Unnamed')}</div>
+          ${c.business_phone ? `<div class="client-phone">${escapeHtml(c.business_phone)}</div>` : ''}
+          <div class="client-id">${escapeHtml((c.id || '').slice(0, 8))}…</div>
+        </td>
+        <td data-label="Status"><span class="badge ${status}">${status}</span></td>
+        <td data-label="Plan"><span class="badge plan-${plan}">${plan}</span></td>
+        <td data-label="Calls 30d"><span class="metric-cell ${c._calls_30d ? '' : 'muted'}">${c._calls_30d}</span></td>
+        <td data-label="Texts 30d"><span class="metric-cell ${c._texts_30d ? '' : 'muted'}">${c._texts_30d}</span></td>
+        <td data-label="Joined" style="color:var(--text-faint);font-size:12px;">${joined}</td>
+        <td data-label="Actions">
+          <div class="row-actions">
+            <button class="action-btn ${status === 'trial' ? 'active' : ''}" data-action="set-status" data-status="trial">Trial</button>
+            <button class="action-btn active ${status === 'active' ? 'active' : ''}" data-action="set-status" data-status="active">Active</button>
+            <button class="action-btn pause ${status === 'paused' ? 'active' : ''}" data-action="set-status" data-status="paused">Pause</button>
+            <button class="action-btn cancel ${status === 'cancelled' ? 'active' : ''}" data-action="set-status" data-status="cancelled">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Wire action buttons
+  tbody.querySelectorAll('.action-btn[data-action="set-status"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('tr');
+      const clientId = row.getAttribute('data-id');
+      const newStatus = btn.getAttribute('data-status');
+      await updateStatus(clientId, newStatus);
+    });
+  });
+}
+
+async function updateStatus(clientId, newStatus) {
+  try {
+    const { error } = await supabase
+      .from('clients')
+      .update({ status: newStatus, status_changed_at: new Date().toISOString() })
+      .eq('id', clientId);
+    if (error) throw error;
+    // Update local state
+    const client = allClients.find(c => c.id === clientId);
+    if (client) {
+      client.status = newStatus;
+      client.status_changed_at = new Date().toISOString();
+    }
+    renderStats();
+    renderClients();
+    showToast(`Status updated to ${newStatus}`, 'success');
+  } catch (err) {
+    console.error(err);
+    showToast(`Failed: ${err.message || 'unknown error'}`, 'error');
+  }
+}
+
+// ============================================================
+// FILTERS / SEARCH
+// ============================================================
+document.querySelectorAll('.filter-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.getAttribute('data-filter');
+    renderClients();
+  });
+});
+document.getElementById('filter-search').addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim();
+  renderClients();
+});
+document.getElementById('btn-refresh').addEventListener('click', loadClients);
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function formatDate(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (_) { return '—'; }
+}
+function showToast(text, type = 'success') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = text;
+  toast.className = 'toast ' + type;
+  setTimeout(() => toast.classList.add('visible'), 10);
+  setTimeout(() => toast.classList.remove('visible'), 2400);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+checkAuth();
+</script>
+
+</body>
+</html>
