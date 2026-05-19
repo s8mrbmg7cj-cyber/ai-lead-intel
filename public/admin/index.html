@@ -3,15 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Admin · AI Lead Intel</title>
-<meta name="robots" content="noindex, nofollow" />
+<title>AI Lead Intel — AI receptionist for local businesses</title>
+<meta name="description" content="AI Lead Intel answers your calls 24/7, captures every lead, and emails you summaries so you never lose a customer to competitors." />
+<meta property="og:title" content="AI Lead Intel — AI receptionist for local businesses" />
+<meta property="og:description" content="24/7 AI receptionist + lead capture for local service businesses. Never miss a lead again." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <style>
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #08080a;
+  --bg-2: #0c0c0f;
+  --bg-3: #0f0f12;
   --surface: #111114;
   --surface-2: #16161b;
   --surface-3: #1c1c22;
@@ -26,1733 +30,1860 @@
   --text-muted: #52525b;
   --brand: #ff6a00;
   --brand-2: #ff9a00;
-  --brand-soft: rgba(255,106,0,0.10);
-  --brand-line: rgba(255,106,0,0.22);
+  --brand-3: #ff8533;
   --brand-glow: rgba(255,106,0,0.32);
+  --brand-soft: rgba(255,106,0,0.10);
+  --brand-tint: rgba(255,106,0,0.05);
+  --brand-line: rgba(255,106,0,0.22);
+  --hot: #ef4444;
+  --hot-soft: rgba(239,68,68,0.1);
+  --hot-line: rgba(239,68,68,0.25);
+  --warm: #f59e0b;
+  --warm-soft: rgba(245,158,11,0.1);
+  --cold: #3b82f6;
+  --cold-soft: rgba(59,130,246,0.08);
   --green: #34d399;
-  --green-soft: rgba(52,211,153,0.10);
+  --green-soft: rgba(52,211,153,0.1);
   --green-line: rgba(52,211,153,0.25);
-  --yellow: #f59e0b;
-  --yellow-soft: rgba(245,158,11,0.10);
-  --yellow-line: rgba(245,158,11,0.25);
-  --red: #ef4444;
-  --red-soft: rgba(239,68,68,0.10);
-  --red-line: rgba(239,68,68,0.25);
-  --blue: #3b82f6;
-  --blue-soft: rgba(59,130,246,0.10);
-  --blue-line: rgba(59,130,246,0.25);
-  --purple: #a855f7;
-  --purple-soft: rgba(168,85,247,0.10);
-  --purple-line: rgba(168,85,247,0.25);
 }
+html { scroll-behavior: smooth; }
 html, body { height: 100%; }
 body {
   font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
   letter-spacing: -0.011em;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
 }
 body::before {
   content: ''; position: fixed; inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,106,0,0.06), transparent 60%),
-    radial-gradient(ellipse 60% 35% at 100% 100%, rgba(168,85,247,0.04), transparent 55%);
-  pointer-events: none;
-  z-index: 0;
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,106,0,0.14), transparent 60%),
+    radial-gradient(ellipse 60% 35% at 100% 0%, rgba(255,154,0,0.07), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 0% 50%, rgba(255,106,0,0.05), transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none; z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-input, select, textarea { font-family: inherit; outline: none; }
+img { max-width: 100%; display: block; }
 
-/* TOPNAV */
 .topnav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(8,8,10,0.85);
+  background: rgba(8,8,10,0.72);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-bottom: 1px solid var(--border);
-  padding: 12px 24px;
+  padding: 14px 28px;
   display: flex; justify-content: space-between; align-items: center;
 }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
 .logo-mark {
-  width: 26px; height: 26px; border-radius: 7px;
+  width: 28px; height: 28px; border-radius: 8px;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  box-shadow: 0 0 14px var(--brand-glow);
+  box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  position: relative; overflow: hidden;
 }
-.admin-pill {
+.logo-mark::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22));
+}
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-link { font-size: 13.5px; color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
+.nav-link:hover { color: var(--text); }
+.nav-cta {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px;
-  background: var(--red-soft);
-  border: 1px solid var(--red-line);
-  border-radius: 99px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--red);
-  font-weight: 600;
-}
-.admin-pill .dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--red);
-  box-shadow: 0 0 5px var(--red);
-}
-.nav-right { display: flex; align-items: center; gap: 14px; }
-.nav-email { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); }
-.btn-signout {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background: var(--surface-2);
   border: 1px solid var(--border-2);
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  transition: all 0.18s;
+}
+.nav-cta:hover {
+  background: var(--surface-3); border-color: var(--border-3); transform: translateY(-1px);
+}
+.nav-signin {
+  padding: 7px 12px;
   border-radius: 7px;
-  font-size: 12px; color: var(--text-dim);
-  transition: all 0.15s;
+  border: 1px solid transparent;
+  transition: all 0.18s;
 }
-.btn-signout:hover { background: var(--surface-3); color: var(--text); }
+.nav-signin:hover {
+  background: var(--surface-2);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+@media (max-width: 720px) {
+  .nav-links .nav-link { display: none; }
+  .nav-links .nav-signin { display: inline-flex; }
+}
 
-/* AUTH */
-.auth-screen {
-  min-height: calc(100vh - 56px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  position: relative; z-index: 1;
-}
-.auth-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 40px;
-  max-width: 420px; width: 100%;
-}
-.auth-eyebrow {
-  display: inline-flex; align-items: center; gap: 6px;
+.wrap { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.wrap-narrow { max-width: 920px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ============ HERO ============ */
+.hero { padding: 88px 0 56px; text-align: center; position: relative; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
   font-family: 'Geist Mono', monospace;
-  font-size: 10px; letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--brand);
   background: var(--brand-soft);
   border: 1px solid var(--brand-line);
-  padding: 5px 11px; border-radius: 99px;
-  font-weight: 600; margin-bottom: 18px;
+  padding: 7px 14px; border-radius: 99px; font-weight: 600;
+  margin-bottom: 26px;
 }
-.auth-eyebrow .dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+.hero-eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 8px var(--brand-glow);
+  animation: pulse 1.6s ease-in-out infinite;
 }
-.auth-title { font-size: 24px; font-weight: 600; letter-spacing: -0.025em; margin-bottom: 8px; }
-.auth-sub { font-size: 14px; color: var(--text-dim); line-height: 1.55; margin-bottom: 24px; }
-.auth-field { margin-bottom: 14px; }
-.auth-input {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--surface-input);
-  border: 1px solid var(--border-2);
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 14px;
-  transition: border-color 0.15s;
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.7); }
 }
-.auth-input:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-soft);
+.hero h1 {
+  font-size: clamp(40px, 6vw, 68px);
+  font-weight: 600; letter-spacing: -0.04em; line-height: 1.04;
+  margin-bottom: 22px; max-width: 880px; margin-left: auto; margin-right: auto;
 }
-.btn-primary {
-  width: 100%;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  color: #fff; border-radius: 10px;
-  font-size: 14px; font-weight: 600;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 14px var(--brand-glow);
-}
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--brand-glow); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.auth-error, .auth-success {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 9px;
-  font-size: 12.5px;
-}
-.auth-error {
-  background: var(--red-soft);
-  border: 1px solid var(--red-line);
-  color: var(--red);
-}
-.auth-success {
-  background: var(--green-soft);
-  border: 1px solid var(--green-line);
-  color: var(--green);
-}
-.access-denied { text-align: center; padding: 48px 24px; }
-.access-denied h2 { font-size: 22px; margin-bottom: 10px; }
-.access-denied p { color: var(--text-dim); font-size: 14px; }
-
-/* APP */
-.app { display: none; padding: 28px 24px 100px; max-width: 1480px; margin: 0 auto; position: relative; z-index: 1; }
-.app.visible { display: block; }
-
-.page-head {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
-}
-.page-title-block .eyebrow {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10.5px; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--text-faint);
-  margin-bottom: 6px;
-}
-.page-title { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; }
-.page-title .accent {
+.hero h1 .accent {
   font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
-.refresh-btn {
-  padding: 8px 14px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: 8px;
-  font-size: 12.5px;
-  color: var(--text-dim);
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: all 0.15s;
+.hero-sub {
+  font-size: clamp(15px, 1.5vw, 18px);
+  color: var(--text-dim); line-height: 1.6;
+  max-width: 620px; margin: 0 auto 28px;
 }
-.refresh-btn:hover { background: var(--surface-3); color: var(--text); }
-.refresh-btn svg { transition: transform 0.6s; }
-.refresh-btn.spinning svg { transform: rotate(360deg); }
-
-/* SECTION TITLE */
-.section-title-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  margin: 32px 0 14px;
+.hero-ctas {
+  display: flex; gap: 12px; justify-content: center;
+  margin-bottom: 24px; flex-wrap: wrap;
 }
-.section-title {
-  font-size: 16px; font-weight: 600;
-  letter-spacing: -0.015em;
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 14px 24px; border-radius: 11px;
+  font-size: 14px; font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+  border: 1px solid transparent;
+  letter-spacing: -0.005em; cursor: pointer; white-space: nowrap; min-height: 48px;
 }
-.section-sub {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; letter-spacing: 0.12em;
-  color: var(--text-faint); text-transform: uppercase;
-  font-weight: 600;
-}
-
-/* STATS GRID */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-}
-.stat {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  position: relative;
-  transition: border-color 0.15s;
-}
-.stat:hover { border-color: var(--border-2); }
-.stat-icon {
-  position: absolute; top: 14px; right: 14px;
-  opacity: 0.4;
-}
-.stat-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--text-faint);
-  font-weight: 600; margin-bottom: 8px;
-}
-.stat-value {
-  font-family: 'Geist Mono', monospace;
-  font-size: 22px; font-weight: 600;
-  letter-spacing: -0.02em; line-height: 1;
-}
-.stat-value.trial { color: var(--blue); }
-.stat-value.active { color: var(--green); }
-.stat-value.paused { color: var(--yellow); }
-.stat-value.cancelled { color: var(--red); }
-.stat-value.errors { color: var(--red); }
-.stat-sub {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; color: var(--text-faint);
-  margin-top: 6px;
-}
-@media (max-width: 880px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-}
-
-/* REVENUE SECTION */
-.revenue-grid {
-  display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px;
-  margin-top: 14px;
-}
-.revenue-hero {
-  background: linear-gradient(135deg, var(--brand-soft) 0%, transparent 60%), var(--surface);
-  border: 1px solid var(--brand-line);
-  border-radius: 14px;
-  padding: 22px 24px;
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 1px 2px rgba(255,106,0,0.3),
+    0 6px 20px var(--brand-glow);
   position: relative; overflow: hidden;
 }
-.revenue-hero::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent);
+.btn-primary::before {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transition: left 0.6s;
 }
-.revenue-hero-label {
+.btn-primary:hover::before { left: 100%; }
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 2px 6px rgba(255,106,0,0.35),
+    0 14px 36px var(--brand-glow);
+}
+.btn-secondary {
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--border-2);
+}
+.btn-secondary:hover {
+  background: var(--surface-3); border-color: var(--border-3); transform: translateY(-1px);
+}
+.btn-large { padding: 16px 28px; font-size: 15px; }
+
+.trust-row {
+  display: flex; justify-content: center; align-items: center;
+  gap: 24px; flex-wrap: wrap; margin-bottom: 56px;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12.5px; color: var(--text-faint);
+  font-family: 'Geist Mono', monospace;
+  letter-spacing: 0.04em; font-weight: 500;
+}
+.trust-item svg { color: var(--brand); flex-shrink: 0; }
+
+/* ============ DASHBOARD MOCKUP ============ */
+.dash-mock-wrap {
+  position: relative; margin: 0 auto; max-width: 1040px; perspective: 1500px;
+}
+.dash-mock-wrap::before {
+  content: ''; position: absolute; inset: -40px -40px 20px;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, var(--brand-glow), transparent 70%);
+  filter: blur(40px); z-index: 0; opacity: 0.6;
+}
+.dash-mock {
+  position: relative;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 20px; overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 60px 120px rgba(0,0,0,0.6),
+    0 24px 48px rgba(0,0,0,0.4);
+  z-index: 1;
+}
+.dash-mock::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,106,0,0.5), transparent);
+}
+.dash-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.dash-bar-dots { display: flex; gap: 6px; }
+.dash-bar-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--surface-3); }
+.dash-bar-title {
+  margin-left: 12px; font-family: 'Geist Mono', monospace;
+  font-size: 11px; color: var(--text-faint); letter-spacing: 0.06em;
+}
+.dash-content { padding: 24px; }
+.dash-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 20px; gap: 16px;
+}
+.dash-title-block .eyebrow {
   font-family: 'Geist Mono', monospace;
   font-size: 10px; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--brand);
-  font-weight: 600; margin-bottom: 10px;
+  color: var(--text-faint); text-transform: uppercase; margin-bottom: 4px;
 }
-.revenue-hero-value {
-  display: flex; align-items: baseline; gap: 4px;
-  margin-bottom: 14px;
+.dash-title { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; }
+.dash-title .accent {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
-.revenue-hero-value .dollar { font-family: 'Geist Mono', monospace; font-size: 22px; color: var(--text-dim); }
-.revenue-hero-value .amount {
+.dash-live {
+  display: inline-flex; align-items: center; gap: 6px;
   font-family: 'Geist Mono', monospace;
-  font-size: 44px; font-weight: 600;
-  letter-spacing: -0.03em; line-height: 1;
+  font-size: 10px; color: var(--green);
+  background: var(--green-soft); border: 1px solid var(--green-line);
+  padding: 5px 11px; border-radius: 99px;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
 }
-.revenue-hero-value .period { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-dim); margin-left: 4px; }
-.revenue-goal {
-  display: flex; justify-content: space-between; align-items: center;
-  font-family: 'Geist Mono', monospace;
+.dash-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.dash-stats {
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 12px; margin-bottom: 16px;
+}
+.dash-stat {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; position: relative; overflow: hidden;
+}
+.dash-stat.hero-stat {
+  background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%), var(--surface-2);
+  border-color: var(--brand-line);
+}
+.dash-stat-label {
+  font-family: 'Geist Mono', monospace; font-size: 9px;
+  color: var(--text-faint); letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 8px; font-weight: 600;
+}
+.dash-stat-value {
+  font-family: 'Geist Mono', monospace; font-size: 26px;
+  font-weight: 600; letter-spacing: -0.02em; line-height: 1;
+}
+.dash-stat.hero-stat .dash-stat-value { font-size: 32px; color: var(--brand); }
+.dash-stat-sub {
   font-size: 11px; color: var(--text-faint);
-  margin-bottom: 8px;
-  letter-spacing: 0.04em;
+  margin-top: 6px; font-family: 'Geist Mono', monospace;
 }
-.revenue-goal .goal-amount { color: var(--text-dim); }
-.progress-bar {
-  height: 8px;
-  background: var(--surface-2);
-  border-radius: 99px;
-  overflow: hidden;
+.dash-stat-sub.up { color: var(--green); }
+.dash-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; }
+.dash-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px;
+}
+.dash-card-head {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.dash-card-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.dash-card-sub {
+  font-family: 'Geist Mono', monospace; font-size: 9.5px;
+  color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.dash-chart { display: flex; align-items: flex-end; gap: 5px; height: 100px; }
+.dash-chart-bar {
+  flex: 1; background: linear-gradient(180deg, var(--brand) 0%, var(--brand-3) 100%);
+  border-radius: 3px 3px 0 0; min-height: 8px; opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.dash-chart-bar:hover { opacity: 1; }
+.dash-leads { display: flex; flex-direction: column; gap: 8px; }
+.dash-lead {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; background: var(--surface-input);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 12px;
+}
+.dash-lead-avatar {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; color: var(--text-dim); font-weight: 600; flex-shrink: 0;
+}
+.dash-lead-info { flex: 1; min-width: 0; overflow: hidden; }
+.dash-lead-num { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text); }
+.dash-lead-status { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+.dash-badge {
+  font-family: 'Geist Mono', monospace; font-size: 9px;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 7px; border-radius: 4px; flex-shrink: 0;
+}
+.dash-badge.hot { background: var(--hot-soft); color: var(--hot); border: 1px solid var(--hot-line); }
+.dash-badge.warm { background: var(--warm-soft); color: var(--warm); border: 1px solid rgba(245,158,11,0.25); }
+.dash-badge.recovered { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+@media (max-width: 720px) {
+  .hero { padding: 56px 0 40px; }
+  .dash-stats { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .dash-content { padding: 16px; }
+  .btn-large { width: 100%; }
+  .hero-ctas .btn { flex: 1 1 100%; }
+}
+
+/* ============ SECTIONS ============ */
+.section { padding: 96px 0; position: relative; }
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--brand); background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  padding: 6px 13px; border-radius: 99px; font-weight: 600; margin-bottom: 18px;
+}
+.section-eyebrow .step-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+}
+.section-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
+.section-title {
+  font-size: clamp(30px, 4.5vw, 46px);
+  font-weight: 600; letter-spacing: -0.035em; line-height: 1.1;
+  margin-bottom: 16px;
+}
+.section-title .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.section-sub {
+  font-size: 16px; color: var(--text-dim); line-height: 1.6;
+  max-width: 580px; margin: 0 auto;
+}
+@media (max-width: 720px) { .section { padding: 64px 0; } }
+
+/* ============ THE FLOW ============ */
+.flow-section {
+  padding: 96px 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,106,0,0.06), transparent 70%);
+}
+.flow-step {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 16px; padding: 26px 22px;
   position: relative;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  text-align: center;
 }
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--brand), var(--brand-2));
-  border-radius: 99px;
-  box-shadow: 0 0 12px var(--brand-glow);
-  transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
-  min-width: 4px;
+.flow-step:hover {
+  transform: translateY(-3px); border-color: var(--brand-line);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px var(--brand-line) inset;
 }
-.progress-percent {
-  margin-top: 8px;
+.flow-arrow {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.flow-arrow svg { width: 18px; height: 18px; }
+.flow-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s;
+}
+.flow-step:hover .flow-icon {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; border-color: var(--brand);
+  box-shadow: 0 8px 20px var(--brand-glow);
+}
+.flow-num {
   font-family: 'Geist Mono', monospace;
-  font-size: 11px; color: var(--text-faint);
-  letter-spacing: 0.04em;
-  display: flex; justify-content: space-between;
+  font-size: 9.5px; letter-spacing: 0.18em;
+  color: var(--text-faint); font-weight: 600;
+  text-transform: uppercase; margin-bottom: 8px;
 }
-.progress-percent .pct { color: var(--brand); }
-.revenue-side {
-  display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 10px;
-}
-.revenue-side .stat {
-  padding: 12px 14px;
+.flow-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+.flow-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+.flow-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 10px; align-items: stretch;
 }
 @media (max-width: 880px) {
-  .revenue-grid { grid-template-columns: 1fr; }
-  .revenue-side { grid-template-rows: auto; grid-template-columns: 1fr 1fr 1fr; }
-}
-@media (max-width: 520px) {
-  .revenue-side { grid-template-columns: 1fr 1fr; }
+  .flow-row { grid-template-columns: 1fr; gap: 14px; }
+  .flow-arrow { transform: rotate(90deg); margin: 0 auto; }
 }
 
-/* SYSTEM HEALTH */
-.health-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+/* ============ HOW IT WORKS ============ */
+.how-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; position: relative;
 }
-.health-card {
-  background: var(--surface);
+.how-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex; justify-content: space-between; align-items: center;
-  transition: border-color 0.15s;
+  border-radius: 18px; padding: 32px 28px;
+  position: relative; z-index: 1;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
 }
-.health-card:hover { border-color: var(--border-2); }
-.health-name { font-size: 12.5px; font-weight: 500; color: var(--text); }
-.health-status {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; letter-spacing: 0.1em;
-  text-transform: uppercase; font-weight: 600;
-  padding: 3px 8px; border-radius: 5px;
+.how-card:hover {
+  transform: translateY(-4px); border-color: var(--border-3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px var(--brand-line) inset;
 }
-.health-status.ok { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
-.health-status.warn { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-line); }
-.health-status.err { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
-.health-status .dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 4px currentColor;
-}
-@media (max-width: 720px) { .health-grid { grid-template-columns: 1fr 1fr; } }
-
-/* FILTERS */
-.filters {
-  display: flex; gap: 8px; margin-bottom: 12px;
-  flex-wrap: wrap; align-items: center;
-}
-.filter-search {
-  flex: 1; min-width: 220px;
-  padding: 9px 14px;
-  background: var(--surface-input);
+.how-num {
+  width: 40px; height: 40px; margin-bottom: 22px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
   border: 1px solid var(--border-2);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace; font-size: 14px;
+  font-weight: 600; color: var(--brand); transition: all 0.3s;
 }
-.filter-search:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-soft);
+.how-card:hover .how-num {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; border-color: var(--brand);
+  box-shadow: 0 8px 20px var(--brand-glow);
 }
-.filter-pill {
-  padding: 8px 13px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12.5px;
-  color: var(--text-dim);
-  transition: all 0.15s;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.filter-pill:hover { color: var(--text); border-color: var(--border-3); }
-.filter-pill.active {
-  background: var(--brand-soft);
-  border-color: var(--brand-line);
+.how-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
   color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
 }
-.filter-select {
-  padding: 9px 28px 9px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-dim);
-  font-size: 12.5px;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  cursor: pointer;
-}
-.filter-select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.how-title { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+.how-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+@media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }
 
-/* CLIENTS TABLE */
-.table-card {
+/* ============ EXISTING NUMBER BADGE ============ */
+.number-badge-section { padding: 28px 0; }
+.number-badge {
+  display: flex; align-items: center; gap: 18px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--brand-line);
+  border-radius: 16px;
+  padding: 22px 26px;
+  max-width: 720px; margin: 0 auto;
+  position: relative; overflow: hidden;
+}
+.number-badge::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+}
+.number-badge-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 8px 20px var(--brand-glow);
+  color: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.number-badge-text { flex: 1; min-width: 0; }
+.number-badge-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 4px; }
+.number-badge-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+@media (max-width: 600px) {
+  .number-badge { flex-direction: column; text-align: center; }
+}
+
+/* ============ EXAMPLE SCENARIO ============ */
+.scenario-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 20px; padding: 36px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 32px; align-items: center;
+  position: relative; overflow: hidden;
+}
+.scenario-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,106,0,0.5), transparent);
+}
+.scenario-text { min-width: 0; }
+.scenario-time {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 600; margin-bottom: 12px;
+}
+.scenario-time .live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+}
+.scenario-headline {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.025em;
+  line-height: 1.25; margin-bottom: 14px;
+}
+.scenario-body { font-size: 14.5px; color: var(--text-dim); line-height: 1.65; margin-bottom: 18px; }
+.scenario-body strong { color: var(--text); font-weight: 600; }
+.scenario-bullets { display: flex; flex-direction: column; gap: 8px; }
+.scenario-bullet {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13.5px; color: var(--text-soft);
+}
+.scenario-bullet svg { color: var(--brand); flex-shrink: 0; }
+
+/* PHONE MOCKUP — now showing CALL transcript */
+.phone-mock {
+  width: 100%; max-width: 340px; margin: 0 auto;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
+  border: 1px solid var(--border-2);
+  border-radius: 24px;
+  padding: 14px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
-.clients-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.clients-table th {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--text-faint);
-  font-weight: 600; text-align: left;
-  padding: 12px 14px;
+.phone-mock-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 8px 12px;
   border-bottom: 1px solid var(--border);
+}
+.phone-mock-name { font-size: 13px; font-weight: 600; }
+.phone-mock-status {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; color: var(--green);
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.phone-mock-status::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 5px var(--green);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.phone-mock-thread {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px 4px 4px;
+}
+.phone-line {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.phone-speaker {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 600;
+  padding-left: 4px;
+}
+.phone-speaker.ai { color: var(--brand); }
+.phone-speaker.caller { color: var(--text-dim); }
+.phone-bubble {
+  padding: 10px 14px;
+  border-radius: 12px; font-size: 13px; line-height: 1.45;
+  max-width: 92%;
+}
+.phone-bubble.ai {
+  background: linear-gradient(135deg, var(--brand-soft), transparent);
+  border: 1px solid var(--brand-line);
+  color: var(--text);
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+.phone-bubble.caller {
+  background: var(--surface-3);
+  color: var(--text-soft);
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+  margin-left: auto;
+}
+.phone-meta {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; color: var(--text-faint);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  align-self: center; margin: 4px 0;
+}
+@media (max-width: 720px) {
+  .scenario-card { grid-template-columns: 1fr; padding: 24px; }
+}
+
+/* ============ WHY LOSE LEADS ============ */
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.why-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px;
+  display: flex; gap: 16px; align-items: flex-start;
+  transition: all 0.2s;
+}
+.why-card:hover { border-color: var(--border-3); background: var(--surface-2); }
+.why-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--hot-soft); border: 1px solid var(--hot-line);
+  color: var(--hot);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.why-text { flex: 1; min-width: 0; }
+.why-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+.why-desc { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; }
+@media (max-width: 720px) { .why-grid { grid-template-columns: 1fr; } }
+
+/* ============ FEATURES ============ */
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px 22px;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.feature-card:hover {
+  transform: translateY(-3px); border-color: var(--border-3);
   background: var(--surface-2);
-  white-space: nowrap;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.3);
 }
-.clients-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-  vertical-align: middle;
+.feature-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
 }
-.clients-table tr.client-row { cursor: pointer; transition: background 0.12s; }
-.clients-table tr.client-row:hover td { background: var(--surface-2); }
-.clients-table tr:last-child td { border-bottom: none; }
-.client-name { font-weight: 600; color: var(--text); }
-.client-contact {
+.feature-title { font-size: 14.5px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+.feature-desc { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+.feature-badge {
+  position: absolute; top: 14px; right: 14px;
   font-family: 'Geist Mono', monospace;
-  font-size: 11px; color: var(--text-faint);
+  font-size: 8.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; font-weight: 600;
+  padding: 3px 7px; border-radius: 4px;
+  background: var(--surface-3); color: var(--text-faint);
+  border: 1px solid var(--border-2);
+}
+@media (max-width: 720px) { .features-grid { grid-template-columns: 1fr; } }
+
+/* ============ LIVE ACTIVITY ============ */
+.live-feed {
+  max-width: 580px; margin: 0 auto;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 18px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.live-feed::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(52,211,153,0.4), transparent);
+}
+.live-feed-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 4px 14px; margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.live-feed-title { font-size: 13px; font-weight: 600; }
+.live-feed-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; color: var(--green);
+  background: var(--green-soft); border: 1px solid var(--green-line);
+  padding: 4px 10px; border-radius: 99px;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.live-feed-pill .live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.live-feed-list {
+  display: flex; flex-direction: column; gap: 8px;
+  position: relative; min-height: 240px;
+}
+.live-event {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  animation: feedIn 0.4s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 0.4s;
+}
+@keyframes feedIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.live-event-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.live-event-icon.green { background: var(--green-soft); color: var(--green); border-color: var(--green-line); }
+.live-event-text { flex: 1; min-width: 0; }
+.live-event-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.live-event-meta {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; color: var(--text-faint);
+  margin-top: 2px; letter-spacing: 0.04em;
+}
+.live-event-time {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* ============ PRICING ============ */
+.pricing-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; max-width: 920px; margin: 0 auto;
+}
+.price-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 20px;
+  padding: 32px; position: relative; overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.price-card.featured {
+  border-color: var(--brand-line);
+  box-shadow: 0 0 0 1px var(--brand-line) inset, 0 30px 60px rgba(255,106,0,0.12);
+}
+.price-card.featured::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 10%, var(--brand) 50%, transparent 90%);
+}
+.price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+}
+.price-card.featured:hover {
+  box-shadow: 0 0 0 1px var(--brand-line) inset, 0 40px 80px var(--brand-glow);
+}
+.price-badge {
+  position: absolute; top: 18px; right: 18px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--brand); background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  padding: 4px 10px; border-radius: 99px; font-weight: 600;
+}
+.price-name {
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 8px;
+}
+.price-tagline { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
+.price-amount {
+  display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px;
+}
+.price-num {
+  font-family: 'Geist Mono', monospace;
+  font-size: 52px; font-weight: 600; letter-spacing: -0.04em; line-height: 1;
+}
+.price-num .dollar { font-size: 28px; color: var(--text-dim); margin-right: 2px; }
+.price-period { font-size: 14px; color: var(--text-dim); }
+.price-divider {
+  height: 1px; background: var(--border);
+  margin: 24px 0;
+}
+.price-features {
+  list-style: none; display: flex; flex-direction: column; gap: 11px;
+  margin-bottom: 28px;
+}
+.price-feature {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px; color: var(--text-soft); line-height: 1.5;
+}
+.price-feature svg {
+  color: var(--brand); flex-shrink: 0; margin-top: 3px;
+}
+.price-feature strong { color: var(--text); font-weight: 600; }
+.price-feature .soon {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 4px;
+  background: var(--surface-3); color: var(--text-faint);
+  border: 1px solid var(--border-2);
+  margin-left: 4px; vertical-align: middle;
+}
+.price-cta { width: 100%; }
+.price-note {
+  margin-top: 12px; text-align: center;
+  font-size: 11.5px; color: var(--text-faint);
+  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .price-card { padding: 26px 22px; }
+}
+
+/* ============ SIGNUP STEPS ============ */
+.signup-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.signup-step {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px 22px;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.signup-step:hover {
+  transform: translateY(-3px); border-color: var(--border-3);
+  background: var(--surface-2);
+}
+.signup-step-num {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  color: var(--brand);
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+.signup-step-title { font-size: 14.5px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+.signup-step-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+@media (max-width: 720px) { .signup-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .signup-grid { grid-template-columns: 1fr; } }
+
+/* ============ TESTIMONIALS ============ */
+.testimonial-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; max-width: 920px; margin: 0 auto;
+}
+.testimonial-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 30px 28px;
+  position: relative;
+  transition: all 0.3s;
+}
+.testimonial-card:hover {
+  transform: translateY(-3px); border-color: var(--border-3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+.testimonial-quote-mark {
+  font-family: 'Instrument Serif', serif;
+  font-size: 56px; line-height: 0.5;
+  color: var(--brand); opacity: 0.4;
+  margin-bottom: 12px;
+}
+.testimonial-text {
+  font-size: 15.5px; color: var(--text-soft);
+  line-height: 1.65; margin-bottom: 20px;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic; font-weight: 400;
+  letter-spacing: -0.005em;
+}
+.testimonial-attr {
+  display: flex; align-items: center; gap: 12px;
+  padding-top: 18px; border-top: 1px solid var(--border);
+}
+.testimonial-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand-soft), var(--surface-3));
+  border: 1px solid var(--brand-line);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px; color: var(--brand); font-weight: 600; flex-shrink: 0;
+}
+.testimonial-name { font-size: 13px; font-weight: 600; letter-spacing: -0.005em; }
+.testimonial-role {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; color: var(--text-faint);
+  letter-spacing: 0.06em; text-transform: uppercase;
   margin-top: 3px;
 }
-.badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 4px 9px; border-radius: 5px;
-  white-space: nowrap;
-}
-.badge.trial { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-line); }
-.badge.active { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
-.badge.paused { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-line); }
-.badge.cancelled { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
-.badge.plan-starter { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border-2); }
-.badge.plan-pro { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-line); }
-.badge.pay-paid { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
-.badge.pay-pending { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-line); }
-.badge.pay-failed { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
-.badge.pay-refunded { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border-2); }
-.badge.pay-na { background: var(--surface-3); color: var(--text-muted); border: 1px solid var(--border-2); }
-.metric-cell { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text); font-weight: 500; }
-.metric-cell.muted { color: var(--text-muted); }
-.date-cell { color: var(--text-faint); font-size: 12px; }
-.row-actions {
-  display: flex; gap: 5px; align-items: center;
-  flex-wrap: wrap;
-}
-.action-btn {
-  padding: 5px 9px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: 6px;
-  font-size: 11px;
-  color: var(--text-dim);
-  font-weight: 500;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.action-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
-.action-btn.green { background: var(--green-soft); color: var(--green); border-color: var(--green-line); }
-.action-btn.yellow { background: var(--yellow-soft); color: var(--yellow); border-color: var(--yellow-line); }
-.action-btn.red { background: var(--red-soft); color: var(--red); border-color: var(--red-line); }
-.empty-row td, .loading-row td {
-  text-align: center; padding: 32px 16px;
-  color: var(--text-faint); font-size: 13px;
-}
-.spinner {
-  display: inline-block; width: 13px; height: 13px;
-  border: 2px solid rgba(255,255,255,0.12);
-  border-top-color: var(--brand);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  vertical-align: -2px; margin-right: 8px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 720px) { .testimonial-grid { grid-template-columns: 1fr; } }
 
-/* MOBILE TABLE (card layout) */
-@media (max-width: 860px) {
-  .clients-table thead { display: none; }
-  .clients-table tr { display: block; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .clients-table td { display: block; padding: 4px 0; border: none; }
-  .clients-table td::before {
-    content: attr(data-label);
-    font-family: 'Geist Mono', monospace;
-    font-size: 9px; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--text-faint);
-    display: block; margin-bottom: 2px;
-  }
-}
-
-/* ====================== DRAWER ====================== */
-.drawer-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
-  z-index: 200;
-}
-.drawer-backdrop.open { opacity: 1; pointer-events: auto; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0;
-  width: 100%; max-width: 560px;
-  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
-  border-left: 1px solid var(--border-2);
-  transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-  z-index: 201;
-  display: flex; flex-direction: column;
+/* ============ FAQ ============ */
+.faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.faq-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px;
   overflow: hidden;
+  transition: all 0.2s;
 }
-.drawer.open { transform: translateX(0); }
-.drawer-head {
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 12px;
-  background: var(--surface);
+.faq-item:hover { border-color: var(--border-2); }
+.faq-item.open { border-color: var(--brand-line); background: var(--surface-2); }
+.faq-q {
+  width: 100%; text-align: left;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  font-size: 14.5px; font-weight: 500;
+  color: var(--text); letter-spacing: -0.005em;
+  background: transparent;
+  cursor: pointer; transition: color 0.2s;
 }
-.drawer-title-block { flex: 1; min-width: 0; }
-.drawer-eyebrow {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--text-faint);
-  margin-bottom: 4px; font-weight: 600;
-}
-.drawer-title {
-  font-size: 20px; font-weight: 600;
-  letter-spacing: -0.02em; line-height: 1.2;
-  word-break: break-word;
-}
-.drawer-badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-.drawer-close {
-  padding: 6px; border-radius: 7px;
-  color: var(--text-dim);
+.faq-q:hover { color: var(--brand-2); }
+.faq-toggle {
+  width: 24px; height: 24px;
+  border-radius: 7px;
   background: var(--surface-2);
   border: 1px solid var(--border-2);
   display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
   flex-shrink: 0;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
-.drawer-close:hover { background: var(--surface-3); color: var(--text); }
-.drawer-body {
-  flex: 1; overflow-y: auto;
-  padding: 22px;
-  display: flex; flex-direction: column; gap: 22px;
+.faq-item.open .faq-toggle {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  transform: rotate(45deg);
 }
-.drawer-section { }
-.drawer-section-title {
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.faq-a-inner {
+  padding: 0 22px 20px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+.faq-item.open .faq-a { max-height: 280px; }
+
+/* ============ FINAL CTA ============ */
+.final-cta {
+  padding: 96px 0;
+  text-align: center;
+}
+.final-cta-card {
+  background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 100%), var(--surface);
+  border: 1px solid var(--brand-line);
+  border-radius: 24px;
+  padding: 64px 40px;
+  max-width: 880px; margin: 0 auto;
+  position: relative; overflow: hidden;
+}
+.final-cta-card::before {
+  content: ''; position: absolute;
+  top: -50%; left: -10%; right: -10%; height: 80%;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--brand-glow), transparent 70%);
+  filter: blur(40px); pointer-events: none;
+}
+.final-cta-content { position: relative; z-index: 1; }
+.final-cta-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--brand); font-weight: 600; margin-bottom: 22px;
+}
+.final-cta-eyebrow .live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.final-cta h2 {
+  font-size: clamp(30px, 4.5vw, 44px);
+  font-weight: 600; letter-spacing: -0.035em;
+  line-height: 1.1; margin-bottom: 16px;
+}
+.final-cta h2 .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.final-cta-sub {
+  font-size: 16px; color: var(--text-dim); line-height: 1.6;
+  max-width: 540px; margin: 0 auto 32px;
+}
+@media (max-width: 720px) {
+  .final-cta { padding: 64px 0; }
+  .final-cta-card { padding: 40px 24px; }
+}
+
+/* ============ FOOTER ============ */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0 32px;
+  background: var(--bg-2);
+  position: relative; z-index: 1;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 36px;
+}
+.footer-brand-block .logo { margin-bottom: 14px; }
+.footer-tag {
+  font-size: 13px; color: var(--text-dim);
+  line-height: 1.6; max-width: 280px;
+}
+.footer-col-title {
   font-family: 'Geist Mono', monospace;
   font-size: 10px; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--text-faint);
-  font-weight: 600; margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  font-weight: 600; margin-bottom: 14px;
 }
-.drawer-info-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+.footer-link {
+  display: block; font-size: 13.5px;
+  color: var(--text-dim); margin-bottom: 9px;
+  transition: color 0.15s;
 }
-.drawer-info-cell { min-width: 0; }
-.drawer-info-cell.full { grid-column: 1 / -1; }
-.drawer-info-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--text-faint);
-  font-weight: 600; margin-bottom: 4px;
-}
-.drawer-info-value {
-  font-size: 13px; color: var(--text);
-  font-weight: 500;
-  word-break: break-word;
-  line-height: 1.4;
-}
-.drawer-info-value.muted { color: var(--text-muted); font-style: italic; font-weight: 400; }
-.drawer-info-value.mono { font-family: 'Geist Mono', monospace; font-size: 12px; }
-
-/* CHECKLIST */
-.checklist {
-  display: flex; flex-direction: column; gap: 6px;
-}
-.checklist-item {
-  display: flex; align-items: center; gap: 11px;
-  padding: 10px 12px;
-  background: var(--surface-input);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.checklist-item:hover { border-color: var(--border-2); background: var(--surface-2); }
-.checklist-item.done { background: var(--green-soft); border-color: var(--green-line); }
-.checklist-box {
-  width: 18px; height: 18px;
-  border-radius: 5px;
-  border: 1.5px solid var(--border-3);
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
-}
-.checklist-item.done .checklist-box {
-  background: var(--green); border-color: var(--green);
-}
-.checklist-item.done .checklist-box::after {
-  content: '';
-  width: 8px; height: 4px;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(-45deg) translate(0.5px, -1px);
-}
-.checklist-label {
-  flex: 1; font-size: 13px; color: var(--text-soft);
-}
-.checklist-item.done .checklist-label { color: var(--green); font-weight: 500; }
-
-/* FEED (calls / texts / activity / errors) */
-.feed { display: flex; flex-direction: column; gap: 6px; }
-.feed-item {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 12px;
-  background: var(--surface-input);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  font-size: 12.5px;
-}
-.feed-icon {
-  width: 22px; height: 22px;
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.feed-icon.brand { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-line); }
-.feed-icon.green { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
-.feed-icon.yellow { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-line); }
-.feed-icon.red { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
-.feed-icon.blue { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-line); }
-.feed-body { flex: 1; min-width: 0; }
-.feed-title { font-size: 12.5px; color: var(--text); font-weight: 500; }
-.feed-meta {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; color: var(--text-faint);
-  margin-top: 2px;
-  letter-spacing: 0.04em;
-}
-.feed-time {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; color: var(--text-muted);
-  flex-shrink: 0;
-}
-.feed-empty {
-  text-align: center; padding: 16px;
-  color: var(--text-muted); font-size: 12px;
-  font-style: italic;
-}
-
-/* DRAWER ACTIONS */
-.drawer-actions {
-  padding: 16px 22px;
+.footer-link:hover { color: var(--text); }
+.footer-bottom {
   border-top: 1px solid var(--border);
-  background: var(--surface);
-  display: flex; gap: 8px; flex-wrap: wrap;
+  padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+  font-size: 12px; color: var(--text-faint);
+  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
 }
-.drawer-actions .action-btn {
-  padding: 8px 14px; font-size: 12px;
+@media (max-width: 720px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-brand-block { grid-column: 1 / -1; }
 }
 
-/* TOAST */
-.toast {
-  position: fixed; bottom: 20px; right: 20px; z-index: 300;
-  background: var(--surface-2);
-  border: 1px solid var(--border-3);
-  border-radius: 11px;
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--text);
-  display: flex; align-items: center; gap: 10px;
-  opacity: 0; transform: translateY(10px);
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-  pointer-events: none;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
-  max-width: 380px;
+.fade-up {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
 }
-.toast.visible { opacity: 1; transform: translateY(0); }
-.toast.success { border-color: var(--green-line); }
-.toast.success .toast-dot { background: var(--green); }
-.toast.error { border-color: var(--red-line); }
-.toast.error .toast-dot { background: var(--red); }
-.toast.warning { border-color: var(--yellow-line); }
-.toast.warning .toast-dot { background: var(--yellow); }
-.toast-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
-
-@media (max-width: 600px) {
-  .drawer { max-width: 100%; }
-  .drawer-info-grid { grid-template-columns: 1fr; }
-}
+.fade-up.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <div class="logo">
+  <a href="#" class="logo">
     <div class="logo-mark"></div>
     <span>AI Lead Intel</span>
-    <span class="admin-pill"><span class="dot"></span>Admin</span>
-  </div>
-  <div class="nav-right" id="nav-right" style="display:none;">
-    <span class="nav-email" id="nav-email"></span>
-    <button class="btn-signout" id="btn-signout">Sign out</button>
+  </a>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How it works</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="/dashboard/" class="nav-link nav-signin">Sign in</a>
+    <a href="/onboarding/" class="nav-cta">Get started →</a>
   </div>
 </nav>
 
-<!-- AUTH -->
-<div class="auth-screen" id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-eyebrow"><span class="dot"></span>Internal · Admin Only</div>
-    <h2 class="auth-title">Sign in to admin</h2>
-    <p class="auth-sub">Magic-link sign-in. Only authorized accounts can access this page.</p>
-    <div class="auth-field">
-      <input type="email" class="auth-input" id="auth-email" placeholder="andrew3333422@gmail.com" autocomplete="email" />
+<!-- HERO -->
+<section class="hero wrap">
+  <div class="hero-eyebrow"><span class="dot"></span>24/7 AI receptionist for local businesses</div>
+  <h1>Never miss a lead, <span class="accent">even after hours.</span></h1>
+  <p class="hero-sub">AI Lead Intel answers your business calls 24/7, captures every lead, and emails you a clean summary so you can follow up the moment you're free.</p>
+  <div class="hero-ctas">
+    <a href="/onboarding/" class="btn btn-primary btn-large">
+      Start Recovering Leads
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <a href="#how" class="btn btn-secondary btn-large">See How It Works</a>
+  </div>
+  <div class="trust-row">
+    <div class="trust-item">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Answers 24/7
     </div>
-    <button class="btn-primary" id="btn-magic">Send magic link</button>
-    <div class="auth-error" id="auth-error" style="display:none;"></div>
-    <div class="auth-success" id="auth-success" style="display:none;">
-      Check your inbox. Click the link to sign in.
+    <div class="trust-item">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Captures every lead
+    </div>
+    <div class="trust-item">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Live in 5–7 days
     </div>
   </div>
-</div>
 
-<!-- ACCESS DENIED -->
-<div class="auth-screen" id="denied-screen" style="display:none;">
-  <div class="auth-card">
-    <div class="access-denied">
-      <h2>Access denied</h2>
-      <p id="denied-msg">This page is restricted to AI Lead Intel admins.</p>
-      <button class="btn-signout" id="btn-signout-2" style="margin-top:20px;">Sign out</button>
-    </div>
-  </div>
-</div>
-
-<!-- APP -->
-<main class="app" id="app">
-
-  <!-- PAGE HEAD -->
-  <div class="page-head">
-    <div class="page-title-block">
-      <div class="eyebrow">Internal · Mission Control</div>
-      <h1 class="page-title">Founder <span class="accent">dashboard</span></h1>
-    </div>
-    <button class="refresh-btn" id="btn-refresh">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-      Refresh
-    </button>
-  </div>
-
-  <!-- REVENUE / GOAL -->
-  <div class="section-title-row">
-    <div class="section-title">Revenue overview</div>
-    <div class="section-sub">Goal $5,000 MRR</div>
-  </div>
-  <div class="revenue-grid">
-    <div class="revenue-hero">
-      <div class="revenue-hero-label">Monthly Recurring Revenue</div>
-      <div class="revenue-hero-value">
-        <span class="dollar">$</span>
-        <span class="amount" id="rev-mrr">0</span>
-        <span class="period">/ mo</span>
+  <!-- DASHBOARD MOCKUP -->
+  <div class="dash-mock-wrap">
+    <div class="dash-mock">
+      <div class="dash-bar">
+        <div class="dash-bar-dots"><div class="dash-bar-dot"></div><div class="dash-bar-dot"></div><div class="dash-bar-dot"></div></div>
+        <div class="dash-bar-title">app.aileadintel.com / dashboard</div>
       </div>
-      <div class="revenue-goal">
-        <span>Progress to $5,000 MRR goal</span>
-        <span class="goal-amount" id="rev-remaining">$5,000 to go</span>
-      </div>
-      <div class="progress-bar"><div class="progress-bar-fill" id="rev-progress" style="width:0%;"></div></div>
-      <div class="progress-percent">
-        <span class="pct" id="rev-pct">0%</span>
-        <span id="rev-arr">$0 ARR</span>
-      </div>
-    </div>
-    <div class="revenue-side">
-      <div class="stat">
-        <div class="stat-label">Active Paid</div>
-        <div class="stat-value active" id="rev-active-count">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Avg Revenue / Client</div>
-        <div class="stat-value" id="rev-arpc">$0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Lost MRR (Cancelled)</div>
-        <div class="stat-value cancelled" id="rev-lost">$0</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CLIENT STATS -->
-  <div class="section-title-row">
-    <div class="section-title">Client overview</div>
-    <div class="section-sub">All time</div>
-  </div>
-  <div class="stats-grid">
-    <div class="stat">
-      <div class="stat-label">Total Clients</div>
-      <div class="stat-value" id="stat-total">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Trial</div>
-      <div class="stat-value trial" id="stat-trial">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Active</div>
-      <div class="stat-value active" id="stat-active">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Paused</div>
-      <div class="stat-value paused" id="stat-paused">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Cancelled</div>
-      <div class="stat-value cancelled" id="stat-cancelled">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Calls (30d)</div>
-      <div class="stat-value" id="stat-calls">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Texts (30d)</div>
-      <div class="stat-value" id="stat-texts">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Errors (open)</div>
-      <div class="stat-value errors" id="stat-errors">—</div>
-    </div>
-  </div>
-
-  <!-- SYSTEM HEALTH -->
-  <div class="section-title-row">
-    <div class="section-title">System health</div>
-    <div class="section-sub">Live</div>
-  </div>
-  <div class="health-grid">
-    <div class="health-card">
-      <span class="health-name">Twilio</span>
-      <span class="health-status ok" id="health-twilio"><span class="dot"></span>Operational</span>
-    </div>
-    <div class="health-card">
-      <span class="health-name">Vapi</span>
-      <span class="health-status ok" id="health-vapi"><span class="dot"></span>Operational</span>
-    </div>
-    <div class="health-card">
-      <span class="health-name">Supabase</span>
-      <span class="health-status ok" id="health-supabase"><span class="dot"></span>Connected</span>
-    </div>
-    <div class="health-card">
-      <span class="health-name">Resend</span>
-      <span class="health-status ok" id="health-resend"><span class="dot"></span>Operational</span>
-    </div>
-  </div>
-
-  <!-- CLIENTS -->
-  <div class="section-title-row">
-    <div class="section-title">Clients</div>
-    <div class="section-sub">Click row to expand</div>
-  </div>
-  <div class="filters">
-    <input type="text" class="filter-search" id="filter-search" placeholder="Search business, phone, or email…" />
-    <button class="filter-pill active" data-filter="all">All</button>
-    <button class="filter-pill" data-filter="trial">Trial</button>
-    <button class="filter-pill" data-filter="active">Active</button>
-    <button class="filter-pill" data-filter="paused">Paused</button>
-    <button class="filter-pill" data-filter="cancelled">Cancelled</button>
-    <select class="filter-select" id="filter-plan">
-      <option value="all">All plans</option>
-      <option value="starter">Starter ($99)</option>
-      <option value="pro">Pro ($297)</option>
-    </select>
-    <select class="filter-select" id="filter-setup">
-      <option value="all">All setup statuses</option>
-      <option value="incomplete">Setup incomplete</option>
-      <option value="live">Live</option>
-    </select>
-  </div>
-
-  <div class="table-card">
-    <table class="clients-table">
-      <thead>
-        <tr>
-          <th>Business / Contact</th>
-          <th>Status</th>
-          <th>Plan</th>
-          <th>Calls 30d</th>
-          <th>Texts 30d</th>
-          <th>Last activity</th>
-          <th>Joined</th>
-          <th>Quick actions</th>
-        </tr>
-      </thead>
-      <tbody id="clients-body">
-        <tr class="loading-row"><td colspan="8"><span class="spinner"></span>Loading clients…</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ACTIVITY FEED -->
-  <div class="section-title-row">
-    <div class="section-title">Recent activity</div>
-    <div class="section-sub">Last 30 events</div>
-  </div>
-  <div class="table-card" style="padding: 14px 16px;">
-    <div class="feed" id="global-activity-feed">
-      <div class="feed-empty">Loading activity…</div>
-    </div>
-  </div>
-
-  <!-- ERROR FEED -->
-  <div class="section-title-row">
-    <div class="section-title">Open errors</div>
-    <div class="section-sub">Last 20</div>
-  </div>
-  <div class="table-card" style="padding: 14px 16px;">
-    <div class="feed" id="global-error-feed">
-      <div class="feed-empty">No errors detected.</div>
-    </div>
-  </div>
-
-</main>
-
-<!-- DRAWER -->
-<div class="drawer-backdrop" id="drawer-backdrop"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer-head">
-    <div class="drawer-title-block">
-      <div class="drawer-eyebrow">Client details</div>
-      <div class="drawer-title" id="drawer-title">—</div>
-      <div class="drawer-badges" id="drawer-badges"></div>
-    </div>
-    <button class="drawer-close" id="drawer-close" aria-label="Close">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-
-  <div class="drawer-body" id="drawer-body">
-    <!-- Populated by JS -->
-  </div>
-
-  <div class="drawer-actions" id="drawer-actions">
-    <!-- Populated by JS -->
-  </div>
-</aside>
-
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <span class="toast-dot"></span>
-  <span id="toast-text">Saved</span>
-</div>
-
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-// ============================================================
-// CONFIG
-// ============================================================
-const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
-const ADMIN_EMAILS = ['andrew3333422@gmail.com'];
-const MRR_GOAL = 5000;
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ============================================================
-// STATE
-// ============================================================
-let currentUser = null;
-let allClients = [];
-let activeStatusFilter = 'all';
-let activePlanFilter = 'all';
-let activeSetupFilter = 'all';
-let searchQuery = '';
-let activityEvents = [];
-let errorEvents = [];
-let selectedClientId = null;
-
-// ============================================================
-// AUTH
-// ============================================================
-const authScreen = document.getElementById('auth-screen');
-const deniedScreen = document.getElementById('denied-screen');
-const app = document.getElementById('app');
-const navRight = document.getElementById('nav-right');
-const navEmail = document.getElementById('nav-email');
-
-async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { showAuth(); return; }
-  currentUser = session.user;
-  if (!ADMIN_EMAILS.includes(currentUser.email)) { showDenied(); return; }
-  showApp();
-}
-
-function showAuth() {
-  authScreen.style.display = 'flex';
-  deniedScreen.style.display = 'none';
-  app.classList.remove('visible');
-  navRight.style.display = 'none';
-}
-function showDenied() {
-  authScreen.style.display = 'none';
-  deniedScreen.style.display = 'flex';
-  app.classList.remove('visible');
-  navRight.style.display = 'none';
-  document.getElementById('denied-msg').textContent =
-    `Account ${currentUser.email} isn't authorized for admin access.`;
-}
-function showApp() {
-  authScreen.style.display = 'none';
-  deniedScreen.style.display = 'none';
-  app.classList.add('visible');
-  navRight.style.display = 'flex';
-  navEmail.textContent = currentUser.email;
-  loadEverything();
-}
-
-document.getElementById('btn-magic').addEventListener('click', async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const errEl = document.getElementById('auth-error');
-  const okEl = document.getElementById('auth-success');
-  errEl.style.display = 'none'; okEl.style.display = 'none';
-  if (!email || !email.includes('@')) {
-    errEl.textContent = 'Enter a valid email address.'; errEl.style.display = 'block'; return;
-  }
-  const btn = document.getElementById('btn-magic');
-  btn.disabled = true; btn.textContent = 'Sending…';
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-  btn.disabled = false; btn.textContent = 'Send magic link';
-  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
-  else { okEl.style.display = 'block'; }
-});
-
-async function signOut() {
-  await supabase.auth.signOut();
-  currentUser = null; showAuth();
-}
-document.getElementById('btn-signout').addEventListener('click', signOut);
-document.getElementById('btn-signout-2').addEventListener('click', signOut);
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  if (session) {
-    currentUser = session.user;
-    if (!ADMIN_EMAILS.includes(currentUser.email)) showDenied();
-    else showApp();
-  }
-});
-
-// ============================================================
-// DATA LOADING
-// ============================================================
-async function loadEverything() {
-  const refreshBtn = document.getElementById('btn-refresh');
-  refreshBtn.classList.add('spinning');
-
-  await Promise.all([
-    loadClients(),
-    loadActivityFeed(),
-    loadErrorFeed(),
-  ]);
-
-  setTimeout(() => refreshBtn.classList.remove('spinning'), 600);
-}
-
-async function loadClients() {
-  const tbody = document.getElementById('clients-body');
-  try {
-    const { data: clients, error } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    allClients = clients || [];
-
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const [callsR, textsR, errR, checklistR] = await Promise.all([
-      supabase.from('calls').select('client_uuid', { head: false }).gte('created_at', thirtyDaysAgo).then(r => r).catch(() => ({ data: [] })),
-      supabase.from('text_messages').select('client_uuid', { head: false }).gte('created_at', thirtyDaysAgo).then(r => r).catch(() => ({ data: [] })),
-      supabase.from('error_log').select('id', { count: 'exact', head: true }).eq('status', 'open').then(r => r).catch(() => ({ count: 0 })),
-      supabase.from('setup_checklist').select('*').then(r => r).catch(() => ({ data: [] })),
-    ]);
-
-    const callCounts = {}, textCounts = {};
-    (callsR.data || []).forEach(c => { if (c.client_uuid) callCounts[c.client_uuid] = (callCounts[c.client_uuid] || 0) + 1; });
-    (textsR.data || []).forEach(t => { if (t.client_uuid) textCounts[t.client_uuid] = (textCounts[t.client_uuid] || 0) + 1; });
-
-    const checklistMap = {};
-    (checklistR.data || []).forEach(c => { checklistMap[c.client_id] = c; });
-
-    allClients = allClients.map(c => ({
-      ...c,
-      _calls_30d: callCounts[c.id] || 0,
-      _texts_30d: textCounts[c.id] || 0,
-      _checklist: checklistMap[c.id] || null,
-    }));
-
-    document.getElementById('stat-errors').textContent = errR.count ?? '—';
-    document.getElementById('stat-calls').textContent = (callsR.data || []).length;
-    document.getElementById('stat-texts').textContent = (textsR.data || []).length;
-
-    renderRevenue();
-    renderClientStats();
-    renderClientsTable();
-  } catch (err) {
-    console.error('Failed to load clients:', err);
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Failed to load: ${escapeHtml(err.message || 'unknown')}</td></tr>`;
-    showToast('Failed to load clients', 'error');
-  }
-}
-
-async function loadActivityFeed() {
-  const feedEl = document.getElementById('global-activity-feed');
-  try {
-    const { data, error } = await supabase
-      .from('activity_log')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(30);
-    if (error) throw error;
-    activityEvents = data || [];
-    renderActivityFeed(feedEl, activityEvents);
-  } catch (err) {
-    feedEl.innerHTML = `<div class="feed-empty">Activity log unavailable: ${escapeHtml(err.message || '')}</div>`;
-  }
-}
-
-async function loadErrorFeed() {
-  const feedEl = document.getElementById('global-error-feed');
-  try {
-    const { data, error } = await supabase
-      .from('error_log')
-      .select('*')
-      .eq('status', 'open')
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (error) throw error;
-    errorEvents = data || [];
-    renderErrorFeed(feedEl, errorEvents);
-  } catch (err) {
-    feedEl.innerHTML = `<div class="feed-empty">No errors detected.</div>`;
-  }
-}
-
-// ============================================================
-// RENDERING
-// ============================================================
-function renderRevenue() {
-  const activePaid = allClients.filter(c => c.status === 'active');
-  const mrr = activePaid.reduce((sum, c) => sum + Number(c.monthly_price || 0), 0);
-  const lost = allClients.filter(c => c.status === 'cancelled').reduce((s, c) => s + Number(c.monthly_price || 0), 0);
-  const arpc = activePaid.length > 0 ? Math.round(mrr / activePaid.length) : 0;
-  const pct = Math.min(100, Math.round((mrr / MRR_GOAL) * 100));
-  const remaining = Math.max(0, MRR_GOAL - mrr);
-  const arr = mrr * 12;
-
-  document.getElementById('rev-mrr').textContent = mrr.toLocaleString();
-  document.getElementById('rev-progress').style.width = pct + '%';
-  document.getElementById('rev-pct').textContent = pct + '%';
-  document.getElementById('rev-remaining').textContent = remaining > 0 ? `$${remaining.toLocaleString()} to go` : '🎉 Goal reached';
-  document.getElementById('rev-arr').textContent = `$${arr.toLocaleString()} ARR`;
-  document.getElementById('rev-active-count').textContent = activePaid.length;
-  document.getElementById('rev-arpc').textContent = `$${arpc}`;
-  document.getElementById('rev-lost').textContent = `$${lost.toLocaleString()}`;
-}
-
-function renderClientStats() {
-  const counts = { trial: 0, active: 0, paused: 0, cancelled: 0 };
-  allClients.forEach(c => {
-    const s = c.status || 'trial';
-    if (counts[s] !== undefined) counts[s]++;
-  });
-  document.getElementById('stat-total').textContent = allClients.length;
-  document.getElementById('stat-trial').textContent = counts.trial;
-  document.getElementById('stat-active').textContent = counts.active;
-  document.getElementById('stat-paused').textContent = counts.paused;
-  document.getElementById('stat-cancelled').textContent = counts.cancelled;
-}
-
-function renderClientsTable() {
-  const tbody = document.getElementById('clients-body');
-  let filtered = allClients;
-
-  if (activeStatusFilter !== 'all') {
-    filtered = filtered.filter(c => (c.status || 'trial') === activeStatusFilter);
-  }
-  if (activePlanFilter !== 'all') {
-    filtered = filtered.filter(c => (c.plan || 'starter') === activePlanFilter);
-  }
-  if (activeSetupFilter === 'incomplete') {
-    filtered = filtered.filter(c => !c._checklist || !c._checklist.live);
-  } else if (activeSetupFilter === 'live') {
-    filtered = filtered.filter(c => c._checklist && c._checklist.live);
-  }
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    filtered = filtered.filter(c =>
-      (c.business_name || '').toLowerCase().includes(q) ||
-      (c.phone_number || '').toLowerCase().includes(q) ||
-      (c.notify_email || '').toLowerCase().includes(q) ||
-      (c.id || '').toLowerCase().includes(q)
-    );
-  }
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No clients match these filters.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(c => {
-    const status = c.status || 'trial';
-    const plan = c.plan || 'starter';
-    const lastAct = c.last_activity_at ? timeAgo(c.last_activity_at) : '—';
-    const joined = c.created_at ? formatDate(c.created_at) : '—';
-    return `
-      <tr class="client-row" data-id="${escapeHtml(c.id)}">
-        <td data-label="Business">
-          <div class="client-name">${escapeHtml(c.business_name || 'Unnamed')}</div>
-          <div class="client-contact">${escapeHtml(c.notify_email || c.phone_number || '—')}</div>
-        </td>
-        <td data-label="Status"><span class="badge ${status}">${status}</span></td>
-        <td data-label="Plan"><span class="badge plan-${plan}">${plan} · $${c.monthly_price || 0}</span></td>
-        <td data-label="Calls 30d"><span class="metric-cell ${c._calls_30d ? '' : 'muted'}">${c._calls_30d}</span></td>
-        <td data-label="Texts 30d"><span class="metric-cell ${c._texts_30d ? '' : 'muted'}">${c._texts_30d}</span></td>
-        <td data-label="Last activity" class="date-cell">${lastAct}</td>
-        <td data-label="Joined" class="date-cell">${joined}</td>
-        <td data-label="Actions">
-          <div class="row-actions" data-stop-bubble="1">
-            ${status === 'active'
-              ? `<button class="action-btn yellow" data-action="set-status" data-status="paused">Pause</button>`
-              : `<button class="action-btn green" data-action="set-status" data-status="active">Activate</button>`
-            }
-            <button class="action-btn" data-action="open-detail">Details</button>
+      <div class="dash-content">
+        <div class="dash-head">
+          <div class="dash-title-block">
+            <div class="eyebrow">Mission Control</div>
+            <h3 class="dash-title">Captured <span class="accent">leads</span></h3>
           </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  // Row click → drawer
-  tbody.querySelectorAll('.client-row').forEach(row => {
-    row.addEventListener('click', (e) => {
-      // Don't open drawer if click was on a button
-      if (e.target.closest('[data-stop-bubble]') && e.target.tagName === 'BUTTON' && e.target.getAttribute('data-action') !== 'open-detail') return;
-      const id = row.getAttribute('data-id');
-      openDrawer(id);
-    });
-  });
-
-  // Action buttons
-  tbody.querySelectorAll('[data-action="set-status"]').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const row = btn.closest('tr');
-      const clientId = row.getAttribute('data-id');
-      const newStatus = btn.getAttribute('data-status');
-      await updateStatus(clientId, newStatus);
-    });
-  });
-}
-
-function renderActivityFeed(container, events) {
-  if (!events || events.length === 0) {
-    container.innerHTML = `<div class="feed-empty">No activity yet. Events will appear here as clients sign up and use the system.</div>`;
-    return;
-  }
-  container.innerHTML = events.map(e => {
-    const iconClass = severityToIconClass(e.severity);
-    const icon = severityToIcon(e.severity);
-    return `
-      <div class="feed-item">
-        <div class="feed-icon ${iconClass}">${icon}</div>
-        <div class="feed-body">
-          <div class="feed-title">${escapeHtml(e.message || e.event_type || 'Event')}</div>
-          <div class="feed-meta">${escapeHtml(e.source || 'system')} · ${escapeHtml(e.event_type || '')}</div>
+          <div class="dash-live"><div class="dash-live-dot"></div>Live</div>
         </div>
-        <div class="feed-time">${timeAgo(e.created_at)}</div>
-      </div>
-    `;
-  }).join('');
-}
 
-function renderErrorFeed(container, events) {
-  if (!events || events.length === 0) {
-    container.innerHTML = `<div class="feed-empty">No errors detected. 🎉</div>`;
-    return;
-  }
-  container.innerHTML = events.map(e => `
-    <div class="feed-item">
-      <div class="feed-icon red">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <div class="feed-body">
-        <div class="feed-title">${escapeHtml(e.error_message || e.error_type || 'Error')}</div>
-        <div class="feed-meta">${escapeHtml(e.source || 'unknown')} · ${escapeHtml(e.error_type || '')}</div>
-      </div>
-      <div class="feed-time">${timeAgo(e.created_at)}</div>
-    </div>
-  `).join('');
-}
-
-function severityToIconClass(sev) {
-  switch (sev) {
-    case 'success': return 'green';
-    case 'warning': return 'yellow';
-    case 'error': return 'red';
-    default: return 'brand';
-  }
-}
-function severityToIcon(sev) {
-  switch (sev) {
-    case 'success': return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-    case 'warning': return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-    case 'error': return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>';
-    default: return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-  }
-}
-
-// ============================================================
-// STATUS UPDATE
-// ============================================================
-async function updateStatus(clientId, newStatus) {
-  try {
-    const { error } = await supabase
-      .from('clients')
-      .update({ status: newStatus, status_changed_at: new Date().toISOString() })
-      .eq('id', clientId);
-    if (error) throw error;
-    const client = allClients.find(c => c.id === clientId);
-    if (client) {
-      client.status = newStatus;
-      client.status_changed_at = new Date().toISOString();
-    }
-    renderRevenue();
-    renderClientStats();
-    renderClientsTable();
-    showToast(`Status updated to ${newStatus}`, 'success');
-    // Reload activity to show the auto-logged status change
-    loadActivityFeed();
-  } catch (err) {
-    console.error(err);
-    showToast(`Failed: ${err.message || 'unknown error'}`, 'error');
-  }
-}
-
-// ============================================================
-// DRAWER
-// ============================================================
-const drawer = document.getElementById('drawer');
-const drawerBackdrop = document.getElementById('drawer-backdrop');
-const drawerTitle = document.getElementById('drawer-title');
-const drawerBadges = document.getElementById('drawer-badges');
-const drawerBody = document.getElementById('drawer-body');
-const drawerActions = document.getElementById('drawer-actions');
-
-function closeDrawer() {
-  drawer.classList.remove('open');
-  drawerBackdrop.classList.remove('open');
-  selectedClientId = null;
-}
-document.getElementById('drawer-close').addEventListener('click', closeDrawer);
-drawerBackdrop.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-});
-
-async function openDrawer(clientId) {
-  selectedClientId = clientId;
-  const client = allClients.find(c => c.id === clientId);
-  if (!client) return;
-
-  drawerTitle.textContent = client.business_name || 'Unnamed client';
-  drawerBadges.innerHTML = `
-    <span class="badge ${client.status || 'trial'}">${client.status || 'trial'}</span>
-    <span class="badge plan-${client.plan || 'starter'}">${client.plan || 'starter'} · $${client.monthly_price || 0}/mo</span>
-    <span class="badge pay-${client.payment_status || 'pending'}">${client.payment_status || 'pending'}</span>
-  `;
-
-  drawerBody.innerHTML = `
-    <div class="drawer-section">
-      <div class="drawer-section-title">Business info</div>
-      <div class="drawer-info-grid">
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Business name</div>
-          <div class="drawer-info-value">${escapeHtml(client.business_name || '—')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Client slug</div>
-          <div class="drawer-info-value mono">${escapeHtml(client.client_slug || '—')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Notify email</div>
-          <div class="drawer-info-value">${escapeHtml(client.notify_email || '—')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Business phone</div>
-          <div class="drawer-info-value mono">${escapeHtml(client.phone_number || '—')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Twilio number</div>
-          <div class="drawer-info-value mono ${client.twilio_number ? '' : 'muted'}">${escapeHtml(client.twilio_number || 'Not assigned')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Setup AI number</div>
-          <div class="drawer-info-value mono ${client.setup_ai_number ? '' : 'muted'}">${escapeHtml(client.setup_ai_number || 'Not assigned')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">Vapi assistant ID</div>
-          <div class="drawer-info-value mono ${client.assistant_id ? '' : 'muted'}">${escapeHtml(client.assistant_id || 'Not built')}</div>
-        </div>
-        <div class="drawer-info-cell">
-          <div class="drawer-info-label">SMS / Voice</div>
-          <div class="drawer-info-value">
-            <span class="badge ${client.sms_enabled === false ? 'cancelled' : 'active'}">SMS ${client.sms_enabled === false ? 'OFF' : 'ON'}</span>
-            <span class="badge ${client.voice_enabled === false ? 'cancelled' : 'active'}">Voice ${client.voice_enabled === false ? 'OFF' : 'ON'}</span>
+        <div class="dash-stats">
+          <div class="dash-stat hero-stat">
+            <div class="dash-stat-label">Leads Captured</div>
+            <div class="dash-stat-value">42</div>
+            <div class="dash-stat-sub up">+18 this week</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Calls Answered</div>
+            <div class="dash-stat-value">61</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Summaries Sent</div>
+            <div class="dash-stat-value">61</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Avg Answer Time</div>
+            <div class="dash-stat-value">2s</div>
           </div>
         </div>
-        <div class="drawer-info-cell full">
-          <div class="drawer-info-label">Notes</div>
-          <div class="drawer-info-value ${client.notes ? '' : 'muted'}" style="white-space:pre-wrap;">${escapeHtml(client.notes || 'No notes')}</div>
+
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-title">Call volume</div>
+              <div class="dash-card-sub">Last 30 days</div>
+            </div>
+            <div class="dash-chart">
+              <div class="dash-chart-bar" style="height:32%"></div>
+              <div class="dash-chart-bar" style="height:48%"></div>
+              <div class="dash-chart-bar" style="height:38%"></div>
+              <div class="dash-chart-bar" style="height:62%"></div>
+              <div class="dash-chart-bar" style="height:54%"></div>
+              <div class="dash-chart-bar" style="height:74%"></div>
+              <div class="dash-chart-bar" style="height:66%"></div>
+              <div class="dash-chart-bar" style="height:82%"></div>
+              <div class="dash-chart-bar" style="height:70%"></div>
+              <div class="dash-chart-bar" style="height:88%"></div>
+              <div class="dash-chart-bar" style="height:78%"></div>
+              <div class="dash-chart-bar" style="height:94%"></div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-title">Recent leads</div>
+              <div class="dash-card-sub">Live</div>
+            </div>
+            <div class="dash-leads">
+              <div class="dash-lead">
+                <div class="dash-lead-avatar">17</div>
+                <div class="dash-lead-info">
+                  <div class="dash-lead-num">555-0117</div>
+                  <div class="dash-lead-status">10×10 unit · 2m ago</div>
+                </div>
+                <span class="dash-badge hot">Hot</span>
+              </div>
+              <div class="dash-lead">
+                <div class="dash-lead-avatar">42</div>
+                <div class="dash-lead-info">
+                  <div class="dash-lead-num">555-0142</div>
+                  <div class="dash-lead-status">Quote request · 14m ago</div>
+                </div>
+                <span class="dash-badge recovered">Saved</span>
+              </div>
+              <div class="dash-lead">
+                <div class="dash-lead-avatar">88</div>
+                <div class="dash-lead-info">
+                  <div class="dash-lead-num">555-0188</div>
+                  <div class="dash-lead-status">Callback request · 1h ago</div>
+                </div>
+                <span class="dash-badge warm">Warm</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="drawer-section">
-      <div class="drawer-section-title">Setup checklist</div>
-      <div class="checklist" id="checklist-list">
-        <div class="feed-empty">Loading…</div>
+<!-- THE FLOW (4-step visual) -->
+<section class="flow-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>The Flow</div>
+      <h2 class="section-title">Calls answered, <span class="accent">leads captured.</span></h2>
+      <p class="section-sub">Four steps. Zero effort on your end. Your AI receptionist handles the conversation while you keep working.</p>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-step fade-up">
+        <div class="flow-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="flow-num">Step 01</div>
+        <div class="flow-title">Customer calls</div>
+        <div class="flow-desc">Someone calls your business looking for service.</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <div class="flow-step fade-up">
+        <div class="flow-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+        </div>
+        <div class="flow-num">Step 02</div>
+        <div class="flow-title">AI answers live</div>
+        <div class="flow-desc">Your AI receptionist picks up on the first ring, day or night.</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <div class="flow-step fade-up">
+        <div class="flow-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </div>
+        <div class="flow-num">Step 03</div>
+        <div class="flow-title">Lead captured</div>
+        <div class="flow-desc">The AI collects the caller's name, contact, and what they need.</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+      <div class="flow-step fade-up">
+        <div class="flow-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="flow-num">Step 04</div>
+        <div class="flow-title">Summary emailed</div>
+        <div class="flow-desc">You get a clean summary of every call so you can follow up fast.</div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="drawer-section">
-      <div class="drawer-section-title">Recent calls</div>
-      <div class="feed" id="drawer-calls"><div class="feed-empty">Loading…</div></div>
-    </div>
-
-    <div class="drawer-section">
-      <div class="drawer-section-title">Recent texts</div>
-      <div class="feed" id="drawer-texts"><div class="feed-empty">Loading…</div></div>
-    </div>
-
-    <div class="drawer-section">
-      <div class="drawer-section-title">Activity log</div>
-      <div class="feed" id="drawer-activity"><div class="feed-empty">Loading…</div></div>
-    </div>
-
-    <div class="drawer-section">
-      <div class="drawer-section-title">Error log</div>
-      <div class="feed" id="drawer-errors"><div class="feed-empty">Loading…</div></div>
-    </div>
-  `;
-
-  // Render quick actions
-  drawerActions.innerHTML = `
-    ${client.status === 'active'
-      ? `<button class="action-btn yellow" data-da="set-status" data-status="paused">Pause client</button>`
-      : `<button class="action-btn green" data-da="set-status" data-status="active">Activate client</button>`
-    }
-    <button class="action-btn ${client.sms_enabled === false ? 'green' : 'yellow'}" data-da="toggle-sms">
-      ${client.sms_enabled === false ? 'Enable SMS' : 'Disable SMS'}
-    </button>
-    <button class="action-btn ${client.voice_enabled === false ? 'green' : 'yellow'}" data-da="toggle-voice">
-      ${client.voice_enabled === false ? 'Enable voice' : 'Disable voice'}
-    </button>
-    <button class="action-btn" data-da="send-test-sms" disabled title="Available when Twilio A2P is approved">Send test SMS</button>
-    <button class="action-btn" data-da="open-as-client">Open client dashboard</button>
-    <button class="action-btn red" data-da="set-status" data-status="cancelled">Cancel</button>
-  `;
-  drawerActions.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => handleDrawerAction(b, client));
-  });
-
-  // Open drawer
-  drawer.classList.add('open');
-  drawerBackdrop.classList.add('open');
-
-  // Lazy-load drawer data
-  loadDrawerData(client);
-}
-
-async function loadDrawerData(client) {
-  // Checklist
-  try {
-    const { data: cl } = await supabase.from('setup_checklist').select('*').eq('client_id', client.id).maybeSingle();
-    renderChecklist(client, cl);
-  } catch (e) {
-    document.getElementById('checklist-list').innerHTML = `<div class="feed-empty">Checklist unavailable.</div>`;
-  }
-
-  // Recent calls
-  try {
-    const { data } = await supabase.from('calls').select('*').eq('client_uuid', client.id).order('created_at', { ascending: false }).limit(5);
-    renderDrawerCalls(data || []);
-  } catch (e) {
-    document.getElementById('drawer-calls').innerHTML = `<div class="feed-empty">No calls yet.</div>`;
-  }
-
-  // Recent texts
-  try {
-    const { data } = await supabase.from('text_messages').select('*').eq('client_uuid', client.id).order('created_at', { ascending: false }).limit(5);
-    renderDrawerTexts(data || []);
-  } catch (e) {
-    document.getElementById('drawer-texts').innerHTML = `<div class="feed-empty">No texts yet.</div>`;
-  }
-
-  // Activity log (per client)
-  try {
-    const { data } = await supabase.from('activity_log').select('*').eq('client_id', client.id).order('created_at', { ascending: false }).limit(10);
-    renderActivityFeed(document.getElementById('drawer-activity'), data || []);
-  } catch (e) {
-    document.getElementById('drawer-activity').innerHTML = `<div class="feed-empty">No activity yet.</div>`;
-  }
-
-  // Error log (per client)
-  try {
-    const { data } = await supabase.from('error_log').select('*').eq('client_id', client.id).order('created_at', { ascending: false }).limit(10);
-    renderErrorFeed(document.getElementById('drawer-errors'), data || []);
-  } catch (e) {
-    document.getElementById('drawer-errors').innerHTML = `<div class="feed-empty">No errors yet.</div>`;
-  }
-}
-
-function renderChecklist(client, checklist) {
-  const items = [
-    ['payment_received', 'Payment received'],
-    ['onboarding_form_completed', 'Onboarding form completed'],
-    ['phone_forwarding_setup', 'Phone forwarding set up'],
-    ['ai_prompt_customized', 'AI prompt customized'],
-    ['test_call_passed', 'Test call passed'],
-    ['notifications_working', 'Notifications working'],
-    ['dashboard_checked', 'Dashboard checked'],
-    ['live', 'Live'],
-  ];
-  const data = checklist || {};
-  document.getElementById('checklist-list').innerHTML = items.map(([key, label]) => {
-    const done = !!data[key];
-    return `
-      <div class="checklist-item ${done ? 'done' : ''}" data-key="${key}">
-        <div class="checklist-box"></div>
-        <div class="checklist-label">${escapeHtml(label)}</div>
+<!-- EXISTING NUMBER BADGE -->
+<section class="number-badge-section">
+  <div class="wrap">
+    <div class="number-badge fade-up">
+      <div class="number-badge-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
       </div>
-    `;
-  }).join('');
+      <div class="number-badge-text">
+        <div class="number-badge-title">Works with your existing business number</div>
+        <div class="number-badge-desc">Keep your number on Google, signs, and business cards. We connect to it without changing a thing.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  document.querySelectorAll('#checklist-list .checklist-item').forEach(item => {
-    item.addEventListener('click', async () => {
-      const key = item.getAttribute('data-key');
-      const newValue = !item.classList.contains('done');
-      item.classList.toggle('done', newValue);
-      try {
-        // Upsert by client_id (trigger creates the row on insert, but we update here)
-        const { error } = await supabase
-          .from('setup_checklist')
-          .update({ [key]: newValue, updated_at: new Date().toISOString() })
-          .eq('client_id', client.id);
-        if (error) throw error;
-        showToast(`${label(key)} ${newValue ? '✓ complete' : 'unchecked'}`, 'success');
-      } catch (e) {
-        item.classList.toggle('done', !newValue);
-        showToast(`Failed to update: ${e.message || 'unknown'}`, 'error');
-      }
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>How it works</div>
+      <h2 class="section-title">Three steps from <span class="accent">ringing phone</span> to captured lead.</h2>
+      <p class="section-sub">No new phone number. No app to install. Your customers feel like they're talking to a friendly receptionist.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card fade-up">
+        <div class="how-num">1</div>
+        <div class="how-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h3 class="how-title">A customer calls</h3>
+        <p class="how-desc">Someone calls your business — but you're on a job, with another customer, or it's after hours.</p>
+      </div>
+      <div class="how-card fade-up">
+        <div class="how-num">2</div>
+        <div class="how-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+        </div>
+        <h3 class="how-title">AI answers the call</h3>
+        <p class="how-desc">Your AI receptionist picks up live, greets the caller, and has a natural conversation in your tone of voice.</p>
+      </div>
+      <div class="how-card fade-up">
+        <div class="how-num">3</div>
+        <div class="how-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h3 class="how-title">Lead captured &amp; sent to you</h3>
+        <p class="how-desc">The AI collects what they need, you get an instant email summary, and the lead lands in your dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY BUSINESSES LOSE LEADS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>The problem</div>
+      <h2 class="section-title">Why local businesses <span class="accent">lose leads.</span></h2>
+      <p class="section-sub">Most missed calls aren't lost because customers don't want to buy. They're lost because nobody picked up.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card fade-up">
+        <div class="why-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+        </div>
+        <div class="why-text">
+          <div class="why-title">Missed calls</div>
+          <div class="why-desc">You're on the job, not at a desk. The phone rings. You don't see it until hours later — and the lead's gone.</div>
+        </div>
+      </div>
+      <div class="why-card fade-up">
+        <div class="why-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="why-text">
+          <div class="why-title">No after-hours coverage</div>
+          <div class="why-desc">Half the calls come in nights and weekends. Voicemail doesn't cut it. Most callers don't leave one.</div>
+        </div>
+      </div>
+      <div class="why-card fade-up">
+        <div class="why-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div class="why-text">
+          <div class="why-title">Voicemail kills leads</div>
+          <div class="why-desc">Studies show most callers won't leave a voicemail. If you don't pick up live, they call your competitor next.</div>
+        </div>
+      </div>
+      <div class="why-card fade-up">
+        <div class="why-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="why-text">
+          <div class="why-title">Competitors answer faster</div>
+          <div class="why-desc">The first business to pick up usually wins the job. If you're #2 to respond, you've already lost.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLE SCENARIO — now showing a real CALL transcript -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>Real scenario</div>
+      <h2 class="section-title">Here's what it sounds like <span class="accent">in real life.</span></h2>
+    </div>
+    <div class="scenario-card fade-up">
+      <div class="scenario-text">
+        <div class="scenario-time"><span class="live-dot"></span>Saturday · 7:42 PM</div>
+        <div class="scenario-headline">A customer calls your business after hours.</div>
+        <div class="scenario-body">You're at dinner with your family. Your phone rings — it's a number you don't recognize. <strong>You'd normally miss the call.</strong></div>
+        <div class="scenario-body">Instead, your AI receptionist <strong>answers live on the first ring</strong>, has a real conversation, gets exactly what they need, and emails you a clean summary so you can follow up tomorrow.</div>
+        <div class="scenario-bullets">
+          <div class="scenario-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            You enjoy your dinner
+          </div>
+          <div class="scenario-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Your customer gets a real conversation
+          </div>
+          <div class="scenario-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Monday morning, you've got a booked job
+          </div>
+        </div>
+      </div>
+      <div class="phone-mock">
+        <div class="phone-mock-head">
+          <div class="phone-mock-name">Your Business · Live Call</div>
+          <div class="phone-mock-status">On Call</div>
+        </div>
+        <div class="phone-mock-thread">
+          <div class="phone-meta">7:42 PM · Call connected</div>
+          <div class="phone-line">
+            <div class="phone-speaker ai">AI Receptionist</div>
+            <div class="phone-bubble ai">"Thanks for calling. How can I help you today?"</div>
+          </div>
+          <div class="phone-line" style="align-items: flex-end;">
+            <div class="phone-speaker caller">Caller</div>
+            <div class="phone-bubble caller">"Hi! My AC stopped working this afternoon. Are you guys able to come out tomorrow?"</div>
+          </div>
+          <div class="phone-line">
+            <div class="phone-speaker ai">AI Receptionist</div>
+            <div class="phone-bubble ai">"Absolutely. Can I grab your name and address so we can get someone scheduled?"</div>
+          </div>
+          <div class="phone-meta">Lead captured · Summary emailed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>Features</div>
+      <h2 class="section-title">Everything you need to <span class="accent">stop losing leads.</span></h2>
+      <p class="section-sub">Built for busy local businesses. No apps to learn. No call center to staff.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
+        <div class="feature-title">24/7 AI receptionist</div>
+        <div class="feature-desc">Answers every call live with a natural conversation in your tone of voice.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg></div>
+        <div class="feature-title">Lead capture</div>
+        <div class="feature-desc">Collects name, phone, what they need, and urgency — every time.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="feature-title">AI call summaries</div>
+        <div class="feature-desc">Every call distilled into a clean summary, emailed to you within seconds of hangup.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="feature-title">After-hours answering</div>
+        <div class="feature-desc">Nights, weekends, holidays — your AI is always on. No more "we'll call you Monday."</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+        <div class="feature-title">Smart call transfers</div>
+        <div class="feature-desc">Urgent calls go straight to you. Routine inquiries get handled by the AI.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <div class="feature-title">Lead dashboard</div>
+        <div class="feature-desc">Track every captured lead with status, notes, and full transcript in one place.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <div class="feature-title">Conversation transcripts</div>
+        <div class="feature-desc">Full transcript of every call saved so you can review exactly what was said.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="feature-title">Mobile-ready dashboard</div>
+        <div class="feature-desc">Check leads, listen to recordings, and update statuses from anywhere.</div>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-badge">Coming soon</span>
+        <div class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="feature-title">Text-back follow-up</div>
+        <div class="feature-desc">Optional SMS follow-up to callers, available as we expand messaging support.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE ACTIVITY -->
+<section class="section">
+  <div class="wrap-narrow">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>Live activity</div>
+      <h2 class="section-title">Watch leads <span class="accent">get captured.</span></h2>
+      <p class="section-sub">A simulated stream of what your dashboard looks like in action.</p>
+    </div>
+    <div class="live-feed fade-up">
+      <div class="live-feed-head">
+        <div class="live-feed-title">Recent activity</div>
+        <div class="live-feed-pill"><span class="live-dot"></span>Live</div>
+      </div>
+      <div class="live-feed-list" id="live-feed-list">
+        <!-- Events injected by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>Pricing</div>
+      <h2 class="section-title">Simple pricing. <span class="accent">Real ROI.</span></h2>
+      <p class="section-sub">Start by capturing leads. Upgrade when you want the full AI front desk experience.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- STARTER -->
+      <div class="price-card fade-up">
+        <div class="price-name">Starter</div>
+        <div class="price-tagline">For solo operators and small local businesses.</div>
+        <div class="price-amount">
+          <div class="price-num"><span class="dollar">$</span>99</div>
+          <div class="price-period">/ month</div>
+        </div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>AI answers missed calls</strong></span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Lead capture &amp; dashboard</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>AI call summaries by email</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>After-hours coverage</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Basic AI personality</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Text-back follow-up <span class="soon">Coming soon</span></span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Easy setup, done with you</span>
+          </li>
+        </ul>
+        <a href="/onboarding/" class="btn btn-secondary price-cta">Start Recovering Leads</a>
+        <div class="price-note">No card required to apply</div>
+      </div>
+
+      <!-- PRO -->
+      <div class="price-card featured fade-up">
+        <div class="price-badge">Most Popular</div>
+        <div class="price-name">AI Front Desk Pro</div>
+        <div class="price-tagline">For growing businesses that want a full AI front desk.</div>
+        <div class="price-amount">
+          <div class="price-num"><span class="dollar">$</span>297</div>
+          <div class="price-period">/ month</div>
+        </div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Everything in Starter</strong></span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>AI answers all calls 24/7</strong> (not just missed ones)</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Live call transfers to your phone</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>AI lead qualification</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Booking &amp; payment links on calls</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Advanced call analytics</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Priority support</span>
+          </li>
+          <li class="price-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Multi-location support</span>
+          </li>
+        </ul>
+        <a href="/onboarding/" class="btn btn-primary price-cta">Activate AI Front Desk</a>
+        <div class="price-note">Payment link sent after you've tested it</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT HAPPENS AFTER SIGNUP -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>What happens next</div>
+      <h2 class="section-title">From signup to live in <span class="accent">5–7 days.</span></h2>
+      <p class="section-sub">No complicated setup. We handle the heavy lifting and walk you through the rest.</p>
+    </div>
+    <div class="signup-grid">
+      <div class="signup-step fade-up">
+        <div class="signup-step-num">1</div>
+        <div class="signup-step-title">Sign up</div>
+        <div class="signup-step-desc">Tell us about your business in one short form. Takes about 2 minutes.</div>
+      </div>
+      <div class="signup-step fade-up">
+        <div class="signup-step-num">2</div>
+        <div class="signup-step-title">Connect your number</div>
+        <div class="signup-step-desc">We help you forward calls to your AI. One quick step on your phone.</div>
+      </div>
+      <div class="signup-step fade-up">
+        <div class="signup-step-num">3</div>
+        <div class="signup-step-title">Customize the AI</div>
+        <div class="signup-step-desc">We tune the AI to fit your business, hours, services, and tone of voice.</div>
+      </div>
+      <div class="signup-step fade-up">
+        <div class="signup-step-num">4</div>
+        <div class="signup-step-title">Go live</div>
+        <div class="signup-step-desc">Test the flow, confirm everything sounds right, then we send your payment link.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>What clients say</div>
+      <h2 class="section-title">Built for the people <span class="accent">who run real businesses.</span></h2>
+      <p class="section-sub">Early customers using AI Lead Intel today.</p>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card fade-up">
+        <div class="testimonial-quote-mark">"</div>
+        <div class="testimonial-text">Running a storage facility means I can't always grab the phone. AI Lead Intel answers the calls I miss and captures the lead right then. It's been a huge weight off my shoulders.</div>
+        <div class="testimonial-attr">
+          <div class="testimonial-avatar">DY</div>
+          <div>
+            <div class="testimonial-name">David Young</div>
+            <div class="testimonial-role">Owner · Prime Vault Self Storage · Noble, OK</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up">
+        <div class="testimonial-quote-mark">"</div>
+        <div class="testimonial-text">I'm on roofs all day. Phone rings, I can't always grab it. Used to lose those calls completely. With AI Lead Intel, the AI answers and gets all the info I need — that's leads I would have lost.</div>
+        <div class="testimonial-attr">
+          <div class="testimonial-avatar">FM</div>
+          <div>
+            <div class="testimonial-name">Founding member</div>
+            <div class="testimonial-role">Local HVAC business</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="wrap-narrow">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="step-dot"></span>FAQ</div>
+      <h2 class="section-title">Common <span class="accent">questions.</span></h2>
+      <p class="section-sub">Still have questions? Email us at hello@aileadintel.com.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>How does the AI receptionist work?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">When someone calls your business and you don't answer, the call forwards to your AI receptionist. The AI greets the caller in your tone of voice, has a natural conversation, captures their name and what they need, and emails you a clean summary the moment they hang up.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>Can I use my existing business number?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. You keep your existing number on Google, business cards, and signs. Nothing changes for your customers. We connect to it without porting or replacing anything.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>How quickly does the AI answer?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Usually on the first or second ring — under 2 seconds in most cases. Faster than any human receptionist could.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>Can I customize how the AI sounds?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. During onboarding you tell us your business name, hours, services, pricing rules, and tone — friendly, professional, or direct. We tune the AI to match.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>Does it text people back too?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">SMS text-back is an optional add-on that we're rolling out as we expand messaging support. The core product is the AI receptionist answering calls live and capturing the lead — which is what most businesses actually need.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>Do I need technical knowledge?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">No. We handle all the technical setup. Your only job is to fill out a quick onboarding form and tap a few buttons on your phone to forward calls.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>What's the difference between Starter and Pro?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Starter ($99/mo) handles missed calls — when you can't pick up, the AI answers and captures the lead. Pro ($297/mo) answers ALL calls 24/7, qualifies leads, transfers urgent calls to you, and includes booking/payment links and advanced analytics.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button">
+          <span>When do I get charged?</span>
+          <span class="faq-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">After you've tested the system and confirmed everything sounds the way you want it, we send you a payment link. Nothing is charged until you've heard it work.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="wrap">
+    <div class="final-cta-card fade-up">
+      <div class="final-cta-content">
+        <div class="final-cta-eyebrow"><span class="live-dot"></span>Stop the leak</div>
+        <h2>Every missed call is a <span class="accent">potential lost customer.</span></h2>
+        <p class="final-cta-sub">Most local businesses lose tens of thousands of dollars a year to missed calls. AI Lead Intel makes sure every call gets answered and every lead gets captured.</p>
+        <a href="/onboarding/" class="btn btn-primary btn-large">
+          Recover More Calls
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand-block">
+        <a href="#" class="logo">
+          <div class="logo-mark"></div>
+          <span>AI Lead Intel</span>
+        </a>
+        <p class="footer-tag">24/7 AI receptionist + lead capture for local service businesses. From the first ring to the booked job.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <a href="#how" class="footer-link">How it works</a>
+        <a href="#features" class="footer-link">Features</a>
+        <a href="#pricing" class="footer-link">Pricing</a>
+        <a href="#faq" class="footer-link">FAQ</a>
+      </div>
+      <div>
+        <div class="footer-col-title">For customers</div>
+        <a href="/dashboard/" class="footer-link">Sign in to dashboard</a>
+        <a href="/setup" class="footer-link">Setup help</a>
+        <a href="mailto:hello@aileadintel.com" class="footer-link">Customer support</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="/onboarding/" class="footer-link">Get started</a>
+        <a href="mailto:hello@aileadintel.com" class="footer-link">Contact</a>
+        <a href="/privacy" class="footer-link">Privacy</a>
+        <a href="/terms" class="footer-link">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© AI Lead Intel · Apex Growth Investments LLC</div>
+      <div>hello@aileadintel.com</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const els = document.querySelectorAll('.fade-up');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('visible'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
     });
-  });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => io.observe(el));
+})();
 
-  function label(key) {
-    const m = items.find(i => i[0] === key);
-    return m ? m[1] : key;
-  }
-}
-
-function renderDrawerCalls(calls) {
-  const el = document.getElementById('drawer-calls');
-  if (!calls.length) { el.innerHTML = `<div class="feed-empty">No calls yet.</div>`; return; }
-  el.innerHTML = calls.map(c => `
-    <div class="feed-item">
-      <div class="feed-icon brand">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      </div>
-      <div class="feed-body">
-        <div class="feed-title">${escapeHtml(c.caller_number || c.from_number || 'Unknown caller')}</div>
-        <div class="feed-meta">${escapeHtml(c.status || 'completed')}${c.duration ? ' · ' + c.duration + 's' : ''}</div>
-      </div>
-      <div class="feed-time">${timeAgo(c.created_at)}</div>
-    </div>
-  `).join('');
-}
-
-function renderDrawerTexts(texts) {
-  const el = document.getElementById('drawer-texts');
-  if (!texts.length) { el.innerHTML = `<div class="feed-empty">No texts yet.</div>`; return; }
-  el.innerHTML = texts.map(t => `
-    <div class="feed-item">
-      <div class="feed-icon blue">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <div class="feed-body">
-        <div class="feed-title">${escapeHtml((t.body || t.message || '').slice(0, 80) || '—')}</div>
-        <div class="feed-meta">${escapeHtml(t.direction || t.from_number || '')}</div>
-      </div>
-      <div class="feed-time">${timeAgo(t.created_at)}</div>
-    </div>
-  `).join('');
-}
-
-async function handleDrawerAction(btn, client) {
-  const action = btn.getAttribute('data-da');
-  if (btn.disabled) return;
-
-  try {
-    if (action === 'set-status') {
-      const newStatus = btn.getAttribute('data-status');
-      await updateStatus(client.id, newStatus);
-      // Re-open drawer with fresh data
-      openDrawer(client.id);
-    } else if (action === 'toggle-sms') {
-      const newVal = !(client.sms_enabled !== false);
-      const { error } = await supabase.from('clients').update({ sms_enabled: newVal }).eq('id', client.id);
-      if (error) throw error;
-      client.sms_enabled = newVal;
-      showToast(`SMS ${newVal ? 'enabled' : 'disabled'}`, 'success');
-      openDrawer(client.id);
-    } else if (action === 'toggle-voice') {
-      const newVal = !(client.voice_enabled !== false);
-      const { error } = await supabase.from('clients').update({ voice_enabled: newVal }).eq('id', client.id);
-      if (error) throw error;
-      client.voice_enabled = newVal;
-      showToast(`Voice ${newVal ? 'enabled' : 'disabled'}`, 'success');
-      openDrawer(client.id);
-    } else if (action === 'open-as-client') {
-      // Opens the customer-facing dashboard in a new tab. Read-only — admin
-      // does NOT auto-impersonate the customer. Admin just sees the same UI.
-      window.open(`/dashboard/?client_id=${client.id}`, '_blank');
-    }
-  } catch (e) {
-    showToast(`Failed: ${e.message || 'unknown'}`, 'error');
-  }
-}
-
-// ============================================================
-// FILTERS
-// ============================================================
-document.querySelectorAll('.filter-pill').forEach(btn => {
+document.querySelectorAll('.faq-q').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeStatusFilter = btn.getAttribute('data-filter');
-    renderClientsTable();
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
   });
 });
-document.getElementById('filter-search').addEventListener('input', (e) => {
-  searchQuery = e.target.value.trim();
-  renderClientsTable();
-});
-document.getElementById('filter-plan').addEventListener('change', (e) => {
-  activePlanFilter = e.target.value;
-  renderClientsTable();
-});
-document.getElementById('filter-setup').addEventListener('change', (e) => {
-  activeSetupFilter = e.target.value;
-  renderClientsTable();
-});
-document.getElementById('btn-refresh').addEventListener('click', loadEverything);
 
-// ============================================================
-// HELPERS
-// ============================================================
-function escapeHtml(str) {
-  if (str === null || str === undefined) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-function formatDate(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch (_) { return '—'; }
-}
-function timeAgo(iso) {
-  if (!iso) return '—';
-  try {
-    const d = new Date(iso);
-    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  } catch (_) { return '—'; }
-}
-function showToast(text, type = 'success') {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-text').textContent = text;
-  toast.className = 'toast ' + type;
-  setTimeout(() => toast.classList.add('visible'), 10);
-  setTimeout(() => toast.classList.remove('visible'), 2600);
-}
+(function() {
+  const feed = document.getElementById('live-feed-list');
+  if (!feed) return;
+  const events = [
+    { icon: 'phone', title: 'Call answered by AI', meta: 'Caller asked about pricing — lead captured', color: 'green' },
+    { icon: 'capture', title: 'New lead captured', meta: 'Name, phone, and service needed saved', color: 'orange' },
+    { icon: 'summary', title: 'Summary emailed to owner', meta: 'Sent within 12 seconds of call ending', color: 'green' },
+    { icon: 'transfer', title: 'Urgent call transferred', meta: 'Hot lead routed to owner phone', color: 'green' },
+    { icon: 'phone', title: 'Call answered by AI', meta: 'After-hours call, full conversation captured', color: 'green' },
+    { icon: 'capture', title: 'New lead captured', meta: 'Quote request added to dashboard', color: 'orange' },
+    { icon: 'summary', title: 'Lead marked hot', meta: 'Caller asked to book today', color: 'orange' },
+    { icon: 'transfer', title: 'Booking link sent on call', meta: 'Caller confirmed appointment', color: 'green' },
+  ];
+  const iconSVG = {
+    'phone': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>',
+    'capture': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>',
+    'summary': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+    'transfer': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+  };
+  const times = ['just now', '12s ago', '38s ago', '1m ago', '2m ago', '4m ago', '8m ago', '14m ago'];
 
-// ============================================================
-// INIT
-// ============================================================
-checkAuth();
+  function buildEvent(ev, i) {
+    const el = document.createElement('div');
+    el.className = 'live-event';
+    el.innerHTML = `
+      <div class="live-event-icon ${ev.color === 'green' ? 'green' : ''}">${iconSVG[ev.icon]}</div>
+      <div class="live-event-text">
+        <div class="live-event-title">${ev.title}</div>
+        <div class="live-event-meta">${ev.meta}</div>
+      </div>
+      <div class="live-event-time">${times[i] || 'just now'}</div>
+    `;
+    return el;
+  }
+  for (let i = 0; i < 4; i++) feed.appendChild(buildEvent(events[i], i));
+  let idx = 4;
+  setInterval(() => {
+    const ev = events[idx % events.length]; idx++;
+    const el = buildEvent(ev, 0);
+    if (feed.children.length >= 4) feed.removeChild(feed.lastChild);
+    feed.insertBefore(el, feed.firstChild);
+    [...feed.children].forEach((child, i) => {
+      const t = child.querySelector('.live-event-time');
+      if (t) t.textContent = times[i] || 'just now';
+    });
+  }, 3500);
+})();
 </script>
 
 </body>
