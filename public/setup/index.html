@@ -190,7 +190,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent);
 }
 
-/* ==================== LOADING STATE ==================== */
+/* ==================== LOADING ==================== */
 .state-loading {
   text-align: center;
   padding: 32px 16px;
@@ -213,7 +213,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-weight: 600;
 }
 
-/* ==================== PENDING STATE ==================== */
+/* ==================== PENDING ==================== */
 .state-pending {
   text-align: center;
   padding: 12px 0;
@@ -254,7 +254,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   max-width: 440px;
   margin: 0 auto 22px;
 }
-.pending-steps {
+
+/* ==================== CHECKLIST (re-usable) ==================== */
+.checklist {
   text-align: left;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -263,7 +265,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   max-width: 420px;
   margin: 0 auto;
 }
-.pending-steps-label {
+.checklist-label {
   font-family: 'Geist Mono', monospace;
   font-size: 9.5px;
   letter-spacing: 0.14em;
@@ -272,29 +274,31 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-weight: 600;
   margin-bottom: 12px;
 }
-.pending-step {
+.checklist-row {
   display: flex; align-items: flex-start; gap: 11px;
-  padding: 7px 0;
+  padding: 8px 0;
   font-size: 13.5px;
   color: var(--text-soft);
   line-height: 1.5;
 }
-.pending-step-icon {
-  width: 18px; height: 18px;
+.checklist-row strong { color: var(--text); font-weight: 600; }
+.checklist-row.muted { color: var(--text-faint); }
+.checklist-icon {
+  width: 20px; height: 20px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
   display: flex; align-items: center; justify-content: center;
 }
-.pending-step-icon.done {
+.checklist-icon.done {
   background: var(--green); color: #fff;
 }
-.pending-step-icon.current {
+.checklist-icon.current {
   background: var(--blue-soft);
   border: 1.5px solid var(--blue);
   position: relative;
 }
-.pending-step-icon.current::after {
+.checklist-icon.current::after {
   content: '';
   width: 6px; height: 6px;
   border-radius: 50%;
@@ -305,14 +309,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   0%,100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.6); }
 }
-.pending-step-icon.upcoming {
+.checklist-icon.upcoming {
   background: var(--surface-3);
   border: 1.5px solid var(--border-3);
 }
-.pending-step strong { color: var(--text); font-weight: 600; }
-.pending-step.upcoming-text { color: var(--text-faint); }
 
-/* ==================== READY STATE ==================== */
+/* ==================== READY — NUMBER ==================== */
 .number-block {
   text-align: center;
   padding: 6px 0 22px;
@@ -375,6 +377,38 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--green);
 }
 
+/* ==================== EXPLAINER ==================== */
+.explainer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.explainer-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 14px 16px;
+  display: flex; gap: 11px; align-items: flex-start;
+}
+.explainer-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.explainer-text {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.explainer-text strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 3px; }
+@media (max-width: 620px) { .explainer-grid { grid-template-columns: 1fr; } }
+
+/* ==================== INSTRUCTIONS ==================== */
 .instruction-block { margin-bottom: 24px; }
 .instruction-title {
   font-family: 'Geist Mono', monospace;
@@ -463,6 +497,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border: 1px solid var(--border-2);
 }
 
+/* ==================== ACCORDION ==================== */
 .accordion {
   margin-top: 14px;
   background: var(--bg-2);
@@ -554,6 +589,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border: 1px solid var(--border-2);
 }
 
+/* ==================== TEST AI CARD ==================== */
 .test-card {
   background:
     radial-gradient(circle at 0% 0%, var(--brand-tint) 0%, transparent 70%),
@@ -563,6 +599,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   padding: 28px 26px;
   position: relative; overflow: hidden;
   display: flex; gap: 18px; align-items: center;
+  margin-bottom: 18px;
 }
 .test-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
@@ -604,8 +641,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--text-dim);
   line-height: 1.55;
 }
-.test-btn {
-  display: inline-flex; align-items: center; gap: 7px;
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 12px 20px;
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
   color: #fff;
@@ -620,20 +657,76 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: relative;
   overflow: hidden;
 }
-.test-btn::before {
+.btn-primary::before {
   content: '';
   position: absolute; top: 0; left: -100%;
   width: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
   transition: left 0.6s;
 }
-.test-btn:hover::before { left: 100%; }
-.test-btn:hover {
+.btn-primary:hover::before { left: 100%; }
+.btn-primary:hover {
   transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.28),
     0 10px 28px var(--brand-glow);
 }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  transition: all 0.18s;
+}
+.btn-secondary:hover {
+  background: var(--surface-3);
+  border-color: var(--border-3);
+}
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ==================== MARK AS LIVE ==================== */
+.live-action-card {
+  background: var(--bg-2);
+  border: 1px dashed var(--green-line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex; gap: 14px; align-items: center;
+  margin-bottom: 18px;
+}
+.live-action-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  color: var(--green);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.live-action-text { flex: 1; min-width: 0; }
+.live-action-title { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+.live-action-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.btn-mark-live {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 14px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--green);
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.btn-mark-live:hover {
+  background: rgba(52,211,153,0.18);
+  transform: translateY(-1px);
+}
+.btn-mark-live:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 /* ==================== LIVE STATE ==================== */
 .state-live {
@@ -705,27 +798,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   word-break: break-all;
 }
 
-.dashboard-cta-btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 13px 22px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
-  color: #fff;
-  border-radius: 11px;
-  font-size: 13.5px;
-  font-weight: 600;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    0 4px 14px var(--brand-glow);
-  transition: all 0.2s;
-}
-.dashboard-cta-btn:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.28),
-    0 10px 28px var(--brand-glow);
-}
-
-/* ==================== ERROR STATE ==================== */
+/* ==================== ERROR ==================== */
 .state-error {
   text-align: center;
   padding: 16px 8px;
@@ -783,13 +856,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+.toast.error { border-color: rgba(248,113,113,0.4); color: #f87171; }
 
 @media (max-width: 620px) {
   .topnav { padding: 12px 16px; }
   .wrap { padding: 36px 16px 80px; }
   .card { padding: 24px 20px; border-radius: 16px; }
   .test-card { padding: 22px; flex-direction: column; align-items: flex-start; text-align: left; gap: 16px; }
-  .test-btn { width: 100%; justify-content: center; }
+  .test-card .btn-primary { width: 100%; }
+  .live-action-card { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .btn-mark-live { width: 100%; justify-content: center; }
   .hero-title { font-size: 28px; }
   .number-big { font-size: 32px; }
   .live-stats { grid-template-columns: 1fr; }
@@ -806,9 +882,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   <a href="mailto:hello@aileadintel.com" class="nav-help">Need help?</a>
 </nav>
 
-<div class="wrap" id="wrap">
+<div class="wrap">
 
-  <!-- HEADER (updated dynamically based on state) -->
   <header class="hero" id="hero">
     <div class="hero-eyebrow" id="hero-eyebrow"><span class="dot"></span>Loading...</div>
     <h1 class="hero-title" id="hero-title">Setting up your <span class="accent">AI receptionist</span></h1>
@@ -816,7 +891,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div id="business-pill" class="hero-business" style="display:none;"></div>
   </header>
 
-  <!-- CONTENT (one of: loading / pending / ready / live / error) -->
   <div id="content">
     <div class="card">
       <div class="state-loading">
@@ -838,9 +912,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// ============================================================
-// CONFIG
-// ============================================================
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -848,9 +919,30 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ============================================================
 // HELPERS
 // ============================================================
+
+/**
+ * Strip country code and non-digits from a phone number,
+ * returning exactly 10 US digits if possible.
+ * Handles inputs like:
+ *   +19067622478  →  9067622478
+ *   19067622478   →  9067622478
+ *   9067622478    →  9067622478
+ *   (906) 762-2478 → 9067622478
+ */
+function normalizeUsNumber(raw) {
+  let digits = String(raw || '').replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    digits = digits.slice(1);
+  }
+  if (digits.length > 10) {
+    digits = digits.slice(-10);
+  }
+  return digits;
+}
+
 function formatPhone(raw) {
-  const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
-  if (digits.length < 10) return raw;
+  const digits = normalizeUsNumber(raw);
+  if (digits.length !== 10) return raw;
   return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6,10)}`;
 }
 
@@ -859,9 +951,10 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function showToast(msg) {
+function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
+  toast.className = 'toast' + (type === 'error' ? ' error' : '');
   toast.classList.add('visible');
   setTimeout(() => toast.classList.remove('visible'), 1800);
 }
@@ -880,93 +973,104 @@ async function copyToClipboard(text, btnEl, btnTextEl) {
     }
     showToast('Number copied');
   } catch (e) {
-    showToast('Long-press the number to copy');
+    showToast('Long-press the number to copy', 'error');
+  }
+}
+
+function setBusinessPill(name) {
+  const pill = document.getElementById('business-pill');
+  if (name) {
+    pill.textContent = name;
+    pill.style.display = 'inline-block';
+  } else {
+    pill.style.display = 'none';
   }
 }
 
 // ============================================================
-// READ URL PARAMS
+// URL PARAMS
 // ============================================================
 const params = new URLSearchParams(window.location.search);
 const slug = params.get('slug');
-const businessParam = params.get('business');
-const aiNumberParam = params.get('aiNumber'); // legacy/testing override
 
 // ============================================================
 // LOAD SETUP INFO
 // ============================================================
 async function loadSetupInfo() {
-  // If we have a slug, fetch from Supabase
-  if (slug) {
-    try {
-      const { data, error } = await supabase
-        .rpc('get_setup_info', { p_slug: slug });
+  // No slug → generic pending state (do NOT load most-recent client)
+  if (!slug) {
+    renderGenericPending();
+    return;
+  }
 
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        renderError('We couldn\'t find your account. Double-check the link from your email or contact support.');
-        return;
-      }
-      const info = data[0];
-      renderByStatus(info);
-    } catch (e) {
-      console.error('Setup info error:', e);
-      // If RPC isn't deployed yet OR query failed, fall back to URL param if present
-      if (aiNumberParam) {
-        renderReady({
-          business_name: businessParam || null,
-          ai_phone_number: aiNumberParam,
-          ai_setup_status: 'ready',
-        });
-      } else {
-        renderError('We couldn\'t load your setup details right now. Please try again, or contact support.');
-      }
+  try {
+    const { data, error } = await supabase
+      .rpc('get_setup_info', { p_slug: slug });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      renderError("We couldn't find your account. Double-check the link from your email or contact support.");
+      return;
     }
-    return;
+    const info = data[0];
+    renderByStatus(info);
+  } catch (e) {
+    console.error('Setup info error:', e);
+    renderError("We couldn't load your setup details right now. Please try again, or contact support.");
   }
-
-  // No slug — fall back to legacy URL params (useful for manual testing)
-  if (aiNumberParam) {
-    renderReady({
-      business_name: businessParam || null,
-      ai_phone_number: aiNumberParam,
-      ai_setup_status: 'ready',
-    });
-    return;
-  }
-
-  // Nothing to render — show pending generic state
-  renderPending({ business_name: null });
 }
 
 // ============================================================
-// RENDER ROUTER
+// ROUTER
 // ============================================================
 function renderByStatus(info) {
-  const status = info.ai_setup_status || 'pending';
-  const hasNumber = !!(info.ai_phone_number && String(info.ai_phone_number).replace(/\D/g, '').length >= 10);
+  const status = (info.ai_setup_status || 'pending').toLowerCase();
+  const digits = normalizeUsNumber(info.ai_phone_number);
+  const hasNumber = digits.length === 10;
 
   if (status === 'live') {
-    renderLive(info);
+    renderLive(info, digits);
   } else if (status === 'ready' && hasNumber) {
-    renderReady(info);
-  } else if (status === 'pending' || !hasNumber) {
-    renderPending(info);
+    renderReady(info, digits);
   } else {
-    // Fallback
     renderPending(info);
   }
 }
 
 // ============================================================
-// PENDING STATE
+// GENERIC PENDING (no slug in URL)
+// ============================================================
+function renderGenericPending() {
+  document.getElementById('hero-eyebrow').className = 'hero-eyebrow pending';
+  document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup';
+  document.getElementById('hero-title').innerHTML = 'Open your <span class="accent">setup link</span>';
+  document.getElementById('hero-sub').textContent = 'This page is personalized to your account. Open the setup link we emailed you to continue.';
+  document.getElementById('business-pill').style.display = 'none';
+
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="state-pending">
+        <div class="pending-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="pending-title">Check your inbox for your setup link</div>
+        <div class="pending-sub">We sent you a personalized setup link by email after you signed up. Open that link from your inbox to continue setting up your AI receptionist.</div>
+        <p style="font-size:12.5px; color:var(--text-faint); margin-top:18px;">Lost your link? Email <a href="mailto:hello@aileadintel.com" style="color:var(--brand);">hello@aileadintel.com</a> and we'll resend it.</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('back-link').style.display = 'inline-flex';
+}
+
+// ============================================================
+// PENDING (slug found, AI not ready yet)
 // ============================================================
 function renderPending(info) {
-  // Update header
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow pending';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup in progress';
   document.getElementById('hero-title').innerHTML = 'Configuring your <span class="accent">AI receptionist</span>';
-  document.getElementById('hero-sub').textContent = 'We\'re assigning your AI receptionist number. This usually takes a few hours.';
+  document.getElementById('hero-sub').textContent = "We're building your AI and assigning a dedicated number. You'll get an email the moment it's ready.";
   setBusinessPill(info.business_name);
 
   document.getElementById('content').innerHTML = `
@@ -978,47 +1082,46 @@ function renderPending(info) {
         <div class="pending-title">Your AI receptionist number is being configured</div>
         <div class="pending-sub">We're building your AI and assigning a dedicated number. You'll get an email the moment it's ready — usually within a few hours.</div>
 
-        <div class="pending-steps">
-          <div class="pending-steps-label">What's happening</div>
-          <div class="pending-step">
-            <div class="pending-step-icon done">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div><strong>Account created</strong></div>
-          </div>
-          <div class="pending-step">
-            <div class="pending-step-icon current"></div>
-            <div><strong>Building your AI &amp; assigning a number</strong></div>
-          </div>
-          <div class="pending-step upcoming-text">
-            <div class="pending-step-icon upcoming"></div>
-            <div>Forward your calls to your AI</div>
-          </div>
-          <div class="pending-step upcoming-text">
-            <div class="pending-step-icon upcoming"></div>
-            <div>Go live</div>
-          </div>
+        <div class="checklist">
+          <div class="checklist-label">What's happening</div>
+          ${checklistRow('done', 'Account created')}
+          ${checklistRow('current', 'Building your AI &amp; assigning a number')}
+          ${checklistRow('upcoming', 'Forward your calls to your AI')}
+          ${checklistRow('upcoming', 'Confirm AI is live')}
         </div>
       </div>
     </div>
   `;
-
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
+function checklistRow(state, label) {
+  const iconMap = {
+    done: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    current: '',
+    upcoming: '',
+  };
+  const textClass = state === 'upcoming' ? 'muted' : '';
+  const labelHtml = state === 'upcoming' ? label : `<strong>${label}</strong>`;
+  return `
+    <div class="checklist-row ${textClass}">
+      <div class="checklist-icon ${state}">${iconMap[state]}</div>
+      <div>${labelHtml}</div>
+    </div>
+  `;
+}
+
 // ============================================================
-// READY STATE
+// READY (AI number assigned, customer needs to forward)
 // ============================================================
-function renderReady(info) {
-  const digits = String(info.ai_phone_number || '').replace(/\D/g, '').slice(0, 10);
+function renderReady(info, digits) {
   const formatted = formatPhone(digits);
   const telHref = `tel:+1${digits}`;
 
-  // Update header
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow';
-  document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Last Step · Forward Your Calls';
-  document.getElementById('hero-title').innerHTML = 'One step to <span class="accent">go live.</span>';
-  document.getElementById('hero-sub').textContent = 'Forward your business calls to your AI receptionist. Takes about 2 minutes.';
+  document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Your AI Receptionist Is Ready';
+  document.getElementById('hero-title').innerHTML = 'Forward your calls <span class="accent">to your AI.</span>';
+  document.getElementById('hero-sub').textContent = 'Your AI receptionist number is ready. Forward your business calls to start capturing leads automatically.';
   setBusinessPill(info.business_name);
 
   document.getElementById('content').innerHTML = `
@@ -1038,6 +1141,47 @@ function renderReady(info) {
         </div>
       </div>
 
+      <!-- HOW THIS WORKS -->
+      <div class="explainer-grid">
+        <div class="explainer-card">
+          <div class="explainer-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="explainer-text">
+            <strong>Keep your existing business number</strong>
+            Customers still dial your normal number — nothing changes on their end.
+          </div>
+        </div>
+        <div class="explainer-card">
+          <div class="explainer-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </div>
+          <div class="explainer-text">
+            <strong>Forward calls to your AI</strong>
+            Forward missed or all business calls to the AI number above.
+          </div>
+        </div>
+        <div class="explainer-card">
+          <div class="explainer-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+          </div>
+          <div class="explainer-text">
+            <strong>AI answers &amp; captures leads</strong>
+            Your AI greets the caller and captures their info live.
+          </div>
+        </div>
+        <div class="explainer-card">
+          <div class="explainer-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="explainer-text">
+            <strong>You get the summary</strong>
+            Lead and call summary land in your email and dashboard.
+          </div>
+        </div>
+      </div>
+
+      <!-- INSTRUCTIONS -->
       <div class="instruction-block">
         <div class="instruction-title">How to forward your calls</div>
         <div class="instruction-body">
@@ -1048,7 +1192,7 @@ function renderReady(info) {
             </li>
             <li>
               <div class="step-num">02</div>
-              <div class="steps-content">Enter your <strong>AI receptionist number</strong></div>
+              <div class="steps-content">Enter your <strong>AI receptionist number</strong> above</div>
             </li>
             <li>
               <div class="step-num">03</div>
@@ -1091,25 +1235,53 @@ function renderReady(info) {
           </div>
         </div>
       </div>
+
+      <!-- CHECKLIST -->
+      <div class="instruction-block" style="margin-bottom: 0;">
+        <div class="instruction-title">Setup progress</div>
+        <div class="checklist" style="max-width: 100%;">
+          <div class="checklist-label">4 steps to live</div>
+          ${checklistRow('done', 'AI number assigned')}
+          ${checklistRow('current', 'Call forwarding enabled')}
+          ${checklistRow('upcoming', 'Test call completed')}
+          ${checklistRow('upcoming', 'AI is live')}
+        </div>
+      </div>
     </div>
 
+    <!-- TEST AI -->
     <div class="test-card">
       <div class="test-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
       </div>
       <div class="test-text">
         <div class="test-eyebrow">Hear it for yourself</div>
-        <div class="test-title">Want to hear your AI receptionist before going live?</div>
-        <div class="test-desc">Call it directly. The AI will answer just like it will for your customers.</div>
+        <div class="test-title">Call &amp; test your AI receptionist</div>
+        <div class="test-desc">Call the AI directly. It'll answer just like it will for your customers.</div>
       </div>
-      <a href="${telHref}" class="test-btn">
+      <a href="${telHref}" class="btn-primary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
         Call &amp; test your AI
       </a>
     </div>
+
+    <!-- MARK AS LIVE -->
+    <div class="live-action-card">
+      <div class="live-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="live-action-text">
+        <div class="live-action-title">Forwarding tested and working?</div>
+        <div class="live-action-desc">Mark your AI as live so we know you're up and running.</div>
+      </div>
+      <button class="btn-mark-live" id="mark-live-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="mark-live-label">Mark as live</span>
+      </button>
+    </div>
   `;
 
-  // Wire up copy/click
+  // Wire up copy
   const copyBtn = document.getElementById('copy-btn');
   const copyText = document.getElementById('copy-text');
   copyBtn.addEventListener('click', () => copyToClipboard(digits, copyBtn, copyText));
@@ -1126,17 +1298,37 @@ function renderReady(info) {
     document.getElementById('carrier-accordion').classList.toggle('open');
   });
 
+  // Mark as live
+  document.getElementById('mark-live-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('mark-live-btn');
+    const label = document.getElementById('mark-live-label');
+    btn.disabled = true;
+    label.textContent = 'Marking...';
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .update({ ai_setup_status: 'live' })
+        .eq('client_slug', slug);
+      if (error) throw error;
+      showToast('Marked as live');
+      setTimeout(() => loadSetupInfo(), 600);
+    } catch (e) {
+      console.error('Mark live error:', e);
+      btn.disabled = false;
+      label.textContent = 'Mark as live';
+      showToast('Could not update status. Try again.', 'error');
+    }
+  });
+
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
 // ============================================================
-// LIVE STATE
+// LIVE
 // ============================================================
-function renderLive(info) {
-  const digits = String(info.ai_phone_number || '').replace(/\D/g, '').slice(0, 10);
+function renderLive(info, digits) {
   const formatted = digits.length === 10 ? formatPhone(digits) : '—';
 
-  // Update header
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow live';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Live';
   document.getElementById('hero-title').innerHTML = 'Your AI receptionist is <span class="accent green">live.</span>';
@@ -1165,10 +1357,20 @@ function renderLive(info) {
           </div>
         </div>
 
-        <a href="/dashboard/" class="dashboard-cta-btn">
-          Open dashboard
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        <div class="checklist" style="margin-top: 8px; text-align:left;">
+          <div class="checklist-label">Confirm forwarding is working</div>
+          ${checklistRow('done', 'AI number assigned')}
+          ${checklistRow('done', 'Call forwarding enabled')}
+          ${checklistRow('done', 'Test call completed')}
+          ${checklistRow('done', 'AI is live')}
+        </div>
+
+        <div style="margin-top: 22px;">
+          <a href="/dashboard/" class="btn-primary" style="display:inline-flex;">
+            Open dashboard
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -1195,12 +1397,12 @@ function renderLive(info) {
 }
 
 // ============================================================
-// ERROR STATE
+// ERROR
 // ============================================================
 function renderError(msg) {
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup';
-  document.getElementById('hero-title').innerHTML = 'Hmm — <span class="accent">something\'s off.</span>';
+  document.getElementById('hero-title').innerHTML = "Hmm — <span class=\"accent\">something's off.</span>";
   document.getElementById('hero-sub').textContent = '';
   document.getElementById('business-pill').style.display = 'none';
 
@@ -1216,19 +1418,6 @@ function renderError(msg) {
     </div>
   `;
   document.getElementById('back-link').style.display = 'inline-flex';
-}
-
-// ============================================================
-// HELPERS
-// ============================================================
-function setBusinessPill(name) {
-  const pill = document.getElementById('business-pill');
-  if (name) {
-    pill.textContent = name;
-    pill.style.display = 'inline-block';
-  } else {
-    pill.style.display = 'none';
-  }
 }
 
 // ============================================================
