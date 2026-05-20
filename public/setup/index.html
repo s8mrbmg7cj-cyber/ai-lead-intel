@@ -193,6 +193,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin-bottom: 14px;
 }
 .number-big {
+  display: inline-block;
   font-family: 'Geist Mono', monospace;
   font-size: clamp(34px, 6vw, 46px);
   font-weight: 600;
@@ -202,12 +203,21 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   word-break: break-all;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.18s;
+  border-bottom: 1px dashed transparent;
+  padding-bottom: 2px;
 }
-.number-copy-btn {
+.number-big:hover { opacity: 0.88; transform: translateY(-1px); border-bottom-color: var(--brand-line); }
+.number-big:active { transform: translateY(0); opacity: 0.7; }
+.number-action-row {
+  display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+}
+.number-action-btn {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   background: var(--surface-2);
   border: 1px solid var(--border-2);
   border-radius: 9px;
@@ -218,12 +228,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-family: 'Geist Mono', monospace;
   letter-spacing: 0.04em;
 }
-.number-copy-btn:hover {
+.number-action-btn:hover {
   background: var(--surface-3);
   border-color: var(--border-3);
   color: var(--text);
 }
-.number-copy-btn.copied {
+.number-action-btn.copied {
   background: var(--green-soft);
   border-color: var(--green-line);
   color: var(--green);
@@ -239,14 +249,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-weight: 600;
   margin-bottom: 14px;
 }
-.instruction-body {
-  font-size: 15px;
-  color: var(--text-soft);
-  line-height: 1.65;
-}
-.instruction-body strong { color: var(--text); font-weight: 600; }
-.instruction-body p { margin-bottom: 14px; }
-.instruction-body p:last-child { margin-bottom: 0; }
 .instruction-body code {
   font-family: 'Geist Mono', monospace;
   background: var(--surface-3);
@@ -257,58 +259,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border: 1px solid var(--border-2);
 }
 
-.help-card {
-  background: linear-gradient(180deg, var(--brand-tint) 0%, transparent 100%), var(--surface);
-  border: 1px solid var(--brand-line);
-  border-radius: 18px;
-  padding: 24px 26px;
-  display: flex; align-items: center; gap: 16px;
-  position: relative; overflow: hidden;
-}
-.help-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--brand), transparent);
-}
-.help-icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  box-shadow: 0 8px 20px var(--brand-glow);
-  color: #fff; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-}
-.help-text { flex: 1; min-width: 0; }
-.help-title {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-bottom: 4px;
-}
-.help-desc {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-}
-.help-btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 11px 18px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
-  color: #fff;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    0 4px 14px var(--brand-glow);
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-.help-btn:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.28),
-    0 8px 24px var(--brand-glow);
-}
-
 .steps-list {
   list-style: none;
   display: flex; flex-direction: column;
@@ -317,17 +267,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .steps-list li {
   display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 11px;
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.55;
   color: var(--text-soft);
+  transition: border-color 0.15s;
 }
+.steps-list li:hover { border-color: var(--border-2); }
 .steps-list li strong { color: var(--text); font-weight: 600; }
 .step-num {
-  width: 24px; height: 24px;
+  width: 26px; height: 26px;
   border-radius: 7px;
   background: var(--brand-soft);
   border: 1px solid var(--brand-line);
@@ -338,8 +290,199 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   margin-top: 1px;
+  letter-spacing: 0.06em;
 }
 .steps-content { flex: 1; min-width: 0; }
+
+/* TRUST / REASSURANCE */
+.trust-block {
+  margin-top: 22px;
+  padding: 14px 16px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: 11px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.trust-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: rgba(52,211,153,0.18);
+  border: 1px solid var(--green-line);
+  color: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.trust-text {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+.trust-text strong { color: var(--text); font-weight: 600; }
+
+/* ACCORDION (Carrier help) */
+.accordion {
+  margin-top: 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.accordion:hover { border-color: var(--border-2); }
+.accordion.open { border-color: var(--brand-line); }
+.accordion-head {
+  width: 100%; text-align: left;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  font-size: 13.5px; font-weight: 500;
+  color: var(--text-soft);
+  transition: color 0.15s;
+}
+.accordion-head:hover { color: var(--text); }
+.accordion-toggle {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.accordion.open .accordion-toggle {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  transform: rotate(45deg);
+}
+.accordion-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.accordion-body-inner {
+  padding: 4px 16px 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.accordion.open .accordion-body { max-height: 320px; }
+.carrier-list {
+  list-style: none;
+  display: flex; flex-direction: column;
+  gap: 7px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+.carrier-list li {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+.carrier-name { color: var(--text); font-weight: 500; }
+.carrier-code {
+  font-family: 'Geist Mono', monospace;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-line);
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.accordion-note {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  line-height: 1.55;
+  margin-top: 4px;
+}
+
+/* TEST AI BLOCK */
+.test-card {
+  background:
+    radial-gradient(circle at 0% 0%, var(--brand-tint) 0%, transparent 70%),
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--brand-line);
+  border-radius: 18px;
+  padding: 28px 26px;
+  position: relative; overflow: hidden;
+  display: flex; gap: 18px; align-items: center;
+}
+.test-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+}
+.test-icon {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 8px 20px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.test-text { flex: 1; min-width: 0; }
+.test-eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.test-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.test-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.test-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
+  color: #fff;
+  border-radius: 11px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 4px 14px var(--brand-glow);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.test-btn::before {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transition: left 0.6s;
+}
+.test-btn:hover::before { left: 100%; }
+.test-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 10px 28px var(--brand-glow);
+}
 
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
@@ -351,12 +494,36 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .back-link:hover { color: var(--text); }
 
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface-2);
+  border: 1px solid var(--green-line);
+  color: var(--green);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: 'Geist Mono', monospace;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+  z-index: 200;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 @media (max-width: 620px) {
   .topnav { padding: 12px 16px; }
   .wrap { padding: 36px 16px 80px; }
   .card { padding: 24px 20px; border-radius: 16px; }
-  .help-card { padding: 20px; flex-direction: column; align-items: flex-start; text-align: left; gap: 14px; }
-  .help-btn { width: 100%; justify-content: center; }
+  .test-card { padding: 22px; flex-direction: column; align-items: flex-start; text-align: left; gap: 16px; }
+  .test-btn { width: 100%; justify-content: center; }
   .hero-title { font-size: 28px; }
   .number-big { font-size: 32px; }
 }
@@ -377,62 +544,106 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   <header class="hero">
     <div class="hero-eyebrow"><span class="dot"></span>Last Step · Forward Your Calls</div>
     <h1 class="hero-title">One step to <span class="accent">go live.</span></h1>
-    <p class="hero-sub">Forward your business calls to your AI receptionist. Takes 2 minutes — or we'll walk you through it on the phone.</p>
+    <p class="hero-sub">Forward your business calls to your AI receptionist. Takes about 2 minutes.</p>
     <div id="business-pill" class="hero-business" style="display:none;"></div>
   </header>
 
   <div class="card">
 
+    <!-- AI NUMBER -->
     <div class="number-block">
       <div class="number-label">Your AI receptionist number</div>
-      <div class="number-big" id="ai-number">(555) 123-4567</div>
-      <button class="number-copy-btn" id="copy-btn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="copy-text">Copy number</span>
-      </button>
+      <a href="#" id="ai-number-link" class="number-big" title="Tap to call">(801) 555-4821</a>
+      <div class="number-action-row">
+        <button class="number-action-btn" id="copy-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copy-text">Copy number</span>
+        </button>
+        <a href="#" id="call-btn" class="number-action-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call
+        </a>
+      </div>
     </div>
 
+    <!-- 3 STEPS -->
     <div class="instruction-block">
       <div class="instruction-title">How to forward your calls</div>
-      <ol class="steps-list">
-        <li>
-          <div class="step-num">1</div>
-          <div class="steps-content">
-            From your <strong>business phone</strong>, dial <code>*72</code>
+      <div class="instruction-body">
+        <ol class="steps-list">
+          <li>
+            <div class="step-num">01</div>
+            <div class="steps-content">
+              From your <strong>business phone</strong>, dial <code>*72</code>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">02</div>
+            <div class="steps-content">
+              Enter your <strong>AI receptionist number</strong>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">03</div>
+            <div class="steps-content">
+              Call your business number from another phone to <strong>test it</strong>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- TRUST BLOCK -->
+      <div class="trust-block">
+        <div class="trust-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="trust-text">
+          <strong>Your business number stays the same.</strong> You can turn call forwarding off anytime by dialing <code style="font-family:'Geist Mono',monospace;background:var(--surface-3);color:var(--brand);padding:1px 6px;border-radius:4px;font-size:12px;border:1px solid var(--border-2);">*73</code> on your business phone.
+        </div>
+      </div>
+
+      <!-- COLLAPSIBLE CARRIER HELP -->
+      <div class="accordion" id="carrier-accordion">
+        <button class="accordion-head" type="button" id="carrier-toggle">
+          <span>My carrier's forwarding code isn't working</span>
+          <span class="accordion-toggle">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            <p class="accordion-note">Different carriers use slightly different forwarding methods. Try the one that matches your provider:</p>
+            <ul class="carrier-list">
+              <li><span class="carrier-name">Verizon</span><span class="carrier-code">*72</span></li>
+              <li><span class="carrier-name">AT&amp;T</span><span class="carrier-code">*72</span></li>
+              <li><span class="carrier-name">T-Mobile</span><span class="carrier-code">**21*</span></li>
+              <li><span class="carrier-name">Xfinity / Comcast</span><span class="carrier-code">*72</span></li>
+              <li><span class="carrier-name">Google Voice</span><span class="carrier-code">Settings → Calls → Forwarding</span></li>
+            </ul>
+            <p class="accordion-note">For T-Mobile, dial <code style="font-family:'Geist Mono',monospace;background:var(--surface-3);color:var(--brand);padding:1px 6px;border-radius:4px;font-size:11.5px;border:1px solid var(--border-2);">**21*</code> followed by your AI number, then <code style="font-family:'Geist Mono',monospace;background:var(--surface-3);color:var(--brand);padding:1px 6px;border-radius:4px;font-size:11.5px;border:1px solid var(--border-2);">#</code> and press call.</p>
           </div>
-        </li>
-        <li>
-          <div class="step-num">2</div>
-          <div class="steps-content">
-            Wait for the tone, then dial the <strong>AI number above</strong>
-          </div>
-        </li>
-        <li>
-          <div class="step-num">3</div>
-          <div class="steps-content">
-            Hang up. Forwarding is active — call your business number from a different phone to test it.
-          </div>
-        </li>
-      </ol>
-      <p style="margin-top: 14px; font-size: 12.5px; color: var(--text-faint); line-height: 1.55;">
-        Different carriers use slightly different codes. If <code>*72</code> doesn't work, that's totally normal — just click the button below and we'll get you set up in a few minutes.
-      </p>
+        </div>
+      </div>
     </div>
 
   </div>
 
-  <!-- HELP CARD -->
-  <div class="help-card">
-    <div class="help-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  <!-- TEST YOUR AI -->
+  <div class="test-card">
+    <div class="test-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
     </div>
-    <div class="help-text">
-      <div class="help-title">Want me to walk you through it?</div>
-      <div class="help-desc">Most setups take less than 5 minutes on the phone. I'll call you when you're ready.</div>
+    <div class="test-text">
+      <div class="test-eyebrow">Hear it for yourself</div>
+      <div class="test-title">Want to hear your AI receptionist before going live?</div>
+      <div class="test-desc">Call it directly. The AI will answer just like it will for your customers.</div>
     </div>
-    <a href="sms:+13856008134?body=Hey%20Andrew%2C%20I'm%20ready%20to%20set%20up%20forwarding%20for%20my%20AI%20receptionist.%20When%20can%20you%20call%20me%3F" class="help-btn">
-      Text me
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    <a href="#" id="test-btn" class="test-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Call &amp; test your AI
     </a>
   </div>
 
@@ -443,6 +654,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 </div>
 
+<div class="toast" id="toast">Number copied</div>
+
 <script>
 function formatPhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
@@ -451,13 +664,28 @@ function formatPhone(raw) {
 }
 
 const params = new URLSearchParams(window.location.search);
-const aiNumber = params.get('aiNumber');
+const aiNumberParam = params.get('aiNumber');
 const business = params.get('business');
 
-if (aiNumber) {
-  const formatted = formatPhone(aiNumber);
-  document.getElementById('ai-number').textContent = formatted;
+const numberEl = document.getElementById('ai-number-link');
+const callBtn = document.getElementById('call-btn');
+const testBtn = document.getElementById('test-btn');
+
+// Default placeholder number
+let activeNumber = '8015554821';
+
+if (aiNumberParam) {
+  activeNumber = String(aiNumberParam).replace(/\D/g, '').slice(0, 10);
+  if (activeNumber.length === 10) {
+    numberEl.textContent = formatPhone(activeNumber);
+  }
 }
+
+// Tap-to-call wiring
+const telHref = `tel:+1${activeNumber}`;
+numberEl.setAttribute('href', telHref);
+callBtn.setAttribute('href', telHref);
+testBtn.setAttribute('href', telHref);
 
 if (business) {
   const pill = document.getElementById('business-pill');
@@ -465,22 +693,47 @@ if (business) {
   pill.style.display = 'inline-block';
 }
 
-document.getElementById('copy-btn').addEventListener('click', async () => {
-  const number = document.getElementById('ai-number').textContent.replace(/\D/g, '');
+// Copy number
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 1800);
+}
+
+async function copyNumber() {
   try {
-    await navigator.clipboard.writeText(number);
+    await navigator.clipboard.writeText(activeNumber);
     const btn = document.getElementById('copy-btn');
     const text = document.getElementById('copy-text');
-    const original = text.textContent;
     text.textContent = 'Copied';
     btn.classList.add('copied');
+    showToast('Number copied');
     setTimeout(() => {
-      text.textContent = original;
+      text.textContent = 'Copy number';
       btn.classList.remove('copied');
     }, 1800);
   } catch (e) {
-    console.log('Copy failed:', e);
+    // Fallback: select the number text
+    showToast('Long-press the number to copy');
   }
+}
+
+document.getElementById('copy-btn').addEventListener('click', copyNumber);
+
+// Tap the big number → on desktop, copy; on mobile, the tel: link handles it
+numberEl.addEventListener('click', (e) => {
+  // On desktop (no tel: support), copy instead of trying to call
+  if (!('ontouchstart' in window) && !navigator.userAgent.match(/Mobi|Android|iPhone/i)) {
+    e.preventDefault();
+    copyNumber();
+  }
+  // On mobile, let the tel: link fire normally
+});
+
+// Accordion toggle
+document.getElementById('carrier-toggle').addEventListener('click', () => {
+  document.getElementById('carrier-accordion').classList.toggle('open');
 });
 </script>
 
