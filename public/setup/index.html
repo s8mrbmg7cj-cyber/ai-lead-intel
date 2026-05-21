@@ -274,7 +274,6 @@ input, select, textarea { font-family: inherit; outline: none; }
 .number-action-btn:hover { background: var(--surface-3); border-color: var(--border-3); color: var(--text); }
 .number-action-btn.copied { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
 
-/* CLEAR INSTRUCTIONS (new) */
 .clear-instructions {
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -316,29 +315,6 @@ input, select, textarea { font-family: inherit; outline: none; }
   font-size: 13px; border: 1px solid var(--border-2);
 }
 
-.steps-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.steps-list li {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 14px 16px;
-  background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 11px;
-  font-size: 14.5px; line-height: 1.55; color: var(--text-soft);
-  transition: border-color 0.15s;
-}
-.steps-list li:hover { border-color: var(--border-2); }
-.steps-list li strong { color: var(--text); font-weight: 600; }
-.step-num {
-  width: 26px; height: 26px; border-radius: 7px;
-  background: var(--brand-soft); border: 1px solid var(--brand-line);
-  color: var(--brand);
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 1px; letter-spacing: 0.06em;
-}
-.steps-content { flex: 1; min-width: 0; }
-
-/* PROVIDER PICKER (new) */
 .provider-block { margin-bottom: 22px; }
 .provider-label {
   font-family: 'Geist Mono', monospace;
@@ -621,6 +597,15 @@ input, select, textarea { font-family: inherit; outline: none; }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.error { border-color: rgba(248,113,113,0.4); color: #f87171; }
 
+.spinner-inline {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
 @media (max-width: 620px) {
   .topnav { padding: 12px 16px; }
   .wrap { padding: 36px 16px 80px; }
@@ -680,30 +665,23 @@ const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
-// PHONE NUMBER HELPERS
+// HELPERS
 // ============================================================
 function normalizeUsNumber(raw) {
   let digits = String(raw || '').replace(/\D/g, '');
-  if (digits.length === 11 && digits.startsWith('1')) {
-    digits = digits.slice(1);
-  }
-  if (digits.length > 10) {
-    digits = digits.slice(-10);
-  }
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+  if (digits.length > 10) digits = digits.slice(-10);
   return digits;
 }
-
 function formatPhone(raw) {
   const digits = normalizeUsNumber(raw);
   if (digits.length !== 10) return raw;
   return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6,10)}`;
 }
-
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
 function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -711,7 +689,6 @@ function showToast(msg, type = 'success') {
   toast.classList.add('visible');
   setTimeout(() => toast.classList.remove('visible'), 1800);
 }
-
 async function copyToClipboard(text, btnEl, btnTextEl, successMsg = 'Copied') {
   try {
     await navigator.clipboard.writeText(text);
@@ -730,7 +707,6 @@ async function copyToClipboard(text, btnEl, btnTextEl, successMsg = 'Copied') {
     showToast('Long-press the text to copy', 'error');
   }
 }
-
 function setBusinessPill(name) {
   const pill = document.getElementById('business-pill');
   if (name) {
@@ -740,7 +716,6 @@ function setBusinessPill(name) {
     pill.style.display = 'none';
   }
 }
-
 function checklistRow(state, label) {
   const iconMap = {
     done: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
@@ -757,33 +732,19 @@ function checklistRow(state, label) {
   `;
 }
 
-// ============================================================
-// URL PARAMS
-// ============================================================
 const params = new URLSearchParams(window.location.search);
 const slug = params.get('slug');
 
-// ============================================================
-// LOAD SETUP INFO
-// ============================================================
 async function loadSetupInfo() {
-  if (!slug) {
-    renderGenericPending();
-    return;
-  }
-
+  if (!slug) { renderGenericPending(); return; }
   try {
-    const { data, error } = await supabase
-      .rpc('get_setup_info', { p_slug: slug });
-
+    const { data, error } = await supabase.rpc('get_setup_info', { p_slug: slug });
     if (error) throw error;
-
     if (!data || data.length === 0) {
       renderError("We couldn't find your account. Double-check the link from your email or contact support.");
       return;
     }
-    const info = data[0];
-    renderByStatus(info);
+    renderByStatus(data[0]);
   } catch (e) {
     console.error('[SETUP] Load error:', e);
     renderError("We couldn't load your setup details right now. Please try again, or contact support.");
@@ -794,26 +755,17 @@ function renderByStatus(info) {
   const status = (info.ai_setup_status || 'pending').toLowerCase();
   const digits = normalizeUsNumber(info.ai_phone_number);
   const hasNumber = digits.length === 10;
-
-  if (status === 'live') {
-    renderLive(info, digits);
-  } else if (status === 'ready' && hasNumber) {
-    renderReady(info, digits);
-  } else {
-    renderPending(info);
-  }
+  if (status === 'live') renderLive(info, digits);
+  else if (status === 'ready' && hasNumber) renderReady(info, digits);
+  else renderPending(info);
 }
 
-// ============================================================
-// GENERIC PENDING (no slug)
-// ============================================================
 function renderGenericPending() {
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow pending';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup';
   document.getElementById('hero-title').innerHTML = 'Open your <span class="accent">setup link</span>';
   document.getElementById('hero-sub').textContent = 'This page is personalized to your account. Open the setup link we emailed you to continue.';
   document.getElementById('business-pill').style.display = 'none';
-
   document.getElementById('content').innerHTML = `
     <div class="card">
       <div class="state-pending">
@@ -829,16 +781,12 @@ function renderGenericPending() {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// ============================================================
-// PENDING (slug found, AI not ready yet)
-// ============================================================
 function renderPending(info) {
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow pending';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup in progress';
   document.getElementById('hero-title').innerHTML = 'Configuring your <span class="accent">AI receptionist</span>';
   document.getElementById('hero-sub').textContent = "We're building your AI and assigning a dedicated number. You'll get an email the moment it's ready.";
   setBusinessPill(info.business_name);
-
   document.getElementById('content').innerHTML = `
     <div class="card">
       <div class="state-pending">
@@ -847,7 +795,6 @@ function renderPending(info) {
         </div>
         <div class="pending-title">Your AI receptionist number is being configured</div>
         <div class="pending-sub">We're building your AI and assigning a dedicated number. You'll get an email the moment it's ready — usually within a few hours.</div>
-
         <div class="checklist" style="max-width: 420px; margin: 0 auto;">
           <div class="checklist-label">What's happening</div>
           ${checklistRow('done', 'Account created')}
@@ -861,13 +808,8 @@ function renderPending(info) {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// ============================================================
-// PROVIDER INSTRUCTIONS
-// ============================================================
 function providerInstructions(providerKey, digits) {
   const formatted = formatPhone(digits);
-  const fwdCode = `*72${digits}`;
-
   switch (providerKey) {
     case 'mobile':
       return `
@@ -920,9 +862,6 @@ function providerInstructions(providerKey, digits) {
   }
 }
 
-// ============================================================
-// READY STATE
-// ============================================================
 function renderReady(info, digits) {
   const formatted = formatPhone(digits);
   const telHref = `tel:+1${digits}`;
@@ -936,8 +875,6 @@ function renderReady(info, digits) {
 
   document.getElementById('content').innerHTML = `
     <div class="card">
-
-      <!-- NUMBER -->
       <div class="number-block">
         <div class="number-label">Your AI receptionist number</div>
         <a href="${telHref}" id="ai-number-link" class="number-big">${escapeHtml(formatted)}</a>
@@ -949,28 +886,14 @@ function renderReady(info, digits) {
         </div>
       </div>
 
-      <!-- CLEAR INSTRUCTIONS -->
       <div class="clear-instructions">
         <div class="clear-instructions-title">How this works</div>
-        <div class="clear-instruction">
-          <div class="clear-instruction-bullet"></div>
-          <div><strong>Keep your current business number.</strong> Customers still dial your normal number.</div>
-        </div>
-        <div class="clear-instruction">
-          <div class="clear-instruction-bullet"></div>
-          <div><strong>Forward missed or all business calls to your AI receptionist number.</strong></div>
-        </div>
-        <div class="clear-instruction">
-          <div class="clear-instruction-bullet"></div>
-          <div><strong>After forwarding, call your business number from another phone to test it.</strong></div>
-        </div>
-        <div class="clear-instruction">
-          <div class="clear-instruction-bullet"></div>
-          <div><strong>If the AI answers, click "Mark as live" below.</strong></div>
-        </div>
+        <div class="clear-instruction"><div class="clear-instruction-bullet"></div><div><strong>Keep your current business number.</strong> Customers still dial your normal number.</div></div>
+        <div class="clear-instruction"><div class="clear-instruction-bullet"></div><div><strong>Forward missed or all business calls to your AI receptionist number.</strong></div></div>
+        <div class="clear-instruction"><div class="clear-instruction-bullet"></div><div><strong>After forwarding, call your business number from another phone to test it.</strong></div></div>
+        <div class="clear-instruction"><div class="clear-instruction-bullet"></div><div><strong>If the AI answers, click "Mark as live" below.</strong></div></div>
       </div>
 
-      <!-- PROVIDER PICKER -->
       <div class="provider-block">
         <div class="provider-label">What phone system do you use?</div>
         <div class="provider-select-wrap">
@@ -986,7 +909,6 @@ function renderReady(info, digits) {
           </select>
         </div>
         <div class="provider-detail" id="provider-detail" style="display:none;"></div>
-
         <div class="forward-code-card" id="forward-code-card" style="display:none;">
           <div class="forward-code-info">
             <div class="forward-code-label">Mobile forwarding code</div>
@@ -999,7 +921,6 @@ function renderReady(info, digits) {
         </div>
       </div>
 
-      <!-- SAFETY/TRUST -->
       <div class="trust-block">
         <div class="trust-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -1012,7 +933,6 @@ function renderReady(info, digits) {
         </div>
       </div>
 
-      <!-- SETUP CHECKLIST -->
       <div class="instruction-block" style="margin-top: 22px; margin-bottom: 0;">
         <div class="instruction-title">Setup progress</div>
         <div class="checklist">
@@ -1025,7 +945,6 @@ function renderReady(info, digits) {
       </div>
     </div>
 
-    <!-- TEST CALL CARD -->
     <div class="test-card">
       <div class="test-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
@@ -1041,7 +960,6 @@ function renderReady(info, digits) {
       </a>
     </div>
 
-    <!-- MARK AS LIVE -->
     <div class="live-action-card">
       <div class="live-action-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1057,7 +975,7 @@ function renderReady(info, digits) {
     </div>
   `;
 
-  // Wire up COPY NUMBER button + tap-to-call number
+  // COPY NUMBER button + tap-to-call
   const copyBtn = document.getElementById('copy-btn');
   const copyText = document.getElementById('copy-text');
   copyBtn.addEventListener('click', () => copyToClipboard(digits, copyBtn, copyText, 'Number copied'));
@@ -1070,11 +988,10 @@ function renderReady(info, digits) {
     }
   });
 
-  // Wire up PROVIDER DROPDOWN
+  // PROVIDER DROPDOWN
   const providerSelect = document.getElementById('provider-select');
   const providerDetail = document.getElementById('provider-detail');
   const forwardCodeCard = document.getElementById('forward-code-card');
-
   providerSelect.addEventListener('change', (e) => {
     const val = e.target.value;
     if (!val) {
@@ -1084,18 +1001,17 @@ function renderReady(info, digits) {
     }
     providerDetail.innerHTML = providerInstructions(val, digits);
     providerDetail.style.display = 'block';
-    // Show forwarding code card only for mobile/landline (the *72 carriers)
     forwardCodeCard.style.display = (val === 'mobile' || val === 'landline') ? 'flex' : 'none';
   });
 
-  // Wire up COPY FORWARDING CODE button
+  // COPY FORWARDING CODE button
   const copyCodeBtn = document.getElementById('copy-code-btn');
   const copyCodeText = document.getElementById('copy-code-text');
   copyCodeBtn.addEventListener('click', () => {
     copyToClipboard(forwardCode, copyCodeBtn, copyCodeText, 'Forwarding code copied');
   });
 
-  // Wire up TEST CALL button (extra logging for desktop where tel: doesn't work)
+  // TEST CALL button
   const testBtn = document.getElementById('test-call-btn');
   testBtn.addEventListener('click', (e) => {
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -1103,37 +1019,51 @@ function renderReady(info, digits) {
       e.preventDefault();
       copyToClipboard(digits, null, null, `Number copied — call ${formatted} from your phone`);
     }
-    // On mobile, let the tel: link fire normally
   });
 
-  // Wire up MARK AS LIVE
+  // ============================================================
+  // MARK AS LIVE — now calls /api/mark-live (server-side)
+  // ============================================================
   const markBtn = document.getElementById('mark-live-btn');
   const markLabel = document.getElementById('mark-live-label');
+
   markBtn.addEventListener('click', async () => {
+    if (markBtn.disabled) return;
     markBtn.disabled = true;
-    markLabel.textContent = 'Marking...';
+    markLabel.innerHTML = '<span class="spinner-inline"></span> Marking...';
+
     try {
-      const { data, error } = await supabase
-        .from('clients')
-        .update({ ai_setup_status: 'live' })
-        .eq('client_slug', slug)
-        .select('id, ai_setup_status');
+      const response = await fetch('/api/mark-live', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_slug: slug }),
+      });
 
-      if (error) {
-        console.error('[SETUP] Mark-live update error:', error);
-        throw error;
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (parseErr) {
+        console.error('[SETUP] Could not parse mark-live response:', parseErr);
       }
 
-      if (!data || data.length === 0) {
-        console.error('[SETUP] Mark-live updated 0 rows. Check that the anon role has UPDATE permission on public.clients via RLS, or that the slug exists.');
-        throw new Error('No rows updated. Contact support.');
+      if (!response.ok || !payload || !payload.success) {
+        const errMsg = (payload && payload.error) || `HTTP ${response.status}`;
+        console.error('[SETUP] Mark-live failed:', errMsg, payload);
+        throw new Error(errMsg);
       }
 
-      console.log('[SETUP] Mark-live OK:', data);
-      showToast('Your AI receptionist is live');
-      setTimeout(() => loadSetupInfo(), 700);
+      console.log('[SETUP] Mark-live success:', payload);
+      showToast('Your AI receptionist is now live');
+
+      // Re-render immediately with the data from the API response
+      setTimeout(() => {
+        renderLive(
+          { business_name: payload.business_name || info.business_name },
+          normalizeUsNumber(payload.ai_phone_number || info.ai_phone_number)
+        );
+      }, 500);
     } catch (e) {
-      console.error('[SETUP] Mark-live failed:', e);
+      console.error('[SETUP] Mark-live error:', e);
       markBtn.disabled = false;
       markLabel.textContent = 'Mark as live';
       showToast('Could not mark as live. Check console for details.', 'error');
@@ -1143,15 +1073,12 @@ function renderReady(info, digits) {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// ============================================================
-// LIVE STATE
-// ============================================================
 function renderLive(info, digits) {
   const formatted = digits.length === 10 ? formatPhone(digits) : '—';
 
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow live';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Live';
-  document.getElementById('hero-title').innerHTML = 'Your AI receptionist is <span class="accent green">live.</span>';
+  document.getElementById('hero-title').innerHTML = 'Your AI receptionist is <span class="accent green">now live.</span>';
   document.getElementById('hero-sub').textContent = 'Calls are being answered. Check your dashboard for incoming leads.';
   setBusinessPill(info.business_name);
 
@@ -1203,20 +1130,15 @@ function renderLive(info, digits) {
       </div>
     </div>
   `;
-
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// ============================================================
-// ERROR
-// ============================================================
 function renderError(msg) {
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Setup';
   document.getElementById('hero-title').innerHTML = "Hmm — <span class=\"accent\">something's off.</span>";
   document.getElementById('hero-sub').textContent = '';
   document.getElementById('business-pill').style.display = 'none';
-
   document.getElementById('content').innerHTML = `
     <div class="card">
       <div class="state-error">
@@ -1231,7 +1153,6 @@ function renderError(msg) {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// INIT
 loadSetupInfo();
 </script>
 
