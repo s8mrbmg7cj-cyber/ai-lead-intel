@@ -2,7 +2,7 @@
 //
 // Sends a customer their personalized setup link via email.
 // VERBOSE LOGGING — surfaces every step in Vercel logs.
-
+ 
 const NTFY_TOPIC = 'mcr-leads-andrew-2025';
 const FROM_EMAIL = 'AI Lead Intel <hello@aileadintel.com>';
 const REPLY_TO = 'hello@aileadintel.com';
