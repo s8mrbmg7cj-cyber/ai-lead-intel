@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System Health · AI Lead Intel</title>
+<script src="/error-reporter.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a;
+  --bg-2: #0c0c0f;
+  --surface: #111114;
+  --surface-2: #16161b;
+  --surface-3: #1c1c22;
+  --border: rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.10);
+  --border-3: rgba(255,255,255,0.14);
+  --text: #fafafa;
+  --text-soft: #d4d4d8;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
+  --brand: #ff6a00;
+  --brand-2: #ff9a00;
+  --brand-glow: rgba(255,106,0,0.32);
+  --brand-soft: rgba(255,106,0,0.10);
+  --brand-line: rgba(255,106,0,0.22);
+  --green: #34d399;
+  --green-soft: rgba(52,211,153,0.10);
+  --green-line: rgba(52,211,153,0.30);
+  --red: #f87171;
+  --red-soft: rgba(248,113,113,0.10);
+  --red-line: rgba(248,113,113,0.30);
+  --yellow: #fbbf24;
+  --yellow-soft: rgba(251,191,36,0.10);
+  --yellow-line: rgba(251,191,36,0.30);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased; line-height: 1.55;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.10), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 100% 0%, rgba(255,154,0,0.06), transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,10,0.72);
+  backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  position: relative; overflow: hidden;
+}
+.logo-mark::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22));
+}
+.nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-dim); }
+.nav-right a { transition: color 0.15s; }
+.nav-right a:hover { color: var(--text); }
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 44px 28px 80px;
+}
+
+.page-head { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.page-eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--brand);
+  font-weight: 600; margin-bottom: 6px;
+}
+.page-title { font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; }
+.page-title .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.refresh-info {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; color: var(--text-faint);
+  letter-spacing: 0.06em;
+  display: flex; align-items: center; gap: 10px;
+}
+.refresh-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.6);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.7); }
+}
+
+/* OVERALL BANNER */
+.overall-banner {
+  border-radius: 18px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 18px;
+  border: 1px solid;
+  position: relative; overflow: hidden;
+  transition: all 0.2s;
+}
+.overall-banner.healthy { background: var(--green-soft); border-color: var(--green-line); }
+.overall-banner.degraded { background: var(--yellow-soft); border-color: var(--yellow-line); }
+.overall-banner.down { background: var(--red-soft); border-color: var(--red-line); }
+.overall-banner.loading { background: var(--surface-2); border-color: var(--border-2); }
+.overall-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.overall-banner.healthy .overall-icon { background: rgba(52,211,153,0.2); color: var(--green); }
+.overall-banner.degraded .overall-icon { background: rgba(251,191,36,0.2); color: var(--yellow); }
+.overall-banner.down .overall-icon { background: rgba(248,113,113,0.2); color: var(--red); }
+.overall-banner.loading .overall-icon { background: var(--surface-3); color: var(--text-faint); }
+.overall-text { flex: 1; min-width: 0; }
+.overall-status {
+  font-size: 11px; font-family: 'Geist Mono', monospace;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 4px;
+}
+.overall-banner.healthy .overall-status { color: var(--green); }
+.overall-banner.degraded .overall-status { color: var(--yellow); }
+.overall-banner.down .overall-status { color: var(--red); }
+.overall-banner.loading .overall-status { color: var(--text-faint); }
+.overall-title { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; }
+.overall-sub { font-size: 13.5px; color: var(--text-dim); margin-top: 3px; }
+
+/* CHECK CARDS */
+.checks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 740px) { .checks-grid { grid-template-columns: 1fr; } }
+
+.check-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.18s;
+}
+.check-card:hover { border-color: var(--border-2); }
+.check-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--surface-3); transition: background 0.2s;
+}
+.check-card.ok::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+.check-card.error::before { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.check-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.check-name {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600;
+}
+.check-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 99px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 700;
+  border: 1px solid;
+}
+.check-badge.ok { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+.check-badge.error { color: var(--red); background: var(--red-soft); border-color: var(--red-line); }
+.check-badge.loading { color: var(--text-faint); background: var(--surface-3); border-color: var(--border-2); }
+.check-badge-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+}
+.check-value {
+  font-size: 28px; font-weight: 600; letter-spacing: -0.025em;
+  margin-bottom: 5px; line-height: 1;
+}
+.check-value.error-msg { font-size: 13px; color: var(--red); line-height: 1.45; font-weight: 500; }
+.check-meta { font-size: 12px; color: var(--text-faint); }
+
+/* ACTIVITY */
+.activity-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 26px;
+}
+.activity-title {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 18px;
+}
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 620px) { .activity-grid { grid-template-columns: 1fr; } }
+.activity-item {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.activity-item-label {
+  font-size: 11.5px; color: var(--text-faint); font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.activity-item-value {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.015em;
+}
+.activity-item-meta { font-size: 12px; color: var(--text-dim); }
+.activity-item-meta.stale { color: var(--yellow); }
+
+.btn-refresh {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  font-size: 12.5px; color: var(--text-dim);
+  font-weight: 500;
+  transition: all 0.15s;
+  font-family: 'Geist Mono', monospace;
+  letter-spacing: 0.04em;
+}
+.btn-refresh:hover { background: var(--surface-3); border-color: var(--border-3); color: var(--text); }
+.btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.spin { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/admin" class="logo">
+    <div class="logo-mark"></div>
+    <span>AI Lead Intel · Admin</span>
+  </a>
+  <div class="nav-right">
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/health" style="color: var(--text);">Health</a>
+    <a href="/">Site</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div>
+      <div class="page-eyebrow">System Status</div>
+      <h1 class="page-title">Operational <span class="accent">health</span></h1>
+    </div>
+    <div class="refresh-info">
+      <span class="refresh-dot"></span>
+      <span id="refresh-text">Refreshing every 60s</span>
+      <button class="btn-refresh" id="refresh-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- OVERALL -->
+  <div class="overall-banner loading" id="overall-banner">
+    <div class="overall-icon" id="overall-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+    </div>
+    <div class="overall-text">
+      <div class="overall-status" id="overall-status">Checking...</div>
+      <div class="overall-title" id="overall-title">Running diagnostics</div>
+      <div class="overall-sub" id="overall-sub">Querying Supabase, Twilio, and Vapi</div>
+    </div>
+  </div>
+
+  <!-- CHECKS -->
+  <div class="checks-grid">
+    <div class="check-card" id="check-supabase">
+      <div class="check-head">
+        <div class="check-name">Supabase</div>
+        <div class="check-badge loading"><span class="check-badge-dot"></span><span>Checking</span></div>
+      </div>
+      <div class="check-value" id="supabase-value">—</div>
+      <div class="check-meta" id="supabase-meta">Database connection</div>
+    </div>
+
+    <div class="check-card" id="check-twilio">
+      <div class="check-head">
+        <div class="check-name">Twilio</div>
+        <div class="check-badge loading"><span class="check-badge-dot"></span><span>Checking</span></div>
+      </div>
+      <div class="check-value" id="twilio-value">—</div>
+      <div class="check-meta" id="twilio-meta">Phone numbers</div>
+    </div>
+
+    <div class="check-card" id="check-vapi">
+      <div class="check-head">
+        <div class="check-name">Vapi</div>
+        <div class="check-badge loading"><span class="check-badge-dot"></span><span>Checking</span></div>
+      </div>
+      <div class="check-value" id="vapi-value">—</div>
+      <div class="check-meta" id="vapi-meta">AI assistants</div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div class="activity-card">
+    <div class="activity-title">Recent activity (last 24h)</div>
+    <div class="activity-grid">
+      <div class="activity-item">
+        <div class="activity-item-label">Calls captured</div>
+        <div class="activity-item-value" id="calls-24h">—</div>
+        <div class="activity-item-meta" id="last-call">Last: —</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-item-label">Onboarding submissions</div>
+        <div class="activity-item-value" id="onboardings-24h">—</div>
+        <div class="activity-item-meta" id="last-onboarding">Last: —</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function timeAgo(iso) {
+  if (!iso) return 'never';
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return Math.floor(diff / 86400000) + 'd ago';
+}
+
+function setBadge(cardId, state, text) {
+  const card = document.getElementById(cardId);
+  const badge = card.querySelector('.check-badge');
+  badge.className = 'check-badge ' + state;
+  badge.innerHTML = `<span class="check-badge-dot"></span><span>${text}</span>`;
+  card.classList.remove('ok', 'error');
+  if (state === 'ok') card.classList.add('ok');
+  else if (state === 'error') card.classList.add('error');
+}
+
+function setOverall(state, status, title, sub) {
+  const banner = document.getElementById('overall-banner');
+  banner.className = 'overall-banner ' + state;
+
+  const iconMap = {
+    healthy: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    degraded: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    down: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+  };
+  document.getElementById('overall-icon').innerHTML = iconMap[state] || '';
+  document.getElementById('overall-status').textContent = status;
+  document.getElementById('overall-title').textContent = title;
+  document.getElementById('overall-sub').textContent = sub;
+}
+
+async function runHealthCheck() {
+  const refreshBtn = document.getElementById('refresh-btn');
+  refreshBtn.disabled = true;
+  refreshBtn.querySelector('svg').classList.add('spin');
+
+  try {
+    const res = await fetch('/api/health-check', { cache: 'no-store' });
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    console.error('[health] fetch failed:', e);
+    setOverall('down', 'Down', "We couldn't reach the health endpoint", 'Check Vercel deployments');
+  } finally {
+    refreshBtn.disabled = false;
+    refreshBtn.querySelector('svg').classList.remove('spin');
+  }
+}
+
+function render(data) {
+  // Supabase
+  if (data.checks.supabase.ok) {
+    setBadge('check-supabase', 'ok', 'Operational');
+    document.getElementById('supabase-value').textContent = data.checks.supabase.ms + 'ms';
+    document.getElementById('supabase-meta').textContent = 'Database responding';
+  } else {
+    setBadge('check-supabase', 'error', 'Down');
+    document.getElementById('supabase-value').textContent = 'Error';
+    document.getElementById('supabase-value').classList.add('error-msg');
+    document.getElementById('supabase-meta').textContent = data.checks.supabase.error || 'Connection failed';
+  }
+
+  // Twilio
+  if (data.checks.twilio.ok) {
+    setBadge('check-twilio', 'ok', 'Operational');
+    document.getElementById('twilio-value').textContent = data.checks.twilio.count;
+    document.getElementById('twilio-meta').textContent = data.checks.twilio.count === 1 ? 'Active phone number' : 'Active phone numbers';
+  } else {
+    setBadge('check-twilio', 'error', 'Down');
+    document.getElementById('twilio-value').textContent = 'Error';
+    document.getElementById('twilio-value').classList.add('error-msg');
+    document.getElementById('twilio-meta').textContent = data.checks.twilio.error || 'Connection failed';
+  }
+
+  // Vapi
+  if (data.checks.vapi.ok) {
+    setBadge('check-vapi', 'ok', 'Operational');
+    document.getElementById('vapi-value').textContent = data.checks.vapi.count;
+    document.getElementById('vapi-meta').textContent = data.checks.vapi.count === 1 ? 'Active AI assistant' : 'Active AI assistants';
+  } else {
+    setBadge('check-vapi', 'error', 'Down');
+    document.getElementById('vapi-value').textContent = 'Error';
+    document.getElementById('vapi-value').classList.add('error-msg');
+    document.getElementById('vapi-meta').textContent = data.checks.vapi.error || 'Connection failed';
+  }
+
+  // Activity
+  document.getElementById('calls-24h').textContent = data.checks.activity.calls_24h;
+  document.getElementById('onboardings-24h').textContent = data.checks.activity.onboardings_24h;
+  document.getElementById('last-call').textContent = 'Last: ' + timeAgo(data.checks.activity.last_call_at);
+  document.getElementById('last-onboarding').textContent = 'Last: ' + timeAgo(data.checks.activity.last_onboarding_at);
+
+  // Overall
+  if (data.overall === 'healthy') {
+    setOverall('healthy', 'All systems operational', 'Everything is running normally', 'Supabase, Twilio, and Vapi all healthy');
+  } else if (data.overall === 'degraded') {
+    const broken = [];
+    if (!data.checks.supabase.ok) broken.push('Supabase');
+    if (!data.checks.twilio.ok) broken.push('Twilio');
+    if (!data.checks.vapi.ok) broken.push('Vapi');
+    setOverall('degraded', 'Partial outage', `${broken.join(', ')} ${broken.length === 1 ? 'is' : 'are'} unreachable`, 'Other systems still working');
+  } else {
+    setOverall('down', 'Major outage', 'Critical systems are down', 'Check Vercel logs and env vars');
+  }
+}
+
+document.getElementById('refresh-btn').addEventListener('click', runHealthCheck);
+
+// Auto-refresh every 60 seconds
+runHealthCheck();
+setInterval(runHealthCheck, 60000);
+</script>
+
+</body>
+</html>
