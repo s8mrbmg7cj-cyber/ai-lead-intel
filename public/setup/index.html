@@ -41,13 +41,9 @@
 html, body { height: 100%; }
 body {
   font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  letter-spacing: -0.011em;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  line-height: 1.55;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; letter-spacing: -0.011em;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased; line-height: 1.55;
 }
 body::before {
   content: ''; position: fixed; inset: 0;
@@ -59,6 +55,7 @@ body::before {
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; outline: none; }
 
 .topnav {
   position: sticky; top: 0; z-index: 100;
@@ -80,16 +77,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22));
 }
-.nav-help {
-  font-size: 13px; color: var(--text-dim);
-  transition: color 0.15s; font-weight: 500;
-}
+.nav-help { font-size: 13px; color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
 .nav-help:hover { color: var(--text); }
 
 .wrap {
   position: relative; z-index: 1;
-  max-width: 640px;
-  margin: 0 auto;
+  max-width: 640px; margin: 0 auto;
   padding: 56px 24px 96px;
 }
 
@@ -97,21 +90,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: 'Geist Mono', monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--brand);
-  background: var(--brand-soft);
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--brand); background: var(--brand-soft);
   border: 1px solid var(--brand-line);
-  padding: 6px 14px;
-  border-radius: 99px;
-  font-weight: 600;
-  margin-bottom: 20px;
+  padding: 6px 14px; border-radius: 99px;
+  font-weight: 600; margin-bottom: 20px;
 }
 .hero-eyebrow .dot {
   width: 5px; height: 5px; border-radius: 50%;
-  background: var(--brand);
-  box-shadow: 0 0 8px var(--brand-glow);
+  background: var(--brand); box-shadow: 0 0 8px var(--brand-glow);
   animation: pulse 1.6s ease-in-out infinite;
 }
 .hero-eyebrow.pending { color: var(--blue); background: var(--blue-soft); border-color: var(--blue-line); }
@@ -124,44 +111,29 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .hero-title {
   font-size: clamp(32px, 5vw, 44px);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-  margin-bottom: 14px;
+  font-weight: 600; letter-spacing: -0.035em;
+  line-height: 1.08; margin-bottom: 14px;
 }
 .hero-title .accent {
-  font-family: 'Instrument Serif', serif;
-  font-style: italic;
-  font-weight: 400;
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero-title .accent.green {
   background: linear-gradient(135deg, var(--green), #4ade80);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero-sub {
-  font-size: 15px;
-  color: var(--text-dim);
-  line-height: 1.6;
-  max-width: 480px;
-  margin: 0 auto;
+  font-size: 15px; color: var(--text-dim); line-height: 1.6;
+  max-width: 480px; margin: 0 auto;
 }
 .hero-business {
-  margin-top: 12px;
-  display: inline-block;
+  margin-top: 12px; display: inline-block;
   font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  color: var(--text-faint);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 11px; color: var(--text-faint);
+  letter-spacing: 0.08em; text-transform: uppercase;
   font-weight: 600;
-  padding: 4px 11px;
-  background: var(--surface-2);
+  padding: 4px 11px; background: var(--surface-2);
   border: 1px solid var(--border-2);
   border-radius: 99px;
 }
@@ -169,180 +141,116 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .card {
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px;
+  border-radius: 20px; padding: 36px;
   box-shadow:
     0 1px 0 rgba(255,255,255,0.04) inset,
     0 32px 80px rgba(0,0,0,0.5),
     0 12px 28px rgba(0,0,0,0.35);
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
   margin-bottom: 18px;
 }
 .card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, var(--border-3), transparent);
 }
 .card::after {
-  content: '';
-  position: absolute; top: -1px; left: 25%; right: 25%; height: 1px;
+  content: ''; position: absolute; top: -1px; left: 25%; right: 25%; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent);
 }
 
-/* ==================== LOADING ==================== */
-.state-loading {
-  text-align: center;
-  padding: 32px 16px;
-}
+.state-loading { text-align: center; padding: 32px 16px; }
 .loading-spinner {
-  width: 32px; height: 32px;
-  margin: 0 auto 18px;
-  border: 3px solid var(--surface-3);
-  border-top-color: var(--brand);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  width: 32px; height: 32px; margin: 0 auto 18px;
+  border: 3px solid var(--surface-3); border-top-color: var(--brand);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text {
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  color: var(--text-faint);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 600;
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--text-faint); letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 600;
 }
 
-/* ==================== PENDING ==================== */
-.state-pending {
-  text-align: center;
-  padding: 12px 0;
-}
+.state-pending { text-align: center; padding: 12px 0; }
 .pending-icon {
-  width: 64px; height: 64px;
-  margin: 0 auto 22px;
+  width: 64px; height: 64px; margin: 0 auto 22px;
   border-radius: 18px;
   background: linear-gradient(135deg, var(--blue-soft) 0%, transparent 100%);
-  border: 1px solid var(--blue-line);
-  color: var(--blue);
+  border: 1px solid var(--blue-line); color: var(--blue);
   display: flex; align-items: center; justify-content: center;
   position: relative;
 }
 .pending-icon::before {
-  content: '';
-  position: absolute; inset: -4px;
-  border-radius: 22px;
-  border: 1px solid var(--blue-line);
-  opacity: 0.4;
-  animation: pulseRing 2.5s ease-out infinite;
+  content: ''; position: absolute; inset: -4px;
+  border-radius: 22px; border: 1px solid var(--blue-line);
+  opacity: 0.4; animation: pulseRing 2.5s ease-out infinite;
 }
 @keyframes pulseRing {
   0% { transform: scale(0.85); opacity: 0.5; }
   100% { transform: scale(1.18); opacity: 0; }
 }
-.pending-title {
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-  line-height: 1.25;
-}
-.pending-sub {
-  font-size: 14.5px;
-  color: var(--text-dim);
-  line-height: 1.6;
-  max-width: 440px;
-  margin: 0 auto 22px;
-}
+.pending-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.25; }
+.pending-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.6; max-width: 440px; margin: 0 auto 22px; }
 
-/* ==================== CHECKLIST (re-usable) ==================== */
 .checklist {
   text-align: left;
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 18px;
-  max-width: 420px;
-  margin: 0 auto;
+  max-width: 100%;
 }
 .checklist-label {
   font-family: 'Geist Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 12px;
 }
 .checklist-row {
   display: flex; align-items: flex-start; gap: 11px;
   padding: 8px 0;
-  font-size: 13.5px;
-  color: var(--text-soft);
+  font-size: 13.5px; color: var(--text-soft);
   line-height: 1.5;
 }
 .checklist-row strong { color: var(--text); font-weight: 600; }
 .checklist-row.muted { color: var(--text-faint); }
 .checklist-icon {
   width: 20px; height: 20px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 1px;
+  border-radius: 50%; flex-shrink: 0; margin-top: 1px;
   display: flex; align-items: center; justify-content: center;
 }
-.checklist-icon.done {
-  background: var(--green); color: #fff;
-}
+.checklist-icon.done { background: var(--green); color: #fff; }
 .checklist-icon.current {
-  background: var(--blue-soft);
-  border: 1.5px solid var(--blue);
-  position: relative;
+  background: var(--blue-soft); border: 1.5px solid var(--blue); position: relative;
 }
 .checklist-icon.current::after {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: pulseDot 1.4s ease-in-out infinite;
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue); animation: pulseDot 1.4s ease-in-out infinite;
 }
 @keyframes pulseDot {
   0%,100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.6); }
 }
-.checklist-icon.upcoming {
-  background: var(--surface-3);
-  border: 1.5px solid var(--border-3);
-}
+.checklist-icon.upcoming { background: var(--surface-3); border: 1.5px solid var(--border-3); }
 
-/* ==================== READY — NUMBER ==================== */
 .number-block {
-  text-align: center;
-  padding: 6px 0 22px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 24px;
+  text-align: center; padding: 6px 0 22px;
+  border-bottom: 1px solid var(--border); margin-bottom: 24px;
 }
 .number-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  font-weight: 600;
-  margin-bottom: 14px;
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 600; margin-bottom: 14px;
 }
 .number-big {
   display: inline-block;
   font-family: 'Geist Mono', monospace;
   font-size: clamp(34px, 6vw, 46px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-weight: 600; letter-spacing: -0.025em;
   line-height: 1;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 14px;
-  word-break: break-all;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 14px; word-break: break-all;
   cursor: pointer;
   transition: opacity 0.18s, transform 0.18s;
   border-bottom: 1px dashed transparent;
@@ -350,119 +258,171 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .number-big:hover { opacity: 0.88; transform: translateY(-1px); border-bottom-color: var(--brand-line); }
 .number-big:active { transform: translateY(0); opacity: 0.7; }
-.number-action-row {
-  display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
-}
+.number-action-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .number-action-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 14px;
   background: var(--surface-2);
   border: 1px solid var(--border-2);
   border-radius: 9px;
-  font-size: 12.5px;
-  color: var(--text-dim);
+  font-size: 12.5px; color: var(--text-dim);
   font-weight: 500;
   transition: all 0.15s;
   font-family: 'Geist Mono', monospace;
   letter-spacing: 0.04em;
 }
-.number-action-btn:hover {
-  background: var(--surface-3);
-  border-color: var(--border-3);
-  color: var(--text);
-}
-.number-action-btn.copied {
-  background: var(--green-soft);
-  border-color: var(--green-line);
-  color: var(--green);
-}
+.number-action-btn:hover { background: var(--surface-3); border-color: var(--border-3); color: var(--text); }
+.number-action-btn.copied { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
 
-/* ==================== EXPLAINER ==================== */
-.explainer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-.explainer-card {
+/* CLEAR INSTRUCTIONS (new) */
+.clear-instructions {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 14px 16px;
-  display: flex; gap: 11px; align-items: flex-start;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
 }
-.explainer-icon {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: var(--brand-soft);
-  border: 1px solid var(--brand-line);
-  color: var(--brand);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+.clear-instructions-title {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 12px;
 }
-.explainer-text {
-  font-size: 12.5px;
-  color: var(--text-soft);
+.clear-instruction {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 6px 0;
+  font-size: 13.5px; color: var(--text-soft);
   line-height: 1.5;
 }
-.explainer-text strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 3px; }
-@media (max-width: 620px) { .explainer-grid { grid-template-columns: 1fr; } }
+.clear-instruction strong { color: var(--text); font-weight: 600; }
+.clear-instruction-bullet {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--brand); flex-shrink: 0;
+  margin-top: 9px;
+  box-shadow: 0 0 5px var(--brand-glow);
+}
 
-/* ==================== INSTRUCTIONS ==================== */
 .instruction-block { margin-bottom: 24px; }
 .instruction-title {
   font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  font-weight: 600;
-  margin-bottom: 14px;
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 14px;
 }
 .instruction-body code {
   font-family: 'Geist Mono', monospace;
-  background: var(--surface-3);
-  color: var(--brand);
-  padding: 2px 7px;
-  border-radius: 5px;
-  font-size: 13px;
-  border: 1px solid var(--border-2);
+  background: var(--surface-3); color: var(--brand);
+  padding: 2px 7px; border-radius: 5px;
+  font-size: 13px; border: 1px solid var(--border-2);
 }
 
-.steps-list {
-  list-style: none;
-  display: flex; flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
+.steps-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .steps-list li {
   display: flex; align-items: flex-start; gap: 12px;
   padding: 14px 16px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
+  background: var(--bg-2); border: 1px solid var(--border);
   border-radius: 11px;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--text-soft);
+  font-size: 14.5px; line-height: 1.55; color: var(--text-soft);
   transition: border-color 0.15s;
 }
 .steps-list li:hover { border-color: var(--border-2); }
 .steps-list li strong { color: var(--text); font-weight: 600; }
 .step-num {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: var(--brand-soft);
-  border: 1px solid var(--brand-line);
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
   color: var(--brand);
   font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-  letter-spacing: 0.06em;
+  flex-shrink: 0; margin-top: 1px; letter-spacing: 0.06em;
 }
 .steps-content { flex: 1; min-width: 0; }
+
+/* PROVIDER PICKER (new) */
+.provider-block { margin-bottom: 22px; }
+.provider-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 10px;
+}
+.provider-select-wrap { position: relative; }
+.provider-select {
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-2);
+  border-radius: 11px;
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  appearance: none; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+.provider-select:hover { border-color: var(--border-3); }
+.provider-select:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-tint); }
+.provider-select option { background: var(--surface-2); color: var(--text); }
+.provider-detail {
+  margin-top: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, var(--brand-tint) 0%, transparent 100%);
+  border: 1px solid var(--brand-line);
+  border-radius: 11px;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.provider-detail strong { color: var(--text); font-weight: 600; }
+.provider-detail code {
+  font-family: 'Geist Mono', monospace;
+  background: var(--surface-3); color: var(--brand);
+  padding: 2px 7px; border-radius: 5px;
+  font-size: 12.5px; border: 1px solid var(--border-2);
+}
+.provider-detail p { margin-bottom: 8px; }
+.provider-detail p:last-child { margin-bottom: 0; }
+
+.forward-code-card {
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 11px;
+  padding: 14px 16px;
+  display: flex; gap: 12px; align-items: center;
+}
+.forward-code-info { flex: 1; min-width: 0; }
+.forward-code-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 5px;
+}
+.forward-code-value {
+  font-family: 'Geist Mono', monospace;
+  font-size: 16px; color: var(--brand);
+  font-weight: 600; letter-spacing: -0.005em;
+  word-break: break-all;
+}
+.copy-code-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
+  border-radius: 9px;
+  font-size: 12px; color: var(--brand);
+  font-weight: 600;
+  transition: all 0.15s; flex-shrink: 0;
+  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
+}
+.copy-code-btn:hover { background: rgba(255,106,0,0.18); transform: translateY(-1px); }
+.copy-code-btn.copied { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+@media (max-width: 620px) {
+  .forward-code-card { flex-direction: column; align-items: stretch; }
+  .copy-code-btn { width: 100%; justify-content: center; }
+}
 
 .trust-block {
   margin-top: 22px;
@@ -473,130 +433,27 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: flex; gap: 12px; align-items: flex-start;
 }
 .trust-icon {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: rgba(52,211,153,0.18);
-  border: 1px solid var(--green-line);
+  width: 26px; height: 26px; border-radius: 7px;
+  background: rgba(52,211,153,0.18); border: 1px solid var(--green-line);
   color: var(--green);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.trust-text {
-  font-size: 13px;
-  color: var(--text-soft);
-  line-height: 1.55;
-}
+.trust-text { font-size: 13px; color: var(--text-soft); line-height: 1.55; }
 .trust-text strong { color: var(--text); font-weight: 600; }
 .trust-text code {
   font-family: 'Geist Mono', monospace;
-  background: var(--surface-3);
-  color: var(--brand);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  border: 1px solid var(--border-2);
+  background: var(--surface-3); color: var(--brand);
+  padding: 1px 6px; border-radius: 4px;
+  font-size: 12px; border: 1px solid var(--border-2);
 }
 
-/* ==================== ACCORDION ==================== */
-.accordion {
-  margin-top: 14px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  overflow: hidden;
-  transition: border-color 0.15s;
-}
-.accordion:hover { border-color: var(--border-2); }
-.accordion.open { border-color: var(--brand-line); }
-.accordion-head {
-  width: 100%; text-align: left;
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  font-size: 13.5px; font-weight: 500;
-  color: var(--text-soft);
-  transition: color 0.15s;
-}
-.accordion-head:hover { color: var(--text); }
-.accordion-toggle {
-  width: 22px; height: 22px;
-  border-radius: 6px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text-dim);
-  flex-shrink: 0;
-  transition: all 0.2s;
-}
-.accordion.open .accordion-toggle {
-  background: var(--brand);
-  border-color: var(--brand);
-  color: #fff;
-  transform: rotate(45deg);
-}
-.accordion-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.accordion-body-inner {
-  padding: 4px 16px 16px;
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-.accordion.open .accordion-body { max-height: 360px; }
-.carrier-list {
-  list-style: none;
-  display: flex; flex-direction: column;
-  gap: 7px;
-  margin-top: 10px;
-  margin-bottom: 12px;
-}
-.carrier-list li {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 14px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12.5px;
-}
-.carrier-name { color: var(--text); font-weight: 500; }
-.carrier-code {
-  font-family: 'Geist Mono', monospace;
-  color: var(--brand);
-  background: var(--brand-soft);
-  border: 1px solid var(--brand-line);
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-.accordion-note {
-  font-size: 11.5px;
-  color: var(--text-faint);
-  line-height: 1.55;
-  margin-top: 4px;
-}
-.accordion-note code {
-  font-family: 'Geist Mono', monospace;
-  background: var(--surface-3);
-  color: var(--brand);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11.5px;
-  border: 1px solid var(--border-2);
-}
-
-/* ==================== TEST AI CARD ==================== */
 .test-card {
   background:
     radial-gradient(circle at 0% 0%, var(--brand-tint) 0%, transparent 70%),
     linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   border: 1px solid var(--brand-line);
-  border-radius: 18px;
-  padding: 28px 26px;
+  border-radius: 18px; padding: 28px 26px;
   position: relative; overflow: hidden;
   display: flex; gap: 18px; align-items: center;
   margin-bottom: 18px;
@@ -606,12 +463,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: linear-gradient(90deg, transparent, var(--brand), transparent);
 }
 .test-icon {
-  width: 48px; height: 48px;
-  border-radius: 13px;
+  width: 48px; height: 48px; border-radius: 13px;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
   box-shadow: 0 8px 20px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
-  color: #fff;
-  flex-shrink: 0;
+  color: #fff; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   animation: float 3s ease-in-out infinite;
 }
@@ -622,44 +477,28 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .test-text { flex: 1; min-width: 0; }
 .test-eyebrow {
   font-family: 'Geist Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--brand);
-  font-weight: 600;
-  margin-bottom: 5px;
+  font-size: 9.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--brand);
+  font-weight: 600; margin-bottom: 5px;
 }
-.test-title {
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  margin-bottom: 4px;
-  line-height: 1.3;
-}
-.test-desc {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.55;
-}
+.test-title { font-size: 16px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 4px; line-height: 1.3; }
+.test-desc { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 12px 20px;
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
   color: #fff;
   border-radius: 11px;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 13.5px; font-weight: 600;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.22),
     0 4px 14px var(--brand-glow);
-  transition: all 0.2s;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s; flex-shrink: 0;
+  position: relative; overflow: hidden;
+  cursor: pointer;
 }
 .btn-primary::before {
-  content: '';
-  position: absolute; top: 0; left: -100%;
+  content: ''; position: absolute; top: 0; left: -100%;
   width: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
   transition: left 0.6s;
@@ -667,29 +506,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn-primary:hover::before { left: 100%; }
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.28),
-    0 10px 28px var(--brand-glow);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 28px var(--brand-glow);
 }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.btn-secondary {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 11px 20px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  transition: all 0.18s;
-}
-.btn-secondary:hover {
-  background: var(--surface-3);
-  border-color: var(--border-3);
-}
-.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ==================== MARK AS LIVE ==================== */
 .live-action-card {
   background: var(--bg-2);
   border: 1px dashed var(--green-line);
@@ -699,12 +519,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin-bottom: 18px;
 }
 .live-action-icon {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  background: var(--green-soft);
-  border: 1px solid var(--green-line);
-  color: var(--green);
-  flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--green-soft); border: 1px solid var(--green-line);
+  color: var(--green); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
 .live-action-text { flex: 1; min-width: 0; }
@@ -712,30 +529,25 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .live-action-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 .btn-mark-live {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 14px;
-  background: var(--green-soft);
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--green), #4ade80);
   border: 1px solid var(--green-line);
   border-radius: 9px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--green);
-  transition: all 0.18s;
-  flex-shrink: 0;
+  font-size: 12.5px; font-weight: 600;
+  color: #052e1d;
+  transition: all 0.18s; flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 12px rgba(52,211,153,0.25);
 }
 .btn-mark-live:hover {
-  background: rgba(52,211,153,0.18);
   transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 8px 22px rgba(52,211,153,0.35);
 }
 .btn-mark-live:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-/* ==================== LIVE STATE ==================== */
-.state-live {
-  text-align: center;
-  padding: 12px 0;
-}
+.state-live { text-align: center; padding: 12px 0; }
 .live-icon {
-  width: 76px; height: 76px;
-  margin: 0 auto 22px;
+  width: 76px; height: 76px; margin: 0 auto 22px;
   border-radius: 22px;
   background: linear-gradient(135deg, var(--green), #4ade80);
   box-shadow:
@@ -752,84 +564,43 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   60% { transform: scale(1.1); }
   100% { transform: scale(1); opacity: 1; }
 }
-.live-title {
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  margin-bottom: 10px;
-  line-height: 1.2;
-}
-.live-sub {
-  font-size: 14.5px;
-  color: var(--text-dim);
-  line-height: 1.6;
-  max-width: 440px;
-  margin: 0 auto 24px;
-}
+.live-title { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; margin-bottom: 10px; line-height: 1.2; }
+.live-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.6; max-width: 440px; margin: 0 auto 24px; }
 .live-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  max-width: 420px;
-  margin: 0 auto 22px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; max-width: 420px; margin: 0 auto 22px;
 }
 .live-stat {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 14px 16px;
-  text-align: left;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 14px 16px; text-align: left;
 }
 .live-stat-label {
   font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 6px;
 }
 .live-stat-value {
-  font-size: 13.5px;
-  color: var(--text);
-  font-weight: 500;
+  font-size: 13.5px; color: var(--text); font-weight: 500;
   font-family: 'Geist Mono', monospace;
-  letter-spacing: -0.005em;
-  word-break: break-all;
+  letter-spacing: -0.005em; word-break: break-all;
 }
 
-/* ==================== ERROR ==================== */
-.state-error {
-  text-align: center;
-  padding: 16px 8px;
-}
+.state-error { text-align: center; padding: 16px 8px; }
 .error-icon {
-  width: 52px; height: 52px;
-  margin: 0 auto 18px;
+  width: 52px; height: 52px; margin: 0 auto 18px;
   border-radius: 14px;
-  background: var(--surface-3);
-  border: 1px solid var(--border-2);
+  background: var(--surface-3); border: 1px solid var(--border-2);
   color: var(--text-dim);
   display: flex; align-items: center; justify-content: center;
 }
-.error-title {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  margin-bottom: 8px;
-}
-.error-sub {
-  font-size: 13.5px;
-  color: var(--text-dim);
-  line-height: 1.55;
-}
+.error-title { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px; }
+.error-sub { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; }
 
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   margin-top: 22px;
-  font-size: 13px;
-  color: var(--text-faint);
-  font-weight: 500;
+  font-size: 13px; color: var(--text-faint); font-weight: 500;
   transition: color 0.15s;
 }
 .back-link:hover { color: var(--text); }
@@ -837,25 +608,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .toast {
   position: fixed; bottom: 20px; left: 50%;
   transform: translateX(-50%) translateY(20px);
-  background: var(--surface-2);
-  border: 1px solid var(--green-line);
+  background: var(--surface-2); border: 1px solid var(--green-line);
   color: var(--green);
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 12.5px;
-  font-weight: 500;
-  font-family: 'Geist Mono', monospace;
-  letter-spacing: 0.04em;
-  opacity: 0;
-  pointer-events: none;
+  padding: 10px 16px; border-radius: 10px;
+  font-size: 12.5px; font-weight: 500;
+  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
+  opacity: 0; pointer-events: none;
   transition: opacity 0.25s, transform 0.25s cubic-bezier(0.16,1,0.3,1);
   box-shadow: 0 12px 36px rgba(0,0,0,0.4);
   z-index: 200;
 }
-.toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.error { border-color: rgba(248,113,113,0.4); color: #f87171; }
 
 @media (max-width: 620px) {
@@ -917,18 +680,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
-// HELPERS
+// PHONE NUMBER HELPERS
 // ============================================================
-
-/**
- * Strip country code and non-digits from a phone number,
- * returning exactly 10 US digits if possible.
- * Handles inputs like:
- *   +19067622478  →  9067622478
- *   19067622478   →  9067622478
- *   9067622478    →  9067622478
- *   (906) 762-2478 → 9067622478
- */
 function normalizeUsNumber(raw) {
   let digits = String(raw || '').replace(/\D/g, '');
   if (digits.length === 11 && digits.startsWith('1')) {
@@ -959,7 +712,7 @@ function showToast(msg, type = 'success') {
   setTimeout(() => toast.classList.remove('visible'), 1800);
 }
 
-async function copyToClipboard(text, btnEl, btnTextEl) {
+async function copyToClipboard(text, btnEl, btnTextEl, successMsg = 'Copied') {
   try {
     await navigator.clipboard.writeText(text);
     if (btnEl && btnTextEl) {
@@ -971,9 +724,10 @@ async function copyToClipboard(text, btnEl, btnTextEl) {
         btnEl.classList.remove('copied');
       }, 1800);
     }
-    showToast('Number copied');
+    showToast(successMsg);
   } catch (e) {
-    showToast('Long-press the number to copy', 'error');
+    console.error('[SETUP] Clipboard error:', e);
+    showToast('Long-press the text to copy', 'error');
   }
 }
 
@@ -987,6 +741,22 @@ function setBusinessPill(name) {
   }
 }
 
+function checklistRow(state, label) {
+  const iconMap = {
+    done: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    current: '',
+    upcoming: '',
+  };
+  const textClass = state === 'upcoming' ? 'muted' : '';
+  const labelHtml = state === 'upcoming' ? label : `<strong>${label}</strong>`;
+  return `
+    <div class="checklist-row ${textClass}">
+      <div class="checklist-icon ${state}">${iconMap[state]}</div>
+      <div>${labelHtml}</div>
+    </div>
+  `;
+}
+
 // ============================================================
 // URL PARAMS
 // ============================================================
@@ -997,7 +767,6 @@ const slug = params.get('slug');
 // LOAD SETUP INFO
 // ============================================================
 async function loadSetupInfo() {
-  // No slug → generic pending state (do NOT load most-recent client)
   if (!slug) {
     renderGenericPending();
     return;
@@ -1016,14 +785,11 @@ async function loadSetupInfo() {
     const info = data[0];
     renderByStatus(info);
   } catch (e) {
-    console.error('Setup info error:', e);
+    console.error('[SETUP] Load error:', e);
     renderError("We couldn't load your setup details right now. Please try again, or contact support.");
   }
 }
 
-// ============================================================
-// ROUTER
-// ============================================================
 function renderByStatus(info) {
   const status = (info.ai_setup_status || 'pending').toLowerCase();
   const digits = normalizeUsNumber(info.ai_phone_number);
@@ -1039,7 +805,7 @@ function renderByStatus(info) {
 }
 
 // ============================================================
-// GENERIC PENDING (no slug in URL)
+// GENERIC PENDING (no slug)
 // ============================================================
 function renderGenericPending() {
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow pending';
@@ -1082,7 +848,7 @@ function renderPending(info) {
         <div class="pending-title">Your AI receptionist number is being configured</div>
         <div class="pending-sub">We're building your AI and assigning a dedicated number. You'll get an email the moment it's ready — usually within a few hours.</div>
 
-        <div class="checklist">
+        <div class="checklist" style="max-width: 420px; margin: 0 auto;">
           <div class="checklist-label">What's happening</div>
           ${checklistRow('done', 'Account created')}
           ${checklistRow('current', 'Building your AI &amp; assigning a number')}
@@ -1095,28 +861,72 @@ function renderPending(info) {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-function checklistRow(state, label) {
-  const iconMap = {
-    done: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    current: '',
-    upcoming: '',
-  };
-  const textClass = state === 'upcoming' ? 'muted' : '';
-  const labelHtml = state === 'upcoming' ? label : `<strong>${label}</strong>`;
-  return `
-    <div class="checklist-row ${textClass}">
-      <div class="checklist-icon ${state}">${iconMap[state]}</div>
-      <div>${labelHtml}</div>
-    </div>
-  `;
+// ============================================================
+// PROVIDER INSTRUCTIONS
+// ============================================================
+function providerInstructions(providerKey, digits) {
+  const formatted = formatPhone(digits);
+  const fwdCode = `*72${digits}`;
+
+  switch (providerKey) {
+    case 'mobile':
+      return `
+        <p><strong>iPhone or Android (most carriers — Verizon, AT&amp;T, Xfinity):</strong></p>
+        <p>Open the phone dialer on your business phone and dial <code>*72</code> followed by your AI number. Tap call, wait for the tone, then hang up. Forwarding is active.</p>
+        <p>For T-Mobile, dial <code>**21*${digits}#</code> and press call instead.</p>
+        <p style="margin-top:10px;">To turn forwarding off later, dial <code>*73</code>.</p>
+      `;
+    case 'google_voice':
+      return `
+        <p><strong>Google Voice:</strong></p>
+        <p>Open <strong>voice.google.com</strong> → Settings (gear icon) → <strong>Calls</strong> → <strong>Call forwarding</strong>.</p>
+        <p>Add a forwarding number: <strong>${formatted}</strong>. Save.</p>
+        <p>Calls to your Google Voice number will now ring your AI receptionist.</p>
+      `;
+    case 'openphone':
+      return `
+        <p><strong>OpenPhone:</strong></p>
+        <p>Open OpenPhone → <strong>Settings</strong> → choose your business number → <strong>Call forwarding</strong>.</p>
+        <p>Set forwarding to: <strong>${formatted}</strong>.</p>
+        <p>Choose "Forward unanswered calls" so the AI only picks up when you don't.</p>
+      `;
+    case 'ringcentral':
+      return `
+        <p><strong>RingCentral:</strong></p>
+        <p>Log into RingCentral admin → <strong>Phone System</strong> → <strong>Users</strong> → pick your line → <strong>Call Handling</strong> → <strong>Call Forwarding</strong>.</p>
+        <p>Add forwarding number: <strong>${formatted}</strong>. Set to forward when no answer.</p>
+      `;
+    case 'dialpad':
+      return `
+        <p><strong>Dialpad:</strong></p>
+        <p>Open Dialpad → <strong>Settings</strong> → <strong>Your office</strong> → <strong>Call routing</strong>.</p>
+        <p>Add an external number: <strong>${formatted}</strong>. Set as forwarding destination for missed/unanswered calls.</p>
+      `;
+    case 'grasshopper':
+      return `
+        <p><strong>Grasshopper:</strong></p>
+        <p>Log into Grasshopper → <strong>Settings</strong> → <strong>Call forwarding</strong>.</p>
+        <p>Add forwarding number: <strong>${formatted}</strong>. Save.</p>
+      `;
+    case 'landline':
+      return `
+        <p><strong>Landline or other system:</strong></p>
+        <p>Most landlines support <code>*72</code> followed by the forwarding number. From your landline, dial <code>*72${digits}</code>, wait for the tone, hang up.</p>
+        <p>If <code>*72</code> doesn't work, call your phone provider (Verizon, AT&amp;T, Spectrum, etc.) and ask them to forward your business line to <strong>${formatted}</strong>.</p>
+        <p style="margin-top:10px;">To turn forwarding off later, dial <code>*73</code>.</p>
+      `;
+    default:
+      return `<p>Pick your phone system above to see the right instructions.</p>`;
+  }
 }
 
 // ============================================================
-// READY (AI number assigned, customer needs to forward)
+// READY STATE
 // ============================================================
 function renderReady(info, digits) {
   const formatted = formatPhone(digits);
   const telHref = `tel:+1${digits}`;
+  const forwardCode = `*72${digits}`;
 
   document.getElementById('hero-eyebrow').className = 'hero-eyebrow';
   document.getElementById('hero-eyebrow').innerHTML = '<span class="dot"></span>Your AI Receptionist Is Ready';
@@ -1126,6 +936,8 @@ function renderReady(info, digits) {
 
   document.getElementById('content').innerHTML = `
     <div class="card">
+
+      <!-- NUMBER -->
       <div class="number-block">
         <div class="number-label">Your AI receptionist number</div>
         <a href="${telHref}" id="ai-number-link" class="number-big">${escapeHtml(formatted)}</a>
@@ -1134,112 +946,76 @@ function renderReady(info, digits) {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             <span id="copy-text">Copy number</span>
           </button>
-          <a href="${telHref}" class="number-action-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call
-          </a>
         </div>
       </div>
 
-      <!-- HOW THIS WORKS -->
-      <div class="explainer-grid">
-        <div class="explainer-card">
-          <div class="explainer-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          </div>
-          <div class="explainer-text">
-            <strong>Keep your existing business number</strong>
-            Customers still dial your normal number — nothing changes on their end.
-          </div>
+      <!-- CLEAR INSTRUCTIONS -->
+      <div class="clear-instructions">
+        <div class="clear-instructions-title">How this works</div>
+        <div class="clear-instruction">
+          <div class="clear-instruction-bullet"></div>
+          <div><strong>Keep your current business number.</strong> Customers still dial your normal number.</div>
         </div>
-        <div class="explainer-card">
-          <div class="explainer-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          </div>
-          <div class="explainer-text">
-            <strong>Forward calls to your AI</strong>
-            Forward missed or all business calls to the AI number above.
-          </div>
+        <div class="clear-instruction">
+          <div class="clear-instruction-bullet"></div>
+          <div><strong>Forward missed or all business calls to your AI receptionist number.</strong></div>
         </div>
-        <div class="explainer-card">
-          <div class="explainer-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-          </div>
-          <div class="explainer-text">
-            <strong>AI answers &amp; captures leads</strong>
-            Your AI greets the caller and captures their info live.
-          </div>
+        <div class="clear-instruction">
+          <div class="clear-instruction-bullet"></div>
+          <div><strong>After forwarding, call your business number from another phone to test it.</strong></div>
         </div>
-        <div class="explainer-card">
-          <div class="explainer-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div class="explainer-text">
-            <strong>You get the summary</strong>
-            Lead and call summary land in your email and dashboard.
-          </div>
+        <div class="clear-instruction">
+          <div class="clear-instruction-bullet"></div>
+          <div><strong>If the AI answers, click "Mark as live" below.</strong></div>
         </div>
       </div>
 
-      <!-- INSTRUCTIONS -->
-      <div class="instruction-block">
-        <div class="instruction-title">How to forward your calls</div>
-        <div class="instruction-body">
-          <ol class="steps-list">
-            <li>
-              <div class="step-num">01</div>
-              <div class="steps-content">From your <strong>business phone</strong>, dial <code>*72</code></div>
-            </li>
-            <li>
-              <div class="step-num">02</div>
-              <div class="steps-content">Enter your <strong>AI receptionist number</strong> above</div>
-            </li>
-            <li>
-              <div class="step-num">03</div>
-              <div class="steps-content">Call your business number from another phone to <strong>test it</strong></div>
-            </li>
-          </ol>
+      <!-- PROVIDER PICKER -->
+      <div class="provider-block">
+        <div class="provider-label">What phone system do you use?</div>
+        <div class="provider-select-wrap">
+          <select class="provider-select" id="provider-select">
+            <option value="">Choose your phone system…</option>
+            <option value="mobile">iPhone / mobile phone</option>
+            <option value="google_voice">Google Voice</option>
+            <option value="openphone">OpenPhone</option>
+            <option value="ringcentral">RingCentral</option>
+            <option value="dialpad">Dialpad</option>
+            <option value="grasshopper">Grasshopper</option>
+            <option value="landline">Landline / other</option>
+          </select>
         </div>
+        <div class="provider-detail" id="provider-detail" style="display:none;"></div>
 
-        <div class="trust-block">
-          <div class="trust-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
+        <div class="forward-code-card" id="forward-code-card" style="display:none;">
+          <div class="forward-code-info">
+            <div class="forward-code-label">Mobile forwarding code</div>
+            <div class="forward-code-value" id="forward-code-value">${escapeHtml(forwardCode)}</div>
           </div>
-          <div class="trust-text">
-            <strong>Your business number stays the same.</strong> You can turn call forwarding off anytime by dialing <code>*73</code> on your business phone.
-          </div>
-        </div>
-
-        <div class="accordion" id="carrier-accordion">
-          <button class="accordion-head" type="button" id="carrier-toggle">
-            <span>My carrier's forwarding code isn't working</span>
-            <span class="accordion-toggle">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </span>
+          <button class="copy-code-btn" id="copy-code-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copy-code-text">Copy code</span>
           </button>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">
-              <p class="accordion-note">Different carriers use slightly different forwarding methods. Try the one that matches your provider:</p>
-              <ul class="carrier-list">
-                <li><span class="carrier-name">Verizon</span><span class="carrier-code">*72</span></li>
-                <li><span class="carrier-name">AT&amp;T</span><span class="carrier-code">*72</span></li>
-                <li><span class="carrier-name">T-Mobile</span><span class="carrier-code">**21*</span></li>
-                <li><span class="carrier-name">Xfinity / Comcast</span><span class="carrier-code">*72</span></li>
-                <li><span class="carrier-name">Google Voice</span><span class="carrier-code">Settings → Calls → Forwarding</span></li>
-              </ul>
-              <p class="accordion-note">For T-Mobile, dial <code>**21*</code> followed by your AI number, then <code>#</code> and press call.</p>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- CHECKLIST -->
-      <div class="instruction-block" style="margin-bottom: 0;">
+      <!-- SAFETY/TRUST -->
+      <div class="trust-block">
+        <div class="trust-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="trust-text">
+          <strong>Your business number stays the same.</strong> To turn forwarding off anytime, dial <code>*73</code> on your business phone.
+        </div>
+      </div>
+
+      <!-- SETUP CHECKLIST -->
+      <div class="instruction-block" style="margin-top: 22px; margin-bottom: 0;">
         <div class="instruction-title">Setup progress</div>
-        <div class="checklist" style="max-width: 100%;">
+        <div class="checklist">
           <div class="checklist-label">4 steps to live</div>
           ${checklistRow('done', 'AI number assigned')}
           ${checklistRow('current', 'Call forwarding enabled')}
@@ -1249,7 +1025,7 @@ function renderReady(info, digits) {
       </div>
     </div>
 
-    <!-- TEST AI -->
+    <!-- TEST CALL CARD -->
     <div class="test-card">
       <div class="test-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
@@ -1257,9 +1033,9 @@ function renderReady(info, digits) {
       <div class="test-text">
         <div class="test-eyebrow">Hear it for yourself</div>
         <div class="test-title">Call &amp; test your AI receptionist</div>
-        <div class="test-desc">Call the AI directly. It'll answer just like it will for your customers.</div>
+        <div class="test-desc">Tap below to call ${escapeHtml(formatted)}. The AI will answer just like it will for your customers.</div>
       </div>
-      <a href="${telHref}" class="btn-primary">
+      <a id="test-call-btn" href="${telHref}" class="btn-primary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
         Call &amp; test your AI
       </a>
@@ -1271,7 +1047,7 @@ function renderReady(info, digits) {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="live-action-text">
-        <div class="live-action-title">Forwarding tested and working?</div>
+        <div class="live-action-title">Forwarding tested and the AI answered?</div>
         <div class="live-action-desc">Mark your AI as live so we know you're up and running.</div>
       </div>
       <button class="btn-mark-live" id="mark-live-btn">
@@ -1281,42 +1057,86 @@ function renderReady(info, digits) {
     </div>
   `;
 
-  // Wire up copy
+  // Wire up COPY NUMBER button + tap-to-call number
   const copyBtn = document.getElementById('copy-btn');
   const copyText = document.getElementById('copy-text');
-  copyBtn.addEventListener('click', () => copyToClipboard(digits, copyBtn, copyText));
+  copyBtn.addEventListener('click', () => copyToClipboard(digits, copyBtn, copyText, 'Number copied'));
 
   const numberEl = document.getElementById('ai-number-link');
   numberEl.addEventListener('click', (e) => {
     if (!('ontouchstart' in window) && !navigator.userAgent.match(/Mobi|Android|iPhone/i)) {
       e.preventDefault();
-      copyToClipboard(digits, copyBtn, copyText);
+      copyToClipboard(digits, copyBtn, copyText, 'Number copied');
     }
   });
 
-  document.getElementById('carrier-toggle').addEventListener('click', () => {
-    document.getElementById('carrier-accordion').classList.toggle('open');
+  // Wire up PROVIDER DROPDOWN
+  const providerSelect = document.getElementById('provider-select');
+  const providerDetail = document.getElementById('provider-detail');
+  const forwardCodeCard = document.getElementById('forward-code-card');
+
+  providerSelect.addEventListener('change', (e) => {
+    const val = e.target.value;
+    if (!val) {
+      providerDetail.style.display = 'none';
+      forwardCodeCard.style.display = 'none';
+      return;
+    }
+    providerDetail.innerHTML = providerInstructions(val, digits);
+    providerDetail.style.display = 'block';
+    // Show forwarding code card only for mobile/landline (the *72 carriers)
+    forwardCodeCard.style.display = (val === 'mobile' || val === 'landline') ? 'flex' : 'none';
   });
 
-  // Mark as live
-  document.getElementById('mark-live-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('mark-live-btn');
-    const label = document.getElementById('mark-live-label');
-    btn.disabled = true;
-    label.textContent = 'Marking...';
+  // Wire up COPY FORWARDING CODE button
+  const copyCodeBtn = document.getElementById('copy-code-btn');
+  const copyCodeText = document.getElementById('copy-code-text');
+  copyCodeBtn.addEventListener('click', () => {
+    copyToClipboard(forwardCode, copyCodeBtn, copyCodeText, 'Forwarding code copied');
+  });
+
+  // Wire up TEST CALL button (extra logging for desktop where tel: doesn't work)
+  const testBtn = document.getElementById('test-call-btn');
+  testBtn.addEventListener('click', (e) => {
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (!isMobile) {
+      e.preventDefault();
+      copyToClipboard(digits, null, null, `Number copied — call ${formatted} from your phone`);
+    }
+    // On mobile, let the tel: link fire normally
+  });
+
+  // Wire up MARK AS LIVE
+  const markBtn = document.getElementById('mark-live-btn');
+  const markLabel = document.getElementById('mark-live-label');
+  markBtn.addEventListener('click', async () => {
+    markBtn.disabled = true;
+    markLabel.textContent = 'Marking...';
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('clients')
         .update({ ai_setup_status: 'live' })
-        .eq('client_slug', slug);
-      if (error) throw error;
-      showToast('Marked as live');
-      setTimeout(() => loadSetupInfo(), 600);
+        .eq('client_slug', slug)
+        .select('id, ai_setup_status');
+
+      if (error) {
+        console.error('[SETUP] Mark-live update error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.error('[SETUP] Mark-live updated 0 rows. Check that the anon role has UPDATE permission on public.clients via RLS, or that the slug exists.');
+        throw new Error('No rows updated. Contact support.');
+      }
+
+      console.log('[SETUP] Mark-live OK:', data);
+      showToast('Your AI receptionist is live');
+      setTimeout(() => loadSetupInfo(), 700);
     } catch (e) {
-      console.error('Mark live error:', e);
-      btn.disabled = false;
-      label.textContent = 'Mark as live';
-      showToast('Could not update status. Try again.', 'error');
+      console.error('[SETUP] Mark-live failed:', e);
+      markBtn.disabled = false;
+      markLabel.textContent = 'Mark as live';
+      showToast('Could not mark as live. Check console for details.', 'error');
     }
   });
 
@@ -1324,7 +1144,7 @@ function renderReady(info, digits) {
 }
 
 // ============================================================
-// LIVE
+// LIVE STATE
 // ============================================================
 function renderLive(info, digits) {
   const formatted = digits.length === 10 ? formatPhone(digits) : '—';
@@ -1357,8 +1177,8 @@ function renderLive(info, digits) {
           </div>
         </div>
 
-        <div class="checklist" style="margin-top: 8px; text-align:left;">
-          <div class="checklist-label">Confirm forwarding is working</div>
+        <div class="checklist" style="margin-top: 8px;">
+          <div class="checklist-label">All steps complete</div>
           ${checklistRow('done', 'AI number assigned')}
           ${checklistRow('done', 'Call forwarding enabled')}
           ${checklistRow('done', 'Test call completed')}
@@ -1374,24 +1194,15 @@ function renderLive(info, digits) {
       </div>
     </div>
 
-    <div class="accordion" id="turn-off-accordion" style="margin-top: 0;">
-      <button class="accordion-head" type="button" id="turn-off-toggle">
-        <span>How to turn off forwarding</span>
-        <span class="accordion-toggle">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </span>
-      </button>
-      <div class="accordion-body">
-        <div class="accordion-body-inner">
-          <p class="accordion-note">If you ever want to stop forwarding calls to your AI, dial <code>*73</code> on your business phone. Forwarding turns off immediately.</p>
-        </div>
+    <div class="trust-block" style="margin-top: 0;">
+      <div class="trust-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="trust-text">
+        Need to turn forwarding off? Dial <code>*73</code> on your business phone.
       </div>
     </div>
   `;
-
-  document.getElementById('turn-off-toggle').addEventListener('click', () => {
-    document.getElementById('turn-off-accordion').classList.toggle('open');
-  });
 
   document.getElementById('back-link').style.display = 'inline-flex';
 }
@@ -1420,9 +1231,7 @@ function renderError(msg) {
   document.getElementById('back-link').style.display = 'inline-flex';
 }
 
-// ============================================================
 // INIT
-// ============================================================
 loadSetupInfo();
 </script>
 
