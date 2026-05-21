@@ -5,17 +5,8 @@
 //   2. Sends Andrew a push notification via ntfy
 //
 // Called from window.onerror, fetch failures, and explicit reports.
-//
-// Body: {
-//   page: "/setup",                      // where the error happened
-//   action: "mark-live",                 // what the user was trying to do
-//   error: "HTTP 500",                   // the error message
-//   slug: "andrew-afnz",                 // optional, helps identify customer
-//   user_agent: "Mozilla/5.0...",        // browser info
-//   stack: "..."                         // optional stack trace
-// }
 
-const NTFY_TOPIC = 'aileadintel-andrew-pushes';
+const NTFY_TOPIC = 'mcr-leads-andrew-2025';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
