@@ -1,284 +1,180 @@
-// /api/send-setup-email.js
-//
-// Sends a customer their personalized setup link via email.
-//
-// POST /api/send-setup-email
-// Body: { client_slug: "andrew-afnz" }
-// Response: { success, email_sent_to, setup_url }
-//
-// Uses Resend API for email delivery (RESEND_API_KEY env var).
-// If Resend isn't configured, falls back to logging-only mode so you can
-// still see what would have been sent.
+/*!
+ * AI Lead Intel — Admin: Send Setup Email button
+ *
+ * Drop into admin page after your existing table renders. Auto-detects each
+ * client row by its data-slug attribute and adds a "Send setup email" button.
+ *
+ * If your admin uses a different attribute (e.g. data-client-slug or data-id),
+ * change ROW_SLUG_ATTR below. If it uses a custom action drawer, plug in there.
+ */
 
-const NTFY_TOPIC = 'mcr-leads-andrew-2025';
-const FROM_EMAIL = 'AI Lead Intel <hello@aileadintel.com>';
-const REPLY_TO = 'hello@aileadintel.com';
-const SITE_URL = 'https://aileadintel.com';
+(function () {
+  'use strict';
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // ===== CONFIG =====
+  const ROW_SLUG_ATTR = 'data-slug'; // attribute on each row that holds client_slug
+  const BUTTON_LABEL = 'Send setup email';
+  const CONFIRM_TEXT = 'Send setup email to this customer?';
 
-  if (req.method === 'OPTIONS') return res.status(200).json({ ok: true });
-  if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
-
-  // ===== PARSE INPUT =====
-  let body = req.body || {};
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch (_) { body = {}; }
-  }
-
-  const clientSlug = (body.client_slug || '').toString().trim();
-
-  if (!clientSlug || !/^[a-z0-9-]+$/.test(clientSlug) || clientSlug.length > 100) {
-    return res.status(400).json({ success: false, error: 'Invalid client_slug' });
-  }
-
-  // ===== ENV =====
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return res.status(500).json({ success: false, error: 'Server missing Supabase credentials' });
-  }
-
-  // ===== 1. FETCH CUSTOMER INFO =====
-  let customer = null;
-  try {
-    const r = await fetch(
-      `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}&select=id,business_name,client_slug,notify_email,phone_number,setup_ai_number,twilio_number,ai_setup_status&limit=1`,
-      {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-        },
+  // ===== STYLES =====
+  if (!document.getElementById('admin-setup-email-styles')) {
+    const style = document.createElement('style');
+    style.id = 'admin-setup-email-styles';
+    style.textContent = `
+      .send-setup-email-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 11px;
+        background: rgba(255,106,0,0.10);
+        border: 1px solid rgba(255,106,0,0.22);
+        border-radius: 7px;
+        color: #ff6a00;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
       }
-    );
-    if (!r.ok) {
-      const txt = await r.text().catch(() => '');
-      console.error('[send-setup-email] Customer fetch failed:', r.status, txt);
-      return res.status(500).json({ success: false, error: 'Could not fetch customer' });
-    }
-    const rows = await r.json();
-    if (!rows || rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Customer not found' });
-    }
-    customer = rows[0];
-  } catch (e) {
-    console.error('[send-setup-email] Fetch exception:', e);
-    return res.status(500).json({ success: false, error: 'Server error fetching customer' });
+      .send-setup-email-btn:hover {
+        background: rgba(255,106,0,0.18);
+        border-color: rgba(255,106,0,0.35);
+        transform: translateY(-1px);
+      }
+      .send-setup-email-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .send-setup-email-btn.sent {
+        background: rgba(52,211,153,0.12);
+        border-color: rgba(52,211,153,0.30);
+        color: #34d399;
+      }
+      .send-setup-email-btn.error {
+        background: rgba(248,113,113,0.12);
+        border-color: rgba(248,113,113,0.30);
+        color: #f87171;
+      }
+      .send-setup-spinner {
+        width: 10px; height: 10px;
+        border: 1.5px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: sse-spin 0.7s linear infinite;
+      }
+      @keyframes sse-spin { to { transform: rotate(360deg); } }
+    `;
+    document.head.appendChild(style);
   }
 
-  const toEmail = customer.notify_email;
-  const businessName = customer.business_name || 'your business';
-  const aiNumber = customer.setup_ai_number || customer.twilio_number || customer.phone_number || null;
-  const setupUrl = `${SITE_URL}/setup?slug=${encodeURIComponent(clientSlug)}`;
-
-  if (!toEmail) {
-    return res.status(400).json({
-      success: false,
-      error: 'Customer has no notify_email on file',
-    });
+  // ===== HELPERS =====
+  function makeButton(slug) {
+    const btn = document.createElement('button');
+    btn.className = 'send-setup-email-btn';
+    btn.type = 'button';
+    btn.dataset.slug = slug;
+    btn.innerHTML = `
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <span class="sse-label">${BUTTON_LABEL}</span>
+    `;
+    btn.addEventListener('click', handleClick);
+    return btn;
   }
 
-  // Format AI number for display
-  let formattedAiNumber = '';
-  if (aiNumber) {
-    const d = String(aiNumber).replace(/\D/g, '').replace(/^1/, '').slice(-10);
-    if (d.length === 10) {
-      formattedAiNumber = `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6,10)}`;
-    }
-  }
+  async function handleClick(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const btn = e.currentTarget;
+    const slug = btn.dataset.slug;
+    if (!slug) return;
+    if (btn.disabled) return;
 
-  // ===== 2. BUILD EMAIL =====
-  const subject = `Your AI receptionist is ready — ${businessName}`;
-  const aiNumberLine = formattedAiNumber
-    ? `<p style="margin:0 0 16px 0;font-size:15px;color:#374151;">Your AI receptionist number: <strong style="font-family:monospace;color:#ff6a00;">${formattedAiNumber}</strong></p>`
-    : '';
+    if (!window.confirm(CONFIRM_TEXT)) return;
 
-  const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
-    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;">
+    const labelEl = btn.querySelector('.sse-label');
+    const original = labelEl.textContent;
+    btn.disabled = true;
+    btn.classList.remove('sent', 'error');
+    labelEl.innerHTML = '<span class="send-setup-spinner"></span> Sending...';
 
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div>
-        <strong style="font-size:14px;color:#111827;letter-spacing:-0.01em;">AI Lead Intel</strong>
-      </div>
-
-      <h1 style="font-size:24px;font-weight:600;color:#111827;letter-spacing:-0.02em;margin:0 0 14px 0;line-height:1.25;">
-        Your AI receptionist is ready
-      </h1>
-
-      <p style="margin:0 0 18px 0;font-size:15px;color:#374151;line-height:1.55;">
-        Hey ${escapeHtml(businessName)},
-      </p>
-
-      <p style="margin:0 0 18px 0;font-size:15px;color:#374151;line-height:1.55;">
-        Your AI receptionist is built and ready to start taking calls. Last step is forwarding your business calls to your AI — takes about 2 minutes.
-      </p>
-
-      ${aiNumberLine}
-
-      <div style="margin:28px 0;">
-        <a href="${setupUrl}" style="display:inline-block;background:linear-gradient(135deg,#ff6a00,#ff8533);color:#ffffff;font-weight:600;font-size:15px;padding:13px 26px;border-radius:10px;text-decoration:none;letter-spacing:-0.005em;">
-          Open your setup page →
-        </a>
-      </div>
-
-      <p style="margin:0 0 14px 0;font-size:14px;color:#374151;line-height:1.55;">
-        The setup page walks you through:
-      </p>
-      <ul style="margin:0 0 18px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;">
-        <li>Forwarding your business calls to your AI</li>
-        <li>Testing that everything works</li>
-        <li>Marking your AI as live</li>
-      </ul>
-
-      <p style="margin:0 0 6px 0;font-size:14px;color:#374151;line-height:1.55;">
-        Reply to this email if you have any questions — I'll get back to you fast.
-      </p>
-
-      <p style="margin:0;font-size:14px;color:#374151;line-height:1.55;">
-        — Andrew
-      </p>
-
-      <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;line-height:1.5;">
-        Setup link: <a href="${setupUrl}" style="color:#ff6a00;word-break:break-all;">${setupUrl}</a>
-      </div>
-    </div>
-
-    <p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">
-      AI Lead Intel · Apex Growth Investments LLC
-    </p>
-  </div>
-</body>
-</html>`;
-
-  const text = `Your AI receptionist is ready
-
-Hey ${businessName},
-
-Your AI receptionist is built and ready to start taking calls. Last step is forwarding your business calls to your AI — takes about 2 minutes.
-
-${formattedAiNumber ? `Your AI receptionist number: ${formattedAiNumber}\n\n` : ''}Open your setup page: ${setupUrl}
-
-The setup page walks you through:
-- Forwarding your business calls to your AI
-- Testing that everything works
-- Marking your AI as live
-
-Reply to this email if you have any questions — I'll get back to you fast.
-
-— Andrew`;
-
-  // ===== 3. SEND VIA RESEND =====
-  let emailSent = false;
-  let emailError = null;
-
-  if (resendKey) {
     try {
-      const r = await fetch('https://api.resend.com/emails', {
+      const res = await fetch('/api/send-setup-email', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: FROM_EMAIL,
-          to: [toEmail],
-          reply_to: REPLY_TO,
-          subject,
-          html,
-          text,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_slug: slug }),
       });
+      const data = await res.json().catch(() => ({}));
 
-      if (!r.ok) {
-        const txt = await r.text().catch(() => '');
-        emailError = `Resend HTTP ${r.status}: ${txt}`.slice(0, 300);
-        console.error('[send-setup-email] Resend failed:', emailError);
-      } else {
-        emailSent = true;
-        console.log('[send-setup-email] Email sent to', toEmail);
+      if (!res.ok || !data.success) {
+        const err = data.error || `HTTP ${res.status}`;
+        console.error('[admin] send-setup-email failed:', err, data);
+        labelEl.textContent = 'Failed';
+        btn.classList.add('error');
+        setTimeout(() => {
+          labelEl.textContent = original;
+          btn.classList.remove('error');
+          btn.disabled = false;
+        }, 3000);
+        return;
       }
-    } catch (e) {
-      emailError = String(e.message || e).slice(0, 300);
-      console.error('[send-setup-email] Resend exception:', e);
+
+      console.log('[admin] Setup email sent:', data);
+      labelEl.textContent = `Sent to ${data.email_sent_to || 'customer'}`;
+      btn.classList.add('sent');
+      setTimeout(() => {
+        labelEl.textContent = original;
+        btn.classList.remove('sent');
+        btn.disabled = false;
+      }, 4000);
+    } catch (err) {
+      console.error('[admin] send-setup-email exception:', err);
+      labelEl.textContent = 'Error';
+      btn.classList.add('error');
+      setTimeout(() => {
+        labelEl.textContent = original;
+        btn.classList.remove('error');
+        btn.disabled = false;
+      }, 3000);
     }
+  }
+
+  function attachToRows() {
+    const rows = document.querySelectorAll(`[${ROW_SLUG_ATTR}]:not([data-sse-attached])`);
+    rows.forEach(row => {
+      const slug = row.getAttribute(ROW_SLUG_ATTR);
+      if (!slug) return;
+      row.setAttribute('data-sse-attached', '1');
+
+      // Find a sensible place to inject the button. Tries common patterns.
+      let target = row.querySelector('.row-actions') ||
+                   row.querySelector('[data-actions]') ||
+                   row.querySelector('.actions') ||
+                   row.querySelector('td:last-child');
+
+      // If no obvious target, append directly to the row
+      if (!target) target = row;
+
+      target.appendChild(makeButton(slug));
+    });
+  }
+
+  // Initial attach
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachToRows);
   } else {
-    emailError = 'RESEND_API_KEY env var not set';
-    console.warn('[send-setup-email] No Resend key — email not actually sent. URL would be:', setupUrl);
+    attachToRows();
   }
 
-  // ===== 4. LOG TO activity_log =====
-  try {
-    await fetch(`${supabaseUrl}/rest/v1/activity_log`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify({
-        client_id: customer.id,
-        action: emailSent ? 'setup_email_sent' : 'setup_email_failed',
-        details: emailSent
-          ? `Setup email sent to ${toEmail}`
-          : `Setup email failed: ${emailError}`,
-      }),
-    });
-  } catch (e) {
-    console.error('[send-setup-email] activity_log write failed:', e);
-  }
+  // Re-attach when rows change (handles dynamic re-renders)
+  const observer = new MutationObserver(() => {
+    attachToRows();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
-  // ===== 5. PUSH NOTIFICATION TO ANDREW =====
-  try {
-    const title = emailSent
-      ? `Setup email sent — ${businessName}`
-      : `Setup email FAILED — ${businessName}`;
-    const lines = emailSent
-      ? [`To: ${toEmail}`, `Slug: ${clientSlug}`, formattedAiNumber ? `AI #: ${formattedAiNumber}` : ''].filter(Boolean)
-      : [`Customer: ${businessName}`, `Slug: ${clientSlug}`, `Error: ${emailError}`];
-    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-      method: 'POST',
-      headers: {
-        Title: title,
-        Priority: emailSent ? '3' : '4',
-        Tags: emailSent ? 'email' : 'warning',
-      },
-      body: lines.join('\n'),
-    });
-  } catch (_) {}
-
-  // ===== RESPOND =====
-  if (emailSent) {
-    return res.status(200).json({
-      success: true,
-      email_sent_to: toEmail,
-      setup_url: setupUrl,
-      business_name: businessName,
-    });
-  } else {
-    return res.status(500).json({
-      success: false,
-      error: emailError || 'Email send failed',
-      setup_url: setupUrl,
-      email_intended_for: toEmail,
-    });
-  }
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+  // Expose for debugging
+  window.refreshSetupEmailButtons = attachToRows;
+})();
