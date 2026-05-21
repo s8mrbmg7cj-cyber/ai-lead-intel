@@ -1,10 +1,8 @@
 // /api/report-error.js
 //
 // Captures errors from any aileadintel.com page and:
-//   1. Logs them to Supabase public.error_log table (for history)
-//   2. Sends Andrew a push notification via ntfy
-//
-// Called from window.onerror, fetch failures, and explicit reports.
+//   1. Sends Andrew a push notification via ntfy (FIRST — most important)
+//   2. Logs to Supabase public.error_log table (for history)
 
 const NTFY_TOPIC = 'mcr-leads-andrew-2025';
 
@@ -43,13 +41,40 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, ignored: true });
   }
 
-  // ===== 1. SAVE TO SUPABASE (for history) =====
+  let ntfyOk = false;
+  let ntfyStatus = null;
+  let ntfyError = null;
+  let supabaseOk = false;
+
+  // ===== 1. NTFY PUSH FIRST — and we WAIT for it to complete =====
+  try {
+    const ntfyRes = await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+      method: 'POST',
+      headers: {
+        'Title': 'Error on aileadintel.com',
+        'Priority': '4',
+        'Tags': 'warning',
+      },
+      body: `Page: ${page}\nAction: ${action}\nError: ${errorMsg}${slug ? `\nCustomer: ${slug}` : ''}`,
+    });
+    ntfyStatus = ntfyRes.status;
+    ntfyOk = ntfyRes.ok;
+    if (!ntfyOk) {
+      const txt = await ntfyRes.text().catch(() => '');
+      ntfyError = `HTTP ${ntfyRes.status} ${txt}`.slice(0, 200);
+    }
+  } catch (e) {
+    ntfyError = String(e && e.message ? e.message : e).slice(0, 200);
+    console.error('[report-error] ntfy push exception:', e);
+  }
+
+  // ===== 2. LOG TO SUPABASE (best effort) =====
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   if (supabaseUrl && supabaseKey) {
     try {
-      await fetch(`${supabaseUrl}/rest/v1/error_log`, {
+      const sbRes = await fetch(`${supabaseUrl}/rest/v1/error_log`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,35 +91,18 @@ export default async function handler(req, res) {
           stack_trace: stack || null,
         }),
       });
+      supabaseOk = sbRes.ok;
     } catch (e) {
       console.error('[report-error] Supabase log failed:', e);
     }
   }
 
-  // ===== 2. PUSH NOTIFICATION TO ANDREW =====
-  try {
-    const title = `🚨 Error on aileadintel.com`;
-    const lines = [
-      `Page: ${page}`,
-      `Action: ${action}`,
-      `Error: ${errorMsg}`,
-    ];
-    if (slug) lines.push(`Customer: ${slug}`);
+  console.log('[report-error]', { page, action, errorMsg, ntfyOk, ntfyStatus, ntfyError, supabaseOk });
 
-    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-      method: 'POST',
-      headers: {
-        'Title': title,
-        'Priority': '4',
-        'Tags': 'warning',
-      },
-      body: lines.join('\n'),
-    });
-  } catch (e) {
-    console.error('[report-error] ntfy push failed:', e);
-  }
-
-  console.log('[report-error] Logged:', { page, action, errorMsg, slug });
-
-  return res.status(200).json({ success: true });
+  return res.status(200).json({
+    success: true,
+    ntfy: { ok: ntfyOk, status: ntfyStatus, error: ntfyError },
+    supabase: { ok: supabaseOk },
+    topic: NTFY_TOPIC,
+  });
 }
