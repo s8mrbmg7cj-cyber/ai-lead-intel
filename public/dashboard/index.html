@@ -8,6 +8,113 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  .support-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 18px 0 24px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,106,0,0.14);
+  backdrop-filter: blur(16px);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.support-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6a00, #ff8f3f);
+}
+
+.support-banner:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,106,0,0.3);
+  box-shadow: 0 10px 28px rgba(255,106,0,0.12);
+}
+
+.support-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.support-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255,106,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6a00;
+  flex-shrink: 0;
+}
+
+.support-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.support-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+}
+
+.support-email {
+  font-size: 14px;
+  color: #666;
+}
+
+.support-email span {
+  color: #ff6a00;
+  font-weight: 600;
+}
+
+.support-arrow {
+  color: #ff6a00;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.support-banner:hover .support-arrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .support-banner {
+    padding: 16px;
+  }
+
+  .support-left {
+    align-items: flex-start;
+  }
+
+  .support-title {
+    font-size: 14px;
+  }
+
+  .support-email {
+    font-size: 13px;
+    word-break: break-word;
+  }
+
+  .support-icon {
+    width: 42px;
+    height: 42px;
+  }
+}
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
