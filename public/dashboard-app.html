@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Dashboard · AI Lead Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a; --bg-2: #0c0c0f;
+  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22;
+  --surface-input: #0d0d10;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
+  --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a; --text-muted: #52525b;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
+  --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased; line-height: 1.55;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.10), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 100% 0%, rgba(255,154,0,0.06), transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,10,0.72);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  position: relative; overflow: hidden;
+}
+.logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-dim); }
+.nav-right a:hover { color: var(--text); }
+.pro-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; border-radius: 99px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  box-shadow: 0 2px 8px var(--brand-glow);
+}
+.wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 36px 28px 80px; }
+.page-head { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.page-eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--brand);
+  font-weight: 600; margin-bottom: 6px;
+}
+.page-title { font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; }
+.page-title .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.refresh-cluster { display: flex; align-items: center; gap: 10px; }
+.refresh-info { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.06em; }
+.btn-refresh {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 14px;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  border-radius: 9px;
+  font-size: 12px; color: var(--text-dim); font-weight: 500;
+  transition: all 0.15s;
+  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
+}
+.btn-refresh:hover { background: var(--surface-3); color: var(--text); }
+.btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.support-banner {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; margin-bottom: 24px;
+  background:
+    linear-gradient(135deg, rgba(255,106,0,0.04) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(22,22,27,0.6) 0%, rgba(17,17,20,0.6) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  text-decoration: none; color: inherit;
+}
+.support-banner::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 20%, rgba(255,106,0,0.5) 50%, transparent 80%);
+  opacity: 0.7; transition: opacity 0.25s;
+}
+.support-banner:hover {
+  border-color: var(--brand-line);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px var(--brand-line) inset;
+}
+.support-banner:hover::before { opacity: 1; }
+.support-banner:hover .support-arrow { transform: translateX(3px); color: var(--brand); }
+.support-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(255,106,0,0.08);
+  border: 1px solid rgba(255,106,0,0.18);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.25s;
+}
+.support-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.support-title { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; line-height: 1.35; }
+.support-email { font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--text-dim); letter-spacing: 0.02em; }
+.support-email .at { color: var(--brand); }
+.support-arrow { color: var(--text-faint); flex-shrink: 0; transition: all 0.25s; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.stat {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px;
+  position: relative; overflow: hidden;
+}
+.stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border-3), transparent); }
+.stat.hero { background: linear-gradient(135deg, var(--brand-tint) 0%, var(--surface-2) 100%); border-color: var(--brand-line); }
+.stat.hero::before { background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.stat-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 10px; }
+.stat-value { font-family: 'Geist Mono', monospace; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; }
+.stat.hero .stat-value { color: var(--brand); }
+.stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 7px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+.calls-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; position: relative;
+}
+.calls-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border-3), transparent); }
+.calls-card::after { content: ''; position: absolute; top: -1px; left: 25%; right: 25%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
+.calls-card-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 22px; border-bottom: 1px solid var(--border); }
+.calls-card-title { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; }
+.calls-card-meta { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; }
+.call-row { display: grid; grid-template-columns: 160px 1fr 110px; gap: 18px; padding: 18px 22px; border-bottom: 1px solid var(--border); align-items: start; }
+.call-row:last-child { border-bottom: none; }
+.call-caller { display: flex; flex-direction: column; gap: 4px; }
+.call-number { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+.call-meta { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.04em; }
+.call-summary { font-size: 13.5px; color: var(--text-soft); line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
+.call-summary.empty { color: var(--text-muted); font-style: italic; font-size: 12.5px; }
+.call-time { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; text-align: right; }
+.empty-state { text-align: center; padding: 60px 24px; }
+.empty-icon { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; }
+.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.empty-sub { font-size: 13px; color: var(--text-dim); max-width: 360px; margin: 0 auto; }
+.loading-state { padding: 60px 24px; display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--text-faint); font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.loading-spinner { width: 22px; height: 22px; border: 2.5px solid var(--surface-3); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.fullpage-state { position: relative; z-index: 1; min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.fullpage-card { max-width: 440px; width: 100%; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 18px; padding: 40px 32px; text-align: center; position: relative; overflow: hidden; }
+.fullpage-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.fullpage-icon { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; }
+.fullpage-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+.fullpage-sub { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 22px; }
+.fullpage-cta { display: inline-flex; align-items: center; gap: 7px; padding: 11px 20px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 10px; color: var(--text); font-size: 13px; font-weight: 500; transition: all 0.15s; }
+.fullpage-cta:hover { background: var(--surface-3); border-color: var(--border-3); }
+.fullpage-cta.primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); border-color: transparent; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 12px var(--brand-glow); }
+@media (max-width: 720px) {
+  .topnav { padding: 12px 16px; }
+  .wrap { padding: 24px 16px 64px; }
+  .page-title { font-size: 26px; }
+  .stats { grid-template-columns: 1fr; }
+  .call-row { grid-template-columns: 1fr; gap: 8px; padding: 16px 18px; }
+  .call-time { text-align: left; }
+  .support-banner { padding: 12px 14px; gap: 12px; }
+  .support-icon { width: 32px; height: 32px; }
+  .support-title { font-size: 12.5px; }
+  .support-email { font-size: 11px; word-break: break-all; }
+}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="/" class="logo">
+    <div class="logo-mark"></div>
+    <span>AI Lead Intel</span>
+  </a>
+  <div class="nav-right" id="nav-right">
+    <a href="/" target="_blank">Site ↗</a>
+  </div>
+</nav>
+<div id="root"></div>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const root = document.getElementById('root');
+let currentClient = null;
+function getSlugFromPath() {
+  const parts = window.location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+  if (parts[0] !== 'dashboard') return null;
+  const slug = parts[1] || '';
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) return null;
+  return slug;
+}
+function escapeHtml(s) { if (s === null || s === undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatPhone(raw) { if (!raw) return '—'; let d = String(raw).replace(/\D/g,''); if (d.length === 11 && d.startsWith('1')) d = d.slice(1); if (d.length !== 10) return raw; return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6,10)}`; }
+function timeAgo(iso) { if (!iso) return '—'; const diff = Date.now() - new Date(iso).getTime(); if (diff < 60000) return 'just now'; if (diff < 3600000) return Math.floor(diff/60000) + 'm ago'; if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago'; if (diff < 7*86400000) return Math.floor(diff/86400000) + 'd ago'; return new Date(iso).toLocaleDateString(); }
+function fullDate(iso) { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+function renderFullState({ icon, title, sub, ctaText, ctaHref, ctaPrimary }) {
+  root.innerHTML = `
+    <div class="fullpage-state">
+      <div class="fullpage-card">
+        <div class="fullpage-icon">${icon}</div>
+        <div class="fullpage-title">${escapeHtml(title)}</div>
+        <div class="fullpage-sub">${escapeHtml(sub)}</div>
+        ${ctaText ? `<a class="fullpage-cta ${ctaPrimary ? 'primary' : ''}" href="${escapeHtml(ctaHref)}">${escapeHtml(ctaText)}</a>` : ''}
+      </div>
+    </div>`;
+}
+function renderNotFound() {
+  renderFullState({
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    title: 'Dashboard not found',
+    sub: "We couldn't find a customer with this dashboard URL. Double-check the link from your welcome email.",
+    ctaText: 'Email support', ctaHref: 'mailto:hello@aileadintel.com',
+  });
+}
+function renderNotPro(client) {
+  renderFullState({
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    title: 'Dashboard is a Pro feature',
+    sub: `${client.business_name || 'Your account'} is on the Starter plan. Upgrade to AI Front Desk Pro to access the dashboard.`,
+    ctaText: 'See Pro plan', ctaHref: '/#pricing', ctaPrimary: true,
+  });
+}
+function renderError(msg) {
+  renderFullState({
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    title: "Couldn't load dashboard",
+    sub: msg || 'Something went wrong. Try refreshing.',
+    ctaText: 'Refresh page', ctaHref: window.location.pathname,
+  });
+}
+function renderShell(client) {
+  document.title = `${client.business_name || 'Dashboard'} · AI Lead Intel`;
+  document.getElementById('nav-right').innerHTML = `<span class="pro-pill">PRO</span><a href="/" target="_blank">Site ↗</a>`;
+  root.innerHTML = `
+    <div class="wrap">
+      <div class="page-head">
+        <div>
+          <div class="page-eyebrow">Your Dashboard</div>
+          <h1 class="page-title">${escapeHtml(client.business_name || 'Your business')}</h1>
+        </div>
+        <div class="refresh-cluster">
+          <span class="refresh-info" id="refresh-info">—</span>
+          <button class="btn-refresh" id="refresh-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      <a href="mailto:hello@aileadintel.com" class="support-banner" aria-label="Email your setup specialist">
+        <div class="support-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="support-text">
+          <div class="support-title">Need help? Text or call your setup specialist anytime.</div>
+          <div class="support-email">hello<span class="at">@</span>aileadintel.com</div>
+        </div>
+        <svg class="support-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <div class="stats">
+        <div class="stat hero">
+          <div class="stat-label">Calls This Week</div>
+          <div class="stat-value" id="stat-week">—</div>
+          <div class="stat-sub">Last 7 days</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Leads Captured</div>
+          <div class="stat-value" id="stat-leads">—</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Calls Today</div>
+          <div class="stat-value" id="stat-today">—</div>
+          <div class="stat-sub">Since midnight</div>
+        </div>
+      </div>
+      <div class="calls-card">
+        <div class="calls-card-head">
+          <div class="calls-card-title">Recent Calls</div>
+          <div class="calls-card-meta" id="calls-meta">—</div>
+        </div>
+        <div id="calls-body">
+          <div class="loading-state"><div class="loading-spinner"></div><span>Loading calls</span></div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('refresh-btn').addEventListener('click', () => loadCalls(client));
+}
+async function loadCalls(client) {
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) refreshBtn.disabled = true;
+  try {
+    const { data: calls, error } = await supabase.from('calls').select('*').eq('client_id', client.id).order('created_at', { ascending: false }).limit(50);
+    if (error) throw error;
+    const list = calls || [];
+    const now = Date.now();
+    const weekAgo = now - 7*24*60*60*1000;
+    const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
+    const callsThisWeek = list.filter(c => c.created_at && new Date(c.created_at).getTime() >= weekAgo).length;
+    const callsToday = list.filter(c => c.created_at && new Date(c.created_at).getTime() >= startOfToday.getTime()).length;
+    const leadsCaptured = list.filter(c => (c.summary && c.summary.length > 10) || c.caller_number).length;
+    document.getElementById('stat-week').textContent = callsThisWeek;
+    document.getElementById('stat-leads').textContent = leadsCaptured;
+    document.getElementById('stat-today').textContent = callsToday;
+    document.getElementById('calls-meta').textContent = list.length === 0 ? 'No calls yet' : `Showing ${list.length} most recent`;
+    const body = document.getElementById('calls-body');
+    if (list.length === 0) {
+      body.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+          <div class="empty-title">No calls yet</div>
+          <div class="empty-sub">Your calls will appear here as soon as your AI starts answering. Make sure forwarding is set up.</div>
+        </div>`;
+    } else {
+      body.innerHTML = list.map(c => `
+        <div class="call-row">
+          <div class="call-caller">
+            <div class="call-number">${escapeHtml(formatPhone(c.caller_number || c.from_number))}</div>
+            <div class="call-meta">${escapeHtml(fullDate(c.created_at))}</div>
+          </div>
+          <div class="call-summary ${c.summary ? '' : 'empty'}">${c.summary ? escapeHtml(c.summary) : 'No summary available.'}</div>
+          <div class="call-time">${escapeHtml(timeAgo(c.created_at))}</div>
+        </div>`).join('');
+    }
+    const info = document.getElementById('refresh-info');
+    if (info) info.textContent = 'Updated ' + timeAgo(new Date().toISOString());
+  } catch (e) {
+    console.error('[dashboard] load calls failed:', e);
+    const body = document.getElementById('calls-body');
+    if (body) body.innerHTML = `<div class="empty-state"><div class="empty-title">Couldn't load calls</div><div class="empty-sub">${escapeHtml(e.message || 'Unknown error')}</div></div>`;
+  } finally {
+    if (refreshBtn) refreshBtn.disabled = false;
+  }
+}
+async function init() {
+  const slug = getSlugFromPath();
+  if (!slug) { renderNotFound(); return; }
+  root.innerHTML = `<div class="wrap"><div class="loading-state"><div class="loading-spinner"></div><span>Loading your dashboard</span></div></div>`;
+  try {
+    const { data, error } = await supabase.from('clients').select('id, business_name, client_slug, plan').eq('client_slug', slug).limit(1);
+    if (error) throw error;
+    if (!data || data.length === 0) { renderNotFound(); return; }
+    const client = data[0];
+    currentClient = client;
+    const plan = (client.plan || '').toLowerCase();
+    if (plan !== 'pro') { renderNotPro(client); return; }
+    renderShell(client);
+    loadCalls(client);
+    setInterval(() => { if (currentClient) loadCalls(currentClient); }, 60000);
+  } catch (e) {
+    console.error('[dashboard] init failed:', e);
+    renderError(e.message);
+  }
+}
+init();
+</script>
+</body>
+</html>
