@@ -1,91 +1,106 @@
 /*!
- * AI Lead Intel — Admin Auth Guard
+ * AI Lead Intel — Admin Auth Guard (HARD BLOCK VERSION)
  *
- * Drop into every page under /admin/ to:
- *   1. Verify the user has a valid admin_session cookie (server-side check)
- *   2. Redirect to /admin/login if not
- *   3. Add a small logout button in the top-right of the nav
+ * Must be loaded as the FIRST script in <head> on every admin page.
+ * Immediately hides the document, calls /api/admin-check, then either
+ * reveals the page or redirects to /admin/login.
  *
- * The cookie is HttpOnly so we can't read it from JS — we rely on the server
- * to validate it by calling /api/admin-check.
+ * Console traces:
+ *   [auth-guard] loaded
+ *   [auth-guard] checking session
+ *   [auth-guard] authorized
+ *   [auth-guard] unauthorized redirect
  */
 
 (function () {
   'use strict';
 
+  console.log('[auth-guard] loaded');
+
+  // ===== INSTANT HIDE (before any paint) =====
+  // documentElement is always available — it's the <html> tag itself
+  try {
+    document.documentElement.style.visibility = 'hidden';
+  } catch (e) {
+    console.error('[auth-guard] could not hide document:', e);
+  }
+
   const CURRENT_PATH = window.location.pathname + window.location.search;
   const LOGIN_URL = `/admin/login?return=${encodeURIComponent(CURRENT_PATH)}`;
 
   // Don't run guard on the login page itself
-  if (window.location.pathname.startsWith('/admin/login')) return;
+  if (window.location.pathname.startsWith('/admin/login')) {
+    document.documentElement.style.visibility = 'visible';
+    return;
+  }
 
-  // ===== STYLES =====
-  const style = document.createElement('style');
-  style.textContent = `
-    .admin-guard-blocker {
-      position: fixed; inset: 0;
-      background: #08080a;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 99999;
-      font-family: 'Geist Mono', monospace;
-      color: rgba(255,255,255,0.5);
-      font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    .admin-guard-spinner {
-      width: 28px; height: 28px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: #ff6a00;
-      border-radius: 50%;
-      animation: ag-spin 0.8s linear infinite;
-      margin-right: 14px;
-    }
-    @keyframes ag-spin { to { transform: rotate(360deg); } }
-    .admin-logout-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 11px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 7px;
-      color: #a1a1aa;
-      font-family: 'Geist Mono', monospace;
-      font-size: 10.5px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .admin-logout-btn:hover {
-      background: rgba(248,113,113,0.10);
-      border-color: rgba(248,113,113,0.30);
-      color: #f87171;
-    }
-  `;
-  document.head.appendChild(style);
+  function reveal() {
+    document.documentElement.style.visibility = 'visible';
+  }
 
-  // ===== BLOCK PAGE UNTIL AUTH RESOLVED =====
-  const blocker = document.createElement('div');
-  blocker.className = 'admin-guard-blocker';
-  blocker.innerHTML = `<div class="admin-guard-spinner"></div><span>Verifying access</span>`;
-  document.body.appendChild(blocker);
+  function redirectToLogin() {
+    console.log('[auth-guard] unauthorized redirect');
+    // Don't reveal — leave hidden so the user never sees flash
+    window.location.replace(LOGIN_URL);
+  }
 
-  // ===== CHECK AUTH =====
-  fetch('/api/admin-check', { credentials: 'same-origin' })
-    .then(r => r.json().catch(() => ({})))
+  // ===== CHECK AUTH IMMEDIATELY =====
+  console.log('[auth-guard] checking session');
+
+  fetch('/api/admin-check', { credentials: 'same-origin', cache: 'no-store' })
+    .then(r => {
+      if (r.status === 401) {
+        redirectToLogin();
+        return null;
+      }
+      return r.json().catch(() => ({}));
+    })
     .then(data => {
-      if (!data || !data.success) {
-        window.location.replace(LOGIN_URL);
+      if (!data) return; // already redirected
+      if (!data.success) {
+        redirectToLogin();
         return;
       }
-      // ✅ Authenticated — remove blocker, wire up logout
-      blocker.remove();
-      injectLogoutButton();
+      console.log('[auth-guard] authorized');
+      reveal();
+      // Inject logout button once DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectLogoutButton);
+      } else {
+        injectLogoutButton();
+      }
     })
-    .catch(() => {
-      window.location.replace(LOGIN_URL);
+    .catch(err => {
+      console.error('[auth-guard] check failed:', err);
+      redirectToLogin();
     });
 
   // ===== LOGOUT BUTTON =====
   function injectLogoutButton() {
+    // Inject style
+    const style = document.createElement('style');
+    style.textContent = `
+      .admin-logout-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 11px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 7px;
+        color: #a1a1aa;
+        font-family: 'Geist Mono', monospace;
+        font-size: 10.5px; font-weight: 600;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .admin-logout-btn:hover {
+        background: rgba(248,113,113,0.10);
+        border-color: rgba(248,113,113,0.30);
+        color: #f87171;
+      }
+    `;
+    document.head.appendChild(style);
+
     const btn = document.createElement('button');
     btn.className = 'admin-logout-btn';
     btn.type = 'button';
@@ -105,11 +120,10 @@
       window.location.href = '/admin/login';
     });
 
-    // Find a good spot — try the topnav first, fall back to body
-    const navRight = document.querySelector('.nav-right') ||
-                     document.querySelector('.topnav') ||
-                     document.body;
-    navRight.appendChild(btn);
+    const target = document.querySelector('.nav-right') ||
+                   document.querySelector('.topnav') ||
+                   document.body;
+    target.appendChild(btn);
   }
 
   // Expose for manual calls
@@ -119,4 +133,12 @@
     } catch (_) {}
     window.location.href = '/admin/login';
   };
+
+  // Failsafe: if something hangs for 8 seconds, just redirect to login
+  setTimeout(() => {
+    if (document.documentElement.style.visibility === 'hidden') {
+      console.warn('[auth-guard] timed out — forcing redirect');
+      redirectToLogin();
+    }
+  }, 8000);
 })();
