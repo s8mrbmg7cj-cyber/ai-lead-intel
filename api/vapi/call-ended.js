@@ -1,10 +1,50 @@
 export const config = {
   maxDuration: 30,
 };
+import crypto from "crypto";
+function verifyVapiSignature(req) {
+  try {
+    const signature = req.headers["x-vapi-signature"];
 
+    if (!signature) {
+      console.error("Missing Vapi signature");
+      return false;
+    }
+
+    const secret = process.env.VAPI_WEBHOOK_SECRET;
+
+    if (!secret) {
+      console.error("Missing VAPI_WEBHOOK_SECRET");
+      return false;
+    }
+
+    const rawBody =
+      typeof req.body === "string"
+        ? req.body
+        : JSON.stringify(req.body);
+
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(rawBody)
+      .digest("hex");
+
+    return signature === expectedSignature;
+  } catch (err) {
+    console.error("Signature verification failed:", err);
+    return false;
+  }
+}
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const validSignature = verifyVapiSignature(req);
+
+  if (!validSignature) {
+    return res.status(401).json({
+      error: "Invalid webhook signature",
+    });
   }
 
   try {
