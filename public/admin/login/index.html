@@ -1,122 +1,212 @@
-/*!
- * AI Lead Intel — Admin Auth Guard
- *
- * Drop into every page under /admin/ to:
- *   1. Verify the user has a valid admin_session cookie (server-side check)
- *   2. Redirect to /admin/login if not
- *   3. Add a small logout button in the top-right of the nav
- *
- * The cookie is HttpOnly so we can't read it from JS — we rely on the server
- * to validate it by calling /api/admin-check.
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin login · AI Lead Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a; --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
+  --text: #fafafa; --text-dim: #a1a1aa; --text-faint: #71717a;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
+  --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.10); --red-line: rgba(248,113,113,0.30);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.12), transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+.card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 380px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 36px 32px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 12px 28px rgba(0,0,0,0.35);
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-3), transparent);
+}
+.card::after {
+  content: ''; position: absolute; top: -1px; left: 25%; right: 25%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; margin-bottom: 24px;
+}
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  position: relative; overflow: hidden;
+}
+.logo-mark::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22));
+}
+.eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--brand); font-weight: 600; margin-bottom: 8px;
+}
+h1 {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+  margin-bottom: 6px; line-height: 1.2;
+}
+h1 .accent {
+  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sub { color: var(--text-dim); font-size: 13.5px; margin-bottom: 22px; }
+label {
+  display: block;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+  font-weight: 600; margin-bottom: 8px;
+}
+input[type="password"] {
+  width: 100%; padding: 13px 14px;
+  background: var(--surface-3); border: 1px solid var(--border-2);
+  border-radius: 11px; color: var(--text); font-family: inherit;
+  font-size: 14px; transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type="password"]:focus {
+  outline: none; border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-tint);
+}
+.error-banner {
+  margin-top: 14px; padding: 10px 13px;
+  background: var(--red-soft); border: 1px solid var(--red-line);
+  border-radius: 9px; color: var(--red);
+  font-size: 12.5px; line-height: 1.5;
+  display: none;
+}
+.error-banner.visible { display: block; animation: slideIn 0.25s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+button {
+  width: 100%; margin-top: 18px;
+  padding: 13px 22px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
+  color: #fff; border: none; border-radius: 11px;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 28px var(--brand-glow);
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.spinner {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.foot {
+  margin-top: 18px; text-align: center;
+  font-size: 11px; color: var(--text-faint);
+}
+.foot a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+.foot a:hover { color: var(--brand); }
+</style>
+</head>
+<body>
 
-(function () {
-  'use strict';
+<div class="card">
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <span>AI Lead Intel · Admin</span>
+  </div>
 
-  const CURRENT_PATH = window.location.pathname + window.location.search;
-  const LOGIN_URL = `/admin/login?return=${encodeURIComponent(CURRENT_PATH)}`;
+  <div class="eyebrow">Restricted Access</div>
+  <h1>Sign in to <span class="accent">admin</span></h1>
+  <p class="sub">Enter your admin password to continue.</p>
 
-  // Don't run guard on the login page itself
-  if (window.location.pathname.startsWith('/admin/login')) return;
+  <form id="login-form">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" autofocus required />
+    <div class="error-banner" id="error-banner"></div>
+    <button type="submit" id="submit-btn">
+      <span id="btn-label">Sign in</span>
+    </button>
+  </form>
 
-  // ===== STYLES =====
-  const style = document.createElement('style');
-  style.textContent = `
-    .admin-guard-blocker {
-      position: fixed; inset: 0;
-      background: #08080a;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 99999;
-      font-family: 'Geist Mono', monospace;
-      color: rgba(255,255,255,0.5);
-      font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    .admin-guard-spinner {
-      width: 28px; height: 28px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: #ff6a00;
-      border-radius: 50%;
-      animation: ag-spin 0.8s linear infinite;
-      margin-right: 14px;
-    }
-    @keyframes ag-spin { to { transform: rotate(360deg); } }
-    .admin-logout-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 11px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 7px;
-      color: #a1a1aa;
-      font-family: 'Geist Mono', monospace;
-      font-size: 10.5px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .admin-logout-btn:hover {
-      background: rgba(248,113,113,0.10);
-      border-color: rgba(248,113,113,0.30);
-      color: #f87171;
-    }
-  `;
-  document.head.appendChild(style);
+  <div class="foot">
+    <a href="/">← Back to site</a>
+  </div>
+</div>
 
-  // ===== BLOCK PAGE UNTIL AUTH RESOLVED =====
-  const blocker = document.createElement('div');
-  blocker.className = 'admin-guard-blocker';
-  blocker.innerHTML = `<div class="admin-guard-spinner"></div><span>Verifying access</span>`;
-  document.body.appendChild(blocker);
+<script>
+const form = document.getElementById('login-form');
+const btn = document.getElementById('submit-btn');
+const btnLabel = document.getElementById('btn-label');
+const passwordInput = document.getElementById('password');
+const errorBanner = document.getElementById('error-banner');
 
-  // ===== CHECK AUTH =====
-  fetch('/api/admin-check', { credentials: 'same-origin' })
-    .then(r => r.json().catch(() => ({})))
-    .then(data => {
-      if (!data || !data.success) {
-        window.location.replace(LOGIN_URL);
-        return;
-      }
-      // ✅ Authenticated — remove blocker, wire up logout
-      blocker.remove();
-      injectLogoutButton();
-    })
-    .catch(() => {
-      window.location.replace(LOGIN_URL);
+function getReturnPath() {
+  const params = new URLSearchParams(window.location.search);
+  const r = params.get('return') || '/admin/';
+  if (r.startsWith('/') && !r.startsWith('//')) return r;
+  return '/admin/';
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorBanner.classList.remove('visible');
+  btn.disabled = true;
+  btnLabel.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const res = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ password: passwordInput.value }),
     });
+    const data = await res.json().catch(() => ({}));
 
-  // ===== LOGOUT BUTTON =====
-  function injectLogoutButton() {
-    const btn = document.createElement('button');
-    btn.className = 'admin-logout-btn';
-    btn.type = 'button';
-    btn.innerHTML = `
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/>
-        <line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      <span>Log out</span>
-    `;
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      try {
-        await fetch('/api/admin-login', { method: 'DELETE', credentials: 'same-origin' });
-      } catch (_) {}
-      window.location.href = '/admin/login';
-    });
+    if (!res.ok || !data.success) {
+      errorBanner.textContent = data.error || 'Login failed. Try again.';
+      errorBanner.classList.add('visible');
+      btn.disabled = false;
+      btnLabel.textContent = 'Sign in';
+      passwordInput.value = '';
+      passwordInput.focus();
+      return;
+    }
 
-    // Find a good spot — try the topnav first, fall back to body
-    const navRight = document.querySelector('.nav-right') ||
-                     document.querySelector('.topnav') ||
-                     document.body;
-    navRight.appendChild(btn);
+    btnLabel.textContent = 'Redirecting...';
+    window.location.href = getReturnPath();
+  } catch (err) {
+    errorBanner.textContent = 'Network error. Try again.';
+    errorBanner.classList.add('visible');
+    btn.disabled = false;
+    btnLabel.textContent = 'Sign in';
   }
+});
+</script>
 
-  // Expose for manual calls
-  window.adminLogout = async () => {
-    try {
-      await fetch('/api/admin-login', { method: 'DELETE', credentials: 'same-origin' });
-    } catch (_) {}
-    window.location.href = '/admin/login';
-  };
-})();
+</body>
+</html>
