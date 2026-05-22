@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/dashboard/:slug",
+      "destination": "/dashboard-app"
+    }
+  ],
   "headers": [
     {
       "source": "/admin/(.*)",
