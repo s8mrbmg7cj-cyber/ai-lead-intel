@@ -1,3 +1,4 @@
+import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
 
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
@@ -269,6 +270,52 @@ async function createClientRow(data, onboardingId) {
 }
 
 export default async function handler(req, res) {
+  // ============================================================
+// PASTE THIS BLOCK at the very top of your handler function,
+// right after `export default async function handler(req, res) {`
+// and BEFORE any of your existing logic.
+//
+// Add this import at the very top of the file (above the handler):
+//   import { rateLimit, getClientIp } from '../lib/rate-limit.js';
+//
+// Then drop this block in:
+// ============================================================
+
+  // ===== SECURITY HEADERS =====
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+
+  // ===== RATE LIMIT (5 submissions per IP per hour) =====
+  if (req.method === 'POST') {
+    const ip = getClientIp(req);
+    const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60); // 5 / hour
+    if (!limit.ok) {
+      res.setHeader('Retry-After', String(limit.retryAfter));
+      console.warn(`[onboarding-submit] 🚫 RATE LIMITED ip=${ip} count=${limit.count}`);
+      return res.status(429).json({
+        success: false,
+        error: 'Too many submissions. Please try again later.',
+      });
+    }
+
+    // ===== HONEYPOT — silently reject bots =====
+    let _body = req.body || {};
+    if (typeof _body === 'string') {
+      try { _body = JSON.parse(_body); } catch (_) { _body = {}; }
+    }
+    // Bots fill in every input they see. The honeypot field is hidden via CSS
+    // so real humans never type into it. If it's filled, it's a bot.
+    if (_body.website_url || _body.company_size_other || _body._gotcha) {
+      console.warn(`[onboarding-submit] 🍯 HONEYPOT TRIGGERED ip=${ip} fields=${Object.keys(_body).filter(k => ['website_url','company_size_other','_gotcha'].includes(k)).join(',')}`);
+      // Return a fake success so bots don't know they were detected
+      return res.status(200).json({ success: true });
+    }
+  }
+
+  // ============================================================
+  // YOUR EXISTING CODE CONTINUES BELOW THIS LINE — DO NOT CHANGE
+  // ============================================================
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
