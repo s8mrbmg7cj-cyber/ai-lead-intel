@@ -1759,6 +1759,9 @@
         const res = await fetch('/api/onboarding-submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          honeypot_name: '',
+website_url: '',
+company_fax: '',
           body: JSON.stringify(formData),
         });
         if (!res.ok && res.status !== 404) {
