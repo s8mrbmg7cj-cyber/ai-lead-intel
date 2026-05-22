@@ -7,6 +7,23 @@ import { requireAdmin } from '../lib/auth.js';
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store');
+  // ============================================================
+// In api/health-check.js, find this section near the top:
+//
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Cache-Control', 'no-store');         ← already there
+//
+// You already have Cache-Control: no-store ✅
+// ADD these three lines right after it:
+// ============================================================
+
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+
+// ============================================================
+// That's it for health-check. Everything else stays the same.
+// ============================================================
 
   // ===== AUTH CHECK =====
   if (!requireAdmin(req, res)) return;
