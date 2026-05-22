@@ -7,6 +7,33 @@
 const NTFY_TOPIC = 'mcr-leads-andrew-2025';
 
 export default async function handler(req, res) {
+  // ============================================================
+// PASTE THIS BLOCK at the top of your handler function,
+// right after `export default async function handler(req, res) {`
+//
+// Add at the very top of the file (above the handler):
+//   import { rateLimit, getClientIp } from '../lib/rate-limit.js';
+// ============================================================
+
+  // Security headers
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  // Rate limit — 30 errors per IP per minute (real errors burst, attackers spam)
+  if (req.method === 'POST') {
+    const ip = getClientIp(req);
+    const limit = rateLimit(`error:${ip}`, 30, 60); // 30 / minute
+    if (!limit.ok) {
+      res.setHeader('Retry-After', String(limit.retryAfter));
+      console.warn(`[report-error] 🚫 RATE LIMITED ip=${ip}`);
+      // Silent 429 — don't tell attackers anything useful
+      return res.status(429).json({ success: false });
+    }
+  }
+
+  // ============================================================
+  // YOUR EXISTING CODE CONTINUES BELOW
+  // ============================================================
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
