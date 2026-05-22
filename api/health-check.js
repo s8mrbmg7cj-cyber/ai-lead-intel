@@ -1,22 +1,15 @@
 // /api/health-check.js
 //
-// Runs health checks on all critical systems and returns a status report.
-//
-// GET /api/health-check
-// Response: {
-//   overall: 'healthy' | 'degraded' | 'down',
-//   checks: {
-//     supabase: { ok, ms, error? },
-//     twilio: { ok, count, error? },
-//     vapi: { ok, count, error? },
-//     activity: { last_call_at, last_onboarding_at, calls_24h, onboardings_24h }
-//   },
-//   timestamp: ISO
-// }
+// PROTECTED — requires valid admin_session cookie.
+
+import { requireAdmin } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store');
+
+  // ===== AUTH CHECK =====
+  if (!requireAdmin(req, res)) return;
 
   const checks = {
     supabase: { ok: false, ms: null, error: null },
@@ -47,9 +40,7 @@ export default async function handler(req, res) {
       });
       checks.supabase.ms = Date.now() - start;
       checks.supabase.ok = r.ok;
-      if (!r.ok) {
-        checks.supabase.error = `HTTP ${r.status}`;
-      }
+      if (!r.ok) checks.supabase.error = `HTTP ${r.status}`;
     } catch (e) {
       checks.supabase.error = String(e.message || e).slice(0, 200);
     }
@@ -105,7 +96,6 @@ export default async function handler(req, res) {
   if (supabaseUrl && supabaseKey) {
     const sinceISO = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    // Last call + 24h count
     try {
       const r = await fetch(
         `${supabaseUrl}/rest/v1/calls?select=created_at&order=created_at.desc&limit=1`,
@@ -135,7 +125,6 @@ export default async function handler(req, res) {
       }
     } catch (_) {}
 
-    // Last onboarding + 24h count
     try {
       const r = await fetch(
         `${supabaseUrl}/rest/v1/client_onboarding?select=created_at&order=created_at.desc&limit=1`,
@@ -166,7 +155,6 @@ export default async function handler(req, res) {
     } catch (_) {}
   }
 
-  // ===== OVERALL STATUS =====
   const critical = [checks.supabase.ok, checks.twilio.ok, checks.vapi.ok];
   const okCount = critical.filter(x => x).length;
   let overall = 'down';
