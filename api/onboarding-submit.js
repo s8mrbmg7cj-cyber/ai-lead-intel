@@ -1,15 +1,11 @@
 // api/onboarding-submit.js
-// Failsafe onboarding handler.
-// - Only Supabase failures return 500. Emails/ntfy can never crash the request.
-// - createClientRow uses lookup-then-PATCH-or-POST (no on_conflict, no upsert).
-// - Sets payment_pending=true, payment_required=true, payment_status='unpaid' on insert.
+// Failsafe onboarding handler with upgraded customer confirmation email.
 
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
 
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 
-// Pricing — single source of truth for the API
 const PLAN_PRICING = {
   starter: { amount: 97.00, label: "Starter — $97/month" },
   pro: { amount: 297.00, label: "AI Front Desk Pro — $297/month" },
@@ -21,11 +17,8 @@ const PLAN_PRICING = {
 
 function escapeHtml(value) {
   return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function normalizeData(data) {
@@ -81,12 +74,10 @@ async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
   let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
   if (!base) base = slugifyBase(data.business_name);
-
   console.log("[onboarding] 🔧 base slug:", base);
-
   const taken = await isSlugTaken(base, supabaseUrl, supabaseKey);
   if (!taken) {
-    console.log("[onboarding] 🔧 slug is free, using:", base);
+    console.log("[onboarding] 🔧 slug is free:", base);
     return base;
   }
   const suffix = Math.random().toString(36).slice(2, 6);
@@ -167,12 +158,8 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     Authorization: `Bearer ${supabaseKey}`,
     Prefer: "return=representation",
   };
-  const readHeaders = {
-    apikey: supabaseKey,
-    Authorization: `Bearer ${supabaseKey}`,
-  };
+  const readHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
 
-  // STEP 1 — Lookup
   let existingId = null;
   if (phoneNumber) {
     console.log("[onboarding] 🔍 Looking up client by phone:", phoneNumber);
@@ -187,21 +174,14 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
         } else {
           console.log("[onboarding] ✅ No existing client with this phone");
         }
-      } else {
-        const text = await lookupRes.text().catch(() => "");
-        console.warn("[onboarding] ⚠️ phone lookup non-OK (will INSERT):", lookupRes.status, text);
       }
     } catch (err) {
-      console.warn("[onboarding] ⚠️ phone lookup exception (will INSERT):", err.message);
+      console.warn("[onboarding] ⚠️ phone lookup exception:", err.message);
     }
-  } else {
-    console.log("[onboarding] 🔍 No phone provided — skipping lookup");
   }
 
-  // STEP 2A — UPDATE path
   if (existingId) {
     console.log("[onboarding] 🔄 UPDATING EXISTING CLIENT — id:", existingId);
-
     const updatePayload = {
       business_name: data.business_name,
       client_slug: finalSlug,
@@ -211,35 +191,24 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
       onboarding_id: onboardingId || null,
       report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
       report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
-      // Payment fields — keep existing if already set, otherwise update plan-based amount
       payment_amount: pricing.amount,
       payment_provider: "paypal",
     };
-
-    const patchUrl = `${supabaseUrl}/rest/v1/clients?id=eq.${existingId}`;
-    const patchRes = await fetch(patchUrl, {
-      method: "PATCH",
-      headers: writeHeaders,
-      body: JSON.stringify(updatePayload),
+    const patchRes = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${existingId}`, {
+      method: "PATCH", headers: writeHeaders, body: JSON.stringify(updatePayload),
     });
-
     if (!patchRes.ok) {
       const text = await patchRes.text().catch(() => "");
-      console.error("[onboarding] ❌ UPDATE failed:", patchRes.status, text);
       throw new Error(`Could not update client (HTTP ${patchRes.status}): ${text.slice(0, 300)}`);
     }
-
     const rows = await patchRes.json().catch(() => []);
     const row = rows && rows[0] ? rows[0] : null;
     if (!row) throw new Error("Client update returned no row");
-
-    console.log("[onboarding] ✅ UPDATE SUCCESS — id:", row.id, "slug:", row.client_slug, "plan:", row.plan);
+    console.log("[onboarding] ✅ UPDATE SUCCESS — id:", row.id);
     return { row, existing: true };
   }
 
-  // STEP 2B — INSERT path
-  console.log("[onboarding] 🆕 CREATING NEW CLIENT — slug:", finalSlug, "plan:", data.plan, "amount:", pricing.amount);
-
+  console.log("[onboarding] 🆕 CREATING NEW CLIENT — slug:", finalSlug, "plan:", data.plan);
   const insertPayload = {
     business_name: data.business_name,
     client_slug: finalSlug,
@@ -252,36 +221,28 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     onboarding_id: onboardingId || null,
     report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
     report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
-    // Payment fields — required-but-pending on signup
     payment_required: true,
     payment_pending: true,
     payment_status: "unpaid",
     payment_provider: "paypal",
     payment_amount: pricing.amount,
   };
-
   const insertRes = await fetch(`${supabaseUrl}/rest/v1/clients`, {
-    method: "POST",
-    headers: writeHeaders,
-    body: JSON.stringify(insertPayload),
+    method: "POST", headers: writeHeaders, body: JSON.stringify(insertPayload),
   });
-
   if (!insertRes.ok) {
     const text = await insertRes.text().catch(() => "");
-    console.error("[onboarding] ❌ INSERT failed:", insertRes.status, text);
     throw new Error(`Could not save client (HTTP ${insertRes.status}): ${text.slice(0, 300)}`);
   }
-
   const rows = await insertRes.json().catch(() => []);
   const row = rows && rows[0] ? rows[0] : null;
   if (!row) throw new Error("Client insert returned no row");
-
-  console.log("[onboarding] ✅ INSERT SUCCESS — id:", row.id, "slug:", row.client_slug, "amount:", row.payment_amount);
+  console.log("[onboarding] ✅ INSERT SUCCESS — id:", row.id);
   return { row, existing: false };
 }
 
 // ============================================================
-// NOTIFICATIONS — fully isolated, never crash the request
+// NOTIFICATIONS
 // ============================================================
 
 async function safeNtfy(data) {
@@ -298,8 +259,7 @@ Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}
       method: "POST",
       headers: {
         Title: `New Onboarding (${data.plan}): ${data.business_name || "AI Lead Intel"}`,
-        Priority: "high",
-        Tags: "rocket",
+        Priority: "high", Tags: "rocket",
       },
       body,
     });
@@ -315,7 +275,6 @@ async function safeOwnerEmail(data) {
     const resendKey = process.env.RESEND_API_KEY;
     const notifyEmail = process.env.NOTIFY_EMAIL;
     if (!resendKey || !notifyEmail) { console.warn("[onboarding] ⚠️ owner email skipped"); return; }
-
     const resend = new Resend(resendKey);
     const result = await resend.emails.send({
       from: "AI Lead Intel <onboarding@resend.dev>",
@@ -355,6 +314,7 @@ async function safeOwnerEmail(data) {
   }
 }
 
+// ====== UPGRADED CUSTOMER CONFIRMATION EMAIL ======
 async function safeCustomerEmail(data, finalSlug) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
@@ -363,11 +323,27 @@ async function safeCustomerEmail(data, finalSlug) {
     const resend = new Resend(resendKey);
     const businessName = data.business_name || "your business";
     const isPro = data.plan === "pro";
-    const dashboardLine = isPro
-      ? `<p style="margin:0 0 14px 0;font-size:14.5px;color:#374151;line-height:1.55;">Your private dashboard URL is reserved: <a href="https://aileadintel.com/dashboard/${finalSlug}" style="color:#ff6a00;">aileadintel.com/dashboard/${finalSlug}</a></p>`
+    const reportFreq = (data.report_frequency || "monthly").toLowerCase();
+    const reportEmail = data.report_email || data.notify_email;
+    const reportFreqLabel = reportFreq === "weekly" ? "every Monday morning" : "on the 1st of each month";
+    const reportFreqShort = reportFreq === "weekly" ? "weekly" : "monthly";
+
+    const dashboardBlock = isPro
+      ? `
+        <div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;">
+          <div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your Pro Dashboard</div>
+          <p style="margin:0 0 10px 0;font-size:14px;color:#374151;line-height:1.55;">Bookmark this — your private dashboard URL:</p>
+          <a href="https://aileadintel.com/dashboard/${finalSlug}" style="display:inline-block;font-family:'SF Mono',Menlo,monospace;font-size:13px;color:#ff6a00;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;text-decoration:none;">aileadintel.com/dashboard/${finalSlug}</a>
+        </div>`
       : "";
-    const reportsLine = !isPro && data.report_frequency
-      ? `<p style="margin:0 0 14px 0;font-size:14.5px;color:#374151;line-height:1.55;">You'll get <strong>${escapeHtml(data.report_frequency)}</strong> lead reports sent to <strong>${escapeHtml(data.report_email || data.notify_email)}</strong>.</p>`
+
+    const reportsBlock = !isPro
+      ? `
+        <div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;">
+          <div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your ${escapeHtml(reportFreqShort)} lead reports</div>
+          <p style="margin:0 0 6px 0;font-size:14px;color:#111827;line-height:1.55;font-weight:600;">We'll email you ${escapeHtml(reportFreqLabel)}.</p>
+          <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p>
+        </div>`
       : "";
 
     const result = await resend.emails.send({
@@ -377,25 +353,32 @@ async function safeCustomerEmail(data, finalSlug) {
       subject: `We got your onboarding — ${businessName}`,
       html: `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,sans-serif;background:#f9fafb;">
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f9fafb;">
   <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
     <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
         <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div>
         <strong style="font-size:14px;color:#111827;">AI Lead Intel</strong>
       </div>
-      <h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;">We got your onboarding ✅</h1>
+      <h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;letter-spacing:-0.02em;">We got your onboarding ✅</h1>
       <p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p>
-      <p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>
-      ${dashboardLine}
-      ${reportsLine}
-      <h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 10px 0;">What happens next</h2>
-      <ol style="margin:0 0 18px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;">
+      <p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>
+
+      ${dashboardBlock}
+      ${reportsBlock}
+
+      <h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 12px 0;letter-spacing:-0.01em;">What happens next</h2>
+      <ol style="margin:0 0 20px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;">
         <li><strong>Within 24 hours:</strong> Andrew personally builds your AI's voice, tone, services, and transfer rules.</li>
         <li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li>
-        <li><strong>Test & go live:</strong> Hear your AI work, then mark it live. Payment link only after you've heard it work.</li>
+        <li><strong>Test &amp; go live:</strong> Hear your AI work, then mark it live. Payment link sent only after you've heard it work.</li>
       </ol>
-      <p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email if you have any questions — I'll respond fast.</p>
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin:0 0 20px 0;">
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">💳 <strong style="color:#111827;">No payment required yet.</strong> We send you a payment link only after your AI is built and you've confirmed it works.</p>
+      </div>
+
+      <p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email anytime if you have questions — I'll respond fast.</p>
       <p style="margin:0;font-size:14px;color:#374151;">— Andrew</p>
     </div>
     <p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p>
@@ -419,7 +402,7 @@ async function runAllNotificationsSafely(data, finalSlug) {
     ]);
     console.log("[onboarding] 📨 notifications complete");
   } catch (err) {
-    console.error("[onboarding] ⚠️ notifications wrapper exception (non-fatal):", err.message);
+    console.error("[onboarding] ⚠️ notifications wrapper exception:", err.message);
   }
 }
 
