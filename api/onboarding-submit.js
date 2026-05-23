@@ -175,7 +175,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
       "Content-Type": "application/json",
       apikey: supabaseKey,
       Authorization: `Bearer ${supabaseKey}`,
-      Prefer: "return=representation",
+      Prefer: "resolution=merge-duplicates,return=representation",
     },
     body: JSON.stringify(payload),
   });
