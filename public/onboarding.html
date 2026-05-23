@@ -12,50 +12,19 @@
   <style>
     *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #08080a;
-      --bg-2: #0c0c0f;
-      --surface: #111114;
-      --surface-2: #16161b;
-      --surface-3: #1c1c22;
-      --surface-input: #0f0f12;
-      --border: rgba(255,255,255,0.06);
-      --border-2: rgba(255,255,255,0.10);
-      --border-3: rgba(255,255,255,0.14);
-      --text: #fafafa;
-      --text-soft: #d4d4d8;
-      --text-dim: #a1a1aa;
-      --text-faint: #71717a;
-      --text-muted: #52525b;
-      --brand: #ff6a00;
-      --brand-2: #ff9a00;
-      --brand-3: #ff8533;
-      --brand-glow: rgba(255,106,0,0.32);
-      --brand-soft: rgba(255,106,0,0.10);
-      --brand-tint: rgba(255,106,0,0.05);
-      --brand-line: rgba(255,106,0,0.22);
-      --error: #f87171;
-      --error-soft: rgba(248,113,113,0.08);
-      --success: #34d399;
+      --bg: #08080a; --bg-2: #0c0c0f;
+      --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22; --surface-input: #0f0f12;
+      --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
+      --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a; --text-muted: #52525b;
+      --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+      --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
+      --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
+      --error: #f87171; --error-soft: rgba(248,113,113,0.08); --success: #34d399;
     }
     html, body { height: 100%; }
     body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.12), transparent 60%),
-        radial-gradient(ellipse 50% 30% at 100% 0%, rgba(255,154,0,0.07), transparent 50%),
-        radial-gradient(ellipse 40% 30% at 0% 60%, rgba(255,106,0,0.04), transparent 60%);
-      pointer-events: none; z-index: 0;
-    }
-    body::after {
-      content: ''; position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
-      background-size: 64px 64px; pointer-events: none; z-index: 0;
-      mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
-    }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.12), transparent 60%), radial-gradient(ellipse 50% 30% at 100% 0%, rgba(255,154,0,0.07), transparent 50%), radial-gradient(ellipse 40% 30% at 0% 60%, rgba(255,106,0,0.04), transparent 60%); pointer-events: none; z-index: 0; }
+    body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none; z-index: 0; mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%); -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%); }
     a { color: inherit; text-decoration: none; }
     button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
     input, select, textarea { font-family: inherit; outline: none; }
@@ -256,7 +225,7 @@
         <div class="plan-banner-label">Selected plan</div>
         <div class="plan-banner-name" id="plan-banner-name">Starter</div>
       </div>
-      <div class="plan-banner-price" id="plan-banner-price">$99 / month</div>
+      <div class="plan-banner-price" id="plan-banner-price">$97 / month</div>
     </div>
     <div class="progress" id="progress">
       <div class="progress-step active" data-step="1"><div class="progress-num"><span>1</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="progress-label">Business</div></div>
@@ -282,6 +251,20 @@
           <div class="field"><div class="float-wrap"><input type="tel" class="float-input phone-input" id="business_phone" placeholder=" " inputmode="numeric" maxlength="14" autocomplete="tel" /><label class="float-label" for="business_phone">Main phone</label></div></div>
         </div>
         <div class="field"><div class="float-wrap"><input type="url" class="float-input" id="website" placeholder=" " autocomplete="url" /><label class="float-label" for="website">Website <span class="opt">— optional</span></label></div></div>
+        <div class="field">
+          <div class="float-wrap">
+            <textarea class="float-textarea" id="services_offered" placeholder=" "></textarea>
+            <label class="float-label" for="services_offered">What services do you offer?</label>
+          </div>
+          <div class="field-hint">Example: lawn mowing, sprinkler repair, weekly maintenance, sod installation</div>
+        </div>
+        <div class="field">
+          <div class="float-wrap">
+            <input type="text" class="float-input" id="service_area" placeholder=" " />
+            <label class="float-label" for="service_area">What cities or areas do you serve?</label>
+          </div>
+          <div class="field-hint">Oklahoma City, Edmond, Norman, Yukon</div>
+        </div>
         <div class="ai-preview">
           <div class="ai-preview-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
           <div class="ai-preview-content"><div class="ai-preview-label">Your AI will say</div><div class="ai-preview-text" id="ai-preview-text">"Thanks for calling. How can I help you today?"</div></div>
@@ -301,6 +284,17 @@
           </div>
           <div class="field"><div class="float-wrap"><input type="email" class="float-input" id="notify_email" placeholder=" " autocomplete="email" required /><label class="float-label" for="notify_email">Notification email</label></div><div class="field-hint">Where call summaries and lead alerts will be sent.</div></div>
           <div class="field"><div class="float-wrap"><input type="text" class="float-input" id="transfer_hours" placeholder=" " required /><label class="float-label" for="transfer_hours">Business hours · transfer hours</label></div><div class="field-hint">e.g. Mon–Fri 9am–6pm</div></div>
+          <div class="field urgent-transfer-field" id="urgent-transfer-field" style="display:none;">
+            <div class="float-wrap">
+              <select class="float-select" id="offer_urgent_transfer">
+                <option value=""></option>
+                <option value="yes">Yes — let the AI offer a live transfer for emergencies</option>
+                <option value="no">No — capture the lead and notify me instead</option>
+              </select>
+              <label class="float-label" for="offer_urgent_transfer">Offer live transfer for urgent calls?</label>
+            </div>
+            <div class="field-hint">For emergencies, lockouts, flooding, outages — the AI will ask the caller if they want to be connected immediately.</div>
+          </div>
         </div>
         <div class="subsection">
           <div class="subsection-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>What customers call about</div>
@@ -324,8 +318,6 @@
             <label class="radio-card" data-value="direct"><input type="radio" name="personality" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Direct</div><div class="radio-desc">Efficient and to-the-point. Best for high-volume or repeat customers.</div><div class="radio-sample">"Thanks for calling. How can I help?"</div></div></label>
           </div>
         </div>
-
-        <!-- LEAD REPORTS (STARTER ONLY) -->
         <div class="subsection" id="reports-subsection" style="display:none;">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -333,32 +325,10 @@
           </div>
           <p style="font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:14px;margin-top:-6px;">Get a clean summary of every lead, missed call, and booking — delivered to your inbox on a schedule you choose.</p>
           <div class="radio-inline" id="report-frequency-stack">
-            <label class="radio-card compact" data-value="weekly">
-              <input type="radio" name="report_frequency" />
-              <div class="radio-dot"></div>
-              <div class="radio-content">
-                <div class="radio-label">Weekly</div>
-                <div class="radio-desc">Every Monday morning</div>
-              </div>
-            </label>
-            <label class="radio-card compact" data-value="monthly">
-              <input type="radio" name="report_frequency" />
-              <div class="radio-dot"></div>
-              <div class="radio-content">
-                <div class="radio-label">Monthly</div>
-                <div class="radio-desc">First of each month</div>
-              </div>
-            </label>
-          </div>
-          <div class="field" style="margin-top:14px;">
-            <div class="float-wrap">
-              <input type="email" class="float-input" id="report_email" placeholder=" " autocomplete="email" />
-              <label class="float-label" for="report_email">Where should we send your lead reports?</label>
-            </div>
-            <div class="field-hint">Defaults to your notification email if left blank.</div>
+            <label class="radio-card compact" data-value="weekly"><input type="radio" name="report_frequency" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Weekly</div><div class="radio-desc">Every Monday morning</div></div></label>
+            <label class="radio-card compact" data-value="monthly"><input type="radio" name="report_frequency" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Monthly</div><div class="radio-desc">First of each month</div></div></label>
           </div>
         </div>
-
         <div class="subsection" style="margin-bottom: 0;">
           <div class="subsection-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Pricing &amp; Notes</div>
           <div class="field"><div class="float-wrap"><select class="float-select" id="pricing_rule"><option value=""></option><option value="yes_specific">Yes — give exact prices when asked</option><option value="yes_ranges">Yes — give price ranges only</option><option value="no_quote">No — say "I'll have someone send you a quote"</option><option value="no_transfer">No — transfer pricing questions to me</option></select><label class="float-label" for="pricing_rule">Should the AI give pricing on calls?</label></div><div class="field-hint">If you don't set this, the AI may improvise prices.</div></div>
@@ -398,11 +368,24 @@
   </div>
   <script>
     'use strict';
-    function safeRedirectToSuccess(slug, plan, businessName) {
-      console.log('[onboarding] 🟢 safeRedirectToSuccess called', { slug, plan, businessName });
-      const params = new URLSearchParams({ plan: plan || 'starter', slug: slug || '', business: businessName || '' });
+
+    // Industries where urgent transfer question is relevant
+    const URGENT_INDUSTRIES = new Set([
+      'self_storage', 'hvac', 'plumbing', 'electrician', 'locksmith', 'roofing'
+    ]);
+
+    function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
+      console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
+      const params = new URLSearchParams({
+        plan: plan || 'starter',
+        slug: slug || '',
+        business: businessName || '',
+      });
+      if (freq) params.set('freq', freq);
+      if (reportEmail) params.set('report_email', reportEmail);
       window.location.href = '/onboarding/success?' + params.toString();
     }
+
     const urlParams = new URLSearchParams(window.location.search);
     const selectedPlan = (function () {
       const raw = (urlParams.get('plan') || '').toLowerCase().trim();
@@ -416,11 +399,10 @@
       const name = document.getElementById('plan-banner-name');
       const price = document.getElementById('plan-banner-price');
       if (selectedPlan === 'pro') { name.textContent = 'AI Front Desk Pro'; price.textContent = '$297 / month'; }
-      else { name.textContent = 'Starter'; price.textContent = '$99 / month'; }
+      else { name.textContent = 'Starter'; price.textContent = '$97 / month'; }
       banner.style.display = 'flex';
     })();
 
-    // Show/hide the Lead Reports subsection based on plan
     (function toggleReportsSection() {
       const sub = document.getElementById('reports-subsection');
       if (sub) sub.style.display = IS_STARTER ? 'block' : 'none';
@@ -469,33 +451,39 @@
       el.addEventListener('change', () => refreshFloatState(el));
       el.addEventListener('blur', () => refreshFloatState(el));
     });
+
     const TOTAL = 3;
     let currentSection = 1;
     let completedSections = new Set();
     let isSubmitting = false;
     const formData = {
       business_name: '', industry: '', business_phone: '',
+      services_offered: '', service_area: '',
       transfer_primary: '', transfer_backup: '', notify_email: '', transfer_hours: '',
+      offer_urgent_transfer: '',
       topics: [], booking_link: '', payment_link: '', website: '',
       personality: '', pricing_rule: '', pricing_examples: '', notes: '',
-      report_frequency: '', report_email: '',
+      report_frequency: '',
     };
     const industryLabels = { self_storage: 'Self Storage', hvac: 'HVAC', plumbing: 'Plumbing', electrician: 'Electrician', landscaping: 'Landscaping / Lawn Care', auto_detailing: 'Auto Detailing', auto_repair: 'Auto Repair', salon: 'Salon / Spa', pest_control: 'Pest Control', cleaning: 'Cleaning Services', roofing: 'Roofing', locksmith: 'Locksmith', real_estate: 'Real Estate', dental: 'Dental / Medical', other: 'Other' };
     const topicLabels = { new_customer: 'New customer / booking', payments: 'Payments / billing', support: 'Customer support', other: 'Other' };
     const personalityLabels = { warm: 'Warm & Conversational', professional: 'Professional', direct: 'Direct' };
     const pricingLabels = { yes_specific: 'Yes — exact prices', yes_ranges: 'Yes — ranges only', no_quote: 'No — promise a quote', no_transfer: 'No — transfer pricing calls' };
     const reportFreqLabels = { weekly: 'Weekly · every Monday', monthly: 'Monthly · 1st of each month' };
-    const STORAGE_KEY = 'aileadintel_onboarding_v10';
+    const urgentTransferLabels = { yes: 'Yes — offer transfer for emergencies', no: 'No — capture lead and notify me' };
+
+    const STORAGE_KEY = 'aileadintel_onboarding_v11';
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) { Object.assign(formData, JSON.parse(saved)); restoreFields(); }
     } catch (e) {}
+
     function restoreFields() {
-      ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes','report_email'].forEach(k => {
+      ['business_name','business_phone','services_offered','service_area','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(k => {
         const el = document.getElementById(k);
         if (el && formData[k]) { el.value = formData[k]; if (el.classList.contains('phone-input')) el.value = formatPhoneValue(el.value); refreshFloatState(el); }
       });
-      ['industry','pricing_rule'].forEach(k => {
+      ['industry','pricing_rule','offer_urgent_transfer'].forEach(k => {
         const el = document.getElementById(k);
         if (el && formData[k]) { el.value = formData[k]; refreshFloatState(el); }
       });
@@ -513,6 +501,20 @@
       }
       updateAIPreview();
     }
+
+    function toggleUrgentTransferField() {
+      const industryEl = document.getElementById('industry');
+      const field = document.getElementById('urgent-transfer-field');
+      if (!industryEl || !field) return;
+      const show = URGENT_INDUSTRIES.has(industryEl.value);
+      field.style.display = show ? 'block' : 'none';
+      if (!show) {
+        const sel = document.getElementById('offer_urgent_transfer');
+        if (sel) { sel.value = ''; refreshFloatState(sel); }
+        formData.offer_urgent_transfer = '';
+      }
+    }
+
     let saveFlashTimeout;
     function autoSave() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(formData)); flashSavePill(); } catch (e) {}
@@ -552,6 +554,7 @@
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     function hideError() { document.getElementById('form-error').classList.remove('visible'); }
+
     function validateSection(section) {
       hideError();
       if (section === 1) {
@@ -562,7 +565,12 @@
         if (!name) { showError('Please enter your business name.'); return false; }
         if (!industry) { showError('Please pick your industry.'); return false; }
         if (!isValidPhone(phone)) { showError('Enter a valid 10-digit phone number.'); return false; }
-        formData.business_name = name; formData.industry = industry; formData.business_phone = phone; formData.website = website;
+        formData.business_name = name;
+        formData.industry = industry;
+        formData.business_phone = phone;
+        formData.website = website;
+        formData.services_offered = document.getElementById('services_offered').value.trim();
+        formData.service_area = document.getElementById('service_area').value.trim();
       }
       if (section === 2) {
         const trans = document.getElementById('transfer_primary').value.trim();
@@ -579,23 +587,23 @@
         if (topics.length === 0) { showError('Pick at least one topic.'); return false; }
         if (!personalityCard) { showError('Pick a personality.'); return false; }
         if (!pricingRule) { showError('Please pick how the AI should handle pricing.'); return false; }
-        formData.transfer_primary = trans; formData.transfer_backup = backup; formData.notify_email = email; formData.transfer_hours = hours; formData.topics = topics;
+        formData.transfer_primary = trans;
+        formData.transfer_backup = backup;
+        formData.notify_email = email;
+        formData.transfer_hours = hours;
+        formData.offer_urgent_transfer = document.getElementById('offer_urgent_transfer').value;
+        formData.topics = topics;
         formData.booking_link = document.getElementById('booking_link').value.trim();
         formData.payment_link = document.getElementById('payment_link').value.trim();
         formData.personality = personalityCard.dataset.value;
         formData.pricing_rule = pricingRule;
         formData.pricing_examples = document.getElementById('pricing_examples').value.trim();
         formData.notes = document.getElementById('notes').value.trim();
-
-        // Lead Reports — only validate for Starter; default if blank
         if (IS_STARTER) {
           const freqCard = document.querySelector('#report-frequency-stack .radio-card.selected');
           formData.report_frequency = freqCard ? freqCard.dataset.value : 'monthly';
-          const reportEmail = document.getElementById('report_email').value.trim();
-          formData.report_email = reportEmail || email; // fallback to notify_email
         } else {
           formData.report_frequency = '';
-          formData.report_email = '';
         }
       }
       autoSave();
@@ -632,17 +640,16 @@
       const reportsSection = IS_STARTER ? `
         <div class="review-section">
           <div class="review-section-head">
-            <div class="review-section-title">
-              <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-              Lead Reports
-            </div>
+            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Lead Reports</div>
             <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
-            <div class="review-row"><div class="review-row-label">Frequency</div>${renderValue(reportFreqLabels[formData.report_frequency] || formData.report_frequency)}</div>
-            <div class="review-row"><div class="review-row-label">Sent to</div>${renderValue(formData.report_email)}</div>
+            <div class="review-row full"><div class="review-row-label">Frequency</div>${renderValue(reportFreqLabels[formData.report_frequency] || formData.report_frequency)}</div>
           </div>
         </div>` : '';
+      const urgentSection = URGENT_INDUSTRIES.has(formData.industry) ? `
+        <div class="review-row full"><div class="review-row-label">Live transfer for urgent calls</div>${renderValue(urgentTransferLabels[formData.offer_urgent_transfer] || '')}</div>
+      ` : '';
       reviewEl.innerHTML = `
         <div class="review-section">
           <div class="review-section-head">
@@ -654,6 +661,8 @@
             <div class="review-row"><div class="review-row-label">Industry</div>${renderValue(industryLabels[formData.industry] || formData.industry)}</div>
             <div class="review-row"><div class="review-row-label">Main phone</div>${renderValue(formData.business_phone)}</div>
             <div class="review-row"><div class="review-row-label">Website</div>${renderValue(formData.website)}</div>
+            <div class="review-row full"><div class="review-row-label">Services offered</div>${renderValue(formData.services_offered)}</div>
+            <div class="review-row full"><div class="review-row-label">Service area</div>${renderValue(formData.service_area)}</div>
           </div>
         </div>
         <div class="review-section">
@@ -666,6 +675,7 @@
             <div class="review-row"><div class="review-row-label">Backup transfer</div>${renderValue(formData.transfer_backup)}</div>
             <div class="review-row full"><div class="review-row-label">Notification email</div>${renderValue(formData.notify_email)}</div>
             <div class="review-row full"><div class="review-row-label">Transfer hours</div>${renderValue(formData.transfer_hours)}</div>
+            ${urgentSection}
           </div>
         </div>
         <div class="review-section">
@@ -721,14 +731,22 @@
       item.addEventListener('click', () => { if (isSubmitting) return; const step = parseInt(item.dataset.step, 10); if (completedSections.has(step) || step <= currentSection) showSection(step); });
     });
     document.getElementById('business_name').addEventListener('input', (e) => { formData.business_name = e.target.value; updateAIPreview(); autoSave(); });
-    ['business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes','report_email'].forEach(id => {
+    ['business_phone','services_offered','service_area','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', () => { formData[id] = el.value; autoSave(); });
     });
-    ['industry','pricing_rule'].forEach(id => {
+    ['industry','pricing_rule','offer_urgent_transfer'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', (e) => { formData[id] = e.target.value; autoSave(); });
     });
+
+    // Industry change → show/hide urgent transfer
+    const industryEl = document.getElementById('industry');
+    if (industryEl) {
+      industryEl.addEventListener('change', toggleUrgentTransferField);
+    }
+    toggleUrgentTransferField();
+
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
@@ -772,15 +790,17 @@
       const hpWebsite = document.getElementById('website_url')?.value || '';
       const hpCompany = document.getElementById('company_size_other')?.value || '';
       const hpGotcha = document.getElementById('_gotcha')?.value || '';
+      // report_email defaults to notify_email on the backend
       const payload = {
         ...formData,
         plan: selectedPlan,
         client_slug: clientSlug,
+        report_email: formData.notify_email,
         website_url: hpWebsite,
         company_size_other: hpCompany,
         _gotcha: hpGotcha,
       };
-      console.log('[onboarding] 📤 sending payload:', { business: payload.business_name, plan: payload.plan, slug: payload.client_slug, report_frequency: payload.report_frequency, report_email: payload.report_email });
+      console.log('[onboarding] 📤 sending payload:', { business: payload.business_name, plan: payload.plan, slug: payload.client_slug, report_frequency: payload.report_frequency, services_offered: payload.services_offered, service_area: payload.service_area, urgent: payload.offer_urgent_transfer });
       function reEnable() { isSubmitting = false; btn.disabled = false; label.textContent = 'Submit & schedule activation'; if (arrow) arrow.style.display = 'block'; }
       let res;
       try { res = await fetch('/api/onboarding-submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); }
@@ -795,7 +815,7 @@
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
       const canonicalSlug = result.client_slug || clientSlug;
       const canonicalPlan = result.plan || selectedPlan;
-      safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '');
+      safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '', result.report_frequency || formData.report_frequency, result.report_email || formData.notify_email);
     }
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
