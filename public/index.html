@@ -276,79 +276,24 @@ img { max-width: 100%; display: block; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 
 /* ====== PLAN SELECTOR MODAL ====== */
-.plan-modal-backdrop {
-  position: fixed; inset: 0; z-index: 1000;
-  background: rgba(8,8,10,0.72);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  display: none; align-items: center; justify-content: center;
-  padding: 24px;
-  animation: backdropIn 0.25s ease-out;
-}
+.plan-modal-backdrop { position: fixed; inset: 0; z-index: 1000; background: rgba(8,8,10,0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; align-items: center; justify-content: center; padding: 24px; animation: backdropIn 0.25s ease-out; overflow-y: auto; }
 .plan-modal-backdrop.open { display: flex; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
-.plan-modal {
-  position: relative;
-  max-width: 920px; width: 100%;
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
-  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-  border: 1px solid var(--border-2);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 60px 120px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.4);
-  animation: modalIn 0.35s cubic-bezier(0.16,1,0.3,1);
-}
-.plan-modal::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--brand), transparent);
-}
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.plan-modal-close {
-  position: absolute; top: 18px; right: 18px;
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--surface-2); border: 1px solid var(--border-2);
-  color: var(--text-dim);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.18s;
-  z-index: 2;
-}
+.plan-modal { position: relative; max-width: 960px; width: 100%; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 24px; padding: 40px; box-shadow: 0 60px 120px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.4); animation: modalIn 0.35s cubic-bezier(0.16,1,0.3,1); margin: auto 0; }
+.plan-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+@keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.plan-modal-close { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text-dim); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; z-index: 2; }
 .plan-modal-close:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
-.plan-modal-head { text-align: center; margin-bottom: 32px; }
-.plan-modal-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--brand); background: var(--brand-soft);
-  border: 1px solid var(--brand-line);
-  padding: 6px 13px; border-radius: 99px; font-weight: 600;
-  margin-bottom: 18px;
-}
+.plan-modal-head { text-align: center; margin-bottom: 28px; }
+.plan-modal-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 6px 13px; border-radius: 99px; font-weight: 600; margin-bottom: 18px; }
 .plan-modal-eyebrow .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
-.plan-modal-title { font-size: clamp(24px, 3.5vw, 32px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 10px; }
+.plan-modal-title { font-size: clamp(26px, 3.5vw, 34px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 12px; }
 .plan-modal-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.plan-modal-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; max-width: 460px; margin: 0 auto; }
+.plan-modal-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; max-width: 480px; margin: 0 auto; }
 .plan-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 720px) {
-  .plan-modal { padding: 28px 20px; border-radius: 18px; }
-  .plan-modal-grid { grid-template-columns: 1fr; gap: 12px; }
-}
-.plan-option {
-  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-3) 100%);
-  border: 1px solid var(--border-2);
-  border-radius: 16px;
-  padding: 24px 22px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-  display: flex; flex-direction: column;
-}
-.plan-option.featured {
-  border-color: var(--brand-line);
-  box-shadow: 0 0 0 1px var(--brand-line) inset, 0 20px 40px rgba(255,106,0,0.1);
-}
+@media (max-width: 720px) { .plan-modal { padding: 28px 20px; border-radius: 18px; } .plan-modal-grid { grid-template-columns: 1fr; gap: 12px; } }
+.plan-option { background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-3) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 26px 22px; position: relative; overflow: hidden; transition: all 0.25s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column; }
+.plan-option.featured { border-color: var(--brand-line); box-shadow: 0 0 0 1px var(--brand-line) inset, 0 20px 40px rgba(255,106,0,0.1); }
 .plan-option.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 10%, var(--brand) 50%, transparent 90%); }
 .plan-option:hover { transform: translateY(-2px); border-color: var(--border-3); }
 .plan-option.featured:hover { border-color: var(--brand-line); box-shadow: 0 0 0 1px var(--brand-line) inset, 0 30px 60px var(--brand-glow); }
@@ -359,7 +304,7 @@ img { max-width: 100%; display: block; }
 .plan-option-num { font-family: 'Geist Mono', monospace; font-size: 36px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
 .plan-option-num .dollar { font-size: 20px; color: var(--text-dim); margin-right: 2px; }
 .plan-option-period { font-size: 13px; color: var(--text-dim); }
-.plan-option-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; flex: 1; }
+.plan-option-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; flex: 1; }
 .plan-option-feature { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--text-soft); line-height: 1.4; }
 .plan-option-feature svg { color: var(--brand); flex-shrink: 0; margin-top: 2px; }
 .plan-option-feature strong { color: var(--text); font-weight: 600; }
@@ -368,7 +313,18 @@ img { max-width: 100%; display: block; }
 .plan-option-cta.secondary:hover { background: var(--surface); border-color: var(--border-3); }
 .plan-option-cta.primary { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
 .plan-option-cta.primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 22px var(--brand-glow); }
-.plan-modal-footer { text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+.plan-option-trust { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.plan-option-trust-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-faint); line-height: 1.4; }
+.plan-option-trust-item svg { color: var(--green); flex-shrink: 0; }
+.plan-modal-timeline-wrap { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
+.plan-modal-timeline-title { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 14px; }
+.plan-modal-timeline { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-width: 720px; margin: 0 auto; }
+.plan-modal-tl { background: var(--surface-input); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; text-align: left; transition: border-color 0.15s; }
+.plan-modal-tl:hover { border-color: var(--border-2); }
+.plan-modal-tl-when { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 4px; }
+.plan-modal-tl-text { font-size: 12.5px; color: var(--text); font-weight: 500; line-height: 1.4; }
+@media (max-width: 560px) { .plan-modal-timeline { grid-template-columns: 1fr; gap: 8px; } }
+.plan-modal-footer { text-align: center; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; line-height: 1.5; }
 .plan-modal-footer .accent { color: var(--brand); }
 </style>
 </head>
@@ -543,16 +499,14 @@ img { max-width: 100%; display: block; }
         <div class="price-amount"><div class="price-num"><span class="dollar">$</span>97</div><div class="price-period">/ month</div></div>
         <div class="price-divider"></div>
         <ul class="price-features">
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>24/7 AI call answering</strong> — never miss another lead</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Missed-call coverage with full conversation capture</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Smart call transfers to your phone for hot leads</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Email summaries within seconds of every call</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Weekly or monthly lead reports</strong> emailed to you</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>24/7 AI receptionist</strong> — never miss another lead</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Missed call text-back</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Lead capture + notifications</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Weekly or monthly lead reports</strong></span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Works after-hours automatically</span></li>
           <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Works with your existing business number</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Email-based support</span></li>
-          <li class="price-feature" style="opacity: 0.5;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span><strong>No dashboard</strong> — leads come straight to your email</span></li>
         </ul>
-        <a href="/onboarding/?plan=starter" class="btn btn-secondary price-cta">Start with Starter</a>
+        <a href="/onboarding.html?plan=starter" class="btn btn-secondary price-cta">Set Up Starter</a>
         <div class="price-note">Hear it work before you pay</div>
       </div>
       <div class="price-card featured fade-up">
@@ -563,16 +517,14 @@ img { max-width: 100%; display: block; }
         <div class="price-divider"></div>
         <ul class="price-features">
           <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Everything in Starter</strong></span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Full client dashboard</strong> — every call, lead, and transcript in one place</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Full call recordings</strong> — listen to any call, anytime</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Live dashboard access</strong> — every call, lead, and transcript in one place</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Call transcripts + analytics</strong> — call volume, peaks, lead quality</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Custom AI voice &amp; personality</strong> — premium ElevenLabs voice</span></li>
           <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Hot lead alerts</strong> — instant push when a caller wants to book today</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Lead tracking</strong> — pipeline view with status, notes, and follow-up reminders</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Premium ElevenLabs voice</strong> — natural, human-like AI</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Advanced AI customization</strong> — pricing, services, FAQs, transfer rules</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Call analytics</strong> — volume, peak times, lead quality breakdown</span></li>
-          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Priority support</strong> — direct line, same-day response</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Lead pipeline tracking</strong> — status, notes, follow-up reminders</span></li>
+          <li class="price-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Priority setup + support</strong> — direct line, same-day response</span></li>
         </ul>
-        <a href="/onboarding/?plan=pro" class="btn btn-primary price-cta">Activate Front Desk Pro</a>
+        <a href="/onboarding.html?plan=pro" class="btn btn-primary price-cta">Set Up Pro</a>
         <div class="price-note">Payment link sent after you've tested it</div>
       </div>
     </div>
@@ -670,8 +622,8 @@ img { max-width: 100%; display: block; }
     </button>
     <div class="plan-modal-head">
       <div class="plan-modal-eyebrow"><span class="dot"></span>Pick your plan</div>
-      <h2 id="plan-modal-title" class="plan-modal-title">Which one fits <span class="accent">your business?</span></h2>
-      <p class="plan-modal-sub">Hear your AI work before you pay either way. No charges until your AI is live and tested.</p>
+      <h2 id="plan-modal-title" class="plan-modal-title">Choose your <span class="accent">AI front desk setup</span></h2>
+      <p class="plan-modal-sub">No payment today. Hear your AI work before activating.</p>
     </div>
     <div class="plan-modal-grid">
       <div class="plan-option">
@@ -679,15 +631,20 @@ img { max-width: 100%; display: block; }
         <div class="plan-option-title">AI Front Desk Starter</div>
         <div class="plan-option-amount"><div class="plan-option-num"><span class="dollar">$</span>97</div><div class="plan-option-period">/ month</div></div>
         <ul class="plan-option-features">
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>AI receptionist</strong> — 24/7</span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Missed call text back</span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Lead capture</span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Weekly or monthly lead reports</strong></span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Email summaries</span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>24/7 AI receptionist</strong></span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Missed call text-back</span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Lead capture + notifications</span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Weekly or monthly reports</strong></span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Works after-hours automatically</span></li>
         </ul>
-        <a href="/onboarding/?plan=starter" class="plan-option-cta secondary">Start Starter Setup
+        <a href="/onboarding.html?plan=starter" class="plan-option-cta secondary">Set Up Starter
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
+        <div class="plan-option-trust">
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>No contracts</div>
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>No setup fee today</div>
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>We help you forward your calls</div>
+        </div>
       </div>
       <div class="plan-option featured">
         <div class="plan-option-badge">Most Popular</div>
@@ -696,18 +653,43 @@ img { max-width: 100%; display: block; }
         <div class="plan-option-amount"><div class="plan-option-num"><span class="dollar">$</span>297</div><div class="plan-option-period">/ month</div></div>
         <ul class="plan-option-features">
           <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Everything in Starter</strong></span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Live dashboard access</strong></span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Call transcripts + analytics</strong></span></li>
           <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Custom AI voice &amp; personality</strong></span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Dashboard access</strong></span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Live lead tracking + call flows</span></li>
-          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Priority support</strong></span></li>
+          <li class="plan-option-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Priority setup + support</strong></span></li>
         </ul>
-        <a href="/onboarding/?plan=pro" class="plan-option-cta primary">Start Pro Setup
+        <a href="/onboarding.html?plan=pro" class="plan-option-cta primary">Set Up Pro
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
+        <div class="plan-option-trust">
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>No contracts</div>
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>No setup fee today</div>
+          <div class="plan-option-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>We help you forward your calls</div>
+        </div>
       </div>
     </div>
+
+    <!-- Timeline reassurance -->
+    <div class="plan-modal-timeline-wrap">
+      <div class="plan-modal-timeline-title">What happens after signup?</div>
+      <div class="plan-modal-timeline">
+        <div class="plan-modal-tl">
+          <div class="plan-modal-tl-when">Today</div>
+          <div class="plan-modal-tl-text">Submit onboarding</div>
+        </div>
+        <div class="plan-modal-tl">
+          <div class="plan-modal-tl-when">Within 24 hours</div>
+          <div class="plan-modal-tl-text">We build your AI receptionist</div>
+        </div>
+        <div class="plan-modal-tl">
+          <div class="plan-modal-tl-when">5–7 days</div>
+          <div class="plan-modal-tl-text">Your AI goes live</div>
+        </div>
+      </div>
+    </div>
+
     <div class="plan-modal-footer">
-      <span class="accent">●</span> No charges until your AI is live and tested
+      Payment is only requested <span class="accent">after</span> your AI is built and tested.
     </div>
   </div>
 </div>
