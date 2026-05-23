@@ -95,11 +95,11 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
     const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Prefer: "return=representation",
-      },
+  "Content-Type": "application/json",
+  apikey: supabaseKey,
+  Authorization: `Bearer ${supabaseKey}`,
+  Prefer: "resolution=merge-duplicates,return=representation",
+},
       body: JSON.stringify({
         business_name: data.business_name,
         industry: data.industry,
@@ -169,7 +169,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     business: data.business_name,
   });
 
-  const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
+  const res = await fetch(`${supabaseUrl}/rest/v1/clients?on_conflict=phone_number`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
