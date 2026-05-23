@@ -116,7 +116,7 @@ async function notifyOwnerEmail(data) {
   try {
     const resend = new Resend(resendKey);
     await resend.emails.send({
-      from: "AI Lead Intel <hello@aileadintel.com>",
+      from: "AI Lead Intel <onboarding@resend.dev>",
       to: notifyEmail.split(",").map((e) => e.trim()),
       subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
       html: `
@@ -169,7 +169,7 @@ async function sendCustomerConfirmation(data, finalSlug) {
       : "";
 
     await resend.emails.send({
-      from: "AI Lead Intel <hello@aileadintel.com>",
+      from: "AI Lead Intel <onboarding@resend.dev>",
       to: [data.notify_email],
       reply_to: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
