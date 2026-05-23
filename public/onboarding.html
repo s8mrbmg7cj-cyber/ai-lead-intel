@@ -107,26 +107,14 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    .nav-save-pill .save-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--text-faint);
-      transition: all 0.2s;
-    }
+    .nav-save-pill .save-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-faint); transition: all 0.2s; }
     .nav-save-pill.saving { color: var(--brand); border-color: rgba(255,106,0,0.3); }
     .nav-save-pill.saving .save-dot { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
     .nav-save-pill.saved { color: var(--brand); border-color: rgba(255,106,0,0.25); }
     .nav-save-pill.saved .save-dot { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
-    .nav-help {
-      font-size: 13px; color: var(--text-dim);
-      transition: color 0.15s; font-weight: 500;
-    }
+    .nav-help { font-size: 13px; color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
     .nav-help:hover { color: var(--text); }
-    .wrap {
-      position: relative; z-index: 1;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 56px 24px 96px;
-    }
+    .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
     .hero { text-align: center; margin-bottom: 36px; }
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -168,24 +156,54 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .hero-sub {
-      font-size: 16px;
+    .hero-sub { font-size: 16px; color: var(--text-dim); line-height: 1.55; max-width: 480px; margin: 0 auto; }
+    .plan-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      background:
+        linear-gradient(135deg, var(--brand-tint) 0%, transparent 60%),
+        linear-gradient(180deg, var(--surface-input) 0%, var(--surface-2) 100%);
+      border: 1px solid var(--brand-line);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    }
+    .plan-banner-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--brand-glow);
+    }
+    .plan-banner-text { flex: 1; min-width: 0; }
+    .plan-banner-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 9.5px;
+      color: var(--brand);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .plan-banner-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+    .plan-banner-price {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
       color: var(--text-dim);
-      line-height: 1.55;
-      max-width: 480px;
-      margin: 0 auto;
+      letter-spacing: 0.02em;
+      font-weight: 500;
+      flex-shrink: 0;
     }
-    .progress {
-      display: flex; align-items: center;
-      gap: 10px;
-      margin-bottom: 28px;
-      padding: 0 4px;
-    }
-    .progress-step {
-      flex: 1;
-      display: flex; align-items: center; gap: 10px;
-      min-width: 0;
-    }
+    .progress { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding: 0 4px; }
+    .progress-step { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
     .progress-num {
       width: 28px; height: 28px; border-radius: 50%;
       background: var(--surface-2);
@@ -205,11 +223,7 @@
       border-color: var(--brand);
       box-shadow: 0 0 0 4px var(--brand-tint), 0 4px 14px var(--brand-glow);
     }
-    .progress-step.done .progress-num {
-      background: var(--brand);
-      color: #fff;
-      border-color: var(--brand);
-    }
+    .progress-step.done .progress-num { background: var(--brand); color: #fff; border-color: var(--brand); }
     .progress-step.done .progress-num span { display: none; }
     .progress-step.done .progress-num svg { display: block; }
     .progress-label {
@@ -223,10 +237,7 @@
       transition: color 0.2s;
     }
     .progress-step.active .progress-label,
-    .progress-step.done .progress-label {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .progress-step.done .progress-label { color: var(--text); font-weight: 600; }
     .progress-line {
       flex-shrink: 0;
       width: 24px;
@@ -276,16 +287,9 @@
     }
     .section-eyebrow .step-dot {
       width: 5px; height: 5px; border-radius: 50%;
-      background: var(--brand);
-      box-shadow: 0 0 6px var(--brand-glow);
+      background: var(--brand); box-shadow: 0 0 6px var(--brand-glow);
     }
-    .section-title {
-      font-size: 26px;
-      font-weight: 600;
-      letter-spacing: -0.025em;
-      line-height: 1.15;
-      margin-bottom: 8px;
-    }
+    .section-title { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 8px; }
     .section-title .accent {
       font-family: 'Instrument Serif', serif;
       font-style: italic;
@@ -295,11 +299,7 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .section-sub {
-      font-size: 14px;
-      color: var(--text-dim);
-      line-height: 1.55;
-    }
+    .section-sub { font-size: 14px; color: var(--text-dim); line-height: 1.55; }
     .subsection { margin-bottom: 28px; }
     .subsection:last-child { margin-bottom: 0; }
     .subsection-label {
@@ -332,12 +332,7 @@
       font-weight: 500;
       letter-spacing: -0.005em;
     }
-    .float-textarea {
-      min-height: 110px;
-      resize: vertical;
-      line-height: 1.55;
-      padding-top: 26px;
-    }
+    .float-textarea { min-height: 110px; resize: vertical; line-height: 1.55; padding-top: 26px; }
     .float-select {
       appearance: none;
       cursor: pointer;
@@ -347,19 +342,13 @@
       padding-right: 40px;
     }
     .float-select option { background: var(--surface-2); color: var(--text); }
-    .float-input:hover,
-    .float-select:hover,
-    .float-textarea:hover { border-color: var(--border-3); }
-    .float-input:focus,
-    .float-select:focus,
-    .float-textarea:focus {
+    .float-input:hover, .float-select:hover, .float-textarea:hover { border-color: var(--border-3); }
+    .float-input:focus, .float-select:focus, .float-textarea:focus {
       border-color: var(--brand);
       box-shadow: 0 0 0 4px var(--brand-tint);
       background: var(--bg-2);
     }
-    .float-input.error,
-    .float-select.error,
-    .float-textarea.error {
+    .float-input.error, .float-select.error, .float-textarea.error {
       border-color: var(--error);
       box-shadow: 0 0 0 4px var(--error-soft);
     }
@@ -388,73 +377,9 @@
       color: var(--brand);
       font-weight: 600;
     }
-    .float-label .opt {
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-left: 4px;
-    }
-    .field-hint {
-      font-size: 12px;
-      color: var(--text-faint);
-      margin-top: 7px;
-      padding-left: 4px;
-      line-height: 1.5;
-    }
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .plan-banner {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px;
-      margin-bottom: 22px;
-      background:
-        linear-gradient(135deg, var(--brand-tint) 0%, transparent 60%),
-        linear-gradient(180deg, var(--surface-input) 0%, var(--surface-2) 100%);
-      border: 1px solid var(--brand-line);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-    }
-    .plan-banner::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--brand), transparent);
-    }
-    .plan-banner-icon {
-      width: 32px; height: 32px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 12px var(--brand-glow);
-    }
-    .plan-banner-text { flex: 1; min-width: 0; }
-    .plan-banner-label {
-      font-family: 'Geist Mono', monospace;
-      font-size: 9.5px;
-      color: var(--brand);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    .plan-banner-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: -0.005em;
-    }
-    .plan-banner-price {
-      font-family: 'Geist Mono', monospace;
-      font-size: 13px;
-      color: var(--text-dim);
-      letter-spacing: 0.02em;
-      font-weight: 500;
-      flex-shrink: 0;
-    }
+    .float-label .opt { color: var(--text-muted); font-weight: 500; margin-left: 4px; }
+    .field-hint { font-size: 12px; color: var(--text-faint); margin-top: 7px; padding-left: 4px; line-height: 1.5; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .ai-preview {
       margin-top: 16px;
       padding: 14px 16px;
@@ -515,10 +440,7 @@
       display: flex; align-items: center; justify-content: center;
       transition: all 0.18s;
     }
-    .check-card.selected .check-box {
-      border-color: var(--brand);
-      background: var(--brand);
-    }
+    .check-card.selected .check-box { border-color: var(--brand); background: var(--brand); }
     .check-card.selected .check-box::after {
       content: '';
       width: 9px; height: 5px;
@@ -541,13 +463,7 @@
       border-color: var(--brand-line);
       color: var(--brand);
     }
-    .check-label {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text);
-      flex: 1;
-      letter-spacing: -0.005em;
-    }
+    .check-label { font-size: 13.5px; font-weight: 500; color: var(--text); flex: 1; letter-spacing: -0.005em; }
     .radio-stack { display: flex; flex-direction: column; gap: 10px; }
     .radio-card {
       display: flex; align-items: flex-start; gap: 14px;
@@ -585,18 +501,8 @@
       box-shadow: 0 0 6px var(--brand-glow);
     }
     .radio-content { flex: 1; min-width: 0; }
-    .radio-label {
-      font-size: 14.5px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 4px;
-      letter-spacing: -0.01em;
-    }
-    .radio-desc {
-      font-size: 12.5px;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
+    .radio-label { font-size: 14.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: -0.01em; }
+    .radio-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
     .radio-sample {
       font-family: 'Instrument Serif', serif;
       font-style: italic;
@@ -609,18 +515,8 @@
       line-height: 1.5;
     }
     .radio-card.selected .radio-sample { border-color: var(--brand); }
-    .legal-note {
-      margin-top: 14px;
-      font-size: 11.5px;
-      color: var(--text-faint);
-      text-align: center;
-      line-height: 1.5;
-    }
-    .legal-note a {
-      color: var(--text-dim);
-      transition: color 0.15s;
-      font-weight: 500;
-    }
+    .legal-note { margin-top: 14px; font-size: 11.5px; color: var(--text-faint); text-align: center; line-height: 1.5; }
+    .legal-note a { color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
     .legal-note a:hover { color: var(--brand); }
     .legal-note .sep { margin: 0 6px; color: var(--text-muted); }
     .activation-card {
@@ -653,14 +549,7 @@
       0%,100% { transform: translateY(0); }
       50% { transform: translateY(-3px); }
     }
-    .activation-title {
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.025em;
-      text-align: center;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
+    .activation-title { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; text-align: center; margin-bottom: 8px; line-height: 1.2; }
     .activation-title .accent {
       font-family: 'Instrument Serif', serif;
       font-style: italic;
@@ -670,19 +559,8 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .activation-sub {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      text-align: center;
-      line-height: 1.55;
-      max-width: 380px;
-      margin: 0 auto;
-    }
-    .review-list {
-      display: flex; flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
+    .activation-sub { font-size: 13.5px; color: var(--text-dim); text-align: center; line-height: 1.55; max-width: 380px; margin: 0 auto; }
+    .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
     .review-section {
       background: var(--surface-input);
       border: 1px solid var(--border);
@@ -691,10 +569,7 @@
       transition: border-color 0.15s;
     }
     .review-section:hover { border-color: var(--border-2); }
-    .review-section-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px;
-    }
+    .review-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .review-section-title {
       display: flex; align-items: center; gap: 9px;
       font-family: 'Geist Mono', monospace;
@@ -734,18 +609,8 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
-    .review-row-value {
-      font-size: 12.5px;
-      color: var(--text);
-      font-weight: 500;
-      word-break: break-word;
-      line-height: 1.4;
-    }
-    .review-row-value.empty {
-      color: var(--text-muted);
-      font-style: italic;
-      font-weight: 400;
-    }
+    .review-row-value { font-size: 12.5px; color: var(--text); font-weight: 500; word-break: break-word; line-height: 1.4; }
+    .review-row-value.empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
     .review-tags { display: flex; flex-wrap: wrap; gap: 5px; }
     .review-tag {
       font-family: 'Geist Mono', monospace;
@@ -778,16 +643,8 @@
       white-space: nowrap;
       min-height: 46px;
     }
-    .btn-back {
-      background: transparent;
-      color: var(--text-dim);
-      border-color: var(--border-3);
-    }
-    .btn-back:hover {
-      color: var(--text);
-      background: var(--surface-3);
-      border-color: var(--border-3);
-    }
+    .btn-back { background: transparent; color: var(--text-dim); border-color: var(--border-3); }
+    .btn-back:hover { color: var(--text); background: var(--surface-3); border-color: var(--border-3); }
     .btn-back:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     .btn-next {
       background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
@@ -857,96 +714,6 @@
       font-weight: 500;
     }
     .trust-item svg { color: var(--brand); }
-    .success-screen {
-      text-align: center;
-      padding: 28px 0 16px;
-    }
-    .success-glyph {
-      width: 88px; height: 88px;
-      margin: 0 auto 28px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      box-shadow:
-        0 24px 50px var(--brand-glow),
-        0 0 0 8px var(--brand-soft),
-        inset 0 1px 0 rgba(255,255,255,0.3);
-      display: flex; align-items: center; justify-content: center;
-      animation: pop 0.55s cubic-bezier(0.16,1,0.3,1);
-      position: relative;
-    }
-    .success-glyph::before {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 24px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
-    }
-    @keyframes pop {
-      0% { transform: scale(0.5); opacity: 0; }
-      60% { transform: scale(1.08); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .success-title {
-      font-size: 36px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
-      line-height: 1.1;
-    }
-    .success-title .accent {
-      font-family: 'Instrument Serif', serif;
-      font-style: italic;
-      font-weight: 400;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .success-sub {
-      color: var(--text-dim);
-      font-size: 15px;
-      line-height: 1.6;
-      max-width: 460px;
-      margin: 0 auto 32px;
-    }
-    .success-steps {
-      background: var(--surface-input);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 24px;
-      text-align: left;
-      max-width: 460px;
-      margin: 0 auto 28px;
-    }
-    .success-steps-label {
-      font-family: 'Geist Mono', monospace;
-      font-size: 10px;
-      color: var(--text-faint);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-    .success-step {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 8px 0;
-      font-size: 13.5px;
-      color: var(--text-soft);
-      line-height: 1.5;
-    }
-    .success-step strong { color: var(--text); font-weight: 600; }
-    .success-step-num {
-      width: 22px; height: 22px;
-      border-radius: 7px;
-      background: var(--brand-soft);
-      border: 1px solid var(--brand-line);
-      color: var(--brand);
-      font-family: 'Geist Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
     .honeypot {
       position: absolute !important;
       left: -9999px !important;
@@ -977,7 +744,6 @@
       .btn { width: 100%; }
       .activation-card { padding: 22px 18px; }
       .activation-title { font-size: 19px; }
-      .success-title { font-size: 28px; }
       .plan-banner-price { display: none; }
     }
   </style>
@@ -1003,7 +769,6 @@
       <p class="hero-sub">Tell us about your business, configure how your AI handles calls, and we'll have it answering in 5–7 days.</p>
     </header>
 
-    <!-- PLAN BANNER (shown when ?plan= is in URL) -->
     <div class="plan-banner" id="plan-banner" style="display:none;">
       <div class="plan-banner-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1036,7 +801,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span id="form-error-text"></span>
       </div>
-      <!-- SECTION 1: BUSINESS BASICS -->
+
       <section class="section active" data-section="1">
         <div class="section-head">
           <div class="section-eyebrow"><span class="step-dot"></span>Step 1 · Business Info</div>
@@ -1096,7 +861,7 @@
           </div>
         </div>
       </section>
-      <!-- SECTION 2: AI CONFIGURATION -->
+
       <section class="section" data-section="2">
         <div class="section-head">
           <div class="section-eyebrow"><span class="step-dot"></span>Step 2 · AI Configuration</div>
@@ -1270,7 +1035,7 @@
           </div>
         </div>
       </section>
-      <!-- SECTION 3: ACTIVATE -->
+
       <section class="section" data-section="3">
         <div class="section-head">
           <div class="section-eyebrow"><span class="step-dot"></span>Step 3 · Activate</div>
@@ -1287,9 +1052,8 @@
         <div class="review-list" id="review-content"></div>
       </section>
 
-      <!-- HONEYPOT FIELDS — hidden from humans, bots fill these in -->
       <div class="honeypot" aria-hidden="true">
-        <label for="website_url">Don't fill out (anti-spam):</label>
+        <label for="website_url">Don't fill out:</label>
         <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off" />
         <label for="company_size_other">Leave blank:</label>
         <input type="text" id="company_size_other" name="company_size_other" tabindex="-1" autocomplete="off" />
@@ -1298,11 +1062,11 @@
       </div>
 
       <div class="actions" id="actions">
-        <button class="btn btn-back" id="btn-back" disabled>
+        <button class="btn btn-back" id="btn-back" type="button" disabled>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </button>
-        <button class="btn btn-next" id="btn-next">
+        <button class="btn btn-next" id="btn-next" type="button">
           <span id="btn-next-label">Continue</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="btn-next-arrow"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -1324,14 +1088,35 @@
     </div>
   </div>
   <script>
-    // ===== READ PLAN FROM URL =====
+    'use strict';
+
+    // ========================================================
+    // GUARDED REDIRECT — the ONLY place we navigate away.
+    // Logs to console first so we can trace any rogue caller.
+    // ========================================================
+    function safeRedirectToSuccess(slug, plan, businessName) {
+      console.log('[onboarding] 🟢 safeRedirectToSuccess called', { slug, plan, businessName });
+      console.trace('[onboarding] redirect stack trace');
+      const params = new URLSearchParams({
+        plan: plan || 'starter',
+        slug: slug || '',
+        business: businessName || '',
+      });
+      const target = '/onboarding/success?' + params.toString();
+      console.log('[onboarding] 🟢 navigating to:', target);
+      window.location.href = target;
+    }
+
+    // ========================================================
+    // PLAN FROM URL
+    // ========================================================
     const urlParams = new URLSearchParams(window.location.search);
     const selectedPlan = (function () {
       const raw = (urlParams.get('plan') || '').toLowerCase().trim();
       return raw === 'pro' ? 'pro' : 'starter';
     })();
+    console.log('[onboarding] selected plan:', selectedPlan);
 
-    // ===== SHOW PLAN BANNER =====
     (function showPlanBanner() {
       const banner = document.getElementById('plan-banner');
       const name = document.getElementById('plan-banner-name');
@@ -1346,7 +1131,9 @@
       banner.style.display = 'flex';
     })();
 
-    // ===== SLUG GENERATOR =====
+    // ========================================================
+    // SLUG GENERATOR
+    // ========================================================
     function slugify(input) {
       if (!input) return '';
       return String(input)
@@ -1359,6 +1146,9 @@
         .slice(0, 60);
     }
 
+    // ========================================================
+    // PHONE FORMATTING + VALIDATION
+    // ========================================================
     function formatPhoneValue(raw) {
       const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
       if (digits.length === 0) return '';
@@ -1386,11 +1176,10 @@
         }
         try { input.setSelectionRange(newPos, newPos); } catch (_) {}
       });
-      input.addEventListener('blur', () => {
-        input.value = formatPhoneValue(input.value);
-      });
+      input.addEventListener('blur', () => { input.value = formatPhoneValue(input.value); });
     }
     document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
+
     function refreshFloatState(el) {
       if (!el) return;
       if (el.value && el.value.trim() !== '') el.classList.add('has-value');
@@ -1402,9 +1191,14 @@
       el.addEventListener('change', () => refreshFloatState(el));
       el.addEventListener('blur', () => refreshFloatState(el));
     });
+
+    // ========================================================
+    // STATE
+    // ========================================================
     const TOTAL = 3;
     let currentSection = 1;
     let completedSections = new Set();
+    let isSubmitting = false; // guard against double-submits
     const formData = {
       business_name: '', industry: '', business_phone: '',
       transfer_primary: '', transfer_backup: '', notify_email: '', transfer_hours: '',
@@ -1424,9 +1218,7 @@
       new_customer: 'New customer / booking', payments: 'Payments / billing',
       support: 'Customer support', other: 'Other',
     };
-    const personalityLabels = {
-      warm: 'Warm & Conversational', professional: 'Professional', direct: 'Direct',
-    };
+    const personalityLabels = { warm: 'Warm & Conversational', professional: 'Professional', direct: 'Direct' };
     const pricingLabels = {
       yes_specific: 'Yes — exact prices', yes_ranges: 'Yes — ranges only',
       no_quote: 'No — promise a quote', no_transfer: 'No — transfer pricing calls',
@@ -1439,6 +1231,7 @@
         restoreFields();
       }
     } catch (e) {}
+
     function restoreFields() {
       ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(k => {
         const el = document.getElementById(k);
@@ -1450,10 +1243,7 @@
       });
       ['industry','pricing_rule'].forEach(k => {
         const el = document.getElementById(k);
-        if (el && formData[k]) {
-          el.value = formData[k];
-          refreshFloatState(el);
-        }
+        if (el && formData[k]) { el.value = formData[k]; refreshFloatState(el); }
       });
       (formData.topics || []).forEach(v => {
         const card = document.querySelector(`#topics-grid .check-card[data-value="${v}"]`);
@@ -1475,10 +1265,7 @@
     }
     let saveFlashTimeout;
     function autoSave() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-        flashSavePill();
-      } catch (e) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(formData)); flashSavePill(); } catch (e) {}
     }
     function flashSavePill() {
       const pill = document.getElementById('save-pill');
@@ -1492,10 +1279,7 @@
         pill.classList.remove('saving');
         pill.classList.add('saved');
         txt.textContent = 'Saved';
-        setTimeout(() => {
-          pill.classList.remove('saved');
-          txt.textContent = 'Auto-saved';
-        }, 1200);
+        setTimeout(() => { pill.classList.remove('saved'); txt.textContent = 'Auto-saved'; }, 1200);
       }, 500);
     }
     function updateProgress() {
@@ -1513,9 +1297,7 @@
     function updateAIPreview() {
       const name = (formData.business_name || '').trim() || 'your business';
       const previewEl = document.getElementById('ai-preview-text');
-      if (previewEl) {
-        previewEl.textContent = `"Thanks for calling ${name}. How can I help you today?"`;
-      }
+      if (previewEl) previewEl.textContent = `"Thanks for calling ${name}. How can I help you today?"`;
     }
     function showError(msg) {
       const el = document.getElementById('form-error');
@@ -1523,9 +1305,8 @@
       el.classList.add('visible');
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    function hideError() {
-      document.getElementById('form-error').classList.remove('visible');
-    }
+    function hideError() { document.getElementById('form-error').classList.remove('visible'); }
+
     function validateSection(section) {
       hideError();
       if (section === 1) {
@@ -1550,12 +1331,12 @@
         const personalityCard = document.querySelector('#personality-stack .radio-card.selected');
         const pricingRule = document.getElementById('pricing_rule').value;
         if (!isValidPhone(trans)) { showError('Enter a valid 10-digit primary transfer number.'); return false; }
-        if (backup && !isValidPhone(backup)) { showError('Backup number must be a valid 10-digit number, or leave it blank.'); return false; }
+        if (backup && !isValidPhone(backup)) { showError('Backup number must be 10 digits or blank.'); return false; }
         if (!email || !email.includes('@')) { showError('Please enter a valid notification email.'); return false; }
-        if (!hours) { showError('Please enter your business hours / transfer hours.'); return false; }
-        if (topics.length === 0) { showError('Pick at least one topic so we know how to train your AI.'); return false; }
-        if (!personalityCard) { showError('Pick a personality for your AI.'); return false; }
-        if (!pricingRule) { showError('Please pick how the AI should handle pricing questions.'); return false; }
+        if (!hours) { showError('Please enter your business hours.'); return false; }
+        if (topics.length === 0) { showError('Pick at least one topic.'); return false; }
+        if (!personalityCard) { showError('Pick a personality.'); return false; }
+        if (!pricingRule) { showError('Please pick how the AI should handle pricing.'); return false; }
         formData.transfer_primary = trans;
         formData.transfer_backup = backup;
         formData.notify_email = email;
@@ -1571,6 +1352,7 @@
       autoSave();
       return true;
     }
+
     function showSection(section) {
       if (section > currentSection) {
         for (let i = currentSection; i < section; i++) completedSections.add(i);
@@ -1601,6 +1383,7 @@
       }, 350);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function buildReview() {
       const reviewEl = document.getElementById('review-content');
       const empty = (v) => !v || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && v.length === 0);
@@ -1613,7 +1396,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>
               Business
             </div>
-            <button class="review-edit" data-edit="1">Edit</button>
+            <button class="review-edit" type="button" data-edit="1">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Name</div>${renderValue(formData.business_name)}</div>
@@ -1628,7 +1411,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
               Call Handling
             </div>
-            <button class="review-edit" data-edit="2">Edit</button>
+            <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Primary transfer</div>${renderValue(formData.transfer_primary)}</div>
@@ -1643,7 +1426,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
               Topics
             </div>
-            <button class="review-edit" data-edit="2">Edit</button>
+            <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row full">
@@ -1657,7 +1440,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg></span>
               Links
             </div>
-            <button class="review-edit" data-edit="2">Edit</button>
+            <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row full"><div class="review-row-label">Booking link</div>${renderValue(formData.booking_link)}</div>
@@ -1670,7 +1453,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
               Personality
             </div>
-            <button class="review-edit" data-edit="2">Edit</button>
+            <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row full">${renderValue(personalityLabels[formData.personality] || formData.personality)}</div>
@@ -1682,7 +1465,7 @@
               <span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
               Pricing &amp; Notes
             </div>
-            <button class="review-edit" data-edit="2">Edit</button>
+            <button class="review-edit" type="button" data-edit="2">Edit</button>
           </div>
           <div class="review-data">
             <div class="review-row full"><div class="review-row-label">Pricing rule</div>${renderValue(pricingLabels[formData.pricing_rule] || formData.pricing_rule)}</div>
@@ -1692,13 +1475,20 @@
         </div>
       `;
       reviewEl.querySelectorAll('.review-edit').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const targetSection = parseInt(btn.dataset.edit, 10);
           showSection(targetSection);
         });
       });
     }
-    document.getElementById('btn-next').addEventListener('click', async () => {
+
+    document.getElementById('btn-next').addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (isSubmitting) {
+        console.log('[onboarding] ⛔ btn-next click ignored — already submitting');
+        return;
+      }
       if (!validateSection(currentSection)) return;
       if (currentSection < TOTAL) {
         showSection(currentSection + 1);
@@ -1706,11 +1496,13 @@
         await submitForm();
       }
     });
-    document.getElementById('btn-back').addEventListener('click', () => {
+    document.getElementById('btn-back').addEventListener('click', (e) => {
+      e.preventDefault();
       if (currentSection > 1) showSection(currentSection - 1);
     });
     document.querySelectorAll('.progress-step').forEach(item => {
       item.addEventListener('click', () => {
+        if (isSubmitting) return;
         const step = parseInt(item.dataset.step, 10);
         if (completedSections.has(step) || step <= currentSection) showSection(step);
       });
@@ -1722,17 +1514,11 @@
     });
     ['business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener('input', () => {
-        formData[id] = el.value;
-        autoSave();
-      });
+      if (el) el.addEventListener('input', () => { formData[id] = el.value; autoSave(); });
     });
     ['industry','pricing_rule'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener('change', (e) => {
-        formData[id] = e.target.value;
-        autoSave();
-      });
+      if (el) el.addEventListener('change', (e) => { formData[id] = e.target.value; autoSave(); });
     });
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -1755,7 +1541,18 @@
         autoSave();
       });
     });
+
+    // ========================================================
+    // SUBMIT — the ONLY place that can call safeRedirectToSuccess
+    // ========================================================
     async function submitForm() {
+      console.log('[onboarding] 📤 submitForm() entered');
+      if (isSubmitting) {
+        console.warn('[onboarding] ⛔ submitForm called twice — ignoring');
+        return;
+      }
+      isSubmitting = true;
+
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
       const arrow = document.getElementById('btn-next-arrow');
@@ -1763,15 +1560,11 @@
       label.innerHTML = '<span class="spinner"></span>';
       if (arrow) arrow.style.display = 'none';
 
-      // Generate slug from business name
       const clientSlug = slugify(formData.business_name);
-
-      // Read honeypot fields (real humans never touch these)
       const hpWebsite = document.getElementById('website_url')?.value || '';
       const hpCompany = document.getElementById('company_size_other')?.value || '';
       const hpGotcha = document.getElementById('_gotcha')?.value || '';
 
-      // Build payload: all existing form fields + plan + client_slug + honeypot
       const payload = {
         ...formData,
         plan: selectedPlan,
@@ -1781,29 +1574,68 @@
         _gotcha: hpGotcha,
       };
 
+      console.log('[onboarding] 📤 sending payload:', {
+        business: payload.business_name,
+        plan: payload.plan,
+        slug: payload.client_slug,
+        email: payload.notify_email,
+      });
+
+      // Helper to re-enable the form after a failed submit.
+      function reEnable() {
+        isSubmitting = false;
+        btn.disabled = false;
+        label.textContent = 'Submit & schedule activation';
+        if (arrow) arrow.style.display = 'block';
+      }
+
+      let res;
       try {
-        const res = await fetch('/api/onboarding-submit', {
+        res = await fetch('/api/onboarding-submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok && res.status !== 404) {
-          const err = await res.text().catch(() => '');
-          console.error('Submit failed:', err);
-        }
       } catch (err) {
-        console.error('Network error:', err);
+        console.error('[onboarding] ❌ network error:', err);
+        showError('Network error. Check your connection and try again.');
+        reEnable();
+        return;
       }
+
+      console.log('[onboarding] 📥 HTTP status:', res.status);
+
+      let result = null;
+      try {
+        result = await res.json();
+      } catch (err) {
+        console.error('[onboarding] ❌ could not parse response JSON:', err);
+        showError('Unexpected server response. Please email hello@aileadintel.com');
+        reEnable();
+        return;
+      }
+
+      console.log('[onboarding] 📥 result body:', result);
+
+      // STRICT GATE — only success === true continues
+      if (!res.ok || result === null || result.success !== true) {
+        const msg = (result && result.error) || `Submit failed (HTTP ${res.status})`;
+        console.warn('[onboarding] ❌ submit unsuccessful — staying on page. msg:', msg);
+        showError(msg + ' — please email hello@aileadintel.com');
+        reEnable();
+        return;
+      }
+
+      console.log('[onboarding] ✅ result.success === true — proceeding to redirect');
+
+      // Only clear storage AFTER confirmed success
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
 
-      // Redirect to the new success page
-      const successParams = new URLSearchParams({
-        plan: selectedPlan,
-        slug: clientSlug,
-        business: formData.business_name || '',
-      });
-      window.location.href = '/onboarding/success?' + successParams.toString();
+      const canonicalSlug = result.client_slug || clientSlug;
+      const canonicalPlan = result.plan || selectedPlan;
+      safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '');
     }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         const activeSection = document.querySelector('.section.active');
@@ -1813,12 +1645,15 @@
         }
       }
     });
+
     function escapeHtml(str) {
       if (!str && str !== 0) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+
     updateProgress();
     updateAIPreview();
+    console.log('[onboarding] ✅ page initialized');
   </script>
 </body>
 </html>
