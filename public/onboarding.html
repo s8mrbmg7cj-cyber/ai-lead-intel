@@ -69,11 +69,9 @@
       mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
       -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
     }
-
     a { color: inherit; text-decoration: none; }
     button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
     input, select, textarea { font-family: inherit; outline: none; }
-
     .topnav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(8,8,10,0.72);
@@ -123,14 +121,12 @@
       transition: color 0.15s; font-weight: 500;
     }
     .nav-help:hover { color: var(--text); }
-
     .wrap {
       position: relative; z-index: 1;
       max-width: 720px;
       margin: 0 auto;
       padding: 56px 24px 96px;
     }
-
     .hero { text-align: center; margin-bottom: 36px; }
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -179,7 +175,6 @@
       max-width: 480px;
       margin: 0 auto;
     }
-
     .progress {
       display: flex; align-items: center;
       gap: 10px;
@@ -240,7 +235,6 @@
       transition: background 0.4s;
     }
     .progress-line.done { background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
-
     .card {
       background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
       border: 1px solid var(--border);
@@ -263,14 +257,12 @@
       position: absolute; top: -1px; left: 25%; right: 25%; height: 1px;
       background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent);
     }
-
     .section { display: none; animation: sectionIn 0.45s cubic-bezier(0.16,1,0.3,1); }
     .section.active { display: block; }
     @keyframes sectionIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .section-head { margin-bottom: 28px; }
     .section-eyebrow {
       display: inline-flex; align-items: center; gap: 7px;
@@ -308,7 +300,6 @@
       color: var(--text-dim);
       line-height: 1.55;
     }
-
     .subsection { margin-bottom: 28px; }
     .subsection:last-child { margin-bottom: 0; }
     .subsection-label {
@@ -324,7 +315,6 @@
       border-bottom: 1px solid var(--border);
     }
     .subsection-label svg { color: var(--brand); }
-
     .field { margin-bottom: 16px; position: relative; }
     .field:last-child { margin-bottom: 0; }
     .float-wrap { position: relative; }
@@ -357,7 +347,6 @@
       padding-right: 40px;
     }
     .float-select option { background: var(--surface-2); color: var(--text); }
-
     .float-input:hover,
     .float-select:hover,
     .float-textarea:hover { border-color: var(--border-3); }
@@ -374,7 +363,6 @@
       border-color: var(--error);
       box-shadow: 0 0 0 4px var(--error-soft);
     }
-
     .float-label {
       position: absolute;
       left: 16px;
@@ -417,7 +405,56 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-
+    .plan-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      background:
+        linear-gradient(135deg, var(--brand-tint) 0%, transparent 60%),
+        linear-gradient(180deg, var(--surface-input) 0%, var(--surface-2) 100%);
+      border: 1px solid var(--brand-line);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    }
+    .plan-banner-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--brand-glow);
+    }
+    .plan-banner-text { flex: 1; min-width: 0; }
+    .plan-banner-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 9.5px;
+      color: var(--brand);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .plan-banner-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.005em;
+    }
+    .plan-banner-price {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
     .ai-preview {
       margin-top: 16px;
       padding: 14px 16px;
@@ -451,7 +488,6 @@
       font-style: italic;
       font-family: 'Instrument Serif', serif;
     }
-
     .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .check-card {
       display: flex; align-items: center; gap: 12px;
@@ -512,7 +548,6 @@
       flex: 1;
       letter-spacing: -0.005em;
     }
-
     .radio-stack { display: flex; flex-direction: column; gap: 10px; }
     .radio-card {
       display: flex; align-items: flex-start; gap: 14px;
@@ -574,7 +609,6 @@
       line-height: 1.5;
     }
     .radio-card.selected .radio-sample { border-color: var(--brand); }
-
     .legal-note {
       margin-top: 14px;
       font-size: 11.5px;
@@ -589,7 +623,6 @@
     }
     .legal-note a:hover { color: var(--brand); }
     .legal-note .sep { margin: 0 6px; color: var(--text-muted); }
-
     .activation-card {
       background:
         radial-gradient(circle at 0% 0%, var(--brand-tint) 0%, transparent 60%),
@@ -645,7 +678,6 @@
       max-width: 380px;
       margin: 0 auto;
     }
-
     .review-list {
       display: flex; flex-direction: column;
       gap: 8px;
@@ -726,7 +758,6 @@
       letter-spacing: 0.04em;
       font-weight: 500;
     }
-
     .actions {
       display: flex; justify-content: space-between; align-items: center;
       margin-top: 32px;
@@ -792,7 +823,6 @@
       animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .form-error {
       background: var(--error-soft);
       border: 1px solid rgba(248,113,113,0.2);
@@ -812,7 +842,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .form-error svg { flex-shrink: 0; }
-
     .trust-row {
       display: flex; justify-content: center; align-items: center;
       gap: 22px;
@@ -828,7 +857,6 @@
       font-weight: 500;
     }
     .trust-item svg { color: var(--brand); }
-
     .success-screen {
       text-align: center;
       padding: 28px 0 16px;
@@ -919,7 +947,16 @@
       flex-shrink: 0;
       margin-top: 1px;
     }
-
+    .honeypot {
+      position: absolute !important;
+      left: -9999px !important;
+      top: auto !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
     @media (max-width: 720px) {
       .topnav { padding: 12px 16px; }
       .nav-save-pill { display: none; }
@@ -941,6 +978,7 @@
       .activation-card { padding: 22px 18px; }
       .activation-title { font-size: 19px; }
       .success-title { font-size: 28px; }
+      .plan-banner-price { display: none; }
     }
   </style>
 </head>
@@ -958,14 +996,24 @@
       <a href="mailto:hello@aileadintel.com" class="nav-help">Need help?</a>
     </div>
   </nav>
-
   <div class="wrap">
-
     <header class="hero">
       <div class="hero-eyebrow"><span class="dot"></span>Setup · Under 60 seconds</div>
       <h1 class="hero-title">Set up your <span class="accent">AI front desk</span></h1>
       <p class="hero-sub">Tell us about your business, configure how your AI handles calls, and we'll have it answering in 5–7 days.</p>
     </header>
+
+    <!-- PLAN BANNER (shown when ?plan= is in URL) -->
+    <div class="plan-banner" id="plan-banner" style="display:none;">
+      <div class="plan-banner-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="plan-banner-text">
+        <div class="plan-banner-label">Selected plan</div>
+        <div class="plan-banner-name" id="plan-banner-name">Starter</div>
+      </div>
+      <div class="plan-banner-price" id="plan-banner-price">$99 / month</div>
+    </div>
 
     <div class="progress" id="progress">
       <div class="progress-step active" data-step="1">
@@ -983,13 +1031,11 @@
         <div class="progress-label">Activate</div>
       </div>
     </div>
-
     <div class="card">
       <div class="form-error" id="form-error">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span id="form-error-text"></span>
       </div>
-
       <!-- SECTION 1: BUSINESS BASICS -->
       <section class="section active" data-section="1">
         <div class="section-head">
@@ -997,14 +1043,12 @@
           <h2 class="section-title">Tell us about your <span class="accent">business</span></h2>
           <p class="section-sub">The basics — your AI uses this when it answers calls.</p>
         </div>
-
         <div class="field">
           <div class="float-wrap">
             <input type="text" class="float-input" id="business_name" placeholder=" " autocomplete="organization" />
             <label class="float-label" for="business_name">Business name</label>
           </div>
         </div>
-
         <div class="field-row">
           <div class="field">
             <div class="float-wrap">
@@ -1036,14 +1080,12 @@
             </div>
           </div>
         </div>
-
         <div class="field">
           <div class="float-wrap">
             <input type="url" class="float-input" id="website" placeholder=" " autocomplete="url" />
             <label class="float-label" for="website">Website <span class="opt">— optional</span></label>
           </div>
         </div>
-
         <div class="ai-preview">
           <div class="ai-preview-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
@@ -1054,7 +1096,6 @@
           </div>
         </div>
       </section>
-
       <!-- SECTION 2: AI CONFIGURATION -->
       <section class="section" data-section="2">
         <div class="section-head">
@@ -1062,13 +1103,11 @@
           <h2 class="section-title">Configure your <span class="accent">AI front desk</span></h2>
           <p class="section-sub">Where to route calls, what callers ask about, and how your AI should sound.</p>
         </div>
-
         <div class="subsection">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             Call Handling
           </div>
-
           <div class="field-row">
             <div class="field">
               <div class="float-wrap">
@@ -1083,7 +1122,6 @@
               </div>
             </div>
           </div>
-
           <div class="field">
             <div class="float-wrap">
               <input type="email" class="float-input" id="notify_email" placeholder=" " autocomplete="email" required />
@@ -1091,7 +1129,6 @@
             </div>
             <div class="field-hint">Where call summaries and lead alerts will be sent.</div>
           </div>
-
           <div class="field">
             <div class="float-wrap">
               <input type="text" class="float-input" id="transfer_hours" placeholder=" " required />
@@ -1100,7 +1137,6 @@
             <div class="field-hint">e.g. Mon–Fri 9am–6pm</div>
           </div>
         </div>
-
         <div class="subsection">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -1141,7 +1177,6 @@
             </label>
           </div>
         </div>
-
         <div class="subsection">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -1160,7 +1195,6 @@
             </div>
           </div>
         </div>
-
         <div class="subsection">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -1196,13 +1230,11 @@
             </label>
           </div>
         </div>
-
         <div class="subsection" style="margin-bottom: 0;">
           <div class="subsection-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Pricing &amp; Notes
           </div>
-
           <div class="field">
             <div class="float-wrap">
               <select class="float-select" id="pricing_rule">
@@ -1216,7 +1248,6 @@
             </div>
             <div class="field-hint">If you don't set this, the AI may improvise prices.</div>
           </div>
-
           <div class="field">
             <div class="float-wrap">
               <textarea class="float-textarea" id="pricing_examples" placeholder=" "></textarea>
@@ -1224,7 +1255,6 @@
             </div>
             <div class="field-hint">One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"</div>
           </div>
-
           <div class="field">
             <div class="float-wrap">
               <textarea class="float-textarea" id="notes" placeholder=" "></textarea>
@@ -1232,7 +1262,6 @@
             </div>
             <div class="field-hint">Special hours, common questions, things the AI should never say.</div>
           </div>
-
           <div class="legal-note">
             By submitting, you agree to our
             <a href="/privacy" target="_blank">Privacy Policy</a>
@@ -1241,7 +1270,6 @@
           </div>
         </div>
       </section>
-
       <!-- SECTION 3: ACTIVATE -->
       <section class="section" data-section="3">
         <div class="section-head">
@@ -1249,7 +1277,6 @@
           <h2 class="section-title">Your AI assistant is <span class="accent">almost ready</span></h2>
           <p class="section-sub">Quick review before we kick off setup. Click any section to edit.</p>
         </div>
-
         <div class="activation-card">
           <div class="activation-icon">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -1257,9 +1284,18 @@
           <div class="activation-title">Ready to <span class="accent">launch setup</span></div>
           <div class="activation-sub">Submit below and we'll review your details, set up your AI, and have it answering calls within 5–7 business days.</div>
         </div>
-
         <div class="review-list" id="review-content"></div>
       </section>
+
+      <!-- HONEYPOT FIELDS — hidden from humans, bots fill these in -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="website_url">Don't fill out (anti-spam):</label>
+        <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off" />
+        <label for="company_size_other">Leave blank:</label>
+        <input type="text" id="company_size_other" name="company_size_other" tabindex="-1" autocomplete="off" />
+        <label for="_gotcha">Leave blank:</label>
+        <input type="text" id="_gotcha" name="_gotcha" tabindex="-1" autocomplete="off" />
+      </div>
 
       <div class="actions" id="actions">
         <button class="btn btn-back" id="btn-back" disabled>
@@ -1271,36 +1307,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="btn-next-arrow"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
-
-      <section class="section" data-section="success">
-        <div class="success-screen">
-          <div class="success-glyph">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
-          <h1 class="success-title">Setup <span class="accent">received</span></h1>
-          <p class="success-sub">We've got your details. We'll review your info and reach out before anything goes live.</p>
-          <div class="success-steps">
-            <div class="success-steps-label">What happens next</div>
-            <div class="success-step">
-              <div class="success-step-num">1</div>
-              <div>You'll get a confirmation at <strong id="success-email">your inbox</strong> in the next few minutes.</div>
-            </div>
-            <div class="success-step">
-              <div class="success-step-num">2</div>
-              <div>We'll <strong>reach out within 1 business day</strong> to finalize a few details.</div>
-            </div>
-            <div class="success-step">
-              <div class="success-step-num">3</div>
-              <div>Your AI <strong>goes live within 5–7 business days</strong> — answering calls 24/7.</div>
-            </div>
-          </div>
-          <a href="/" class="btn btn-back" style="display: inline-flex;">← Back to home</a>
-        </div>
-      </section>
     </div>
-
     <div class="trust-row" id="trust-row">
       <div class="trust-item">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1316,8 +1323,42 @@
       </div>
     </div>
   </div>
-
   <script>
+    // ===== READ PLAN FROM URL =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedPlan = (function () {
+      const raw = (urlParams.get('plan') || '').toLowerCase().trim();
+      return raw === 'pro' ? 'pro' : 'starter';
+    })();
+
+    // ===== SHOW PLAN BANNER =====
+    (function showPlanBanner() {
+      const banner = document.getElementById('plan-banner');
+      const name = document.getElementById('plan-banner-name');
+      const price = document.getElementById('plan-banner-price');
+      if (selectedPlan === 'pro') {
+        name.textContent = 'AI Front Desk Pro';
+        price.textContent = '$297 / month';
+      } else {
+        name.textContent = 'Starter';
+        price.textContent = '$99 / month';
+      }
+      banner.style.display = 'flex';
+    })();
+
+    // ===== SLUG GENERATOR =====
+    function slugify(input) {
+      if (!input) return '';
+      return String(input)
+        .toLowerCase()
+        .trim()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/-{2,}/g, '-')
+        .slice(0, 60);
+    }
+
     function formatPhoneValue(raw) {
       const digits = String(raw || '').replace(/\D/g, '').slice(0, 10);
       if (digits.length === 0) return '';
@@ -1350,7 +1391,6 @@
       });
     }
     document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
-
     function refreshFloatState(el) {
       if (!el) return;
       if (el.value && el.value.trim() !== '') el.classList.add('has-value');
@@ -1362,11 +1402,9 @@
       el.addEventListener('change', () => refreshFloatState(el));
       el.addEventListener('blur', () => refreshFloatState(el));
     });
-
     const TOTAL = 3;
     let currentSection = 1;
     let completedSections = new Set();
-
     const formData = {
       business_name: '', industry: '', business_phone: '',
       transfer_primary: '', transfer_backup: '', notify_email: '', transfer_hours: '',
@@ -1375,7 +1413,6 @@
       personality: '',
       pricing_rule: '', pricing_examples: '', notes: '',
     };
-
     const industryLabels = {
       self_storage: 'Self Storage', hvac: 'HVAC', plumbing: 'Plumbing', electrician: 'Electrician',
       landscaping: 'Landscaping / Lawn Care', auto_detailing: 'Auto Detailing', auto_repair: 'Auto Repair',
@@ -1394,9 +1431,7 @@
       yes_specific: 'Yes — exact prices', yes_ranges: 'Yes — ranges only',
       no_quote: 'No — promise a quote', no_transfer: 'No — transfer pricing calls',
     };
-
     const STORAGE_KEY = 'aileadintel_onboarding_v9';
-
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -1404,7 +1439,6 @@
         restoreFields();
       }
     } catch (e) {}
-
     function restoreFields() {
       ['business_name','business_phone','transfer_primary','transfer_backup','notify_email','transfer_hours','booking_link','payment_link','website','pricing_examples','notes'].forEach(k => {
         const el = document.getElementById(k);
@@ -1439,7 +1473,6 @@
       }
       updateAIPreview();
     }
-
     let saveFlashTimeout;
     function autoSave() {
       try {
@@ -1465,7 +1498,6 @@
         }, 1200);
       }, 500);
     }
-
     function updateProgress() {
       document.querySelectorAll('.progress-step').forEach(item => {
         const step = parseInt(item.dataset.step, 10);
@@ -1478,7 +1510,6 @@
         line.classList.toggle('done', completedSections.has(after));
       });
     }
-
     function updateAIPreview() {
       const name = (formData.business_name || '').trim() || 'your business';
       const previewEl = document.getElementById('ai-preview-text');
@@ -1486,7 +1517,6 @@
         previewEl.textContent = `"Thanks for calling ${name}. How can I help you today?"`;
       }
     }
-
     function showError(msg) {
       const el = document.getElementById('form-error');
       document.getElementById('form-error-text').textContent = msg;
@@ -1496,7 +1526,6 @@
     function hideError() {
       document.getElementById('form-error').classList.remove('visible');
     }
-
     function validateSection(section) {
       hideError();
       if (section === 1) {
@@ -1520,7 +1549,6 @@
         const topics = Array.from(document.querySelectorAll('#topics-grid .check-card.selected')).map(el => el.dataset.value);
         const personalityCard = document.querySelector('#personality-stack .radio-card.selected');
         const pricingRule = document.getElementById('pricing_rule').value;
-
         if (!isValidPhone(trans)) { showError('Enter a valid 10-digit primary transfer number.'); return false; }
         if (backup && !isValidPhone(backup)) { showError('Backup number must be a valid 10-digit number, or leave it blank.'); return false; }
         if (!email || !email.includes('@')) { showError('Please enter a valid notification email.'); return false; }
@@ -1528,7 +1556,6 @@
         if (topics.length === 0) { showError('Pick at least one topic so we know how to train your AI.'); return false; }
         if (!personalityCard) { showError('Pick a personality for your AI.'); return false; }
         if (!pricingRule) { showError('Please pick how the AI should handle pricing questions.'); return false; }
-
         formData.transfer_primary = trans;
         formData.transfer_backup = backup;
         formData.notify_email = email;
@@ -1544,7 +1571,6 @@
       autoSave();
       return true;
     }
-
     function showSection(section) {
       if (section > currentSection) {
         for (let i = currentSection; i < section; i++) completedSections.add(i);
@@ -1552,14 +1578,11 @@
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       const target = document.querySelector(`.section[data-section="${section}"]`);
       if (target) target.classList.add('active');
-
       const backBtn = document.getElementById('btn-back');
       const nextBtn = document.getElementById('btn-next');
       const nextLabel = document.getElementById('btn-next-label');
       const nextArrow = document.getElementById('btn-next-arrow');
-
       backBtn.disabled = section <= 1;
-
       if (section === TOTAL) {
         nextLabel.textContent = 'Submit & schedule activation';
         nextBtn.classList.add('btn-launch');
@@ -1568,7 +1591,6 @@
         nextBtn.classList.remove('btn-launch');
       }
       if (nextArrow) nextArrow.style.display = 'block';
-
       currentSection = section;
       updateProgress();
       hideError();
@@ -1579,13 +1601,11 @@
       }, 350);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function buildReview() {
       const reviewEl = document.getElementById('review-content');
       const empty = (v) => !v || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && v.length === 0);
       const emptyTag = '<span class="review-row-value empty">Not provided</span>';
       const renderValue = (v) => empty(v) ? emptyTag : `<span class="review-row-value">${escapeHtml(v)}</span>`;
-
       reviewEl.innerHTML = `
         <div class="review-section">
           <div class="review-section-head">
@@ -1602,7 +1622,6 @@
             <div class="review-row"><div class="review-row-label">Website</div>${renderValue(formData.website)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1618,7 +1637,6 @@
             <div class="review-row full"><div class="review-row-label">Transfer hours</div>${renderValue(formData.transfer_hours)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1633,7 +1651,6 @@
             </div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1647,7 +1664,6 @@
             <div class="review-row full"><div class="review-row-label">Payment link</div>${renderValue(formData.payment_link)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1660,7 +1676,6 @@
             <div class="review-row full">${renderValue(personalityLabels[formData.personality] || formData.personality)}</div>
           </div>
         </div>
-
         <div class="review-section">
           <div class="review-section-head">
             <div class="review-section-title">
@@ -1676,7 +1691,6 @@
           </div>
         </div>
       `;
-
       reviewEl.querySelectorAll('.review-edit').forEach(btn => {
         btn.addEventListener('click', () => {
           const targetSection = parseInt(btn.dataset.edit, 10);
@@ -1684,7 +1698,6 @@
         });
       });
     }
-
     document.getElementById('btn-next').addEventListener('click', async () => {
       if (!validateSection(currentSection)) return;
       if (currentSection < TOTAL) {
@@ -1693,18 +1706,15 @@
         await submitForm();
       }
     });
-
     document.getElementById('btn-back').addEventListener('click', () => {
       if (currentSection > 1) showSection(currentSection - 1);
     });
-
     document.querySelectorAll('.progress-step').forEach(item => {
       item.addEventListener('click', () => {
         const step = parseInt(item.dataset.step, 10);
         if (completedSections.has(step) || step <= currentSection) showSection(step);
       });
     });
-
     document.getElementById('business_name').addEventListener('input', (e) => {
       formData.business_name = e.target.value;
       updateAIPreview();
@@ -1724,7 +1734,6 @@
         autoSave();
       });
     });
-
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1735,7 +1744,6 @@
         autoSave();
       });
     });
-
     document.querySelectorAll('#personality-stack .radio-card').forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1747,7 +1755,6 @@
         autoSave();
       });
     });
-
     async function submitForm() {
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
@@ -1755,14 +1762,30 @@
       btn.disabled = true;
       label.innerHTML = '<span class="spinner"></span>';
       if (arrow) arrow.style.display = 'none';
+
+      // Generate slug from business name
+      const clientSlug = slugify(formData.business_name);
+
+      // Read honeypot fields (real humans never touch these)
+      const hpWebsite = document.getElementById('website_url')?.value || '';
+      const hpCompany = document.getElementById('company_size_other')?.value || '';
+      const hpGotcha = document.getElementById('_gotcha')?.value || '';
+
+      // Build payload: all existing form fields + plan + client_slug + honeypot
+      const payload = {
+        ...formData,
+        plan: selectedPlan,
+        client_slug: clientSlug,
+        website_url: hpWebsite,
+        company_size_other: hpCompany,
+        _gotcha: hpGotcha,
+      };
+
       try {
         const res = await fetch('/api/onboarding-submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          honeypot_name: '',
-website_url: '',
-company_fax: '',
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         if (!res.ok && res.status !== 404) {
           const err = await res.text().catch(() => '');
@@ -1772,35 +1795,28 @@ company_fax: '',
         console.error('Network error:', err);
       }
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      showSuccess();
-    }
 
-    function showSuccess() {
-      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-      document.querySelector('.section[data-section="success"]').classList.add('active');
-      document.getElementById('actions').style.display = 'none';
-      document.getElementById('trust-row').style.display = 'none';
-      document.querySelector('.hero').style.display = 'none';
-      document.getElementById('progress').style.display = 'none';
-      document.getElementById('success-email').textContent = formData.notify_email || 'your inbox';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Redirect to the new success page
+      const successParams = new URLSearchParams({
+        plan: selectedPlan,
+        slug: clientSlug,
+        business: formData.business_name || '',
+      });
+      window.location.href = '/onboarding/success?' + successParams.toString();
     }
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         const activeSection = document.querySelector('.section.active');
-        if (activeSection && activeSection.dataset.section !== 'success') {
+        if (activeSection) {
           e.preventDefault();
           document.getElementById('btn-next').click();
         }
       }
     });
-
     function escapeHtml(str) {
       if (!str && str !== 0) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-
     updateProgress();
     updateAIPreview();
   </script>
