@@ -1,5 +1,5 @@
 // api/onboarding-submit.js
-// Failsafe onboarding handler with upgraded customer confirmation email.
+// Failsafe onboarding handler with services_offered, service_area, offer_urgent_transfer fields.
 
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
@@ -10,10 +10,6 @@ const PLAN_PRICING = {
   starter: { amount: 97.00, label: "Starter — $97/month" },
   pro: { amount: 297.00, label: "AI Front Desk Pro — $297/month" },
 };
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 function escapeHtml(value) {
   return String(value || "")
@@ -39,6 +35,9 @@ function normalizeData(data) {
     pricing_rule: data.pricing_rule || "",
     pricing_examples: data.pricing_examples || "",
     notes: data.notes || "",
+    services_offered: data.services_offered || "",
+    service_area: data.service_area || "",
+    offer_urgent_transfer: data.offer_urgent_transfer || "",
     plan: data.plan === "pro" ? "pro" : "starter",
     client_slug_from_form: data.client_slug || "",
     report_frequency: data.report_frequency || "",
@@ -86,9 +85,12 @@ async function resolveSlug(data, supabaseUrl, supabaseKey) {
   return final;
 }
 
-// ============================================================
-// SUPABASE — onboarding row (non-critical)
-// ============================================================
+// Convert "yes"/"no" string into boolean or null for Supabase
+function parseUrgentTransfer(value) {
+  if (value === "yes") return true;
+  if (value === "no") return false;
+  return null;
+}
 
 async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
   console.log("[onboarding] 💾 inserting client_onboarding row...");
@@ -115,6 +117,9 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
         info_link: data.website,
         tone: data.personality,
         notes: data.notes,
+        services_offered: data.services_offered,
+        service_area: data.service_area,
+        offer_urgent_transfer: parseUrgentTransfer(data.offer_urgent_transfer),
         status: "new",
         raw_data: data.raw_data,
       }),
@@ -134,13 +139,10 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
   }
 }
 
-// ============================================================
-// SUPABASE — clients row (CRITICAL: lookup-then-PATCH-or-POST)
-// ============================================================
-
 async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey) {
   const phoneNumber = data.business_phone || null;
   const pricing = PLAN_PRICING[data.plan] || PLAN_PRICING.starter;
+  const urgentBool = parseUrgentTransfer(data.offer_urgent_transfer);
 
   const adminNotes = [
     `Industry: ${data.industry || "—"}`,
@@ -149,6 +151,9 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     `Hours: ${data.transfer_hours || "—"}`,
     `Personality: ${data.personality || "—"}`,
     `Pricing rule: ${data.pricing_rule || "—"}`,
+    data.services_offered ? `Services: ${data.services_offered}` : null,
+    data.service_area ? `Service area: ${data.service_area}` : null,
+    urgentBool !== null ? `Urgent transfer: ${urgentBool ? "Yes" : "No"}` : null,
     data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
   ].filter(Boolean).join("\n");
 
@@ -191,6 +196,9 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
       onboarding_id: onboardingId || null,
       report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
       report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
+      services_offered: data.services_offered,
+      service_area: data.service_area,
+      offer_urgent_transfer: urgentBool,
       payment_amount: pricing.amount,
       payment_provider: "paypal",
     };
@@ -221,6 +229,9 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     onboarding_id: onboardingId || null,
     report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
     report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
+    services_offered: data.services_offered,
+    service_area: data.service_area,
+    offer_urgent_transfer: urgentBool,
     payment_required: true,
     payment_pending: true,
     payment_status: "unpaid",
@@ -241,16 +252,14 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   return { row, existing: false };
 }
 
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
 async function safeNtfy(data) {
   try {
     const body = `New AI Lead Intel onboarding
 Business: ${data.business_name || "—"}
 Industry: ${data.industry || "—"}
 Phone: ${data.business_phone || "—"}
+Services: ${data.services_offered || "—"}
+Service area: ${data.service_area || "—"}
 Transfer: ${data.transfer_primary || "—"}
 Email: ${data.notify_email || "—"}
 Plan: ${data.plan}
@@ -276,8 +285,10 @@ async function safeOwnerEmail(data) {
     const notifyEmail = process.env.NOTIFY_EMAIL;
     if (!resendKey || !notifyEmail) { console.warn("[onboarding] ⚠️ owner email skipped"); return; }
     const resend = new Resend(resendKey);
+    const urgentDisplay = data.offer_urgent_transfer === "yes" ? "Yes — offer transfer" :
+                          data.offer_urgent_transfer === "no" ? "No — capture & notify" : "—";
     const result = await resend.emails.send({
-      from: "AI Lead Intel <hello@aileadintel.com>",
+      from: "AI Lead Intel <onboarding@resend.dev>",
       to: notifyEmail.split(",").map((e) => e.trim()).filter(Boolean),
       subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
       html: `
@@ -288,11 +299,14 @@ async function safeOwnerEmail(data) {
           <p><strong>Name:</strong> ${escapeHtml(data.business_name)}</p>
           <p><strong>Industry:</strong> ${escapeHtml(data.industry)}</p>
           <p><strong>Main Phone:</strong> ${escapeHtml(data.business_phone)}</p>
+          <p><strong>Services offered:</strong> ${escapeHtml(data.services_offered || "—")}</p>
+          <p><strong>Service area:</strong> ${escapeHtml(data.service_area || "—")}</p>
           <h3>Call Handling</h3>
           <p><strong>Primary Transfer:</strong> ${escapeHtml(data.transfer_primary)}</p>
           <p><strong>Backup Transfer:</strong> ${escapeHtml(data.transfer_backup || "—")}</p>
           <p><strong>Notification Email:</strong> ${escapeHtml(data.notify_email)}</p>
           <p><strong>Transfer Hours:</strong> ${escapeHtml(data.transfer_hours)}</p>
+          <p><strong>Urgent transfer:</strong> ${escapeHtml(urgentDisplay)}</p>
           <h3>Topics</h3>
           <p>${escapeHtml((data.topics || []).join(", ") || "—")}</p>
           <h3>Personality / Pricing</h3>
@@ -314,7 +328,6 @@ async function safeOwnerEmail(data) {
   }
 }
 
-// ====== UPGRADED CUSTOMER CONFIRMATION EMAIL ======
 async function safeCustomerEmail(data, finalSlug) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
@@ -345,11 +358,11 @@ async function safeCustomerEmail(data, finalSlug) {
           <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p>
         </div>`
       : "";
-console.log("[onboarding] 🚀 sending customer email to:", data.notify_email);
+
     const result = await resend.emails.send({
-      from: "AI Lead Intel <hello@aileadintel.com>",
+      from: "AI Lead Intel <onboarding@resend.dev>",
       to: [data.notify_email],
-      replyTo: "hello@aileadintel.com",
+      reply_to: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
       html: `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
@@ -406,10 +419,6 @@ async function runAllNotificationsSafely(data, finalSlug) {
   }
 }
 
-// ============================================================
-// HANDLER
-// ============================================================
-
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -451,6 +460,8 @@ export default async function handler(req, res) {
       ip, business: data.business_name, plan: data.plan,
       slug_from_form: data.client_slug_from_form, email: data.notify_email,
       phone: data.business_phone, report_frequency: data.report_frequency,
+      services_offered: data.services_offered, service_area: data.service_area,
+      offer_urgent_transfer: data.offer_urgent_transfer,
     });
 
     if (!data.business_name) {
