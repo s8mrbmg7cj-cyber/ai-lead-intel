@@ -30,29 +30,56 @@ function normalizeData(data) {
     pricing_rule: data.pricing_rule || "",
     pricing_examples: data.pricing_examples || "",
     notes: data.notes || "",
-    plan: data.plan || "starter", // 'starter' or 'pro' - default to starter
+    plan: data.plan === "pro" ? "pro" : "starter",
+    client_slug_from_form: data.client_slug || "",
     raw_data: data,
   };
 }
 
 /**
- * Generate a URL-friendly slug from a business name.
- * Adds a short random suffix to avoid collisions.
- * Example: "Prime Vault Self Storage" -> "prime-vault-self-storage-x7k2"
+ * Slugify a business name. Used as fallback / collision suffix.
  */
-function generateSlug(businessName) {
-  const base = String(businessName || "client")
+function slugifyBase(businessName) {
+  return String(businessName || "client")
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, "") // strip punctuation
-    .replace(/\s+/g, "-")          // spaces to dashes
-    .replace(/-+/g, "-")           // collapse repeats
-    .slice(0, 40);                 // cap length
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 50) || "client";
+}
 
-  // 4-char random suffix for uniqueness
+/**
+ * Check if a slug is already taken.
+ */
+async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`,
+      { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+    );
+    if (!res.ok) return false;
+    const rows = await res.json();
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Take the slug the frontend sent, fall back to slugify(business_name) if missing,
+ * then add a suffix only if there's a collision.
+ */
+async function resolveSlug(data, supabaseUrl, supabaseKey) {
+  let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+  if (!base) base = slugifyBase(data.business_name);
+
+  if (!await isSlugTaken(base, supabaseUrl, supabaseKey)) {
+    return base;
+  }
+  // Collision — add 4 char suffix
   const suffix = Math.random().toString(36).slice(2, 6);
-
-  return `${base || "client"}-${suffix}`;
+  return `${base}-${suffix}`;
 }
 
 async function sendNtfyNotification(data) {
@@ -63,12 +90,12 @@ Industry: ${data.industry || "—"}
 Phone: ${data.business_phone || "—"}
 Transfer: ${data.transfer_primary || "—"}
 Email: ${data.notify_email || "—"}
+Plan: ${data.plan}
 Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}`;
-
     await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
       method: "POST",
       headers: {
-        Title: `New Onboarding: ${data.business_name || "AI Lead Intel"}`,
+        Title: `New Onboarding (${data.plan}): ${data.business_name || "AI Lead Intel"}`,
         Priority: "high",
         Tags: "rocket",
       },
@@ -82,74 +109,112 @@ Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}
 async function notifyOwnerEmail(data) {
   const resendKey = process.env.RESEND_API_KEY;
   const notifyEmail = process.env.NOTIFY_EMAIL;
-
   if (!resendKey || !notifyEmail) {
-    console.log("EMAIL SKIPPED — missing RESEND_API_KEY or NOTIFY_EMAIL");
+    console.log("OWNER EMAIL SKIPPED — missing RESEND_API_KEY or NOTIFY_EMAIL");
     return;
   }
-
-  const resend = new Resend(resendKey);
-
-  await resend.emails.send({
-    from: "AI Lead Intel <onboarding@resend.dev>",
-    to: notifyEmail.split(",").map((email) => email.trim()),
-    subject: `New AI Lead Intel onboarding: ${data.business_name || "New lead"}`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;background:#0a0a0c;color:#ffffff;padding:28px;border-radius:12px;">
-        <h2 style="color:#ff6a00;margin-top:0;">New AI Lead Intel Onboarding</h2>
-
-        <h3>Business</h3>
-        <p><strong>Name:</strong> ${escapeHtml(data.business_name)}</p>
-        <p><strong>Industry:</strong> ${escapeHtml(data.industry)}</p>
-        <p><strong>Main Phone:</strong> ${escapeHtml(data.business_phone)}</p>
-        <p><strong>Plan Requested:</strong> ${escapeHtml(data.plan)}</p>
-
-        <h3>Call Handling</h3>
-        <p><strong>Primary Transfer:</strong> ${escapeHtml(data.transfer_primary)}</p>
-        <p><strong>Backup Transfer:</strong> ${escapeHtml(data.transfer_backup || "—")}</p>
-        <p><strong>Notification Email:</strong> ${escapeHtml(data.notify_email)}</p>
-        <p><strong>Transfer Hours:</strong> ${escapeHtml(data.transfer_hours)}</p>
-        <p><strong>SMS Consent:</strong> ${data.sms_consent ? "Yes" : "No"}</p>
-
-        <h3>Topics</h3>
-        <p>${escapeHtml((data.topics || []).join(", ") || "—")}</p>
-
-        <h3>Links</h3>
-        <p><strong>Booking:</strong> ${escapeHtml(data.booking_link || "—")}</p>
-        <p><strong>Payment:</strong> ${escapeHtml(data.payment_link || "—")}</p>
-        <p><strong>Website:</strong> ${escapeHtml(data.website || "—")}</p>
-
-        <h3>Personality / Pricing</h3>
-        <p><strong>Personality:</strong> ${escapeHtml(data.personality || "—")}</p>
-        <p><strong>Pricing Rule:</strong> ${escapeHtml(data.pricing_rule || "—")}</p>
-        <p><strong>Pricing Examples:</strong><br>${escapeHtml(data.pricing_examples || "—")}</p>
-
-        <h3>Notes</h3>
-        <p style="white-space:pre-wrap;">${escapeHtml(data.notes || "—")}</p>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:24px 0;" />
-        <p style="color:#aaa;font-size:12px;">Submitted ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}</p>
-        <p style="color:#aaa;font-size:12px;">View in admin: <a href="https://aileadintel.com/admin" style="color:#ff6a00;">aileadintel.com/admin</a></p>
-      </div>
-    `,
-  });
-
-  console.log("EMAIL SENT to", notifyEmail);
+  try {
+    const resend = new Resend(resendKey);
+    await resend.emails.send({
+      from: "AI Lead Intel <hello@aileadintel.com>",
+      to: notifyEmail.split(",").map((e) => e.trim()),
+      subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;background:#0a0a0c;color:#ffffff;padding:28px;border-radius:12px;">
+          <h2 style="color:#ff6a00;margin-top:0;">New AI Lead Intel Onboarding</h2>
+          <p><strong>Plan:</strong> ${escapeHtml(data.plan.toUpperCase())}</p>
+          <h3>Business</h3>
+          <p><strong>Name:</strong> ${escapeHtml(data.business_name)}</p>
+          <p><strong>Industry:</strong> ${escapeHtml(data.industry)}</p>
+          <p><strong>Main Phone:</strong> ${escapeHtml(data.business_phone)}</p>
+          <h3>Call Handling</h3>
+          <p><strong>Primary Transfer:</strong> ${escapeHtml(data.transfer_primary)}</p>
+          <p><strong>Backup Transfer:</strong> ${escapeHtml(data.transfer_backup || "—")}</p>
+          <p><strong>Notification Email:</strong> ${escapeHtml(data.notify_email)}</p>
+          <p><strong>Transfer Hours:</strong> ${escapeHtml(data.transfer_hours)}</p>
+          <h3>Topics</h3>
+          <p>${escapeHtml((data.topics || []).join(", ") || "—")}</p>
+          <h3>Personality / Pricing</h3>
+          <p><strong>Personality:</strong> ${escapeHtml(data.personality || "—")}</p>
+          <p><strong>Pricing Rule:</strong> ${escapeHtml(data.pricing_rule || "—")}</p>
+          <p><strong>Pricing Examples:</strong><br>${escapeHtml(data.pricing_examples || "—")}</p>
+          <h3>Notes</h3>
+          <p style="white-space:pre-wrap;">${escapeHtml(data.notes || "—")}</p>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:24px 0;" />
+          <p style="color:#aaa;font-size:12px;">View in admin: <a href="https://aileadintel.com/admin" style="color:#ff6a00;">aileadintel.com/admin</a></p>
+        </div>
+      `,
+    });
+    console.log("OWNER EMAIL SENT to", notifyEmail);
+  } catch (e) {
+    console.error("OWNER EMAIL FAILED:", e.message);
+  }
 }
 
 /**
- * Save the raw onboarding submission to the client_onboarding table.
- * Returns the created row's ID (so we can link it to the clients row).
+ * Confirmation email to the CUSTOMER (different from owner email above).
+ */
+async function sendCustomerConfirmation(data, finalSlug) {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey || !data.notify_email) {
+    console.log("CUSTOMER EMAIL SKIPPED — missing key or email");
+    return;
+  }
+  try {
+    const resend = new Resend(resendKey);
+    const businessName = data.business_name || "your business";
+    const isPro = data.plan === "pro";
+    const dashboardLine = isPro
+      ? `<p style="margin:0 0 14px 0;font-size:14.5px;color:#374151;line-height:1.55;">Your private dashboard URL is reserved: <a href="https://aileadintel.com/dashboard/${finalSlug}" style="color:#ff6a00;">aileadintel.com/dashboard/${finalSlug}</a></p>`
+      : "";
+
+    await resend.emails.send({
+      from: "AI Lead Intel <hello@aileadintel.com>",
+      to: [data.notify_email],
+      reply_to: "hello@aileadintel.com",
+      subject: `We got your onboarding — ${businessName}`,
+      html: `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,sans-serif;background:#f9fafb;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div>
+        <strong style="font-size:14px;color:#111827;">AI Lead Intel</strong>
+      </div>
+      <h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;">We got your onboarding ✅</h1>
+      <p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p>
+      <p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>
+      ${dashboardLine}
+      <h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 10px 0;">What happens next</h2>
+      <ol style="margin:0 0 18px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;">
+        <li><strong>Within 24 hours:</strong> Andrew personally builds your AI's voice, tone, services, and transfer rules.</li>
+        <li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li>
+        <li><strong>Test & go live:</strong> Hear your AI work, then mark it live. Payment link only after you've heard it work.</li>
+      </ol>
+      <p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email if you have any questions — I'll respond fast.</p>
+      <p style="margin:0;font-size:14px;color:#374151;">— Andrew</p>
+    </div>
+    <p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p>
+  </div>
+</body></html>`,
+    });
+    console.log("CUSTOMER EMAIL SENT to", data.notify_email);
+  } catch (e) {
+    console.error("CUSTOMER EMAIL FAILED:", e.message);
+  }
+}
+
+/**
+ * Save onboarding row. Returns the row ID.
  */
 async function saveOnboardingToSupabase(data) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-
   if (!supabaseUrl || !supabaseKey) {
-    console.log("SUPABASE SKIPPED — missing keys");
+    console.error("SUPABASE creds missing");
     return null;
   }
-
   try {
     const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
       method: "POST",
@@ -157,7 +222,7 @@ async function saveOnboardingToSupabase(data) {
         "Content-Type": "application/json",
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
-        Prefer: "return=representation", // changed from minimal so we can get the inserted ID
+        Prefer: "return=representation",
       },
       body: JSON.stringify({
         business_name: data.business_name,
@@ -177,41 +242,29 @@ async function saveOnboardingToSupabase(data) {
         raw_data: data.raw_data,
       }),
     });
-
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      console.log("SUPABASE onboarding INSERT failed:", res.status, text);
+      console.error("ONBOARDING INSERT FAILED:", res.status, text);
       return null;
     }
-
     const rows = await res.json().catch(() => []);
     return rows && rows[0] ? rows[0].id : null;
   } catch (error) {
-    console.log("SUPABASE ONBOARDING ERROR:", error.message);
+    console.error("ONBOARDING INSERT EXCEPTION:", error.message);
     return null;
   }
 }
 
 /**
- * Create a row in the `clients` table so the customer appears in /admin.
- * - status: 'trial' (they haven't paid yet)
- * - plan: from form (defaults to 'starter')
- * - active: true (they're a real prospect)
- * - onboarding_id: links back to client_onboarding row for full context
+ * Create a row in the `clients` table. Returns { id, client_slug } or throws.
  */
-async function createClientRow(data, onboardingId) {
+async function createClientRow(data, onboardingId, finalSlug) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-
   if (!supabaseUrl || !supabaseKey) {
-    console.log("CLIENT ROW SKIPPED — missing Supabase keys");
-    return null;
+    throw new Error("Supabase credentials missing");
   }
 
-  // Force plan to one of the allowed values (CHECK constraint = 'starter' | 'pro')
-  const safePlan = data.plan === "pro" ? "pro" : "starter";
-
-  // Build a notes string with onboarding details so the admin row is useful at a glance
   const adminNotes = [
     `Industry: ${data.industry || "—"}`,
     `Forward to: ${data.transfer_primary || "—"}`,
@@ -220,139 +273,125 @@ async function createClientRow(data, onboardingId) {
     `Personality: ${data.personality || "—"}`,
     `Pricing rule: ${data.pricing_rule || "—"}`,
     data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ].filter(Boolean).join("\n");
 
   const payload = {
     business_name: data.business_name,
-    client_slug: generateSlug(data.business_name),
+    client_slug: finalSlug,
     notify_email: data.notify_email,
     phone_number: data.business_phone || null,
-    plan: safePlan,
+    plan: data.plan,
     status: "trial",
     active: true,
     notes: adminNotes,
     onboarding_id: onboardingId || null,
-    // status_changed_at + created_at + updated_at use the column defaults
-    // owner_user_id stays null — you'll wire up an auth user manually for now
-    // assistant_id, vapi_phone_number_id, twilio_number stay null until you build the AI
   };
 
-  try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Prefer: "return=representation",
-      },
-      body: JSON.stringify(payload),
-    });
+  console.log("CREATING CLIENT ROW:", { slug: finalSlug, plan: data.plan, email: data.notify_email });
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.log("CLIENT ROW INSERT failed:", res.status, text);
-      return null;
-    }
+  const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    const rows = await res.json().catch(() => []);
-    const newClient = rows && rows[0] ? rows[0] : null;
-    if (newClient) {
-      console.log("CLIENT ROW CREATED:", newClient.id, newClient.client_slug);
-    }
-    return newClient;
-  } catch (error) {
-    console.log("CLIENT ROW ERROR:", error.message);
-    return null;
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error("CLIENT ROW INSERT FAILED:", res.status, text);
+    throw new Error(`Could not save client: HTTP ${res.status} — ${text.slice(0, 200)}`);
   }
+
+  const rows = await res.json().catch(() => []);
+  const row = rows && rows[0] ? rows[0] : null;
+  if (!row) throw new Error("Client row creation returned no row");
+
+  console.log("CLIENT ROW CREATED:", row.id, row.client_slug);
+  return row;
 }
 
 export default async function handler(req, res) {
-  // ============================================================
-// PASTE THIS BLOCK at the very top of your handler function,
-// right after `export default async function handler(req, res) {`
-// and BEFORE any of your existing logic.
-//
-// Add this import at the very top of the file (above the handler):
-//   import { rateLimit, getClientIp } from '../lib/rate-limit.js';
-//
-// Then drop this block in:
-// ============================================================
-
-  // ===== SECURITY HEADERS =====
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'no-referrer');
-
-  // ===== RATE LIMIT (5 submissions per IP per hour) =====
-  if (req.method === 'POST') {
-    const ip = getClientIp(req);
-    const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60); // 5 / hour
-    if (!limit.ok) {
-      res.setHeader('Retry-After', String(limit.retryAfter));
-      console.warn(`[onboarding-submit] 🚫 RATE LIMITED ip=${ip} count=${limit.count}`);
-      return res.status(429).json({
-        success: false,
-        error: 'Too many submissions. Please try again later.',
-      });
-    }
-
-    // ===== HONEYPOT — silently reject bots =====
-    let _body = req.body || {};
-    if (typeof _body === 'string') {
-      try { _body = JSON.parse(_body); } catch (_) { _body = {}; }
-    }
-    // Bots fill in every input they see. The honeypot field is hidden via CSS
-    // so real humans never type into it. If it's filled, it's a bot.
-    if (_body.website_url || _body.company_size_other || _body._gotcha) {
-      console.warn(`[onboarding-submit] 🍯 HONEYPOT TRIGGERED ip=${ip} fields=${Object.keys(_body).filter(k => ['website_url','company_size_other','_gotcha'].includes(k)).join(',')}`);
-      // Return a fake success so bots don't know they were detected
-      return res.status(200).json({ success: true });
-    }
-  }
-
-  // ============================================================
-  // YOUR EXISTING CODE CONTINUES BELOW THIS LINE — DO NOT CHANGE
-  // ============================================================
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "no-referrer");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).json({ ok: true });
+  if (req.method === "OPTIONS") return res.status(200).json({ ok: true });
+  if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
+
+  const ip = getClientIp(req);
+
+  // Rate limit
+  const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60);
+  if (!limit.ok) {
+    res.setHeader('Retry-After', String(limit.retryAfter));
+    console.warn(`[onboarding] 🚫 RATE LIMITED ip=${ip}`);
+    return res.status(429).json({ success: false, error: "Too many submissions. Try again later." });
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  // Honeypot
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (_) { body = {}; }
+  }
+  if (body.website_url || body.company_size_other || body._gotcha) {
+    console.warn(`[onboarding] 🍯 HONEYPOT ip=${ip}`);
+    return res.status(200).json({ success: true });
   }
 
   try {
-    const data = normalizeData(req.body || {});
+    const data = normalizeData(body);
+    console.log("[onboarding] received:", { business: data.business_name, plan: data.plan, slug_from_form: data.client_slug_from_form });
 
-    if (!data.business_name) {
-      return res.status(400).json({ error: "Missing business name" });
-    }
-    if (!data.notify_email) {
-      return res.status(400).json({ error: "Missing notification email" });
+    if (!data.business_name) return res.status(400).json({ success: false, error: "Missing business name" });
+    if (!data.notify_email) return res.status(400).json({ success: false, error: "Missing notification email" });
+
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("[onboarding] Supabase env vars missing");
+      return res.status(500).json({ success: false, error: "Server misconfigured" });
     }
 
-    // Step 1 — Fire ntfy + owner email + onboarding insert in parallel.
-    // We need the onboarding row's ID to link to the clients row, so we await it.
-    const [, , onboardingId] = await Promise.all([
+    // Resolve final slug (use frontend's if available + free, else collision-suffix it)
+    const finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
+    console.log("[onboarding] final slug:", finalSlug);
+
+    // Save onboarding row
+    const onboardingId = await saveOnboardingToSupabase(data);
+
+    // Create client row — THIS MUST SUCCEED
+    let clientRow;
+    try {
+      clientRow = await createClientRow(data, onboardingId, finalSlug);
+    } catch (e) {
+      console.error("[onboarding] client row failed:", e.message);
+      // Still notify owner so we don't lose the lead
+      await Promise.all([sendNtfyNotification(data), notifyOwnerEmail(data)]);
+      return res.status(500).json({ success: false, error: "Could not save client. Please contact hello@aileadintel.com." });
+    }
+
+    // Fire off non-blocking notifications (don't await — let them run after response)
+    Promise.all([
       sendNtfyNotification(data),
       notifyOwnerEmail(data),
-      saveOnboardingToSupabase(data),
-    ]);
+      sendCustomerConfirmation(data, finalSlug),
+    ]).catch(e => console.error("[onboarding] notification error:", e));
 
-    // Step 2 — Create the clients row so they appear in /admin immediately.
-    // Runs after onboarding insert so we can link via onboarding_id.
-    await createClientRow(data, onboardingId);
+    return res.status(200).json({
+      success: true,
+      client_slug: clientRow.client_slug,
+      plan: data.plan,
+    });
 
-    return res.status(200).json({ success: true });
   } catch (error) {
-    console.error("ONBOARDING ERROR:", error);
-    return res.status(500).json({ error: "Failed to submit onboarding" });
+    console.error("[onboarding] FATAL:", error);
+    return res.status(500).json({ success: false, error: "Failed to submit onboarding" });
   }
 }
