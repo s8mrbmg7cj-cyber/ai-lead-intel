@@ -1,7 +1,15 @@
+// api/onboarding-submit.js
+// Failsafe version: Supabase save is the only thing that can fail the request.
+// Every email/notification is isolated and CANNOT cause a 500.
+
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
 
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
+
+// ============================================================
+// HELPERS
+// ============================================================
 
 function escapeHtml(value) {
   return String(value || "")
@@ -36,9 +44,6 @@ function normalizeData(data) {
   };
 }
 
-/**
- * Slugify a business name. Used as fallback / collision suffix.
- */
 function slugifyBase(businessName) {
   return String(businessName || "client")
     .toLowerCase()
@@ -49,40 +54,154 @@ function slugifyBase(businessName) {
     .slice(0, 50) || "client";
 }
 
-/**
- * Check if a slug is already taken.
- */
 async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
   try {
-    const res = await fetch(
+    const r = await fetch(
       `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`,
       { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
     );
-    if (!res.ok) return false;
-    const rows = await res.json();
+    if (!r.ok) return false;
+    const rows = await r.json();
     return Array.isArray(rows) && rows.length > 0;
   } catch (_) {
     return false;
   }
 }
 
-/**
- * Take the slug the frontend sent, fall back to slugify(business_name) if missing,
- * then add a suffix only if there's a collision.
- */
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
   let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
   if (!base) base = slugifyBase(data.business_name);
 
-  if (!await isSlugTaken(base, supabaseUrl, supabaseKey)) {
+  console.log("[onboarding] 🔧 base slug from form/business:", base);
+
+  const taken = await isSlugTaken(base, supabaseUrl, supabaseKey);
+  if (!taken) {
+    console.log("[onboarding] 🔧 slug is free, using:", base);
     return base;
   }
-  // Collision — add 4 char suffix
   const suffix = Math.random().toString(36).slice(2, 6);
-  return `${base}-${suffix}`;
+  const final = `${base}-${suffix}`;
+  console.log("[onboarding] 🔧 slug collided, retrying with suffix:", final);
+  return final;
 }
 
-async function sendNtfyNotification(data) {
+// ============================================================
+// SUPABASE — these are the ONLY operations that can fail the request
+// ============================================================
+
+async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
+  console.log("[onboarding] 💾 inserting client_onboarding row...");
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({
+        business_name: data.business_name,
+        industry: data.industry,
+        business_phone: data.business_phone,
+        forward_number: data.transfer_primary,
+        backup_number: data.transfer_backup,
+        voicemail_email: data.notify_email,
+        transfer_hours: data.transfer_hours,
+        call_reasons: data.topics,
+        payment_link: data.payment_link,
+        booking_link: data.booking_link,
+        info_link: data.website,
+        tone: data.personality,
+        notes: data.notes,
+        status: "new",
+        raw_data: data.raw_data,
+      }),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[onboarding] ❌ client_onboarding INSERT FAILED:", res.status, text);
+      // Non-critical row — don't fail the whole submission.
+      return null;
+    }
+    const rows = await res.json().catch(() => []);
+    const id = rows && rows[0] ? rows[0].id : null;
+    console.log("[onboarding] ✅ client_onboarding row created:", id);
+    return id;
+  } catch (error) {
+    console.error("[onboarding] ❌ client_onboarding EXCEPTION:", error.message);
+    // Non-critical row — don't fail the whole submission.
+    return null;
+  }
+}
+
+/**
+ * Creates the clients row. THIS IS THE CRITICAL INSERT.
+ * Returns row on success, throws on failure.
+ */
+async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey) {
+  const adminNotes = [
+    `Industry: ${data.industry || "—"}`,
+    `Forward to: ${data.transfer_primary || "—"}`,
+    data.transfer_backup ? `Backup: ${data.transfer_backup}` : null,
+    `Hours: ${data.transfer_hours || "—"}`,
+    `Personality: ${data.personality || "—"}`,
+    `Pricing rule: ${data.pricing_rule || "—"}`,
+    data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
+  ].filter(Boolean).join("\n");
+
+  const payload = {
+    business_name: data.business_name,
+    client_slug: finalSlug,
+    notify_email: data.notify_email,
+    phone_number: data.business_phone || null,
+    plan: data.plan,
+    status: "trial",
+    active: true,
+    notes: adminNotes,
+    onboarding_id: onboardingId || null,
+  };
+
+  console.log("[onboarding] 💾 inserting clients row:", {
+    slug: finalSlug,
+    plan: data.plan,
+    email: data.notify_email,
+    business: data.business_name,
+  });
+
+  const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error("[onboarding] ❌ CLIENTS INSERT FAILED:", res.status, text);
+    throw new Error(`Could not save client (HTTP ${res.status}): ${text.slice(0, 300)}`);
+  }
+
+  const rows = await res.json().catch(() => []);
+  const row = rows && rows[0] ? rows[0] : null;
+  if (!row) {
+    console.error("[onboarding] ❌ CLIENTS INSERT returned no row");
+    throw new Error("Client insert returned no row");
+  }
+
+  console.log("[onboarding] ✅ clients row created:", row.id, row.client_slug);
+  return row;
+}
+
+// ============================================================
+// NOTIFICATIONS — ALL fully isolated. None can crash the request.
+// ============================================================
+
+async function safeNtfy(data) {
   try {
     const body = `New AI Lead Intel onboarding
 Business: ${data.business_name || "—"}
@@ -92,7 +211,7 @@ Transfer: ${data.transfer_primary || "—"}
 Email: ${data.notify_email || "—"}
 Plan: ${data.plan}
 Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}`;
-    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+    const r = await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
       method: "POST",
       headers: {
         Title: `New Onboarding (${data.plan}): ${data.business_name || "AI Lead Intel"}`,
@@ -101,23 +220,33 @@ Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}
       },
       body,
     });
-  } catch (error) {
-    console.log("NTFY ERROR:", error.message);
+    if (!r.ok) {
+      console.warn("[onboarding] ⚠️ ntfy non-OK status:", r.status);
+    } else {
+      console.log("[onboarding] ✅ ntfy sent");
+    }
+  } catch (err) {
+    console.error("[onboarding] ⚠️ ntfy error (non-fatal):", err.message);
   }
 }
 
-async function notifyOwnerEmail(data) {
-  const resendKey = process.env.RESEND_API_KEY;
-  const notifyEmail = process.env.NOTIFY_EMAIL;
-  if (!resendKey || !notifyEmail) {
-    console.log("OWNER EMAIL SKIPPED — missing RESEND_API_KEY or NOTIFY_EMAIL");
-    return;
-  }
+async function safeOwnerEmail(data) {
   try {
+    const resendKey = process.env.RESEND_API_KEY;
+    const notifyEmail = process.env.NOTIFY_EMAIL;
+    if (!resendKey) {
+      console.warn("[onboarding] ⚠️ owner email skipped — RESEND_API_KEY not set");
+      return;
+    }
+    if (!notifyEmail) {
+      console.warn("[onboarding] ⚠️ owner email skipped — NOTIFY_EMAIL not set");
+      return;
+    }
+
     const resend = new Resend(resendKey);
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "AI Lead Intel <onboarding@resend.dev>",
-      to: notifyEmail.split(",").map((e) => e.trim()),
+      to: notifyEmail.split(",").map((e) => e.trim()).filter(Boolean),
       subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;background:#0a0a0c;color:#ffffff;padding:28px;border-radius:12px;">
@@ -145,22 +274,28 @@ async function notifyOwnerEmail(data) {
         </div>
       `,
     });
-    console.log("OWNER EMAIL SENT to", notifyEmail);
-  } catch (e) {
-    console.error("OWNER EMAIL FAILED:", e.message);
+    if (result && result.error) {
+      console.error("[onboarding] ⚠️ owner email Resend error (non-fatal):", result.error);
+    } else {
+      console.log("[onboarding] ✅ owner email sent to", notifyEmail);
+    }
+  } catch (err) {
+    console.error("[onboarding] ⚠️ owner email EXCEPTION (non-fatal):", err.message);
   }
 }
 
-/**
- * Confirmation email to the CUSTOMER (different from owner email above).
- */
-async function sendCustomerConfirmation(data, finalSlug) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey || !data.notify_email) {
-    console.log("CUSTOMER EMAIL SKIPPED — missing key or email");
-    return;
-  }
+async function safeCustomerEmail(data, finalSlug) {
   try {
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      console.warn("[onboarding] ⚠️ customer email skipped — RESEND_API_KEY not set");
+      return;
+    }
+    if (!data.notify_email) {
+      console.warn("[onboarding] ⚠️ customer email skipped — no notify_email");
+      return;
+    }
+
     const resend = new Resend(resendKey);
     const businessName = data.business_name || "your business";
     const isPro = data.plan === "pro";
@@ -168,7 +303,7 @@ async function sendCustomerConfirmation(data, finalSlug) {
       ? `<p style="margin:0 0 14px 0;font-size:14.5px;color:#374151;line-height:1.55;">Your private dashboard URL is reserved: <a href="https://aileadintel.com/dashboard/${finalSlug}" style="color:#ff6a00;">aileadintel.com/dashboard/${finalSlug}</a></p>`
       : "";
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "AI Lead Intel <onboarding@resend.dev>",
       to: [data.notify_email],
       reply_to: "hello@aileadintel.com",
@@ -199,122 +334,40 @@ async function sendCustomerConfirmation(data, finalSlug) {
   </div>
 </body></html>`,
     });
-    console.log("CUSTOMER EMAIL SENT to", data.notify_email);
-  } catch (e) {
-    console.error("CUSTOMER EMAIL FAILED:", e.message);
-  }
-}
-
-/**
- * Save onboarding row. Returns the row ID.
- */
-async function saveOnboardingToSupabase(data) {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-  if (!supabaseUrl || !supabaseKey) {
-    console.error("SUPABASE creds missing");
-    return null;
-  }
-  try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Prefer: "return=representation",
-      },
-      body: JSON.stringify({
-        business_name: data.business_name,
-        industry: data.industry,
-        business_phone: data.business_phone,
-        forward_number: data.transfer_primary,
-        backup_number: data.transfer_backup,
-        voicemail_email: data.notify_email,
-        transfer_hours: data.transfer_hours,
-        call_reasons: data.topics,
-        payment_link: data.payment_link,
-        booking_link: data.booking_link,
-        info_link: data.website,
-        tone: data.personality,
-        notes: data.notes,
-        status: "new",
-        raw_data: data.raw_data,
-      }),
-    });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("ONBOARDING INSERT FAILED:", res.status, text);
-      return null;
+    if (result && result.error) {
+      console.error("[onboarding] ⚠️ customer email Resend error (non-fatal):", result.error);
+    } else {
+      console.log("[onboarding] ✅ customer email sent to", data.notify_email);
     }
-    const rows = await res.json().catch(() => []);
-    return rows && rows[0] ? rows[0].id : null;
-  } catch (error) {
-    console.error("ONBOARDING INSERT EXCEPTION:", error.message);
-    return null;
+  } catch (err) {
+    console.error("[onboarding] ⚠️ customer email EXCEPTION (non-fatal):", err.message);
   }
 }
 
 /**
- * Create a row in the `clients` table. Returns { id, client_slug } or throws.
+ * Run every notification in isolation. Wrapped in its own try/catch
+ * so even if Promise.allSettled throws (it shouldn't), we still don't crash.
  */
-async function createClientRow(data, onboardingId, finalSlug) {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Supabase credentials missing");
+async function runAllNotificationsSafely(data, finalSlug) {
+  try {
+    console.log("[onboarding] 📨 starting notifications (all isolated)...");
+    await Promise.allSettled([
+      safeNtfy(data),
+      safeOwnerEmail(data),
+      safeCustomerEmail(data, finalSlug),
+    ]);
+    console.log("[onboarding] 📨 notifications complete");
+  } catch (err) {
+    console.error("[onboarding] ⚠️ notifications wrapper exception (non-fatal):", err.message);
   }
-
-  const adminNotes = [
-    `Industry: ${data.industry || "—"}`,
-    `Forward to: ${data.transfer_primary || "—"}`,
-    data.transfer_backup ? `Backup: ${data.transfer_backup}` : null,
-    `Hours: ${data.transfer_hours || "—"}`,
-    `Personality: ${data.personality || "—"}`,
-    `Pricing rule: ${data.pricing_rule || "—"}`,
-    data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
-  ].filter(Boolean).join("\n");
-
-  const payload = {
-    business_name: data.business_name,
-    client_slug: finalSlug,
-    notify_email: data.notify_email,
-    phone_number: data.business_phone || null,
-    plan: data.plan,
-    status: "trial",
-    active: true,
-    notes: adminNotes,
-    onboarding_id: onboardingId || null,
-  };
-
-  console.log("CREATING CLIENT ROW:", { slug: finalSlug, plan: data.plan, email: data.notify_email });
-
-  const res = await fetch(`${supabaseUrl}/rest/v1/clients`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-      Prefer: "return=representation",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    console.error("CLIENT ROW INSERT FAILED:", res.status, text);
-    throw new Error(`Could not save client: HTTP ${res.status} — ${text.slice(0, 200)}`);
-  }
-
-  const rows = await res.json().catch(() => []);
-  const row = rows && rows[0] ? rows[0] : null;
-  if (!row) throw new Error("Client row creation returned no row");
-
-  console.log("CLIENT ROW CREATED:", row.id, row.client_slug);
-  return row;
 }
+
+// ============================================================
+// HANDLER
+// ============================================================
 
 export default async function handler(req, res) {
+  // Security headers
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
@@ -322,76 +375,122 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") return res.status(200).json({ ok: true });
-  if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
-
-  const ip = getClientIp(req);
+  if (req.method === "OPTIONS") {
+    return res.status(200).json({ ok: true });
+  }
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, error: "Method not allowed" });
+  }
 
   // Rate limit
-  const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60);
-  if (!limit.ok) {
-    res.setHeader('Retry-After', String(limit.retryAfter));
-    console.warn(`[onboarding] 🚫 RATE LIMITED ip=${ip}`);
-    return res.status(429).json({ success: false, error: "Too many submissions. Try again later." });
+  let ip = "unknown";
+  try {
+    ip = getClientIp(req);
+    const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60);
+    if (!limit.ok) {
+      res.setHeader("Retry-After", String(limit.retryAfter));
+      console.warn(`[onboarding] 🚫 RATE LIMITED ip=${ip}`);
+      return res.status(429).json({ success: false, error: "Too many submissions. Try again later." });
+    }
+  } catch (err) {
+    console.error("[onboarding] ⚠️ rate-limit subsystem error (continuing):", err.message);
+  }
+
+  // Parse body
+  let body = req.body || {};
+  if (typeof body === "string") {
+    try { body = JSON.parse(body); } catch (_) { body = {}; }
   }
 
   // Honeypot
-  let body = req.body || {};
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch (_) { body = {}; }
-  }
   if (body.website_url || body.company_size_other || body._gotcha) {
-    console.warn(`[onboarding] 🍯 HONEYPOT ip=${ip}`);
+    console.warn(`[onboarding] 🍯 HONEYPOT TRIGGERED ip=${ip}`);
     return res.status(200).json({ success: true });
   }
 
+  // ============================================================
+  // MAIN FLOW — Supabase is the only thing that can fail the request
+  // ============================================================
+
   try {
     const data = normalizeData(body);
-    console.log("[onboarding] received:", { business: data.business_name, plan: data.plan, slug_from_form: data.client_slug_from_form });
 
-    if (!data.business_name) return res.status(400).json({ success: false, error: "Missing business name" });
-    if (!data.notify_email) return res.status(400).json({ success: false, error: "Missing notification email" });
+    console.log("[onboarding] 📥 RECEIVED PAYLOAD:", {
+      ip,
+      business: data.business_name,
+      plan: data.plan,
+      slug_from_form: data.client_slug_from_form,
+      email: data.notify_email,
+      phone: data.business_phone,
+      industry: data.industry,
+    });
 
+    // Required fields
+    if (!data.business_name) {
+      console.warn("[onboarding] ❌ missing business_name");
+      return res.status(400).json({ success: false, error: "Missing business name" });
+    }
+    if (!data.notify_email) {
+      console.warn("[onboarding] ❌ missing notify_email");
+      return res.status(400).json({ success: false, error: "Missing notification email" });
+    }
+
+    // Required env vars for Supabase
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
     if (!supabaseUrl || !supabaseKey) {
-      console.error("[onboarding] Supabase env vars missing");
-      return res.status(500).json({ success: false, error: "Server misconfigured" });
+      console.error("[onboarding] ❌ Supabase env vars missing", {
+        has_url: !!supabaseUrl,
+        has_key: !!supabaseKey,
+      });
+      return res.status(500).json({ success: false, error: "Server misconfigured (database not available)" });
     }
 
-    // Resolve final slug (use frontend's if available + free, else collision-suffix it)
+    // Resolve final slug
     const finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
-    console.log("[onboarding] final slug:", finalSlug);
+    console.log("[onboarding] 🔧 FINAL SLUG:", finalSlug);
 
-    // Save onboarding row
-    const onboardingId = await saveOnboardingToSupabase(data);
+    // STEP 1: Save onboarding row (non-critical — keeps going even on fail)
+    const onboardingId = await saveOnboardingToSupabase(data, supabaseUrl, supabaseKey);
 
-    // Create client row — THIS MUST SUCCEED
+    // STEP 2: Save the CRITICAL clients row — this MUST succeed
     let clientRow;
     try {
-      clientRow = await createClientRow(data, onboardingId, finalSlug);
-    } catch (e) {
-      console.error("[onboarding] client row failed:", e.message);
-      // Still notify owner so we don't lose the lead
-      await Promise.all([sendNtfyNotification(data), notifyOwnerEmail(data)]);
-      return res.status(500).json({ success: false, error: "Could not save client. Please contact hello@aileadintel.com." });
+      clientRow = await createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey);
+    } catch (err) {
+      console.error("[onboarding] ❌ FATAL: clients insert failed:", err.message);
+      // Try to notify the owner so we don't lose the lead even though save failed.
+      runAllNotificationsSafely(data, finalSlug).catch(() => {});
+      return res.status(500).json({
+        success: false,
+        error: "Could not save your submission to our database. Please email hello@aileadintel.com directly.",
+      });
     }
 
-    // Fire off non-blocking notifications (don't await — let them run after response)
-    Promise.all([
-      sendNtfyNotification(data),
-      notifyOwnerEmail(data),
-      sendCustomerConfirmation(data, finalSlug),
-    ]).catch(e => console.error("[onboarding] notification error:", e));
+    // STEP 3: All notifications — fully isolated, can't fail the request.
+    // Run them concurrently but don't await before responding. Vercel keeps
+    // the function alive long enough for these to finish in practice; even
+    // if it doesn't, the customer row is saved so we have the lead.
+    runAllNotificationsSafely(data, finalSlug).catch((err) => {
+      console.error("[onboarding] ⚠️ notification wrapper unexpected (non-fatal):", err.message);
+    });
 
-    return res.status(200).json({
+    // STEP 4: Success response
+    const responseBody = {
       success: true,
       client_slug: clientRow.client_slug,
       plan: data.plan,
-    });
+    };
+    console.log("[onboarding] ✅ FINAL RESPONSE:", responseBody);
+    return res.status(200).json(responseBody);
 
   } catch (error) {
-    console.error("[onboarding] FATAL:", error);
-    return res.status(500).json({ success: false, error: "Failed to submit onboarding" });
+    // Catch-all for anything we missed. Should be impossible to hit
+    // unless something in normalizeData or resolveSlug throws.
+    console.error("[onboarding] ❌ UNHANDLED EXCEPTION:", error.message, error.stack);
+    return res.status(500).json({
+      success: false,
+      error: "Unexpected server error. Please email hello@aileadintel.com.",
+    });
   }
 }
