@@ -345,11 +345,11 @@ async function safeCustomerEmail(data, finalSlug) {
           <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p>
         </div>`
       : "";
-
+console.log("[onboarding] 🚀 sending customer email to:", data.notify_email);
     const result = await resend.emails.send({
       from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],
-      reply_to: "hello@aileadintel.com",
+      replyTo: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
       html: `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
