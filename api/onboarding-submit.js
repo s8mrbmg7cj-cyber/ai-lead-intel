@@ -277,7 +277,7 @@ async function safeOwnerEmail(data) {
     if (!resendKey || !notifyEmail) { console.warn("[onboarding] ⚠️ owner email skipped"); return; }
     const resend = new Resend(resendKey);
     const result = await resend.emails.send({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: notifyEmail.split(",").map((e) => e.trim()).filter(Boolean),
       subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
       html: `
@@ -347,7 +347,7 @@ async function safeCustomerEmail(data, finalSlug) {
       : "";
 
     const result = await resend.emails.send({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],
       reply_to: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
