@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Dashboard · AI Lead Intel</title>
+<meta name="robots" content="noindex,nofollow" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
@@ -11,376 +12,535 @@
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #08080a; --bg-2: #0c0c0f;
-  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22;
-  --surface-input: #0d0d10;
+  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22; --surface-input: #0d0d10;
   --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
   --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a; --text-muted: #52525b;
   --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
   --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
   --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
   --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+  --warn: #f59e0b; --warn-soft: rgba(245,158,11,0.10); --warn-line: rgba(245,158,11,0.28);
+  --hot: #ef4444; --hot-soft: rgba(239,68,68,0.10); --hot-line: rgba(239,68,68,0.28);
+  --cold: #3b82f6; --cold-soft: rgba(59,130,246,0.10); --cold-line: rgba(59,130,246,0.28);
 }
 html, body { height: 100%; }
-body {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg); color: var(--text);
-  min-height: 100vh; letter-spacing: -0.011em;
-  -webkit-font-smoothing: antialiased; line-height: 1.55;
-}
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(255,106,0,0.10), transparent 60%),
-    radial-gradient(ellipse 50% 30% at 100% 0%, rgba(255,154,0,0.06), transparent 50%);
-  pointer-events: none; z-index: 0;
-}
+body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,106,0,0.10), transparent 60%); pointer-events: none; z-index: 0; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-.topnav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(8,8,10,0.72);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 28px;
-  display: flex; justify-content: space-between; align-items: center;
-}
+.topnav { position: relative; z-index: 100; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(8,8,10,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
-.logo-mark {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
-  position: relative; overflow: hidden;
-}
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
 .logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
-.nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-dim); }
-.nav-right a:hover { color: var(--text); }
-.pro-pill {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 10px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  color: #fff; border-radius: 99px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9.5px; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  box-shadow: 0 2px 8px var(--brand-glow);
-}
-.wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 36px 28px 80px; }
-.page-head { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
-.page-eyebrow {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10.5px; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--brand);
-  font-weight: 600; margin-bottom: 6px;
-}
-.page-title { font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; }
-.page-title .accent {
-  font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-}
-.refresh-cluster { display: flex; align-items: center; gap: 10px; }
-.refresh-info { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.06em; }
-.btn-refresh {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 14px;
-  background: var(--surface-2); border: 1px solid var(--border-2);
-  border-radius: 9px;
-  font-size: 12px; color: var(--text-dim); font-weight: 500;
-  transition: all 0.15s;
-  font-family: 'Geist Mono', monospace; letter-spacing: 0.04em;
-}
-.btn-refresh:hover { background: var(--surface-3); color: var(--text); }
-.btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
-.support-banner {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; margin-bottom: 24px;
-  background:
-    linear-gradient(135deg, rgba(255,106,0,0.04) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(22,22,27,0.6) 0%, rgba(17,17,20,0.6) 100%);
-  border: 1px solid var(--border-2);
-  border-radius: 14px;
-  position: relative; overflow: hidden;
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-  text-decoration: none; color: inherit;
-}
-.support-banner::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent 20%, rgba(255,106,0,0.5) 50%, transparent 80%);
-  opacity: 0.7; transition: opacity 0.25s;
-}
-.support-banner:hover {
-  border-color: var(--brand-line);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px var(--brand-line) inset;
-}
-.support-banner:hover::before { opacity: 1; }
-.support-banner:hover .support-arrow { transform: translateX(3px); color: var(--brand); }
-.support-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: rgba(255,106,0,0.08);
-  border: 1px solid rgba(255,106,0,0.18);
-  color: var(--brand);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all 0.25s;
-}
-.support-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.support-title { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; line-height: 1.35; }
-.support-email { font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--text-dim); letter-spacing: 0.02em; }
-.support-email .at { color: var(--brand); }
-.support-arrow { color: var(--text-faint); flex-shrink: 0; transition: all 0.25s; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-.stat {
-  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px 22px;
-  position: relative; overflow: hidden;
-}
-.stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border-3), transparent); }
-.stat.hero { background: linear-gradient(135deg, var(--brand-tint) 0%, var(--surface-2) 100%); border-color: var(--brand-line); }
-.stat.hero::before { background: linear-gradient(90deg, transparent, var(--brand), transparent); }
-.stat-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 10px; }
-.stat-value { font-family: 'Geist Mono', monospace; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; }
-.stat.hero .stat-value { color: var(--brand); }
-.stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 7px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
-.calls-card {
-  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-  border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden; position: relative;
-}
-.calls-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border-3), transparent); }
-.calls-card::after { content: ''; position: absolute; top: -1px; left: 25%; right: 25%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
-.calls-card-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 22px; border-bottom: 1px solid var(--border); }
-.calls-card-title { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; }
-.calls-card-meta { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; }
-.call-row { display: grid; grid-template-columns: 160px 1fr 110px; gap: 18px; padding: 18px 22px; border-bottom: 1px solid var(--border); align-items: start; }
-.call-row:last-child { border-bottom: none; }
-.call-caller { display: flex; flex-direction: column; gap: 4px; }
-.call-number { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
-.call-meta { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.04em; }
-.call-summary { font-size: 13.5px; color: var(--text-soft); line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
-.call-summary.empty { color: var(--text-muted); font-style: italic; font-size: 12.5px; }
-.call-time { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; text-align: right; }
-.empty-state { text-align: center; padding: 60px 24px; }
-.empty-icon { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; }
-.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-.empty-sub { font-size: 13px; color: var(--text-dim); max-width: 360px; margin: 0 auto; }
-.loading-state { padding: 60px 24px; display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--text-faint); font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
-.loading-spinner { width: 22px; height: 22px; border: 2.5px solid var(--surface-3); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-link { font-size: 13px; color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
+.nav-link:hover { color: var(--text); }
+.support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; }
+.support-pill:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.support-pill svg { color: var(--brand); }
+@media (max-width: 720px) { .nav-link { display: none; } .topnav { padding: 12px 16px; } }
+
+/* ====== GLOBAL STATES ====== */
+.state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
+.state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
+.state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
+.state-icon.loading { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); border: 1px solid var(--border-2); }
+.state-icon.preparing { background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 16px 40px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+.state-icon.not-found { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); border: 1px solid var(--border-2); color: var(--text-dim); }
+.state-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 6px 13px; border-radius: 99px; margin-bottom: 18px; border: 1px solid; }
+.state-eyebrow.preparing { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
+.state-eyebrow.preparing .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+.state-eyebrow.not-found { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
+.state-title { font-size: clamp(26px, 4vw, 34px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 12px; max-width: 540px; margin-left: auto; margin-right: auto; }
+.state-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.state-desc { font-size: 15px; color: var(--text-dim); line-height: 1.6; max-width: 460px; margin: 0 auto 28px; }
+.state-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 20px; border-radius: 11px; font-size: 13.5px; font-weight: 600; transition: all 0.18s; border: 1px solid transparent; cursor: pointer; min-height: 44px; }
+.btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 26px var(--brand-glow); }
+.btn-secondary { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
+.btn-secondary:hover { background: var(--surface-3); border-color: var(--border-3); }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border-2); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.fullpage-state { position: relative; z-index: 1; min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 24px; }
-.fullpage-card { max-width: 440px; width: 100%; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 18px; padding: 40px 32px; text-align: center; position: relative; overflow: hidden; }
-.fullpage-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
-.fullpage-icon { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; }
-.fullpage-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
-.fullpage-sub { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 22px; }
-.fullpage-cta { display: inline-flex; align-items: center; gap: 7px; padding: 11px 20px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 10px; color: var(--text); font-size: 13px; font-weight: 500; transition: all 0.15s; }
-.fullpage-cta:hover { background: var(--surface-3); border-color: var(--border-3); }
-.fullpage-cta.primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); border-color: transparent; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 12px var(--brand-glow); }
-@media (max-width: 720px) {
-  .topnav { padding: 12px 16px; }
-  .wrap { padding: 24px 16px 64px; }
-  .page-title { font-size: 26px; }
-  .stats { grid-template-columns: 1fr; }
-  .call-row { grid-template-columns: 1fr; gap: 8px; padding: 16px 18px; }
-  .call-time { text-align: left; }
-  .support-banner { padding: 12px 14px; gap: 12px; }
-  .support-icon { width: 32px; height: 32px; }
-  .support-title { font-size: 12.5px; }
-  .support-email { font-size: 11px; word-break: break-all; }
+.checklist { display: flex; flex-direction: column; gap: 10px; max-width: 380px; margin: 26px auto 0; text-align: left; }
+.checklist-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; }
+.checklist-item.done .checklist-dot { background: linear-gradient(135deg, var(--green), #4ade80); border-color: transparent; color: #fff; }
+.checklist-item.active .checklist-dot { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #fff; animation: ringPulse 2s ease-in-out infinite; }
+@keyframes ringPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,106,0,0.4); } 50% { box-shadow: 0 0 0 6px rgba(255,106,0,0); } }
+.checklist-dot { width: 24px; height: 24px; border-radius: 7px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.checklist-text { flex: 1; min-width: 0; }
+.checklist-label { font-size: 12.5px; font-weight: 500; color: var(--text); letter-spacing: -0.005em; }
+.checklist-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
+.checklist-item.done .checklist-meta { color: var(--green); }
+.checklist-item.active .checklist-meta { color: var(--brand); }
+
+/* ====== ACTIVE DASHBOARD ====== */
+.dash { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 32px 28px 80px; display: none; }
+.dash.visible { display: block; }
+.dash-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 26px; gap: 16px; flex-wrap: wrap; }
+.dash-head-left { min-width: 0; }
+.dash-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 6px; }
+.dash-eyebrow .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.6s ease-in-out infinite; }
+.dash-title { font-size: clamp(24px, 3vw, 30px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+.dash-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.dash-head-right { display: flex; align-items: center; gap: 10px; }
+.dash-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: var(--text-dim); }
+.dash-pill.live { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+.dash-pill.live .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.6s ease-in-out infinite; }
+.dash-pill.plan { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
+.stats-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.stat { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; position: relative; overflow: hidden; transition: all 0.2s; }
+.stat:hover { border-color: var(--border-2); }
+.stat.hero-stat { background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 70%), linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border-color: var(--brand-line); }
+.stat.hero-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.stat-label { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
+.stat-value { font-family: 'Geist Mono', monospace; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; }
+.stat.hero-stat .stat-value { font-size: 40px; color: var(--brand); }
+.stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 8px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+.stat-sub.up { color: var(--green); }
+.dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; }
+.panel { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.panel-title { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
+.panel-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+.calls-list { display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow-y: auto; }
+.call-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 11px; transition: all 0.15s; cursor: pointer; }
+.call-row:hover { border-color: var(--border-2); background: var(--bg-2); }
+.call-avatar { width: 32px; height: 32px; border-radius: 9px; background: var(--surface-3); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-dim); flex-shrink: 0; }
+.call-body { flex: 1; min-width: 0; }
+.call-num { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: -0.005em; }
+.call-meta { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
+.call-time { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); flex-shrink: 0; letter-spacing: 0.04em; }
+.badge { font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; flex-shrink: 0; border: 1px solid; }
+.badge.hot { color: var(--hot); background: var(--hot-soft); border-color: var(--hot-line); }
+.badge.warm { color: var(--warn); background: var(--warn-soft); border-color: var(--warn-line); }
+.badge.lead { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+.badge.missed { color: var(--cold); background: var(--cold-soft); border-color: var(--cold-line); }
+.empty-state { padding: 32px 16px; text-align: center; }
+.empty-state-icon { width: 44px; height: 44px; margin: 0 auto 14px; border-radius: 12px; background: var(--surface-input); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
+.empty-state-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.empty-state-desc { font-size: 12px; color: var(--text-faint); line-height: 1.5; }
+.info-list { display: flex; flex-direction: column; gap: 10px; }
+.info-row { display: flex; flex-direction: column; gap: 3px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+.info-value { font-size: 13.5px; color: var(--text); font-weight: 500; word-break: break-word; letter-spacing: -0.005em; }
+.support-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 70%), var(--surface-input); border: 1px solid var(--brand-line); border-radius: 12px; margin-top: 14px; }
+.support-banner-icon { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px var(--brand-glow); }
+.support-banner-text { flex: 1; min-width: 0; }
+.support-banner-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.support-banner-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.support-banner-desc a { color: var(--brand); font-weight: 500; }
+@media (max-width: 880px) {
+  .dash { padding: 24px 16px 80px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .stat-value { font-size: 26px; }
+  .stat.hero-stat .stat-value { font-size: 32px; }
 }
 </style>
 </head>
 <body>
 <nav class="topnav">
-  <a href="/" class="logo">
-    <div class="logo-mark"></div>
-    <span>AI Lead Intel</span>
-  </a>
-  <div class="nav-right" id="nav-right">
-    <a href="/" target="_blank">Site ↗</a>
+  <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
+  <div class="nav-right">
+    <a href="mailto:hello@aileadintel.com" class="support-pill">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Support
+    </a>
   </div>
 </nav>
-<div id="root"></div>
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+<!-- LOADING STATE -->
+<div class="state-wrap" id="state-loading">
+  <div class="state-icon loading"><div class="spinner"></div></div>
+  <div class="state-title">Loading dashboard<span class="accent">…</span></div>
+  <div class="state-desc">Hang tight — pulling your account details.</div>
+</div>
+
+<!-- BEING PREPARED STATE -->
+<div class="state-wrap" id="state-preparing" style="display:none;">
+  <div class="state-icon preparing">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  </div>
+  <div class="state-eyebrow preparing"><span class="dot"></span>Setup in progress</div>
+  <h1 class="state-title">Your dashboard is <span class="accent">being prepared.</span></h1>
+  <p class="state-desc" id="preparing-desc">We're building your AI right now. Once it's live and answering calls, this dashboard will fill up with leads, transcripts, and analytics in real time.</p>
+  <div class="checklist">
+    <div class="checklist-item done">
+      <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="checklist-text">
+        <div class="checklist-label">Onboarding submitted</div>
+        <div class="checklist-meta">Today · Complete</div>
+      </div>
+    </div>
+    <div class="checklist-item active">
+      <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg></div>
+      <div class="checklist-text">
+        <div class="checklist-label">Building your AI receptionist</div>
+        <div class="checklist-meta">In progress · You'll get setup email soon</div>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="checklist-text">
+        <div class="checklist-label">Test & go live</div>
+        <div class="checklist-meta">5–7 days · Pending</div>
+      </div>
+    </div>
+  </div>
+  <div class="state-actions" style="margin-top: 28px;">
+    <a href="mailto:hello@aileadintel.com" class="btn btn-secondary">Email support</a>
+    <button class="btn btn-primary" onclick="window.location.reload()">
+      Check status
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- NOT FOUND STATE -->
+<div class="state-wrap" id="state-notfound" style="display:none;">
+  <div class="state-icon not-found">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </div>
+  <div class="state-eyebrow not-found">Not found</div>
+  <h1 class="state-title">We couldn't find <span class="accent">that dashboard.</span></h1>
+  <p class="state-desc">The URL might be mistyped, or your account may be on the Starter plan (which uses email reports instead of a dashboard).</p>
+  <div class="state-actions">
+    <a href="/" class="btn btn-secondary">Back to home</a>
+    <a href="mailto:hello@aileadintel.com" class="btn btn-primary">Contact support</a>
+  </div>
+</div>
+
+<!-- ACTIVE DASHBOARD -->
+<div class="dash" id="dash">
+  <div class="dash-head">
+    <div class="dash-head-left">
+      <div class="dash-eyebrow"><span class="live-dot"></span><span id="head-status">Mission Control</span></div>
+      <h1 class="dash-title"><span id="dash-business">Your business</span><span class="accent"> dashboard</span></h1>
+    </div>
+    <div class="dash-head-right">
+      <div class="dash-pill plan" id="dash-plan">PRO</div>
+      <div class="dash-pill live" id="dash-live"><span class="dot"></span>Live</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat hero-stat">
+      <div class="stat-label">Leads Captured</div>
+      <div class="stat-value" id="stat-leads">0</div>
+      <div class="stat-sub" id="stat-leads-sub">No leads yet</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Calls Answered</div>
+      <div class="stat-value" id="stat-calls">0</div>
+      <div class="stat-sub" id="stat-calls-sub">All time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Missed Calls</div>
+      <div class="stat-value" id="stat-missed">0</div>
+      <div class="stat-sub" id="stat-missed-sub">All time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg Answer</div>
+      <div class="stat-value" id="stat-answer">—</div>
+      <div class="stat-sub">Time to pickup</div>
+    </div>
+  </div>
+  <div class="dash-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Recent calls</div>
+        <div class="panel-sub" id="panel-calls-sub">Live</div>
+      </div>
+      <div class="calls-list" id="calls-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+          </div>
+          <div class="empty-state-title">No calls yet</div>
+          <div class="empty-state-desc">Calls will appear here as soon as your AI receptionist starts answering.</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Your AI front desk</div>
+        <div class="panel-sub" id="panel-info-sub">Account</div>
+      </div>
+      <div class="info-list">
+        <div class="info-row"><div class="info-label">Business</div><div class="info-value" id="info-business">—</div></div>
+        <div class="info-row"><div class="info-label">Plan</div><div class="info-value" id="info-plan">Pro</div></div>
+        <div class="info-row"><div class="info-label">Status</div><div class="info-value" id="info-status">Active</div></div>
+        <div class="info-row"><div class="info-label">Notification email</div><div class="info-value" id="info-email">—</div></div>
+        <div class="info-row"><div class="info-label">Payment status</div><div class="info-value" id="info-payment">—</div></div>
+      </div>
+      <div class="support-banner">
+        <div class="support-banner-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <div class="support-banner-text">
+          <div class="support-banner-title">Need to change something?</div>
+          <div class="support-banner-desc">Hours, voice, transfer rules — email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a> and we'll update it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ===========================================================
+// CONFIG
+// ===========================================================
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const root = document.getElementById('root');
-let currentClient = null;
-function getSlugFromPath() {
-  const parts = window.location.pathname.replace(/^\/+|\/+$/g, '').split('/');
-  if (parts[0] !== 'dashboard') return null;
-  const slug = parts[1] || '';
-  if (!slug || !/^[a-z0-9-]+$/.test(slug)) return null;
-  return slug;
+
+// ===========================================================
+// SLUG FROM URL
+// ===========================================================
+function getSlugFromUrl() {
+  // Supports /dashboard/SLUG (via Vercel rewrite) and ?slug=SLUG
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get('slug');
+  if (fromQuery) return fromQuery.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const path = window.location.pathname.replace(/\/+$/, '');
+  const parts = path.split('/').filter(Boolean);
+  // path like /dashboard/SLUG → parts = ['dashboard', 'SLUG']
+  if (parts.length >= 2 && parts[parts.length - 2] === 'dashboard') {
+    return parts[parts.length - 1].toLowerCase().replace(/[^a-z0-9-]/g, '');
+  }
+  if (parts[0] === 'dashboard' && parts[1]) {
+    return parts[1].toLowerCase().replace(/[^a-z0-9-]/g, '');
+  }
+  return '';
 }
-function escapeHtml(s) { if (s === null || s === undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function formatPhone(raw) { if (!raw) return '—'; let d = String(raw).replace(/\D/g,''); if (d.length === 11 && d.startsWith('1')) d = d.slice(1); if (d.length !== 10) return raw; return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6,10)}`; }
-function timeAgo(iso) { if (!iso) return '—'; const diff = Date.now() - new Date(iso).getTime(); if (diff < 60000) return 'just now'; if (diff < 3600000) return Math.floor(diff/60000) + 'm ago'; if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago'; if (diff < 7*86400000) return Math.floor(diff/86400000) + 'd ago'; return new Date(iso).toLocaleDateString(); }
-function fullDate(iso) { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
-function renderFullState({ icon, title, sub, ctaText, ctaHref, ctaPrimary }) {
-  root.innerHTML = `
-    <div class="fullpage-state">
-      <div class="fullpage-card">
-        <div class="fullpage-icon">${icon}</div>
-        <div class="fullpage-title">${escapeHtml(title)}</div>
-        <div class="fullpage-sub">${escapeHtml(sub)}</div>
-        ${ctaText ? `<a class="fullpage-cta ${ctaPrimary ? 'primary' : ''}" href="${escapeHtml(ctaHref)}">${escapeHtml(ctaText)}</a>` : ''}
-      </div>
-    </div>`;
-}
-function renderNotFound() {
-  renderFullState({
-    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-    title: 'Dashboard not found',
-    sub: "We couldn't find a customer with this dashboard URL. Double-check the link from your welcome email.",
-    ctaText: 'Email support', ctaHref: 'mailto:hello@aileadintel.com',
+
+// ===========================================================
+// STATE TRANSITIONS
+// ===========================================================
+function showState(which) {
+  ['state-loading', 'state-preparing', 'state-notfound'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = (id === which) ? '' : 'none';
   });
+  const dash = document.getElementById('dash');
+  if (dash) dash.classList.toggle('visible', which === 'dash');
 }
-function renderNotPro(client) {
-  renderFullState({
-    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-    title: 'Dashboard is a Pro feature',
-    sub: `${client.business_name || 'Your account'} is on the Starter plan. Upgrade to AI Front Desk Pro to access the dashboard.`,
-    ctaText: 'See Pro plan', ctaHref: '/#pricing', ctaPrimary: true,
-  });
-}
-function renderError(msg) {
-  renderFullState({
-    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
-    title: "Couldn't load dashboard",
-    sub: msg || 'Something went wrong. Try refreshing.',
-    ctaText: 'Refresh page', ctaHref: window.location.pathname,
-  });
-}
-function renderShell(client) {
-  document.title = `${client.business_name || 'Dashboard'} · AI Lead Intel`;
-  document.getElementById('nav-right').innerHTML = `<span class="pro-pill">PRO</span><a href="/" target="_blank">Site ↗</a>`;
-  root.innerHTML = `
-    <div class="wrap">
-      <div class="page-head">
-        <div>
-          <div class="page-eyebrow">Your Dashboard</div>
-          <h1 class="page-title">${escapeHtml(client.business_name || 'Your business')}</h1>
-        </div>
-        <div class="refresh-cluster">
-          <span class="refresh-info" id="refresh-info">—</span>
-          <button class="btn-refresh" id="refresh-btn">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Refresh
-          </button>
-        </div>
-      </div>
-      <a href="mailto:hello@aileadintel.com" class="support-banner" aria-label="Email your setup specialist">
-        <div class="support-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </div>
-        <div class="support-text">
-          <div class="support-title">Need help? Text or call your setup specialist anytime.</div>
-          <div class="support-email">hello<span class="at">@</span>aileadintel.com</div>
-        </div>
-        <svg class="support-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
-      <div class="stats">
-        <div class="stat hero">
-          <div class="stat-label">Calls This Week</div>
-          <div class="stat-value" id="stat-week">—</div>
-          <div class="stat-sub">Last 7 days</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Leads Captured</div>
-          <div class="stat-value" id="stat-leads">—</div>
-          <div class="stat-sub">All time</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Calls Today</div>
-          <div class="stat-value" id="stat-today">—</div>
-          <div class="stat-sub">Since midnight</div>
-        </div>
-      </div>
-      <div class="calls-card">
-        <div class="calls-card-head">
-          <div class="calls-card-title">Recent Calls</div>
-          <div class="calls-card-meta" id="calls-meta">—</div>
-        </div>
-        <div id="calls-body">
-          <div class="loading-state"><div class="loading-spinner"></div><span>Loading calls</span></div>
-        </div>
-      </div>
-    </div>`;
-  document.getElementById('refresh-btn').addEventListener('click', () => loadCalls(client));
-}
-async function loadCalls(client) {
-  const refreshBtn = document.getElementById('refresh-btn');
-  if (refreshBtn) refreshBtn.disabled = true;
+
+// ===========================================================
+// CLIENT FETCH
+// ===========================================================
+async function fetchClient(slug) {
+  const url = `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`;
   try {
-    const { data: calls, error } = await supabase.from('calls').select('*').eq('client_id', client.id).order('created_at', { ascending: false }).limit(50);
-    if (error) throw error;
-    const list = calls || [];
-    const now = Date.now();
-    const weekAgo = now - 7*24*60*60*1000;
-    const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
-    const callsThisWeek = list.filter(c => c.created_at && new Date(c.created_at).getTime() >= weekAgo).length;
-    const callsToday = list.filter(c => c.created_at && new Date(c.created_at).getTime() >= startOfToday.getTime()).length;
-    const leadsCaptured = list.filter(c => (c.summary && c.summary.length > 10) || c.caller_number).length;
-    document.getElementById('stat-week').textContent = callsThisWeek;
-    document.getElementById('stat-leads').textContent = leadsCaptured;
-    document.getElementById('stat-today').textContent = callsToday;
-    document.getElementById('calls-meta').textContent = list.length === 0 ? 'No calls yet' : `Showing ${list.length} most recent`;
-    const body = document.getElementById('calls-body');
-    if (list.length === 0) {
-      body.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-          <div class="empty-title">No calls yet</div>
-          <div class="empty-sub">Your calls will appear here as soon as your AI starts answering. Make sure forwarding is set up.</div>
-        </div>`;
-    } else {
-      body.innerHTML = list.map(c => `
-        <div class="call-row">
-          <div class="call-caller">
-            <div class="call-number">${escapeHtml(formatPhone(c.caller_number || c.from_number))}</div>
-            <div class="call-meta">${escapeHtml(fullDate(c.created_at))}</div>
-          </div>
-          <div class="call-summary ${c.summary ? '' : 'empty'}">${c.summary ? escapeHtml(c.summary) : 'No summary available.'}</div>
-          <div class="call-time">${escapeHtml(timeAgo(c.created_at))}</div>
-        </div>`).join('');
+    const res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+    if (!res.ok) {
+      console.warn('[dashboard] clients fetch non-OK:', res.status);
+      return null;
     }
-    const info = document.getElementById('refresh-info');
-    if (info) info.textContent = 'Updated ' + timeAgo(new Date().toISOString());
-  } catch (e) {
-    console.error('[dashboard] load calls failed:', e);
-    const body = document.getElementById('calls-body');
-    if (body) body.innerHTML = `<div class="empty-state"><div class="empty-title">Couldn't load calls</div><div class="empty-sub">${escapeHtml(e.message || 'Unknown error')}</div></div>`;
-  } finally {
-    if (refreshBtn) refreshBtn.disabled = false;
+    const rows = await res.json().catch(() => []);
+    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    console.error('[dashboard] clients fetch exception:', err);
+    return null;
   }
 }
-async function init() {
-  const slug = getSlugFromPath();
-  if (!slug) { renderNotFound(); return; }
-  root.innerHTML = `<div class="wrap"><div class="loading-state"><div class="loading-spinner"></div><span>Loading your dashboard</span></div></div>`;
+
+async function fetchCalls(clientId) {
+  // Try fetching from a 'calls' table if it exists. Failure is non-fatal.
+  const url = `${SUPABASE_URL}/rest/v1/calls?client_id=eq.${encodeURIComponent(clientId)}&select=*&order=created_at.desc&limit=20`;
   try {
-    const { data, error } = await supabase.from('clients').select('id, business_name, client_slug, plan').eq('client_slug', slug).limit(1);
-    if (error) throw error;
-    if (!data || data.length === 0) { renderNotFound(); return; }
-    const client = data[0];
-    currentClient = client;
-    const plan = (client.plan || '').toLowerCase();
-    if (plan !== 'pro') { renderNotPro(client); return; }
-    renderShell(client);
-    loadCalls(client);
-    setInterval(() => { if (currentClient) loadCalls(currentClient); }, 60000);
-  } catch (e) {
-    console.error('[dashboard] init failed:', e);
-    renderError(e.message);
+    const res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+    if (!res.ok) return [];
+    const rows = await res.json().catch(() => []);
+    return Array.isArray(rows) ? rows : [];
+  } catch (err) {
+    return [];
   }
 }
-init();
+
+// ===========================================================
+// COMPLETENESS CHECK
+// — Determines if the row has enough to show the real dashboard.
+// — Otherwise we show "being prepared" (NOT "not found").
+// ===========================================================
+function isClientReady(client) {
+  if (!client) return false;
+  // The row exists; consider it "ready" if status is anything beyond trial/new and
+  // it's been marked active, OR if there are calls available.
+  // For now, treat any row with active=true AND a status field meaning "live" as ready.
+  const liveStatuses = ['active', 'live', 'enabled'];
+  const status = (client.status || '').toLowerCase();
+  if (client.active === true && liveStatuses.includes(status)) return true;
+  return false;
+}
+
+// ===========================================================
+// FORMATTERS
+// ===========================================================
+function formatPhone(num) {
+  if (!num) return '—';
+  const digits = String(num).replace(/\D/g, '');
+  if (digits.length === 10) return `${digits.slice(0,3)}-${digits.slice(3,6)}-${digits.slice(6)}`;
+  if (digits.length === 11) return `+${digits[0]} ${digits.slice(1,4)}-${digits.slice(4,7)}-${digits.slice(7)}`;
+  return num;
+}
+function formatTimeAgo(iso) {
+  if (!iso) return '—';
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const diff = Math.max(0, Math.floor((now - then) / 1000));
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ===========================================================
+// RENDER ACTIVE DASHBOARD
+// ===========================================================
+function renderDashboard(client, calls) {
+  const businessName = client.business_name || 'Your business';
+  const plan = (client.plan || 'pro').toLowerCase();
+  const status = (client.status || 'active').toLowerCase();
+  const notifyEmail = client.notify_email || '—';
+  const paymentStatus = (client.payment_status || 'unpaid').toLowerCase();
+
+  document.getElementById('dash-business').textContent = businessName;
+  document.getElementById('info-business').textContent = businessName;
+  document.getElementById('info-plan').textContent = plan === 'pro' ? 'AI Front Desk Pro' : 'Starter';
+  document.getElementById('info-status').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  document.getElementById('info-email').textContent = notifyEmail;
+
+  const paymentLabels = { paid: 'Paid', unpaid: 'Payment pending', pending: 'Payment pending', refunded: 'Refunded' };
+  document.getElementById('info-payment').textContent = paymentLabels[paymentStatus] || 'Payment pending';
+
+  const planPill = document.getElementById('dash-plan');
+  planPill.textContent = plan === 'pro' ? 'PRO' : 'STARTER';
+
+  const livePill = document.getElementById('dash-live');
+  if (status === 'active' || status === 'live') {
+    livePill.innerHTML = '<span class="dot"></span>Live';
+  } else {
+    livePill.innerHTML = '<span class="dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span>' + status;
+  }
+
+  // Stats
+  const totalCalls = calls.length;
+  const leads = calls.filter(c => c.is_lead || (c.outcome && c.outcome.toLowerCase().includes('lead'))).length;
+  const missed = calls.filter(c => c.is_missed || (c.outcome && c.outcome.toLowerCase().includes('missed'))).length;
+  document.getElementById('stat-leads').textContent = leads;
+  document.getElementById('stat-calls').textContent = totalCalls;
+  document.getElementById('stat-missed').textContent = missed;
+  document.getElementById('stat-leads-sub').textContent = leads > 0 ? `+${leads} total` : 'No leads yet';
+  document.getElementById('stat-calls-sub').textContent = totalCalls > 0 ? 'All time' : 'No calls yet';
+  document.getElementById('stat-missed-sub').textContent = missed > 0 ? 'All time' : 'None missed';
+
+  // Recent calls list
+  const list = document.getElementById('calls-list');
+  if (calls.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
+        <div class="empty-state-title">No calls yet</div>
+        <div class="empty-state-desc">Calls will appear here as soon as your AI receptionist starts answering.</div>
+      </div>`;
+  } else {
+    list.innerHTML = calls.map(c => {
+      const callerNum = formatPhone(c.caller_number || c.from_number || c.caller || '');
+      const initials = (callerNum.replace(/\D/g, '').slice(-2)) || '?';
+      const outcome = (c.outcome || (c.is_lead ? 'lead' : 'call')).toLowerCase();
+      let badgeClass = 'lead';
+      let badgeText = 'Lead';
+      if (outcome.includes('missed')) { badgeClass = 'missed'; badgeText = 'Missed'; }
+      else if (outcome.includes('hot')) { badgeClass = 'hot'; badgeText = 'Hot'; }
+      else if (outcome.includes('warm')) { badgeClass = 'warm'; badgeText = 'Warm'; }
+      const meta = c.summary || c.transcript_summary || c.notes || 'No summary yet';
+      return `
+        <div class="call-row">
+          <div class="call-avatar">${escapeHtml(initials)}</div>
+          <div class="call-body">
+            <div class="call-num">${escapeHtml(callerNum)}</div>
+            <div class="call-meta">${escapeHtml(meta).slice(0, 80)}${meta.length > 80 ? '…' : ''}</div>
+          </div>
+          <div class="badge ${badgeClass}">${badgeText}</div>
+          <div class="call-time">${escapeHtml(formatTimeAgo(c.created_at || c.started_at))}</div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// ===========================================================
+// RENDER "BEING PREPARED" with personalized business name
+// ===========================================================
+function renderPreparing(client) {
+  if (client && client.business_name) {
+    document.getElementById('preparing-desc').textContent =
+      `We're building ${client.business_name}'s AI right now. Once it's live and answering calls, this dashboard will fill up with leads, transcripts, and analytics in real time.`;
+  }
+}
+
+// ===========================================================
+// MAIN
+// ===========================================================
+(async function init() {
+  const slug = getSlugFromUrl();
+
+  if (!slug || slug.length < 2) {
+    console.warn('[dashboard] no slug in URL');
+    showState('state-notfound');
+    return;
+  }
+
+  console.log('[dashboard] looking up slug:', slug);
+  const client = await fetchClient(slug);
+
+  if (!client) {
+    console.warn('[dashboard] no client found for slug:', slug);
+    showState('state-notfound');
+    return;
+  }
+
+  // Starter on the dashboard URL — show being-prepared with a Starter twist
+  if ((client.plan || '').toLowerCase() === 'starter') {
+    console.log('[dashboard] starter plan — directing to reports messaging');
+    renderPreparing(client);
+    document.getElementById('preparing-desc').innerHTML =
+      `${client.business_name || 'Your business'} is on the <strong>Starter plan</strong> — you'll receive automated lead reports by email. The full dashboard is a <a href="/#pricing" style="color:var(--brand);border-bottom:1px solid var(--brand-line);">Pro</a> feature.`;
+    showState('state-preparing');
+    return;
+  }
+
+  if (!isClientReady(client)) {
+    console.log('[dashboard] client exists but not yet ready — showing preparing state');
+    renderPreparing(client);
+    showState('state-preparing');
+    return;
+  }
+
+  // Client is ready — fetch calls and render dashboard
+  console.log('[dashboard] client ready, fetching calls...');
+  const calls = await fetchCalls(client.id);
+  renderDashboard(client, calls);
+  showState('dash');
+})();
 </script>
 </body>
 </html>
