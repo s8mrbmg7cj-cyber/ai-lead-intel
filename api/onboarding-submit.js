@@ -425,7 +425,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     offer_urgent_transfer: urgentBool,
     payment_required: true,
     payment_pending: true,
-    payment_status: "unpaid",
+    payment_status: "pending",
     payment_provider: "paypal",
     payment_amount: pricing.amount,
     ai_prompt: aiConfig.ai_prompt,
