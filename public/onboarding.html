@@ -823,11 +823,129 @@
         const msg = (result && result.error) || `Submit failed (HTTP ${res.status})`;
         showError(msg + ' — please email hello@aileadintel.com'); reEnable(); return;
       }
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      const canonicalSlug = result.client_slug || clientSlug;
-      const canonicalPlan = result.plan || selectedPlan;
-      safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '', result.report_frequency || formData.report_frequency, result.report_email || formData.notify_email);
-    }
+      try { 
+  localStorage.removeItem(STORAGE_KEY); 
+} catch (e) {}
+
+const canonicalSlug = result.client_slug || clientSlug;
+const canonicalPlan = result.plan || selectedPlan;
+
+/* PREMIUM SUCCESS STATE */
+
+document.querySelector('.card').innerHTML = `
+  <div class="activation-card" style="
+    padding:48px 32px;
+    text-align:center;
+    min-height:520px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  ">
+
+    <div class="activation-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+
+    <div style="
+      font-family:'Geist Mono', monospace;
+      font-size:11px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:var(--brand);
+      margin-bottom:18px;
+      font-weight:600;
+    ">
+      AI SETUP INITIALIZED
+    </div>
+
+    <h1 style="
+      font-size:42px;
+      line-height:1.05;
+      margin-bottom:18px;
+      font-weight:600;
+      letter-spacing:-0.04em;
+    ">
+      Your AI assistant is being prepared
+    </h1>
+
+    <p style="
+      color:var(--text-dim);
+      font-size:16px;
+      line-height:1.7;
+      max-width:580px;
+      margin:0 auto 36px auto;
+    ">
+      Saving your business profile, generating your AI receptionist,
+      and preparing your dashboard access...
+    </p>
+
+    <div style="
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      text-align:left;
+    ">
+
+      <div style="
+        background:rgba(255,255,255,0.03);
+        border:1px solid rgba(34,197,94,0.28);
+        border-radius:14px;
+        padding:16px 18px;
+      ">
+        ✅ Business profile saved
+      </div>
+
+      <div style="
+        background:rgba(255,255,255,0.03);
+        border:1px solid rgba(34,197,94,0.28);
+        border-radius:14px;
+        padding:16px 18px;
+      ">
+        ✅ AI voice configured
+      </div>
+
+      <div style="
+        background:rgba(255,106,0,0.06);
+        border:1px solid rgba(255,106,0,0.30);
+        border-radius:14px;
+        padding:16px 18px;
+        box-shadow:0 0 24px rgba(255,106,0,0.08);
+      ">
+        ⏳ Preparing dashboard access
+      </div>
+
+      <div style="
+        background:rgba(255,255,255,0.03);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:14px;
+        padding:16px 18px;
+        color:var(--text-dim);
+      ">
+        ⏳ Redirecting to secure activation
+      </div>
+
+    </div>
+
+  </div>
+`;
+
+document.getElementById('progress').style.opacity = '0.45';
+
+document.getElementById('trust-row').style.display = 'none';
+
+await new Promise(resolve => setTimeout(resolve, 2800));
+
+safeRedirectToSuccess(
+  canonicalSlug,
+  canonicalPlan,
+  formData.business_name || '',
+  result.report_frequency || formData.report_frequency,
+  result.report_email || formData.notify_email
+);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         const activeSection = document.querySelector('.section.active');
