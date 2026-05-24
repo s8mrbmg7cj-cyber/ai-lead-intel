@@ -375,25 +375,28 @@
     ]);
 
     function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
-      console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
-      const params = new URLSearchParams({
-        plan: plan || 'starter',
-        slug: slug || '',
-        business: businessName || '',
-      });
-      if (freq) params.set('freq', freq);
-      if (reportEmail) params.set('report_email', reportEmail);
-      const starterPaypal = https:"//www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-50G30112J25385417NIJG3XY"
-const proPaypal = https:"//www.paypal.com/ncp/payment/HWF8SSX9FAB98"
+  console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
 
-if (plan === "starter") {
-  window.location.href = starterPaypal;
-} else {
-  window.location.href = proPaypal;
+  const params = new URLSearchParams({
+    plan: plan || 'starter',
+    slug: slug || '',
+    business: businessName || '',
+  });
+
+  if (freq) params.set('freq', freq);
+  if (reportEmail) params.set('report_email', reportEmail);
+
+  const starterPaypal = "https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-50G30112J25385417NIJG3XY";
+  const proPaypal = "https://www.paypal.com/ncp/payment/HWF8SSX9FAB98";
+
+  if (plan === "starter") {
+    window.location.href = starterPaypal;
+  } else {
+    window.location.href = proPaypal;
+  }
+
+  return;
 }
-
-return;
-
     const urlParams = new URLSearchParams(window.location.search);
     const selectedPlan = (function () {
       const raw = (urlParams.get('plan') || '').toLowerCase().trim();
