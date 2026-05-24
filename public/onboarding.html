@@ -826,7 +826,8 @@
       try { 
   localStorage.removeItem(STORAGE_KEY); 
 } catch (e) {}
-
+label.innerHTML = 'Setup submitted successfully ✓';
+await new Promise(resolve => setTimeout(resolve, 1800));
 const canonicalSlug = result.client_slug || clientSlug;
 const canonicalPlan = result.plan || selectedPlan;
 
