@@ -1,8 +1,7 @@
 // api/onboarding-submit.js
 // Failsafe onboarding handler.
-// - Only Supabase failures return 500. Emails/ntfy can never crash the request.
-// - createClientRow uses lookup-then-PATCH-or-POST.
-// - Customer confirmation email uses verified domain hello@aileadintel.com with verbose logging.
+// - Customer email is now AWAITED so Vercel doesn't terminate before Resend sends.
+// - generateAiConfig() builds Vapi-ready prompt + summary fields and saves them.
 
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
@@ -12,6 +11,35 @@ const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 const PLAN_PRICING = {
   starter: { amount: 97.00, label: "Starter — $97/month" },
   pro: { amount: 297.00, label: "AI Front Desk Pro — $297/month" },
+};
+
+const INDUSTRY_LABELS = {
+  self_storage: "Self Storage", hvac: "HVAC", plumbing: "Plumbing",
+  electrician: "Electrician", landscaping: "Landscaping / Lawn Care",
+  auto_detailing: "Auto Detailing", auto_repair: "Auto Repair",
+  salon: "Salon / Spa", pest_control: "Pest Control",
+  cleaning: "Cleaning Services", roofing: "Roofing", locksmith: "Locksmith",
+  real_estate: "Real Estate", dental: "Dental / Medical", other: "Other",
+};
+
+const PERSONALITY_LABELS = {
+  warm: "Warm & Conversational — friendly, approachable, talks like a real person",
+  professional: "Professional — polished, corporate, formal",
+  direct: "Direct — efficient, to-the-point, no fluff",
+};
+
+const PRICING_LABELS = {
+  yes_specific: "Give exact prices when asked",
+  yes_ranges: "Give price ranges only — never exact figures",
+  no_quote: "Never quote prices — say 'I'll have someone send you a quote'",
+  no_transfer: "Never quote prices — transfer pricing questions to the owner",
+};
+
+const TOPIC_LABELS = {
+  new_customer: "New customer / booking",
+  payments: "Payments / billing",
+  support: "Customer support",
+  other: "Other",
 };
 
 // ============================================================
@@ -55,12 +83,9 @@ function normalizeData(data) {
 
 function slugifyBase(businessName) {
   return String(businessName || "client")
-    .toLowerCase()
-    .trim()
+    .toLowerCase().trim()
     .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 50) || "client";
+    .replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 50) || "client";
 }
 
 async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
@@ -72,9 +97,7 @@ async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
     if (!r.ok) return false;
     const rows = await r.json();
     return Array.isArray(rows) && rows.length > 0;
-  } catch (_) {
-    return false;
-  }
+  } catch (_) { return false; }
 }
 
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
@@ -96,6 +119,133 @@ function parseUrgentTransfer(value) {
   if (value === "yes") return true;
   if (value === "no") return false;
   return null;
+}
+
+// ============================================================
+// AI CONFIG GENERATOR — builds Vapi-ready prompt synchronously
+// ============================================================
+
+function generateAiConfig(data) {
+  const businessName = data.business_name || "the business";
+  const industryLabel = INDUSTRY_LABELS[data.industry] || data.industry || "service business";
+  const personalityLabel = PERSONALITY_LABELS[data.personality] || "warm and friendly";
+  const pricingRuleLabel = PRICING_LABELS[data.pricing_rule] || "transfer pricing questions to the owner";
+  const services = (data.services_offered || "").trim();
+  const serviceArea = (data.service_area || "").trim();
+  const hours = (data.transfer_hours || "regular business hours").trim();
+  const transferPrimary = (data.transfer_primary || "").trim();
+  const transferBackup = (data.transfer_backup || "").trim();
+  const pricingExamples = (data.pricing_examples || "").trim();
+  const notes = (data.notes || "").trim();
+  const topicsList = Array.isArray(data.topics) ? data.topics.map(t => TOPIC_LABELS[t] || t).filter(Boolean) : [];
+  const offerUrgent = data.offer_urgent_transfer === "yes";
+
+  // GREETING — short, in the personality
+  let ai_greeting;
+  if (data.personality === "professional") {
+    ai_greeting = `Good day, thank you for calling ${businessName}. How may I assist you?`;
+  } else if (data.personality === "direct") {
+    ai_greeting = `Thanks for calling ${businessName}. How can I help?`;
+  } else {
+    ai_greeting = `Hey, thanks for calling ${businessName}! What can I do for you today?`;
+  }
+
+  // PERSONALITY
+  const ai_personality = personalityLabel;
+
+  // TRANSFER BEHAVIOR — full rules paragraph
+  let transferLines = [];
+  transferLines.push(`Business hours: ${hours}.`);
+  if (transferPrimary) transferLines.push(`Primary transfer number: ${transferPrimary}.`);
+  if (transferBackup) transferLines.push(`Backup transfer number: ${transferBackup}.`);
+  transferLines.push(`Only transfer when a caller explicitly asks to speak to a human, OR for confirmed emergencies (see below).`);
+  if (offerUrgent) {
+    transferLines.push(
+      `Urgent call handling: If a caller mentions an emergency, lockout, flooding, urgent access issue, outage, or similar urgent situation, do the following — 1) acknowledge the urgency calmly, 2) ask if they would like to be connected with someone immediately, 3) only transfer if the caller confirms yes. Never transfer automatically without asking.`
+    );
+  } else {
+    transferLines.push(
+      `Urgent calls: Capture the lead in detail (name, callback number, nature of urgency), assure the caller someone will be in touch quickly, and notify the owner via the lead summary. Do NOT transfer.`
+    );
+  }
+  const transfer_behavior = transferLines.join(" ");
+
+  // SERVICES SUMMARY
+  const servicesParts = [];
+  servicesParts.push(`${businessName} is a ${industryLabel.toLowerCase()} business.`);
+  if (services) servicesParts.push(`Services offered: ${services}.`);
+  if (serviceArea) servicesParts.push(`Service area: ${serviceArea}.`);
+  const services_summary = servicesParts.join(" ");
+
+  // FAQ SUMMARY — pricing rule + common prices + common topics + notes
+  const faqParts = [];
+  faqParts.push(`Pricing rule: ${pricingRuleLabel}.`);
+  if (pricingExamples) faqParts.push(`Common prices the AI should know:\n${pricingExamples}`);
+  if (topicsList.length) faqParts.push(`Most common reasons people call: ${topicsList.join(", ")}.`);
+  if (notes) faqParts.push(`Additional notes from the owner: ${notes}`);
+  const faq_summary = faqParts.join("\n\n");
+
+  // FULL VAPI SYSTEM PROMPT
+  const promptLines = [];
+  promptLines.push(`You are the AI receptionist for ${businessName}, a ${industryLabel.toLowerCase()} business.`);
+  promptLines.push("");
+  promptLines.push(`# OPENING`);
+  promptLines.push(`Greeting: "${ai_greeting}"`);
+  promptLines.push("");
+  promptLines.push(`# PERSONALITY`);
+  promptLines.push(ai_personality);
+  promptLines.push("");
+  promptLines.push(`# BUSINESS DETAILS`);
+  if (services) promptLines.push(`Services offered: ${services}`);
+  if (serviceArea) promptLines.push(`Service area: ${serviceArea}`);
+  promptLines.push(`Hours: ${hours}`);
+  promptLines.push("");
+  promptLines.push(`# WHAT TO COLLECT ON EVERY CALL`);
+  promptLines.push(`- Caller's full name`);
+  promptLines.push(`- Best callback number`);
+  promptLines.push(`- What they need (be specific — the service, the issue, or the question)`);
+  promptLines.push(`- Urgency (today, this week, flexible)`);
+  promptLines.push(`- Any address or location info if relevant to the service`);
+  promptLines.push("");
+  promptLines.push(`# PRICING POLICY`);
+  promptLines.push(pricingRuleLabel);
+  if (pricingExamples) {
+    promptLines.push("");
+    promptLines.push(`Known prices you may quote when appropriate:`);
+    promptLines.push(pricingExamples);
+  }
+  promptLines.push("");
+  promptLines.push(`# CALL TRANSFER RULES`);
+  promptLines.push(transfer_behavior);
+  promptLines.push("");
+  if (topicsList.length) {
+    promptLines.push(`# COMMON CALL REASONS`);
+    promptLines.push(`Be ready for callers asking about: ${topicsList.join(", ")}`);
+    promptLines.push("");
+  }
+  if (notes) {
+    promptLines.push(`# IMPORTANT NOTES FROM THE OWNER`);
+    promptLines.push(notes);
+    promptLines.push("");
+  }
+  promptLines.push(`# HARD RULES`);
+  promptLines.push(`- Never make up prices, services, or hours.`);
+  promptLines.push(`- Never promise something the business hasn't said it can do.`);
+  promptLines.push(`- If you don't know an answer, say "Great question — let me have someone follow up with that," capture the info, and move on.`);
+  promptLines.push(`- Stay in character as ${businessName}'s receptionist at all times.`);
+  promptLines.push(`- Keep responses short and conversational. Don't lecture or over-explain.`);
+  promptLines.push(`- Confirm the caller's contact info before ending the call.`);
+
+  const ai_prompt = promptLines.join("\n");
+
+  return {
+    ai_prompt,
+    ai_greeting,
+    ai_personality,
+    transfer_behavior,
+    services_summary,
+    faq_summary,
+  };
 }
 
 // ============================================================
@@ -158,6 +308,10 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   const pricing = PLAN_PRICING[data.plan] || PLAN_PRICING.starter;
   const urgentBool = parseUrgentTransfer(data.offer_urgent_transfer);
 
+  // Generate the AI config — synchronous, no APIs, no waiting
+  const aiConfig = generateAiConfig(data);
+  console.log("[onboarding] 🤖 AI config generated — prompt length:", aiConfig.ai_prompt.length, "chars");
+
   const adminNotes = [
     `Industry: ${data.industry || "—"}`,
     `Forward to: ${data.transfer_primary || "—"}`,
@@ -215,6 +369,12 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
       offer_urgent_transfer: urgentBool,
       payment_amount: pricing.amount,
       payment_provider: "paypal",
+      ai_prompt: aiConfig.ai_prompt,
+      ai_greeting: aiConfig.ai_greeting,
+      ai_personality: aiConfig.ai_personality,
+      transfer_behavior: aiConfig.transfer_behavior,
+      services_summary: aiConfig.services_summary,
+      faq_summary: aiConfig.faq_summary,
     };
     const patchRes = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${existingId}`, {
       method: "PATCH", headers: writeHeaders, body: JSON.stringify(updatePayload),
@@ -251,6 +411,12 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     payment_status: "unpaid",
     payment_provider: "paypal",
     payment_amount: pricing.amount,
+    ai_prompt: aiConfig.ai_prompt,
+    ai_greeting: aiConfig.ai_greeting,
+    ai_personality: aiConfig.ai_personality,
+    transfer_behavior: aiConfig.transfer_behavior,
+    services_summary: aiConfig.services_summary,
+    faq_summary: aiConfig.faq_summary,
   };
   const insertRes = await fetch(`${supabaseUrl}/rest/v1/clients`, {
     method: "POST", headers: writeHeaders, body: JSON.stringify(insertPayload),
@@ -361,7 +527,7 @@ async function safeCustomerEmail(data, finalSlug) {
       return;
     }
     if (!data || !data.notify_email) {
-      console.warn("[onboarding] ⚠️ customer email SKIPPED — notify_email empty/null", { data_keys: data ? Object.keys(data) : null });
+      console.warn("[onboarding] ⚠️ customer email SKIPPED — notify_email empty/null");
       return;
     }
 
@@ -374,78 +540,32 @@ async function safeCustomerEmail(data, finalSlug) {
     const reportFreqShort = reportFreq === "weekly" ? "weekly" : "monthly";
 
     const dashboardBlock = isPro
-      ? `
-        <div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;">
-          <div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your Pro Dashboard</div>
-          <p style="margin:0 0 10px 0;font-size:14px;color:#374151;line-height:1.55;">Bookmark this — your private dashboard URL:</p>
-          <a href="https://aileadintel.com/dashboard/${finalSlug}" style="display:inline-block;font-family:'SF Mono',Menlo,monospace;font-size:13px;color:#ff6a00;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;text-decoration:none;">aileadintel.com/dashboard/${finalSlug}</a>
-        </div>`
+      ? `<div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;"><div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your Pro Dashboard</div><p style="margin:0 0 10px 0;font-size:14px;color:#374151;line-height:1.55;">Bookmark this — your private dashboard URL:</p><a href="https://aileadintel.com/dashboard/${finalSlug}" style="display:inline-block;font-family:'SF Mono',Menlo,monospace;font-size:13px;color:#ff6a00;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;text-decoration:none;">aileadintel.com/dashboard/${finalSlug}</a></div>`
       : "";
 
     const reportsBlock = !isPro
-      ? `
-        <div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;">
-          <div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your ${escapeHtml(reportFreqShort)} lead reports</div>
-          <p style="margin:0 0 6px 0;font-size:14px;color:#111827;line-height:1.55;font-weight:600;">We'll email you ${escapeHtml(reportFreqLabel)}.</p>
-          <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p>
-        </div>`
+      ? `<div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;"><div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your ${escapeHtml(reportFreqShort)} lead reports</div><p style="margin:0 0 6px 0;font-size:14px;color:#111827;line-height:1.55;font-weight:600;">We'll email you ${escapeHtml(reportFreqLabel)}.</p><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p></div>`
       : "";
 
-    console.log("[onboarding] 📧 sending customer email NOW", {
-      to: data.notify_email,
-      from: "AI Lead Intel <hello@aileadintel.com>",
-      subject: `We got your onboarding — ${businessName}`,
-    });
+    console.log("[onboarding] 📧 sending customer email NOW", { to: data.notify_email });
 
     const result = await resend.emails.send({
       from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],
       replyTo: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
-      html: `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f9fafb;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
-    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div>
-        <strong style="font-size:14px;color:#111827;">AI Lead Intel</strong>
-      </div>
-      <h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;letter-spacing:-0.02em;">We got your onboarding ✅</h1>
-      <p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p>
-      <p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>
-
-      ${dashboardBlock}
-      ${reportsBlock}
-
-      <h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 12px 0;letter-spacing:-0.01em;">What happens next</h2>
-      <ol style="margin:0 0 20px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;">
-        <li><strong>Within 24 hours:</strong> Andrew personally builds your AI's voice, tone, services, and transfer rules.</li>
-        <li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li>
-        <li><strong>Test &amp; go live:</strong> Hear your AI work, then mark it live. Payment link sent only after you've heard it work.</li>
-      </ol>
-
-      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin:0 0 20px 0;">
-        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">💳 <strong style="color:#111827;">No payment required yet.</strong> We send you a payment link only after your AI is built and you've confirmed it works.</p>
-      </div>
-
-      <p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email anytime if you have questions — I'll respond fast.</p>
-      <p style="margin:0;font-size:14px;color:#374151;">— Andrew</p>
-    </div>
-    <p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p>
-  </div>
-</body></html>`,
+      html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f9fafb;"><div style="max-width:560px;margin:0 auto;padding:32px 20px;"><div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;"><div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div><strong style="font-size:14px;color:#111827;">AI Lead Intel</strong></div><h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;letter-spacing:-0.02em;">We got your onboarding ✅</h1><p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p><p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>${dashboardBlock}${reportsBlock}<h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 12px 0;letter-spacing:-0.01em;">What happens next</h2><ol style="margin:0 0 20px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;"><li><strong>Within 24 hours:</strong> Andrew personally builds your AI's voice, tone, services, and transfer rules.</li><li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li><li><strong>Test &amp; go live:</strong> Hear your AI work, then mark it live. Payment link sent only after you've heard it work.</li></ol><div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin:0 0 20px 0;"><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">💳 <strong style="color:#111827;">No payment required yet.</strong> We send you a payment link only after your AI is built and you've confirmed it works.</p></div><p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email anytime if you have questions — I'll respond fast.</p><p style="margin:0;font-size:14px;color:#374151;">— Andrew</p></div><p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p></div></body></html>`,
     });
 
     if (result && result.error) {
-      console.error("[onboarding] ❌ customer email FAILED (Resend error):", JSON.stringify(result.error));
+      console.error("[onboarding] ❌ customer email FAILED:", JSON.stringify(result.error));
     } else if (result && result.data && result.data.id) {
       console.log("[onboarding] ✅ customer email SENT — Resend id:", result.data.id, "→", data.notify_email);
     } else {
-      console.log("[onboarding] ✅ customer email send call returned without error →", data.notify_email, "result:", JSON.stringify(result));
+      console.log("[onboarding] ✅ customer email returned no error →", data.notify_email);
     }
   } catch (err) {
-    console.error("[onboarding] ❌ customer email EXCEPTION:", err.message, err.stack);
+    console.error("[onboarding] ❌ customer email EXCEPTION:", err.message);
   }
 }
 
@@ -536,7 +656,7 @@ export default async function handler(req, res) {
       clientResult = await createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey);
     } catch (err) {
       console.error("[onboarding] ❌ FATAL: clients save failed:", err.message);
-      runAllNotificationsSafely(data, finalSlug).catch(() => {});
+      await runAllNotificationsSafely(data, finalSlug);
       return res.status(500).json({
         success: false,
         error: "Could not save your submission. Please email hello@aileadintel.com.",
@@ -544,9 +664,8 @@ export default async function handler(req, res) {
     }
     const clientRow = clientResult.row;
 
-    runAllNotificationsSafely(data, finalSlug).catch((err) => {
-      console.error("[onboarding] ⚠️ notification wrapper:", err.message);
-    });
+    // AWAITED so Vercel doesn't terminate before Resend finishes
+    await runAllNotificationsSafely(data, finalSlug);
 
     const responseBody = {
       success: true,
