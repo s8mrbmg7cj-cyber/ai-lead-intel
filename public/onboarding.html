@@ -367,12 +367,12 @@
         <div class="section-head">
           <div class="section-eyebrow"><span class="step-dot"></span>Step 3 · Activate</div>
           <h2 class="section-title">Your AI assistant is <span class="accent">almost ready</span></h2>
-          <p class="section-sub">Quick review before we kick off setup. Click any section to edit.</p>
+          <p class="section-sub">Submit and you'll be taken to PayPal to start your subscription.</p>
         </div>
         <div class="activation-card">
           <div class="activation-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
           <div class="activation-title">Ready to <span class="accent">launch setup</span></div>
-          <div class="activation-sub">Submit below and you'll be taken to PayPal to start your subscription. After payment, we kick off your AI setup.</div>
+          <div class="activation-sub">Submit below and you'll be taken to PayPal to start your subscription. After payment, your AI setup begins.</div>
         </div>
         <div class="review-list" id="review-content"></div>
       </section>
@@ -395,9 +395,7 @@
   <script>
     'use strict';
 
-    const URGENT_INDUSTRIES = new Set([
-      'self_storage', 'hvac', 'plumbing', 'electrician', 'locksmith', 'roofing'
-    ]);
+    const URGENT_INDUSTRIES = new Set(['self_storage','hvac','plumbing','electrician','locksmith','roofing']);
 
     const EMERGENCY_COPY = {
       plumbing: "If this is a plumbing emergency — active flooding, a burst pipe, or no shut-off — please call 911 or your local emergency line right away. We'll follow up the moment we hear from you.",
@@ -419,14 +417,10 @@
     const EMERGENCY_FALLBACK = "If this is an urgent situation, please contact emergency services right away — we'll follow up with you after.";
 
     function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
-      const params = new URLSearchParams({
-        plan: plan || 'starter',
-        slug: slug || '',
-        business: businessName || '',
-      });
+      const params = new URLSearchParams({ plan: plan || 'starter', slug: slug || '', business: businessName || '' });
       if (freq) params.set('freq', freq);
       if (reportEmail) params.set('report_email', reportEmail);
-      window.location.href = '/onboarding/success?' + params.toString();
+      window.location.assign('/onboarding/success?' + params.toString());
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -494,7 +488,7 @@
     }
     document.querySelectorAll('.float-input, .float-select, .float-textarea').forEach(el => {
       refreshFloatState(el);
-      ['input', 'change', 'blur', 'focus', 'keyup', 'paste'].forEach(evt => {
+      ['input','change','blur','focus','keyup','paste'].forEach(evt => {
         el.addEventListener(evt, () => refreshFloatState(el));
       });
     });
@@ -719,25 +713,11 @@
       const empty = (v) => !v || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && v.length === 0);
       const emptyTag = '<span class="review-row-value empty">Not provided</span>';
       const renderValue = (v) => empty(v) ? emptyTag : `<span class="review-row-value">${escapeHtml(v)}</span>`;
-      const reportsSection = IS_STARTER ? `
-        <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Lead Reports</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
-          <div class="review-data">
-            <div class="review-row full"><div class="review-row-label">Frequency</div>${renderValue(reportFreqLabels[formData.report_frequency] || formData.report_frequency)}</div>
-          </div>
-        </div>` : '';
-      const urgentSection = URGENT_INDUSTRIES.has(formData.industry) ? `
-        <div class="review-row full"><div class="review-row-label">Live transfer for urgent calls</div>${renderValue(urgentTransferLabels[formData.offer_urgent_transfer] || '')}</div>
-      ` : '';
+      const reportsSection = IS_STARTER ? `<div class="review-section"><div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Lead Reports</div><button class="review-edit" type="button" data-edit="2">Edit</button></div><div class="review-data"><div class="review-row full"><div class="review-row-label">Frequency</div>${renderValue(reportFreqLabels[formData.report_frequency] || formData.report_frequency)}</div></div></div>` : '';
+      const urgentSection = URGENT_INDUSTRIES.has(formData.industry) ? `<div class="review-row full"><div class="review-row-label">Live transfer for urgent calls</div>${renderValue(urgentTransferLabels[formData.offer_urgent_transfer] || '')}</div>` : '';
       reviewEl.innerHTML = `
         <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Business</div>
-            <button class="review-edit" type="button" data-edit="1">Edit</button>
-          </div>
+          <div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>Business</div><button class="review-edit" type="button" data-edit="1">Edit</button></div>
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Name</div>${renderValue(formData.business_name)}</div>
             <div class="review-row"><div class="review-row-label">Industry</div>${renderValue(industryLabels[formData.industry] || formData.industry)}</div>
@@ -748,10 +728,7 @@
           </div>
         </div>
         <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>Call Handling</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
+          <div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>Call Handling</div><button class="review-edit" type="button" data-edit="2">Edit</button></div>
           <div class="review-data">
             <div class="review-row"><div class="review-row-label">Primary transfer</div>${renderValue(formData.transfer_primary)}</div>
             <div class="review-row"><div class="review-row-label">Backup transfer</div>${renderValue(formData.transfer_backup)}</div>
@@ -761,35 +738,16 @@
           </div>
         </div>
         <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Topics</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
+          <div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Topics</div><button class="review-edit" type="button" data-edit="2">Edit</button></div>
           <div class="review-data"><div class="review-row full">${formData.topics.length === 0 ? emptyTag : `<div class="review-tags">${formData.topics.map(t => `<span class="review-tag">${escapeHtml(topicLabels[t] || t)}</span>`).join('')}</div>`}</div></div>
         </div>
         <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg></span>Links</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
-          <div class="review-data">
-            <div class="review-row full"><div class="review-row-label">Booking link</div>${renderValue(formData.booking_link)}</div>
-            <div class="review-row full"><div class="review-row-label">Payment link</div>${renderValue(formData.payment_link)}</div>
-          </div>
-        </div>
-        <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>Personality</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
+          <div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>Personality</div><button class="review-edit" type="button" data-edit="2">Edit</button></div>
           <div class="review-data"><div class="review-row full">${renderValue(personalityLabels[formData.personality] || formData.personality)}</div></div>
         </div>
         ${reportsSection}
         <div class="review-section">
-          <div class="review-section-head">
-            <div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Pricing &amp; Notes</div>
-            <button class="review-edit" type="button" data-edit="2">Edit</button>
-          </div>
+          <div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Pricing &amp; Notes</div><button class="review-edit" type="button" data-edit="2">Edit</button></div>
           <div class="review-data">
             <div class="review-row full"><div class="review-row-label">Pricing rule</div>${renderValue(pricingLabels[formData.pricing_rule] || formData.pricing_rule)}</div>
             <div class="review-row full"><div class="review-row-label">Common prices</div>${renderValue(formData.pricing_examples)}</div>
@@ -825,10 +783,7 @@
 
     const industryEl = document.getElementById('industry');
     if (industryEl) {
-      industryEl.addEventListener('change', () => {
-        toggleUrgentTransferField();
-        updateEmergencyPreview();
-      });
+      industryEl.addEventListener('change', () => { toggleUrgentTransferField(); updateEmergencyPreview(); });
     }
     toggleUrgentTransferField();
     updateEmergencyPreview();
@@ -864,10 +819,14 @@
       });
     });
 
+    // ========================================================
+    // SUBMIT HANDLER — PayPal redirect FIRST, no race conditions
+    // ========================================================
     async function submitForm() {
       console.log('[onboarding] 📤 submitForm() entered');
-      if (isSubmitting) return;
+      if (isSubmitting) { console.warn('[onboarding] 🛑 already submitting — blocked'); return; }
       isSubmitting = true;
+
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
       const arrow = document.getElementById('btn-next-arrow');
@@ -875,11 +834,22 @@
       label.innerHTML = '<span class="spinner"></span>';
       if (arrow) arrow.style.display = 'none';
 
+      function reEnable() {
+        isSubmitting = false;
+        btn.disabled = false;
+        label.textContent = 'Submit & continue to PayPal';
+        if (arrow) arrow.style.display = 'block';
+      }
+      function hardFail(userMsg, tech) {
+        console.error('[onboarding] ❌ HARD FAIL:', userMsg, tech || '');
+        showError(userMsg + ' — email hello@aileadintel.com if this continues.');
+        reEnable();
+      }
+
       const clientSlug = slugify(formData.business_name);
       const hpWebsite = document.getElementById('website_url')?.value || '';
       const hpCompany = document.getElementById('company_size_other')?.value || '';
       const hpGotcha = document.getElementById('_gotcha')?.value || '';
-
       const payload = {
         ...formData,
         plan: selectedPlan,
@@ -889,66 +859,63 @@
         company_size_other: hpCompany,
         _gotcha: hpGotcha,
       };
+      console.log('[onboarding] 📤 payload:', { business: payload.business_name, plan: payload.plan, slug: payload.client_slug });
 
-      function reEnable() {
-        isSubmitting = false;
-        btn.disabled = false;
-        label.textContent = 'Submit & continue to PayPal';
-        if (arrow) arrow.style.display = 'block';
-      }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => { console.warn('[onboarding] ⏰ timeout 30s'); controller.abort(); }, 30000);
 
-      let res;
+      let response;
       try {
-        res = await fetch('/api/onboarding-submit', {
+        response = await fetch('/api/onboarding-submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         });
       } catch (err) {
-        console.error('[onboarding] ❌ network error:', err);
-        showError('Network error. Check your connection and try again.');
-        reEnable();
-        return;
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') return hardFail('Request timed out. Please try again.', err);
+        return hardFail('Network error. Check your connection.', err);
+      }
+      clearTimeout(timeoutId);
+
+      console.log('[onboarding] 📥 RAW RESPONSE:', response);
+      console.log('[onboarding] 📥 STATUS:', response.status);
+
+      let rawText;
+      try { rawText = await response.text(); }
+      catch (err) { return hardFail('Could not read server response.', err); }
+      console.log('[onboarding] 📥 RAW TEXT:', rawText);
+
+      let result;
+      try { result = JSON.parse(rawText); }
+      catch (err) { console.error('[onboarding] ❌ JSON PARSE FAILED:', err); return hardFail('Server returned an invalid response.', err); }
+      console.log('[onboarding] 📥 PARSED JSON:', result);
+
+      if (!response.ok || result === null || result.success !== true) {
+        const apiMsg = (result && result.error) || `Submit failed (HTTP ${response.status})`;
+        return hardFail(apiMsg, result);
       }
 
-      let result = null;
-      try { result = await res.json(); }
-      catch (err) { showError('Unexpected server response.'); reEnable(); return; }
-
-      console.log('[onboarding] 📥 result:', result);
-
-      if (!res.ok || result === null || result.success !== true) {
-        const msg = (result && result.error) || `Submit failed (HTTP ${res.status})`;
-        showError(msg + ' — please email hello@aileadintel.com');
-        reEnable();
-        return;
-      }
-
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
 
       const canonicalSlug = result.client_slug || clientSlug;
       const canonicalPlan = result.plan || selectedPlan;
+      const paypalUrl = result.paypal_redirect;
+      console.log('[onboarding] 💳 PAYPAL URL:', paypalUrl);
 
-      // Redirect to PayPal subscription checkout
-      if (result.paypal_redirect && result.paypal_redirect.startsWith('https://')) {
+      if (typeof paypalUrl === 'string' && paypalUrl.startsWith('https://')) {
         label.innerHTML = 'Redirecting to PayPal…';
-        console.log('[onboarding] 💳 redirecting to PayPal:', result.paypal_redirect);
-        await new Promise(resolve => setTimeout(resolve, 600));
-        window.location.href = result.paypal_redirect;
+        console.log('[onboarding] ✅ redirecting to PayPal');
+        await new Promise(r => setTimeout(r, 400));
+        window.location.assign(paypalUrl);
         return;
       }
 
-      // Fallback if PayPal URL missing (env var not set) — don't strand customer
-      console.warn('[onboarding] ⚠️ paypal_redirect missing — falling back to success page');
+      console.warn('[onboarding] ⚠️ paypal_redirect missing — using fallback');
       label.innerHTML = 'Submitted ✓';
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      safeRedirectToSuccess(
-        canonicalSlug,
-        canonicalPlan,
-        formData.business_name || '',
-        result.report_frequency || formData.report_frequency,
-        result.report_email || formData.notify_email
-      );
+      await new Promise(r => setTimeout(r, 1000));
+      safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '', result.report_frequency || formData.report_frequency, result.report_email || formData.notify_email);
     }
 
     document.addEventListener('keydown', (e) => {
