@@ -1,6 +1,6 @@
 // api/onboarding-return.js
-// PayPal sends customers here after a successful subscription.
-// We look up the client and 302 to the success page with all needed URL params.
+// PayPal sends customers here after successful subscription.
+// Looks up client, marks paid, redirects to success page with all params.
 
 export default async function handler(req, res) {
   console.log("[paypal-return] hit:", { query: req.query });
@@ -20,31 +20,22 @@ export default async function handler(req, res) {
     if (customIdFromQuery) {
       try {
         const r = await fetch(`${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(customIdFromQuery)}&select=*&limit=1`, { headers });
-        if (r.ok) {
-          const rows = await r.json().catch(() => []);
-          if (rows && rows[0]) client = rows[0];
-        }
-      } catch (err) { console.warn("[paypal-return] custom_id lookup failed:", err.message); }
+        if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) client = rows[0]; }
+      } catch (e) { console.warn("[paypal-return] custom_id lookup:", e.message); }
     }
 
     if (!client && subscriptionId) {
       try {
         const r = await fetch(`${supabaseUrl}/rest/v1/clients?payment_external_id=eq.${encodeURIComponent(subscriptionId)}&select=*&limit=1`, { headers });
-        if (r.ok) {
-          const rows = await r.json().catch(() => []);
-          if (rows && rows[0]) client = rows[0];
-        }
-      } catch (err) { console.warn("[paypal-return] subscription_id lookup failed:", err.message); }
+        if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) client = rows[0]; }
+      } catch (e) { console.warn("[paypal-return] sub_id lookup:", e.message); }
     }
 
     if (!client) {
       try {
         const r = await fetch(`${supabaseUrl}/rest/v1/clients?payment_status=eq.unpaid&select=*&order=created_at.desc&limit=1`, { headers });
-        if (r.ok) {
-          const rows = await r.json().catch(() => []);
-          if (rows && rows[0]) client = rows[0];
-        }
-      } catch (err) { console.warn("[paypal-return] fallback lookup failed:", err.message); }
+        if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) client = rows[0]; }
+      } catch (e) { console.warn("[paypal-return] fallback lookup:", e.message); }
     }
 
     if (client && subscriptionId) {
@@ -60,8 +51,8 @@ export default async function handler(req, res) {
             status: "active",
           }),
         });
-        console.log("[paypal-return] ✅ marked client paid:", client.client_slug);
-      } catch (err) { console.error("[paypal-return] failed to update client:", err.message); }
+        console.log("[paypal-return] marked client paid:", client.client_slug);
+      } catch (e) { console.error("[paypal-return] update failed:", e.message); }
     }
   }
 
@@ -72,10 +63,10 @@ export default async function handler(req, res) {
   if (client?.report_frequency) params.set("freq", client.report_frequency);
   if (client?.report_email) params.set("report_email", client.report_email);
   if (subscriptionId) params.set("paypal_sub", subscriptionId);
+  params.set("paid", subscriptionId ? "1" : "0");
 
   const redirectUrl = `${baseUrl}/onboarding/success?${params.toString()}`;
-  console.log("[paypal-return] 🟢 302 →", redirectUrl);
-
+  console.log("[paypal-return] 302 →", redirectUrl);
   res.writeHead(302, { Location: redirectUrl });
   res.end();
 }
