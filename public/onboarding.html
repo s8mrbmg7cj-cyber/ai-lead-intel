@@ -854,17 +854,41 @@
       const canonicalSlug = result.client_slug || clientSlug;
       const canonicalPlan = result.plan || selectedPlan;
 
-      label.innerHTML = 'Setup submitted successfully ✓';
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Redirect to PayPal subscription checkout
+if (
+  result.paypal_redirect &&
+  result.paypal_redirect.startsWith('https://')
+) {
+  label.innerHTML = 'Redirecting to PayPal…';
 
-      safeRedirectToSuccess(
-        canonicalSlug,
-        canonicalPlan,
-        formData.business_name || '',
-        result.report_frequency || formData.report_frequency,
-        result.report_email || formData.notify_email
-      );
-    }
+  console.log(
+    '[onboarding] 💳 redirecting to PayPal:',
+    result.paypal_redirect
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 600));
+
+  window.location.href = result.paypal_redirect;
+
+  return;
+}
+
+// Fallback if PayPal URL missing
+console.warn(
+  '[onboarding] ⚠️ paypal_redirect missing — falling back to success page'
+);
+
+label.innerHTML = 'Setup submitted successfully ✓';
+
+await new Promise(resolve => setTimeout(resolve, 1200));
+
+safeRedirectToSuccess(
+  canonicalSlug,
+  canonicalPlan,
+  formData.business_name || '',
+  result.report_frequency || formData.report_frequency,
+  result.report_email || formData.notify_email
+);
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
