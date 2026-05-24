@@ -28,19 +28,17 @@ body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; back
 body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,106,0,0.10), transparent 60%); pointer-events: none; z-index: 0; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
 .topnav { position: relative; z-index: 100; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(8,8,10,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
 .logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
 .logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
 .nav-right { display: flex; align-items: center; gap: 12px; }
-.nav-link { font-size: 13px; color: var(--text-dim); transition: color 0.15s; font-weight: 500; }
-.nav-link:hover { color: var(--text); }
 .support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; }
 .support-pill:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
 .support-pill svg { color: var(--brand); }
-@media (max-width: 720px) { .nav-link { display: none; } .topnav { padding: 12px 16px; } }
+@media (max-width: 720px) { .topnav { padding: 12px 16px; } }
 
-/* ====== GLOBAL STATES ====== */
 .state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
 .state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
 .state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
@@ -75,7 +73,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .checklist-item.done .checklist-meta { color: var(--green); }
 .checklist-item.active .checklist-meta { color: var(--brand); }
 
-/* ====== ACTIVE DASHBOARD ====== */
 .dash { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 32px 28px 80px; display: none; }
 .dash.visible { display: block; }
 .dash-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 26px; gap: 16px; flex-wrap: wrap; }
@@ -98,25 +95,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .stat-value { font-family: 'Geist Mono', monospace; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; }
 .stat.hero-stat .stat-value { font-size: 40px; color: var(--brand); }
 .stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 8px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
-.stat-sub.up { color: var(--green); }
-.dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; }
+.dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-bottom: 20px; }
 .panel { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .panel-title { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
 .panel-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
 .calls-list { display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow-y: auto; }
-.call-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 11px; transition: all 0.15s; cursor: pointer; }
-.call-row:hover { border-color: var(--border-2); background: var(--bg-2); }
-.call-avatar { width: 32px; height: 32px; border-radius: 9px; background: var(--surface-3); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-dim); flex-shrink: 0; }
-.call-body { flex: 1; min-width: 0; }
-.call-num { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: -0.005em; }
-.call-meta { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
-.call-time { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); flex-shrink: 0; letter-spacing: 0.04em; }
-.badge { font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; flex-shrink: 0; border: 1px solid; }
-.badge.hot { color: var(--hot); background: var(--hot-soft); border-color: var(--hot-line); }
-.badge.warm { color: var(--warn); background: var(--warn-soft); border-color: var(--warn-line); }
-.badge.lead { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
-.badge.missed { color: var(--cold); background: var(--cold-soft); border-color: var(--cold-line); }
 .empty-state { padding: 32px 16px; text-align: center; }
 .empty-state-icon { width: 44px; height: 44px; margin: 0 auto 14px; border-radius: 12px; background: var(--surface-input); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
 .empty-state-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
@@ -132,6 +116,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .support-banner-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
 .support-banner-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 .support-banner-desc a { color: var(--brand); font-weight: 500; }
+
+/* AI CONFIG CARDS */
+.ai-section { margin-top: 4px; }
+.ai-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.ai-section-title { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 6px 13px; border-radius: 99px; font-weight: 600; }
+.ai-section-title .ai-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
+.ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 880px) { .ai-grid { grid-template-columns: 1fr; } }
+.ai-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden; transition: all 0.2s; }
+.ai-card:hover { border-color: var(--brand-line); }
+.ai-card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.ai-card-label { display: inline-flex; align-items: center; gap: 7px; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+.ai-card-label svg { color: var(--brand); }
+.ai-card-content { font-size: 13.5px; color: var(--text); line-height: 1.6; letter-spacing: -0.005em; }
+.ai-card-content.italic { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16.5px; color: var(--text-soft); line-height: 1.5; }
+.ai-card-content.mono { font-family: 'Geist Mono', monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-soft); }
+.ai-card-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
+
 @media (max-width: 880px) {
   .dash { padding: 24px 16px 80px; }
   .stats-row { grid-template-columns: 1fr 1fr; }
@@ -152,14 +154,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </nav>
 
-<!-- LOADING STATE -->
 <div class="state-wrap" id="state-loading">
   <div class="state-icon loading"><div class="spinner"></div></div>
   <div class="state-title">Loading dashboard<span class="accent">…</span></div>
   <div class="state-desc">Hang tight — pulling your account details.</div>
 </div>
 
-<!-- BEING PREPARED STATE -->
 <div class="state-wrap" id="state-preparing" style="display:none;">
   <div class="state-icon preparing">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -199,7 +199,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </div>
 
-<!-- NOT FOUND STATE -->
 <div class="state-wrap" id="state-notfound" style="display:none;">
   <div class="state-icon not-found">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -213,11 +212,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </div>
 
-<!-- ACTIVE DASHBOARD -->
 <div class="dash" id="dash">
   <div class="dash-head">
     <div class="dash-head-left">
-      <div class="dash-eyebrow"><span class="live-dot"></span><span id="head-status">Mission Control</span></div>
+      <div class="dash-eyebrow"><span class="live-dot"></span><span>Mission Control</span></div>
       <h1 class="dash-title"><span id="dash-business">Your business</span><span class="accent"> dashboard</span></h1>
     </div>
     <div class="dash-head-right">
@@ -251,7 +249,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title">Recent calls</div>
-        <div class="panel-sub" id="panel-calls-sub">Live</div>
+        <div class="panel-sub">Live</div>
       </div>
       <div class="calls-list" id="calls-list">
         <div class="empty-state">
@@ -266,7 +264,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div class="panel">
       <div class="panel-head">
         <div class="panel-title">Your AI front desk</div>
-        <div class="panel-sub" id="panel-info-sub">Account</div>
+        <div class="panel-sub">Account</div>
       </div>
       <div class="info-list">
         <div class="info-row"><div class="info-label">Business</div><div class="info-value" id="info-business">—</div></div>
@@ -286,28 +284,57 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
     </div>
   </div>
+
+  <!-- AI CONFIG SECTION -->
+  <div class="ai-section" id="ai-section">
+    <div class="ai-section-head">
+      <div class="ai-section-title"><span class="ai-dot"></span>AI Configuration</div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-card featured">
+        <div class="ai-card-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>
+          Greeting
+        </div>
+        <div class="ai-card-content italic" id="ai-greeting"><span class="ai-card-empty">Not yet configured.</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Personality
+        </div>
+        <div class="ai-card-content" id="ai-personality"><span class="ai-card-empty">Not yet configured.</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+          Services summary
+        </div>
+        <div class="ai-card-content" id="ai-services"><span class="ai-card-empty">Not yet configured.</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Transfer rules
+        </div>
+        <div class="ai-card-content" id="ai-transfer"><span class="ai-card-empty">Not yet configured.</span></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 'use strict';
 
-// ===========================================================
-// CONFIG
-// ===========================================================
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 
-// ===========================================================
-// SLUG FROM URL
-// ===========================================================
 function getSlugFromUrl() {
-  // Supports /dashboard/SLUG (via Vercel rewrite) and ?slug=SLUG
   const params = new URLSearchParams(window.location.search);
   const fromQuery = params.get('slug');
   if (fromQuery) return fromQuery.toLowerCase().replace(/[^a-z0-9-]/g, '');
   const path = window.location.pathname.replace(/\/+$/, '');
   const parts = path.split('/').filter(Boolean);
-  // path like /dashboard/SLUG → parts = ['dashboard', 'SLUG']
   if (parts.length >= 2 && parts[parts.length - 2] === 'dashboard') {
     return parts[parts.length - 1].toLowerCase().replace(/[^a-z0-9-]/g, '');
   }
@@ -317,9 +344,6 @@ function getSlugFromUrl() {
   return '';
 }
 
-// ===========================================================
-// STATE TRANSITIONS
-// ===========================================================
 function showState(which) {
   ['state-loading', 'state-preparing', 'state-notfound'].forEach(id => {
     const el = document.getElementById(id);
@@ -329,22 +353,13 @@ function showState(which) {
   if (dash) dash.classList.toggle('visible', which === 'dash');
 }
 
-// ===========================================================
-// CLIENT FETCH
-// ===========================================================
 async function fetchClient(slug) {
   const url = `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`;
   try {
     const res = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
     });
-    if (!res.ok) {
-      console.warn('[dashboard] clients fetch non-OK:', res.status);
-      return null;
-    }
+    if (!res.ok) return null;
     const rows = await res.json().catch(() => []);
     return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
   } catch (err) {
@@ -354,42 +369,25 @@ async function fetchClient(slug) {
 }
 
 async function fetchCalls(clientId) {
-  // Try fetching from a 'calls' table if it exists. Failure is non-fatal.
   const url = `${SUPABASE_URL}/rest/v1/calls?client_id=eq.${encodeURIComponent(clientId)}&select=*&order=created_at.desc&limit=20`;
   try {
     const res = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
     });
     if (!res.ok) return [];
     const rows = await res.json().catch(() => []);
     return Array.isArray(rows) ? rows : [];
-  } catch (err) {
-    return [];
-  }
+  } catch (err) { return []; }
 }
 
-// ===========================================================
-// COMPLETENESS CHECK
-// — Determines if the row has enough to show the real dashboard.
-// — Otherwise we show "being prepared" (NOT "not found").
-// ===========================================================
 function isClientReady(client) {
   if (!client) return false;
-  // The row exists; consider it "ready" if status is anything beyond trial/new and
-  // it's been marked active, OR if there are calls available.
-  // For now, treat any row with active=true AND a status field meaning "live" as ready.
   const liveStatuses = ['active', 'live', 'enabled'];
   const status = (client.status || '').toLowerCase();
   if (client.active === true && liveStatuses.includes(status)) return true;
   return false;
 }
 
-// ===========================================================
-// FORMATTERS
-// ===========================================================
 function formatPhone(num) {
   if (!num) return '—';
   const digits = String(num).replace(/\D/g, '');
@@ -400,8 +398,7 @@ function formatPhone(num) {
 function formatTimeAgo(iso) {
   if (!iso) return '—';
   const then = new Date(iso).getTime();
-  const now = Date.now();
-  const diff = Math.max(0, Math.floor((now - then) / 1000));
+  const diff = Math.max(0, Math.floor((Date.now() - then) / 1000));
   if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
@@ -412,135 +409,111 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// ===========================================================
-// RENDER ACTIVE DASHBOARD
-// ===========================================================
+function renderAiConfig(client) {
+  const setCard = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      el.innerHTML = '<span class="ai-card-empty">Not yet configured.</span>';
+    } else {
+      el.textContent = trimmed;
+    }
+  };
+  setCard('ai-greeting', client.ai_greeting);
+  setCard('ai-personality', client.ai_personality);
+  setCard('ai-services', client.services_summary);
+  setCard('ai-transfer', client.transfer_behavior);
+}
+
+function renderCalls(calls) {
+  const list = document.getElementById('calls-list');
+  if (!list) return;
+  if (!calls || calls.length === 0) return; // keep default empty state
+  list.innerHTML = '';
+  calls.forEach(call => {
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface-input);border:1px solid var(--border);border-radius:11px;';
+    item.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:9px;background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;color:var(--text);">${escapeHtml(formatPhone(call.caller_number))}</div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:2px;">${escapeHtml(call.summary || call.transcript_snippet || 'Call captured')}</div>
+      </div>
+      <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);flex-shrink:0;">${formatTimeAgo(call.created_at)}</div>
+    `;
+    list.appendChild(item);
+  });
+}
+
 function renderDashboard(client, calls) {
-  const businessName = client.business_name || 'Your business';
-  const plan = (client.plan || 'pro').toLowerCase();
+  document.getElementById('dash-business').textContent = client.business_name || 'Your business';
+  document.getElementById('info-business').textContent = client.business_name || '—';
+  document.getElementById('info-email').textContent = client.notify_email || '—';
+
+  const plan = (client.plan || 'pro').toUpperCase();
+  document.getElementById('dash-plan').textContent = plan;
+  document.getElementById('info-plan').textContent = plan === 'PRO' ? 'AI Front Desk Pro' : 'Starter';
+
   const status = (client.status || 'active').toLowerCase();
-  const notifyEmail = client.notify_email || '—';
-  const paymentStatus = (client.payment_status || 'unpaid').toLowerCase();
-
-  document.getElementById('dash-business').textContent = businessName;
-  document.getElementById('info-business').textContent = businessName;
-  document.getElementById('info-plan').textContent = plan === 'pro' ? 'AI Front Desk Pro' : 'Starter';
   document.getElementById('info-status').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-  document.getElementById('info-email').textContent = notifyEmail;
 
-  const paymentLabels = { paid: 'Paid', unpaid: 'Payment pending', pending: 'Payment pending', refunded: 'Refunded' };
-  document.getElementById('info-payment').textContent = paymentLabels[paymentStatus] || 'Payment pending';
-
-  const planPill = document.getElementById('dash-plan');
-  planPill.textContent = plan === 'pro' ? 'PRO' : 'STARTER';
-
-  const livePill = document.getElementById('dash-live');
-  if (status === 'active' || status === 'live') {
-    livePill.innerHTML = '<span class="dot"></span>Live';
-  } else {
-    livePill.innerHTML = '<span class="dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span>' + status;
-  }
+  // Payment status
+  let paymentLabel = 'Unknown';
+  if (client.payment_status === 'paid') paymentLabel = 'Paid ✓';
+  else if (client.payment_pending === true) paymentLabel = 'Payment pending';
+  else if (client.payment_status === 'unpaid') paymentLabel = 'Unpaid';
+  document.getElementById('info-payment').textContent = paymentLabel;
 
   // Stats
-  const totalCalls = calls.length;
-  const leads = calls.filter(c => c.is_lead || (c.outcome && c.outcome.toLowerCase().includes('lead'))).length;
-  const missed = calls.filter(c => c.is_missed || (c.outcome && c.outcome.toLowerCase().includes('missed'))).length;
-  document.getElementById('stat-leads').textContent = leads;
-  document.getElementById('stat-calls').textContent = totalCalls;
-  document.getElementById('stat-missed').textContent = missed;
-  document.getElementById('stat-leads-sub').textContent = leads > 0 ? `+${leads} total` : 'No leads yet';
-  document.getElementById('stat-calls-sub').textContent = totalCalls > 0 ? 'All time' : 'No calls yet';
-  document.getElementById('stat-missed-sub').textContent = missed > 0 ? 'All time' : 'None missed';
+  const leadCalls = (calls || []).filter(c => c.lead_captured === true);
+  const missedCalls = (calls || []).filter(c => c.missed === true);
+  document.getElementById('stat-leads').textContent = leadCalls.length;
+  document.getElementById('stat-calls').textContent = (calls || []).length;
+  document.getElementById('stat-missed').textContent = missedCalls.length;
+  document.getElementById('stat-leads-sub').textContent = leadCalls.length === 0 ? 'No leads yet' : `${leadCalls.length} captured`;
+  document.getElementById('stat-calls-sub').textContent = (calls || []).length === 0 ? 'No calls yet' : 'All time';
 
-  // Recent calls list
-  const list = document.getElementById('calls-list');
-  if (calls.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
-        <div class="empty-state-title">No calls yet</div>
-        <div class="empty-state-desc">Calls will appear here as soon as your AI receptionist starts answering.</div>
-      </div>`;
-  } else {
-    list.innerHTML = calls.map(c => {
-      const callerNum = formatPhone(c.caller_number || c.from_number || c.caller || '');
-      const initials = (callerNum.replace(/\D/g, '').slice(-2)) || '?';
-      const outcome = (c.outcome || (c.is_lead ? 'lead' : 'call')).toLowerCase();
-      let badgeClass = 'lead';
-      let badgeText = 'Lead';
-      if (outcome.includes('missed')) { badgeClass = 'missed'; badgeText = 'Missed'; }
-      else if (outcome.includes('hot')) { badgeClass = 'hot'; badgeText = 'Hot'; }
-      else if (outcome.includes('warm')) { badgeClass = 'warm'; badgeText = 'Warm'; }
-      const meta = c.summary || c.transcript_summary || c.notes || 'No summary yet';
-      return `
-        <div class="call-row">
-          <div class="call-avatar">${escapeHtml(initials)}</div>
-          <div class="call-body">
-            <div class="call-num">${escapeHtml(callerNum)}</div>
-            <div class="call-meta">${escapeHtml(meta).slice(0, 80)}${meta.length > 80 ? '…' : ''}</div>
-          </div>
-          <div class="badge ${badgeClass}">${badgeText}</div>
-          <div class="call-time">${escapeHtml(formatTimeAgo(c.created_at || c.started_at))}</div>
-        </div>
-      `;
-    }).join('');
-  }
+  renderCalls(calls);
+  renderAiConfig(client);
+
+  showState('dash');
 }
 
-// ===========================================================
-// RENDER "BEING PREPARED" with personalized business name
-// ===========================================================
-function renderPreparing(client) {
-  if (client && client.business_name) {
-    document.getElementById('preparing-desc').textContent =
-      `We're building ${client.business_name}'s AI right now. Once it's live and answering calls, this dashboard will fill up with leads, transcripts, and analytics in real time.`;
-  }
-}
-
-// ===========================================================
-// MAIN
-// ===========================================================
-(async function init() {
+async function init() {
   const slug = getSlugFromUrl();
+  if (!slug) { showState('state-notfound'); return; }
 
-  if (!slug || slug.length < 2) {
-    console.warn('[dashboard] no slug in URL');
-    showState('state-notfound');
-    return;
-  }
-
-  console.log('[dashboard] looking up slug:', slug);
+  console.log('[dashboard] loading slug:', slug);
   const client = await fetchClient(slug);
 
   if (!client) {
-    console.warn('[dashboard] no client found for slug:', slug);
+    console.log('[dashboard] no client found for slug');
     showState('state-notfound');
     return;
   }
 
-  // Starter on the dashboard URL — show being-prepared with a Starter twist
-  if ((client.plan || '').toLowerCase() === 'starter') {
-    console.log('[dashboard] starter plan — directing to reports messaging');
-    renderPreparing(client);
-    document.getElementById('preparing-desc').innerHTML =
-      `${client.business_name || 'Your business'} is on the <strong>Starter plan</strong> — you'll receive automated lead reports by email. The full dashboard is a <a href="/#pricing" style="color:var(--brand);border-bottom:1px solid var(--brand-line);">Pro</a> feature.`;
+  if (client.plan === 'starter') {
+    console.log('[dashboard] client is on Starter — reports-only, no dashboard');
+    document.getElementById('preparing-desc').textContent = 'You\'re on the Starter plan, which uses email reports instead of a live dashboard. Check your inbox for your weekly or monthly lead report.';
     showState('state-preparing');
     return;
   }
 
   if (!isClientReady(client)) {
-    console.log('[dashboard] client exists but not yet ready — showing preparing state');
-    renderPreparing(client);
+    console.log('[dashboard] client not yet active — showing preparing state');
     showState('state-preparing');
     return;
   }
 
-  // Client is ready — fetch calls and render dashboard
-  console.log('[dashboard] client ready, fetching calls...');
+  // Client is live → fetch calls and render
   const calls = await fetchCalls(client.id);
   renderDashboard(client, calls);
-  showState('dash');
-})();
+}
+
+init();
 </script>
 </body>
 </html>
