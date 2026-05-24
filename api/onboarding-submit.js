@@ -1,5 +1,8 @@
 // api/onboarding-submit.js
-// Failsafe onboarding handler with services_offered, service_area, offer_urgent_transfer fields.
+// Failsafe onboarding handler.
+// - Only Supabase failures return 500. Emails/ntfy can never crash the request.
+// - createClientRow uses lookup-then-PATCH-or-POST.
+// - Customer confirmation email uses verified domain hello@aileadintel.com with verbose logging.
 
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
@@ -10,6 +13,10 @@ const PLAN_PRICING = {
   starter: { amount: 97.00, label: "Starter — $97/month" },
   pro: { amount: 297.00, label: "AI Front Desk Pro — $297/month" },
 };
+
+// ============================================================
+// HELPERS
+// ============================================================
 
 function escapeHtml(value) {
   return String(value || "")
@@ -85,12 +92,15 @@ async function resolveSlug(data, supabaseUrl, supabaseKey) {
   return final;
 }
 
-// Convert "yes"/"no" string into boolean or null for Supabase
 function parseUrgentTransfer(value) {
   if (value === "yes") return true;
   if (value === "no") return false;
   return null;
 }
+
+// ============================================================
+// SUPABASE — client_onboarding (non-critical)
+// ============================================================
 
 async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
   console.log("[onboarding] 💾 inserting client_onboarding row...");
@@ -138,6 +148,10 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
     return null;
   }
 }
+
+// ============================================================
+// SUPABASE — clients row (CRITICAL: lookup-then-PATCH-or-POST)
+// ============================================================
 
 async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey) {
   const phoneNumber = data.business_phone || null;
@@ -252,6 +266,10 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   return { row, existing: false };
 }
 
+// ============================================================
+// NOTIFICATIONS — fully isolated, never crash the request
+// ============================================================
+
 async function safeNtfy(data) {
   try {
     const body = `New AI Lead Intel onboarding
@@ -288,7 +306,7 @@ async function safeOwnerEmail(data) {
     const urgentDisplay = data.offer_urgent_transfer === "yes" ? "Yes — offer transfer" :
                           data.offer_urgent_transfer === "no" ? "No — capture & notify" : "—";
     const result = await resend.emails.send({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: notifyEmail.split(",").map((e) => e.trim()).filter(Boolean),
       subject: `[${data.plan.toUpperCase()}] New onboarding: ${data.business_name || "New lead"}`,
       html: `
@@ -329,9 +347,23 @@ async function safeOwnerEmail(data) {
 }
 
 async function safeCustomerEmail(data, finalSlug) {
+  console.log("[onboarding] 📧 safeCustomerEmail() ENTERED", {
+    has_notify_email: !!data?.notify_email,
+    notify_email: data?.notify_email,
+    plan: data?.plan,
+    finalSlug,
+  });
+
   try {
     const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey || !data.notify_email) { console.warn("[onboarding] ⚠️ customer email skipped"); return; }
+    if (!resendKey) {
+      console.warn("[onboarding] ⚠️ customer email SKIPPED — RESEND_API_KEY missing");
+      return;
+    }
+    if (!data || !data.notify_email) {
+      console.warn("[onboarding] ⚠️ customer email SKIPPED — notify_email empty/null", { data_keys: data ? Object.keys(data) : null });
+      return;
+    }
 
     const resend = new Resend(resendKey);
     const businessName = data.business_name || "your business";
@@ -359,10 +391,16 @@ async function safeCustomerEmail(data, finalSlug) {
         </div>`
       : "";
 
+    console.log("[onboarding] 📧 sending customer email NOW", {
+      to: data.notify_email,
+      from: "AI Lead Intel <hello@aileadintel.com>",
+      subject: `We got your onboarding — ${businessName}`,
+    });
+
     const result = await resend.emails.send({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],
-      reply_to: "hello@aileadintel.com",
+      replyTo: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
       html: `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
@@ -398,10 +436,16 @@ async function safeCustomerEmail(data, finalSlug) {
   </div>
 </body></html>`,
     });
-    if (result && result.error) console.error("[onboarding] ⚠️ customer email error (non-fatal):", result.error);
-    else console.log("[onboarding] ✅ customer email sent to", data.notify_email);
+
+    if (result && result.error) {
+      console.error("[onboarding] ❌ customer email FAILED (Resend error):", JSON.stringify(result.error));
+    } else if (result && result.data && result.data.id) {
+      console.log("[onboarding] ✅ customer email SENT — Resend id:", result.data.id, "→", data.notify_email);
+    } else {
+      console.log("[onboarding] ✅ customer email send call returned without error →", data.notify_email, "result:", JSON.stringify(result));
+    }
   } catch (err) {
-    console.error("[onboarding] ⚠️ customer email EXCEPTION (non-fatal):", err.message);
+    console.error("[onboarding] ❌ customer email EXCEPTION:", err.message, err.stack);
   }
 }
 
@@ -418,6 +462,10 @@ async function runAllNotificationsSafely(data, finalSlug) {
     console.error("[onboarding] ⚠️ notifications wrapper exception:", err.message);
   }
 }
+
+// ============================================================
+// HANDLER
+// ============================================================
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
