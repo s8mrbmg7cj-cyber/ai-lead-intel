@@ -383,8 +383,14 @@
       });
       if (freq) params.set('freq', freq);
       if (reportEmail) params.set('report_email', reportEmail);
-      window.location.href = '/onboarding/success?' + params.toString();
-    }
+      const starterPaypal = "YOUR_STARTER_LINK";
+const proPaypal = "YOUR_PRO_LINK";
+
+if (plan === "starter") {
+  window.location.href = starterPaypal;
+} else {
+  window.location.href = proPaypal;
+}
 
     const urlParams = new URLSearchParams(window.location.search);
     const selectedPlan = (function () {
