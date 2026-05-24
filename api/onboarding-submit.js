@@ -1,7 +1,11 @@
 // api/onboarding-submit.js
-// Failsafe onboarding handler.
-// - Customer email is now AWAITED so Vercel doesn't terminate before Resend sends.
-// - generateAiConfig() builds Vapi-ready prompt + summary fields and saves them.
+// Production onboarding handler for AI Lead Intel.
+// - Status uses "pending" / "active" / "paused" (no more "trial")
+// - Customer email rewritten to use "our team" / "AI Lead Intel" — no Andrew, no payment block
+// - All notifications isolated with try/catch — they NEVER fail the onboarding
+// - generateAiConfig() builds Vapi-ready prompt + summary fields synchronously
+// - Resilient against email/ntfy failures
+// - Clean logging
 
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
@@ -41,6 +45,9 @@ const TOPIC_LABELS = {
   support: "Customer support",
   other: "Other",
 };
+
+// Valid status values allowed by Supabase constraint
+const VALID_STATUSES = new Set(["pending", "active", "paused"]);
 
 // ============================================================
 // HELPERS
@@ -103,15 +110,15 @@ async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
   let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
   if (!base) base = slugifyBase(data.business_name);
-  console.log("[onboarding] 🔧 base slug:", base);
+  console.log("[onboarding] slug base:", base);
   const taken = await isSlugTaken(base, supabaseUrl, supabaseKey);
   if (!taken) {
-    console.log("[onboarding] 🔧 slug is free:", base);
+    console.log("[onboarding] slug available:", base);
     return base;
   }
   const suffix = Math.random().toString(36).slice(2, 6);
   const final = `${base}-${suffix}`;
-  console.log("[onboarding] 🔧 slug collided, using:", final);
+  console.log("[onboarding] slug collision → using:", final);
   return final;
 }
 
@@ -121,8 +128,16 @@ function parseUrgentTransfer(value) {
   return null;
 }
 
+function safeStatus(value) {
+  // Map any incoming value to a valid status; default to "pending"
+  if (typeof value === "string" && VALID_STATUSES.has(value.toLowerCase())) {
+    return value.toLowerCase();
+  }
+  return "pending";
+}
+
 // ============================================================
-// AI CONFIG GENERATOR — builds Vapi-ready prompt synchronously
+// AI CONFIG GENERATOR — synchronous, builds Vapi-ready prompt
 // ============================================================
 
 function generateAiConfig(data) {
@@ -140,7 +155,7 @@ function generateAiConfig(data) {
   const topicsList = Array.isArray(data.topics) ? data.topics.map(t => TOPIC_LABELS[t] || t).filter(Boolean) : [];
   const offerUrgent = data.offer_urgent_transfer === "yes";
 
-  // GREETING — short, in the personality
+  // GREETING
   let ai_greeting;
   if (data.personality === "professional") {
     ai_greeting = `Good day, thank you for calling ${businessName}. How may I assist you?`;
@@ -153,8 +168,8 @@ function generateAiConfig(data) {
   // PERSONALITY
   const ai_personality = personalityLabel;
 
-  // TRANSFER BEHAVIOR — full rules paragraph
-  let transferLines = [];
+  // TRANSFER BEHAVIOR
+  const transferLines = [];
   transferLines.push(`Business hours: ${hours}.`);
   if (transferPrimary) transferLines.push(`Primary transfer number: ${transferPrimary}.`);
   if (transferBackup) transferLines.push(`Backup transfer number: ${transferBackup}.`);
@@ -177,7 +192,7 @@ function generateAiConfig(data) {
   if (serviceArea) servicesParts.push(`Service area: ${serviceArea}.`);
   const services_summary = servicesParts.join(" ");
 
-  // FAQ SUMMARY — pricing rule + common prices + common topics + notes
+  // FAQ SUMMARY
   const faqParts = [];
   faqParts.push(`Pricing rule: ${pricingRuleLabel}.`);
   if (pricingExamples) faqParts.push(`Common prices the AI should know:\n${pricingExamples}`);
@@ -249,11 +264,11 @@ function generateAiConfig(data) {
 }
 
 // ============================================================
-// SUPABASE — client_onboarding (non-critical)
+// SUPABASE — client_onboarding (non-critical, never crashes flow)
 // ============================================================
 
 async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
-  console.log("[onboarding] 💾 inserting client_onboarding row...");
+  console.log("[onboarding] saving client_onboarding row...");
   try {
     const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
       method: "POST",
@@ -286,21 +301,21 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
     });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      console.error("[onboarding] ❌ client_onboarding INSERT FAILED:", res.status, text);
+      console.error("[onboarding] client_onboarding INSERT failed:", res.status, text);
       return null;
     }
     const rows = await res.json().catch(() => []);
     const id = rows && rows[0] ? rows[0].id : null;
-    console.log("[onboarding] ✅ client_onboarding row created:", id);
+    console.log("[onboarding] client_onboarding row created:", id);
     return id;
   } catch (error) {
-    console.error("[onboarding] ❌ client_onboarding EXCEPTION:", error.message);
+    console.error("[onboarding] client_onboarding EXCEPTION:", error.message);
     return null;
   }
 }
 
 // ============================================================
-// SUPABASE — clients row (CRITICAL: lookup-then-PATCH-or-POST)
+// SUPABASE — clients (CRITICAL: lookup-then-PATCH-or-POST)
 // ============================================================
 
 async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey) {
@@ -308,9 +323,9 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   const pricing = PLAN_PRICING[data.plan] || PLAN_PRICING.starter;
   const urgentBool = parseUrgentTransfer(data.offer_urgent_transfer);
 
-  // Generate the AI config — synchronous, no APIs, no waiting
+  // Generate AI config synchronously
   const aiConfig = generateAiConfig(data);
-  console.log("[onboarding] 🤖 AI config generated — prompt length:", aiConfig.ai_prompt.length, "chars");
+  console.log("[onboarding] AI config generated — prompt length:", aiConfig.ai_prompt.length, "chars");
 
   const adminNotes = [
     `Industry: ${data.industry || "—"}`,
@@ -335,7 +350,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
 
   let existingId = null;
   if (phoneNumber) {
-    console.log("[onboarding] 🔍 Looking up client by phone:", phoneNumber);
+    console.log("[onboarding] looking up client by phone:", phoneNumber);
     try {
       const lookupUrl = `${supabaseUrl}/rest/v1/clients?phone_number=eq.${encodeURIComponent(phoneNumber)}&select=id&limit=1`;
       const lookupRes = await fetch(lookupUrl, { headers: readHeaders });
@@ -343,23 +358,25 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
         const rows = await lookupRes.json().catch(() => []);
         if (Array.isArray(rows) && rows.length > 0 && rows[0].id) {
           existingId = rows[0].id;
-          console.log("[onboarding] ☎️ EXISTING CLIENT FOUND — id:", existingId);
+          console.log("[onboarding] existing client found — id:", existingId);
         } else {
-          console.log("[onboarding] ✅ No existing client with this phone");
+          console.log("[onboarding] no existing client with this phone");
         }
       }
     } catch (err) {
-      console.warn("[onboarding] ⚠️ phone lookup exception:", err.message);
+      console.warn("[onboarding] phone lookup exception:", err.message);
     }
   }
 
+  // Note: status uses safeStatus() to guarantee a valid value (pending/active/paused)
   if (existingId) {
-    console.log("[onboarding] 🔄 UPDATING EXISTING CLIENT — id:", existingId);
+    console.log("[onboarding] UPDATING existing client — id:", existingId);
     const updatePayload = {
       business_name: data.business_name,
       client_slug: finalSlug,
       notify_email: data.notify_email,
       plan: data.plan,
+      status: safeStatus("pending"),
       notes: adminNotes,
       onboarding_id: onboardingId || null,
       report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
@@ -386,18 +403,18 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     const rows = await patchRes.json().catch(() => []);
     const row = rows && rows[0] ? rows[0] : null;
     if (!row) throw new Error("Client update returned no row");
-    console.log("[onboarding] ✅ UPDATE SUCCESS — id:", row.id);
+    console.log("[onboarding] UPDATE success — id:", row.id);
     return { row, existing: true };
   }
 
-  console.log("[onboarding] 🆕 CREATING NEW CLIENT — slug:", finalSlug, "plan:", data.plan);
+  console.log("[onboarding] CREATING new client — slug:", finalSlug, "plan:", data.plan);
   const insertPayload = {
     business_name: data.business_name,
     client_slug: finalSlug,
     notify_email: data.notify_email,
     phone_number: phoneNumber,
     plan: data.plan,
-    status: "trial",
+    status: safeStatus("pending"),
     active: true,
     notes: adminNotes,
     onboarding_id: onboardingId || null,
@@ -428,7 +445,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   const rows = await insertRes.json().catch(() => []);
   const row = rows && rows[0] ? rows[0] : null;
   if (!row) throw new Error("Client insert returned no row");
-  console.log("[onboarding] ✅ INSERT SUCCESS — id:", row.id);
+  console.log("[onboarding] INSERT success — id:", row.id);
   return { row, existing: false };
 }
 
@@ -456,10 +473,10 @@ Submitted: ${new Date().toLocaleString("en-US", { timeZone: "America/Denver" })}
       },
       body,
     });
-    if (!r.ok) console.warn("[onboarding] ⚠️ ntfy non-OK:", r.status);
-    else console.log("[onboarding] ✅ ntfy sent");
+    if (!r.ok) console.warn("[onboarding] ntfy non-OK:", r.status);
+    else console.log("[onboarding] ntfy sent");
   } catch (err) {
-    console.error("[onboarding] ⚠️ ntfy error (non-fatal):", err.message);
+    console.error("[onboarding] ntfy error (non-fatal):", err.message);
   }
 }
 
@@ -467,7 +484,7 @@ async function safeOwnerEmail(data) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
     const notifyEmail = process.env.NOTIFY_EMAIL;
-    if (!resendKey || !notifyEmail) { console.warn("[onboarding] ⚠️ owner email skipped"); return; }
+    if (!resendKey || !notifyEmail) { console.warn("[onboarding] owner email skipped — env missing"); return; }
     const resend = new Resend(resendKey);
     const urgentDisplay = data.offer_urgent_transfer === "yes" ? "Yes — offer transfer" :
                           data.offer_urgent_transfer === "no" ? "No — capture & notify" : "—";
@@ -505,17 +522,16 @@ async function safeOwnerEmail(data) {
         </div>
       `,
     });
-    if (result && result.error) console.error("[onboarding] ⚠️ owner email error (non-fatal):", result.error);
-    else console.log("[onboarding] ✅ owner email sent");
+    if (result && result.error) console.error("[onboarding] owner email error (non-fatal):", result.error);
+    else console.log("[onboarding] owner email sent");
   } catch (err) {
-    console.error("[onboarding] ⚠️ owner email EXCEPTION (non-fatal):", err.message);
+    console.error("[onboarding] owner email EXCEPTION (non-fatal):", err.message);
   }
 }
 
 async function safeCustomerEmail(data, finalSlug) {
-  console.log("[onboarding] 📧 safeCustomerEmail() ENTERED", {
+  console.log("[onboarding] safeCustomerEmail entered", {
     has_notify_email: !!data?.notify_email,
-    notify_email: data?.notify_email,
     plan: data?.plan,
     finalSlug,
   });
@@ -523,11 +539,11 @@ async function safeCustomerEmail(data, finalSlug) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
     if (!resendKey) {
-      console.warn("[onboarding] ⚠️ customer email SKIPPED — RESEND_API_KEY missing");
+      console.warn("[onboarding] customer email skipped — RESEND_API_KEY missing");
       return;
     }
     if (!data || !data.notify_email) {
-      console.warn("[onboarding] ⚠️ customer email SKIPPED — notify_email empty/null");
+      console.warn("[onboarding] customer email skipped — notify_email empty");
       return;
     }
 
@@ -547,39 +563,39 @@ async function safeCustomerEmail(data, finalSlug) {
       ? `<div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;"><div style="font-family:'SF Mono',Menlo,monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your ${escapeHtml(reportFreqShort)} lead reports</div><p style="margin:0 0 6px 0;font-size:14px;color:#111827;line-height:1.55;font-weight:600;">We'll email you ${escapeHtml(reportFreqLabel)}.</p><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">Each report includes every lead captured, missed call, callback request, and booking — sent to <strong style="color:#374151;">${escapeHtml(reportEmail)}</strong>.</p></div>`
       : "";
 
-    console.log("[onboarding] 📧 sending customer email NOW", { to: data.notify_email });
+    console.log("[onboarding] sending customer email now →", data.notify_email);
 
     const result = await resend.emails.send({
       from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],
       replyTo: "hello@aileadintel.com",
       subject: `We got your onboarding — ${businessName}`,
-      html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f9fafb;"><div style="max-width:560px;margin:0 auto;padding:32px 20px;"><div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;"><div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div><strong style="font-size:14px;color:#111827;">AI Lead Intel</strong></div><h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;letter-spacing:-0.02em;">We got your onboarding ✅</h1><p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p><p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>${dashboardBlock}${reportsBlock}<h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 12px 0;letter-spacing:-0.01em;">What happens next</h2><ol style="margin:0 0 20px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;"><li><strong>Within 24 hours:</strong> Andrew personally builds your AI's voice, tone, services, and transfer rules.</li><li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li><li><strong>Test &amp; go live:</strong> Hear your AI work, then mark it live. Payment link sent only after you've heard it work.</li></ol><div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin:0 0 20px 0;"><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;">💳 <strong style="color:#111827;">No payment required yet.</strong> We send you a payment link only after your AI is built and you've confirmed it works.</p></div><p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email anytime if you have questions — I'll respond fast.</p><p style="margin:0;font-size:14px;color:#374151;">— Andrew</p></div><p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p></div></body></html>`,
+      html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f9fafb;"><div style="max-width:560px;margin:0 auto;padding:32px 20px;"><div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:36px 32px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;"><div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6a00,#ff9a00);"></div><strong style="font-size:14px;color:#111827;">AI Lead Intel</strong></div><h1 style="font-size:22px;font-weight:600;color:#111827;margin:0 0 14px 0;line-height:1.25;letter-spacing:-0.02em;">We got your onboarding ✅</h1><p style="margin:0 0 16px 0;font-size:15px;color:#374151;line-height:1.55;">Hey ${escapeHtml(businessName)},</p><p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.55;">Thanks for signing up for the <strong>${isPro ? "AI Front Desk Pro" : "Starter"}</strong> plan. We've got everything we need to start building your AI receptionist.</p>${dashboardBlock}${reportsBlock}<h2 style="font-size:16px;font-weight:600;color:#111827;margin:24px 0 12px 0;letter-spacing:-0.01em;">What happens next</h2><ol style="margin:0 0 20px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.7;"><li><strong>Within 24 hours:</strong> Our team builds your AI's voice, tone, services, and transfer rules.</li><li><strong>Setup email:</strong> You'll get a one-click guide to forward your business calls to your AI (~2 minutes).</li><li><strong>Test &amp; go live:</strong> Hear your AI work, then mark it live.</li></ol><p style="margin:18px 0 6px 0;font-size:14px;color:#374151;">Reply to this email anytime if you have questions — our team responds fast.</p><p style="margin:0;font-size:14px;color:#374151;">— AI Lead Intel</p></div><p style="text-align:center;margin:18px 0 0 0;font-size:11px;color:#9ca3af;">AI Lead Intel · Apex Growth Investments LLC</p></div></body></html>`,
     });
 
     if (result && result.error) {
-      console.error("[onboarding] ❌ customer email FAILED:", JSON.stringify(result.error));
+      console.error("[onboarding] customer email FAILED (non-fatal):", JSON.stringify(result.error));
     } else if (result && result.data && result.data.id) {
-      console.log("[onboarding] ✅ customer email SENT — Resend id:", result.data.id, "→", data.notify_email);
+      console.log("[onboarding] customer email SENT — Resend id:", result.data.id);
     } else {
-      console.log("[onboarding] ✅ customer email returned no error →", data.notify_email);
+      console.log("[onboarding] customer email returned without error");
     }
   } catch (err) {
-    console.error("[onboarding] ❌ customer email EXCEPTION:", err.message);
+    console.error("[onboarding] customer email EXCEPTION (non-fatal):", err.message);
   }
 }
 
 async function runAllNotificationsSafely(data, finalSlug) {
   try {
-    console.log("[onboarding] 📨 starting notifications...");
+    console.log("[onboarding] starting notifications...");
     await Promise.allSettled([
       safeNtfy(data),
       safeOwnerEmail(data),
       safeCustomerEmail(data, finalSlug),
     ]);
-    console.log("[onboarding] 📨 notifications complete");
+    console.log("[onboarding] notifications complete");
   } catch (err) {
-    console.error("[onboarding] ⚠️ notifications wrapper exception:", err.message);
+    console.error("[onboarding] notifications wrapper exception (non-fatal):", err.message);
   }
 }
 
@@ -604,11 +620,11 @@ export default async function handler(req, res) {
     const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60);
     if (!limit.ok) {
       res.setHeader("Retry-After", String(limit.retryAfter));
-      console.warn(`[onboarding] 🚫 RATE LIMITED ip=${ip}`);
+      console.warn(`[onboarding] rate limited ip=${ip}`);
       return res.status(429).json({ success: false, error: "Too many submissions. Try again later." });
     }
   } catch (err) {
-    console.error("[onboarding] ⚠️ rate-limit subsystem error:", err.message);
+    console.error("[onboarding] rate-limit subsystem error:", err.message);
   }
 
   let body = req.body || {};
@@ -617,17 +633,16 @@ export default async function handler(req, res) {
   }
 
   if (body.website_url || body.company_size_other || body._gotcha) {
-    console.warn(`[onboarding] 🍯 HONEYPOT TRIGGERED ip=${ip}`);
+    console.warn(`[onboarding] honeypot triggered ip=${ip}`);
     return res.status(200).json({ success: true });
   }
 
   try {
     const data = normalizeData(body);
 
-    console.log("[onboarding] 📥 RECEIVED PAYLOAD:", {
+    console.log("[onboarding] received payload:", {
       ip, business: data.business_name, plan: data.plan,
-      slug_from_form: data.client_slug_from_form, email: data.notify_email,
-      phone: data.business_phone, report_frequency: data.report_frequency,
+      email: data.notify_email, phone: data.business_phone,
       services_offered: data.services_offered, service_area: data.service_area,
       offer_urgent_transfer: data.offer_urgent_transfer,
     });
@@ -642,12 +657,12 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
     if (!supabaseUrl || !supabaseKey) {
-      console.error("[onboarding] ❌ Supabase env vars missing");
+      console.error("[onboarding] Supabase env vars missing");
       return res.status(500).json({ success: false, error: "Server misconfigured" });
     }
 
     const finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
-    console.log("[onboarding] 🔧 FINAL SLUG:", finalSlug);
+    console.log("[onboarding] FINAL SLUG:", finalSlug);
 
     const onboardingId = await saveOnboardingToSupabase(data, supabaseUrl, supabaseKey);
 
@@ -655,7 +670,8 @@ export default async function handler(req, res) {
     try {
       clientResult = await createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey);
     } catch (err) {
-      console.error("[onboarding] ❌ FATAL: clients save failed:", err.message);
+      console.error("[onboarding] FATAL: clients save failed:", err.message);
+      // Still try notifications so owner gets alerted
       await runAllNotificationsSafely(data, finalSlug);
       return res.status(500).json({
         success: false,
@@ -664,8 +680,13 @@ export default async function handler(req, res) {
     }
     const clientRow = clientResult.row;
 
-    // AWAITED so Vercel doesn't terminate before Resend finishes
-    await runAllNotificationsSafely(data, finalSlug);
+    // AWAITED — guarantees Vercel doesn't terminate before Resend completes
+    // Wrapped to GUARANTEE no email failure can ever bubble up and break onboarding
+    try {
+      await runAllNotificationsSafely(data, finalSlug);
+    } catch (notifyErr) {
+      console.error("[onboarding] notifications top-level exception (swallowed):", notifyErr.message);
+    }
 
     const responseBody = {
       success: true,
@@ -675,11 +696,11 @@ export default async function handler(req, res) {
       report_frequency: clientRow.report_frequency || null,
       report_email: clientRow.report_email || null,
     };
-    console.log("[onboarding] ✅ FINAL RESPONSE:", responseBody);
+    console.log("[onboarding] FINAL RESPONSE:", responseBody);
     return res.status(200).json(responseBody);
 
   } catch (error) {
-    console.error("[onboarding] ❌ UNHANDLED EXCEPTION:", error.message, error.stack);
+    console.error("[onboarding] UNHANDLED EXCEPTION:", error.message, error.stack);
     return res.status(500).json({
       success: false,
       error: "Unexpected server error. Please email hello@aileadintel.com.",
