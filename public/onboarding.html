@@ -93,8 +93,25 @@
     .float-select option { background: var(--surface-2); color: var(--text); }
     .float-input:hover, .float-select:hover, .float-textarea:hover { border-color: var(--border-3); }
     .float-input:focus, .float-select:focus, .float-textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-tint); background: var(--bg-2); }
-    .float-label { position: absolute; left: 16px; top: 18px; font-size: 14px; color: var(--text-faint); pointer-events: none; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); font-weight: 500; letter-spacing: -0.005em; background: transparent; }
-    .float-input:focus ~ .float-label, .float-input.has-value ~ .float-label, .float-select:focus ~ .float-label, .float-select.has-value ~ .float-label, .float-textarea:focus ~ .float-label, .float-textarea.has-value ~ .float-label { top: 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+    .float-label { position: absolute; left: 16px; top: 18px; font-size: 14px; color: var(--text-faint); pointer-events: none; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); font-weight: 500; letter-spacing: -0.005em; background: transparent; max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .float-input:focus ~ .float-label,
+    .float-input.has-value ~ .float-label,
+    .float-input:not(:placeholder-shown) ~ .float-label,
+    .float-input:-webkit-autofill ~ .float-label,
+    .float-select:focus ~ .float-label,
+    .float-select.has-value ~ .float-label,
+    .float-textarea:focus ~ .float-label,
+    .float-textarea.has-value ~ .float-label,
+    .float-textarea:not(:placeholder-shown) ~ .float-label { top: 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+    .float-input:-webkit-autofill,
+    .float-input:-webkit-autofill:hover,
+    .float-input:-webkit-autofill:focus,
+    .float-textarea:-webkit-autofill {
+      -webkit-text-fill-color: var(--text) !important;
+      -webkit-box-shadow: 0 0 0 1000px var(--surface-input) inset !important;
+      caret-color: var(--text);
+      transition: background-color 9999s ease-in-out 0s;
+    }
     .float-label .opt { color: var(--text-muted); font-weight: 500; margin-left: 4px; }
     .field-hint { font-size: 12px; color: var(--text-faint); margin-top: 7px; padding-left: 4px; line-height: 1.5; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -103,6 +120,11 @@
     .ai-preview-content { flex: 1; min-width: 0; }
     .ai-preview-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--brand); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; margin-bottom: 4px; }
     .ai-preview-text { font-size: 13.5px; color: var(--text); line-height: 1.55; font-style: italic; font-family: 'Instrument Serif', serif; }
+    .emergency-preview { margin-top: 12px; padding: 14px 16px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 12px; display: flex; gap: 12px; align-items: flex-start; }
+    .emergency-preview-icon { width: 28px; height: 28px; border-radius: 8px; background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.25); color: var(--error); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .emergency-preview-content { flex: 1; min-width: 0; }
+    .emergency-preview-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; margin-bottom: 4px; }
+    .emergency-preview-text { font-size: 13px; color: var(--text-soft); line-height: 1.55; }
     .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .check-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 12px; cursor: pointer; transition: all 0.18s; user-select: none; -webkit-tap-highlight-color: transparent; }
     .check-card:hover { border-color: var(--border-3); background: var(--surface-3); }
@@ -269,6 +291,10 @@
           <div class="ai-preview-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
           <div class="ai-preview-content"><div class="ai-preview-label">Your AI will say</div><div class="ai-preview-text" id="ai-preview-text">"Thanks for calling. How can I help you today?"</div></div>
         </div>
+        <div class="emergency-preview">
+          <div class="emergency-preview-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div class="emergency-preview-content"><div class="emergency-preview-label">For emergencies, the AI will say</div><div class="emergency-preview-text" id="emergency-preview-text">If this is an urgent situation, please contact emergency services right away — we'll follow up with you after.</div></div>
+        </div>
       </section>
       <section class="section" data-section="2">
         <div class="section-head">
@@ -346,7 +372,7 @@
         <div class="activation-card">
           <div class="activation-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
           <div class="activation-title">Ready to <span class="accent">launch setup</span></div>
-          <div class="activation-sub">Submit below and we'll review your details, set up your AI, and have it answering calls within 5–7 business days.</div>
+          <div class="activation-sub">Submit below and you'll be taken to PayPal to start your subscription. After payment, we kick off your AI setup.</div>
         </div>
         <div class="review-list" id="review-content"></div>
       </section>
@@ -373,8 +399,26 @@
       'self_storage', 'hvac', 'plumbing', 'electrician', 'locksmith', 'roofing'
     ]);
 
+    const EMERGENCY_COPY = {
+      plumbing: "If this is a plumbing emergency — active flooding, a burst pipe, or no shut-off — please call 911 or your local emergency line right away. We'll follow up the moment we hear from you.",
+      hvac: "If you're without heat or AC in extreme weather, or smell gas, please contact 911 or your gas company immediately. We'll be in touch as soon as we receive your message.",
+      electrician: "If you smell smoke, see sparks, or have an active electrical hazard, please call 911 first. We'll respond as quickly as possible after.",
+      self_storage: "If you've been locked out, locked in, or have an after-hours security concern, please call local non-emergency services. We'll get back to you as soon as we can.",
+      locksmith: "If you're locked in somewhere unsafe or in immediate danger, please call 911 first. For lockouts, leave us a message and we'll respond right away.",
+      roofing: "If you have an active leak, structural damage, or a downed line, please contact 911 or your insurance company first. We'll follow up shortly after.",
+      pest_control: "If you've encountered a venomous animal or a serious health hazard, please contact local animal control or 911 first. We'll respond as soon as possible.",
+      auto_repair: "If your vehicle is unsafe to drive or you're stranded, please contact roadside assistance or 911 right away. We'll be in touch shortly.",
+      dental: "If you're experiencing severe bleeding, swelling, or trauma, please go to your nearest emergency room. We'll follow up as soon as we can.",
+      real_estate: "If this is a safety or security emergency at one of our properties, please call 911 first. We'll respond as soon as possible after.",
+      cleaning: "If there's a serious safety concern at the property, please contact 911 or building management first. We'll follow up shortly.",
+      salon: "If you're experiencing a serious allergic reaction or injury, please contact 911 right away. We'll be in touch as soon as we receive your message.",
+      auto_detailing: "If there's a serious safety concern, please contact 911 first. We'll follow up shortly.",
+      landscaping: "If there's an immediate hazard — downed power line, gas leak, injury — please contact 911 first. We'll follow up as soon as we can.",
+      other: "If this is an urgent or unsafe situation, please contact emergency services right away. We'll follow up as soon as possible.",
+    };
+    const EMERGENCY_FALLBACK = "If this is an urgent situation, please contact emergency services right away — we'll follow up with you after.";
+
     function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
-      console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
       const params = new URLSearchParams({
         plan: plan || 'starter',
         slug: slug || '',
@@ -434,21 +478,31 @@
           newPos = i + 1;
         }
         try { input.setSelectionRange(newPos, newPos); } catch (_) {}
+        refreshFloatState(input);
       });
-      input.addEventListener('blur', () => { input.value = formatPhoneValue(input.value); });
+      input.addEventListener('blur', () => { input.value = formatPhoneValue(input.value); refreshFloatState(input); });
     }
     document.querySelectorAll('.phone-input').forEach(attachPhoneFormatter);
+
     function refreshFloatState(el) {
       if (!el) return;
-      if (el.value && el.value.trim() !== '') el.classList.add('has-value');
-      else el.classList.remove('has-value');
+      const hasValue = el.value !== null && el.value !== undefined && String(el.value).trim() !== '';
+      el.classList.toggle('has-value', hasValue);
+    }
+    function refreshAllFloatStates() {
+      document.querySelectorAll('.float-input, .float-select, .float-textarea').forEach(refreshFloatState);
     }
     document.querySelectorAll('.float-input, .float-select, .float-textarea').forEach(el => {
       refreshFloatState(el);
-      el.addEventListener('input', () => refreshFloatState(el));
-      el.addEventListener('change', () => refreshFloatState(el));
-      el.addEventListener('blur', () => refreshFloatState(el));
+      ['input', 'change', 'blur', 'focus', 'keyup', 'paste'].forEach(evt => {
+        el.addEventListener(evt, () => refreshFloatState(el));
+      });
     });
+    setTimeout(refreshAllFloatStates, 100);
+    setTimeout(refreshAllFloatStates, 600);
+    setTimeout(refreshAllFloatStates, 1500);
+    window.addEventListener('pageshow', refreshAllFloatStates);
+    window.addEventListener('focus', refreshAllFloatStates);
 
     const TOTAL = 3;
     let currentSection = 1;
@@ -498,6 +552,7 @@
         if (card) { card.classList.add('selected'); const r = card.querySelector('input'); if (r) r.checked = true; }
       }
       updateAIPreview();
+      updateEmergencyPreview();
     }
 
     function toggleUrgentTransferField() {
@@ -540,11 +595,29 @@
         line.classList.toggle('done', completedSections.has(after));
       });
     }
-    function updateAIPreview() {
-      const name = (formData.business_name || '').trim() || 'your business';
-      const previewEl = document.getElementById('ai-preview-text');
-      if (previewEl) previewEl.textContent = `"Thanks for calling ${name}. How can I help you today?"`;
+
+    function sanitizeBusinessName(raw) {
+      if (!raw) return '';
+      return String(raw).replace(/[<>"]/g, '').trim().slice(0, 80);
     }
+    function updateAIPreview() {
+      const nameEl = document.getElementById('business_name');
+      const rawName = nameEl ? nameEl.value : (formData.business_name || '');
+      const name = sanitizeBusinessName(rawName);
+      const previewEl = document.getElementById('ai-preview-text');
+      if (!previewEl) return;
+      const next = name ? `"Thanks for calling ${name}. How can I help you today?"` : `"Thanks for calling. How can I help you today?"`;
+      if (previewEl.textContent !== next) previewEl.textContent = next;
+    }
+    function updateEmergencyPreview() {
+      const previewEl = document.getElementById('emergency-preview-text');
+      if (!previewEl) return;
+      const industryEl = document.getElementById('industry');
+      const industry = industryEl ? industryEl.value : (formData.industry || '');
+      const next = EMERGENCY_COPY[industry] || EMERGENCY_FALLBACK;
+      if (previewEl.textContent !== next) previewEl.textContent = next;
+    }
+
     function showError(msg) {
       const el = document.getElementById('form-error');
       document.getElementById('form-error-text').textContent = msg;
@@ -553,13 +626,23 @@
     }
     function hideError() { document.getElementById('form-error').classList.remove('visible'); }
 
+    function getVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return '';
+      const v = el.value;
+      if (v === null || v === undefined) return '';
+      return String(v).trim();
+    }
+
     function validateSection(section) {
       hideError();
+      refreshAllFloatStates();
+
       if (section === 1) {
-        const name = document.getElementById('business_name').value.trim();
-        const industry = document.getElementById('industry').value;
-        const phone = document.getElementById('business_phone').value.trim();
-        const website = document.getElementById('website').value.trim();
+        const name = getVal('business_name');
+        const industry = getVal('industry');
+        const phone = getVal('business_phone');
+        const website = getVal('website');
         if (!name) { showError('Please enter your business name.'); return false; }
         if (!industry) { showError('Please pick your industry.'); return false; }
         if (!isValidPhone(phone)) { showError('Enter a valid 10-digit phone number.'); return false; }
@@ -567,17 +650,17 @@
         formData.industry = industry;
         formData.business_phone = phone;
         formData.website = website;
-        formData.services_offered = document.getElementById('services_offered').value.trim();
-        formData.service_area = document.getElementById('service_area').value.trim();
+        formData.services_offered = getVal('services_offered');
+        formData.service_area = getVal('service_area');
       }
       if (section === 2) {
-        const trans = document.getElementById('transfer_primary').value.trim();
-        const backup = document.getElementById('transfer_backup').value.trim();
-        const email = document.getElementById('notify_email').value.trim();
-        const hours = document.getElementById('transfer_hours').value.trim();
+        const trans = getVal('transfer_primary');
+        const backup = getVal('transfer_backup');
+        const email = getVal('notify_email');
+        const hours = getVal('transfer_hours');
         const topics = Array.from(document.querySelectorAll('#topics-grid .check-card.selected')).map(el => el.dataset.value);
         const personalityCard = document.querySelector('#personality-stack .radio-card.selected');
-        const pricingRule = document.getElementById('pricing_rule').value;
+        const pricingRule = getVal('pricing_rule');
         if (!isValidPhone(trans)) { showError('Enter a valid 10-digit primary transfer number.'); return false; }
         if (backup && !isValidPhone(backup)) { showError('Backup number must be 10 digits or blank.'); return false; }
         if (!email || !email.includes('@')) { showError('Please enter a valid notification email.'); return false; }
@@ -589,14 +672,14 @@
         formData.transfer_backup = backup;
         formData.notify_email = email;
         formData.transfer_hours = hours;
-        formData.offer_urgent_transfer = document.getElementById('offer_urgent_transfer').value;
+        formData.offer_urgent_transfer = getVal('offer_urgent_transfer');
         formData.topics = topics;
-        formData.booking_link = document.getElementById('booking_link').value.trim();
-        formData.payment_link = document.getElementById('payment_link').value.trim();
+        formData.booking_link = getVal('booking_link');
+        formData.payment_link = getVal('payment_link');
         formData.personality = personalityCard.dataset.value;
         formData.pricing_rule = pricingRule;
-        formData.pricing_examples = document.getElementById('pricing_examples').value.trim();
-        formData.notes = document.getElementById('notes').value.trim();
+        formData.pricing_examples = getVal('pricing_examples');
+        formData.notes = getVal('notes');
         if (IS_STARTER) {
           const freqCard = document.querySelector('#report-frequency-stack .radio-card.selected');
           formData.report_frequency = freqCard ? freqCard.dataset.value : 'monthly';
@@ -617,12 +700,13 @@
       const nextLabel = document.getElementById('btn-next-label');
       const nextArrow = document.getElementById('btn-next-arrow');
       backBtn.disabled = section <= 1;
-      if (section === TOTAL) { nextLabel.textContent = 'Submit & schedule activation'; nextBtn.classList.add('btn-launch'); }
+      if (section === TOTAL) { nextLabel.textContent = 'Submit & continue to PayPal'; nextBtn.classList.add('btn-launch'); }
       else { nextLabel.textContent = 'Continue'; nextBtn.classList.remove('btn-launch'); }
       if (nextArrow) nextArrow.style.display = 'block';
       currentSection = section;
       updateProgress();
       hideError();
+      refreshAllFloatStates();
       if (section === 3) buildReview();
       setTimeout(() => {
         const firstField = target?.querySelector('.float-input:not(.has-value), .float-select:not(.has-value), .float-textarea:not(.has-value)');
@@ -740,8 +824,14 @@
     });
 
     const industryEl = document.getElementById('industry');
-    if (industryEl) { industryEl.addEventListener('change', toggleUrgentTransferField); }
+    if (industryEl) {
+      industryEl.addEventListener('change', () => {
+        toggleUrgentTransferField();
+        updateEmergencyPreview();
+      });
+    }
     toggleUrgentTransferField();
+    updateEmergencyPreview();
 
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -800,20 +890,10 @@
         _gotcha: hpGotcha,
       };
 
-      console.log('[onboarding] 📤 sending payload:', {
-        business: payload.business_name,
-        plan: payload.plan,
-        slug: payload.client_slug,
-        report_frequency: payload.report_frequency,
-        services_offered: payload.services_offered,
-        service_area: payload.service_area,
-        urgent: payload.offer_urgent_transfer,
-      });
-
       function reEnable() {
         isSubmitting = false;
         btn.disabled = false;
-        label.textContent = 'Submit & schedule activation';
+        label.textContent = 'Submit & continue to PayPal';
         if (arrow) arrow.style.display = 'block';
       }
 
@@ -832,13 +912,8 @@
       }
 
       let result = null;
-      try {
-        result = await res.json();
-      } catch (err) {
-        showError('Unexpected server response.');
-        reEnable();
-        return;
-      }
+      try { result = await res.json(); }
+      catch (err) { showError('Unexpected server response.'); reEnable(); return; }
 
       console.log('[onboarding] 📥 result:', result);
 
@@ -855,40 +930,26 @@
       const canonicalPlan = result.plan || selectedPlan;
 
       // Redirect to PayPal subscription checkout
-if (
-  result.paypal_redirect &&
-  result.paypal_redirect.startsWith('https://')
-) {
-  label.innerHTML = 'Redirecting to PayPal…';
+      if (result.paypal_redirect && result.paypal_redirect.startsWith('https://')) {
+        label.innerHTML = 'Redirecting to PayPal…';
+        console.log('[onboarding] 💳 redirecting to PayPal:', result.paypal_redirect);
+        await new Promise(resolve => setTimeout(resolve, 600));
+        window.location.href = result.paypal_redirect;
+        return;
+      }
 
-  console.log(
-    '[onboarding] 💳 redirecting to PayPal:',
-    result.paypal_redirect
-  );
-
-  await new Promise(resolve => setTimeout(resolve, 600));
-
-  window.location.href = result.paypal_redirect;
-
-  return;
-}
-
-// Fallback if PayPal URL missing
-console.warn(
-  '[onboarding] ⚠️ paypal_redirect missing — falling back to success page'
-);
-
-label.innerHTML = 'Setup submitted successfully ✓';
-
-await new Promise(resolve => setTimeout(resolve, 1200));
-
-safeRedirectToSuccess(
-  canonicalSlug,
-  canonicalPlan,
-  formData.business_name || '',
-  result.report_frequency || formData.report_frequency,
-  result.report_email || formData.notify_email
-);
+      // Fallback if PayPal URL missing (env var not set) — don't strand customer
+      console.warn('[onboarding] ⚠️ paypal_redirect missing — falling back to success page');
+      label.innerHTML = 'Submitted ✓';
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      safeRedirectToSuccess(
+        canonicalSlug,
+        canonicalPlan,
+        formData.business_name || '',
+        result.report_frequency || formData.report_frequency,
+        result.report_email || formData.notify_email
+      );
+    }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
@@ -897,8 +958,11 @@ safeRedirectToSuccess(
       }
     });
     function escapeHtml(str) { if (!str && str !== 0) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
     updateProgress();
     updateAIPreview();
+    updateEmergencyPreview();
+    refreshAllFloatStates();
     console.log('[onboarding] ✅ initialized');
   </script>
 </body>
