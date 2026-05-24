@@ -688,17 +688,46 @@ export default async function handler(req, res) {
       console.error("[onboarding] notifications top-level exception (swallowed):", notifyErr.message);
     }
 
-    const responseBody = {
-      success: true,
-      existing_client: clientResult.existing,
-      client_slug: clientRow.client_slug,
-      plan: clientRow.plan || data.plan,
-      report_frequency: clientRow.report_frequency || null,
-      report_email: clientRow.report_email || null,
-    };
-    console.log("[onboarding] FINAL RESPONSE:", responseBody);
-    return res.status(200).json(responseBody);
+    // Pick PayPal hosted subscription URL based on plan
+const paypalStarterUrl = process.env.PAYPAL_STARTER_URL || "";
+const paypalProUrl = process.env.PAYPAL_PRO_URL || "";
 
+const paypalUrl =
+  (clientRow.plan || data.plan) === "pro"
+    ? paypalProUrl
+    : paypalStarterUrl;
+
+// Build PayPal redirect URL
+let paypalRedirect = paypalUrl;
+
+if (paypalRedirect) {
+  const sep = paypalRedirect.includes("?") ? "&" : "?";
+
+  paypalRedirect =
+    `${paypalRedirect}${sep}custom_id=` +
+    encodeURIComponent(clientRow.client_slug);
+}
+
+const responseBody = {
+  success: true,
+  existing_client: clientResult.existing,
+  client_slug: clientRow.client_slug,
+  plan: clientRow.plan || data.plan,
+  business_name: clientRow.business_name || data.business_name || "",
+  report_frequency: clientRow.report_frequency || null,
+  report_email: clientRow.report_email || null,
+  paypal_redirect: paypalRedirect,
+};
+
+console.log(
+  "[onboarding] ✅ FINAL RESPONSE:",
+  {
+    ...responseBody,
+    paypal_redirect: paypalRedirect ? "(set)" : "(empty)"
+  }
+);
+
+return res.status(200).json(responseBody);
   } catch (error) {
     console.error("[onboarding] UNHANDLED EXCEPTION:", error.message, error.stack);
     return res.status(500).json({
