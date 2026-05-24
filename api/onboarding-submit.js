@@ -347,6 +347,12 @@ export default async function handler(req, res) {
     const paypalStarterUrl = process.env.PAYPAL_STARTER_URL || "";
     const paypalProUrl = process.env.PAYPAL_PRO_URL || "";
     const paypalUrl = (clientRow.plan || data.plan) === "pro" ? paypalProUrl : paypalStarterUrl;
+    console.log("[paypal debug]");
+console.log("clientRow.plan:", clientRow.plan);
+console.log("data.plan:", data.plan);
+console.log("paypalStarterUrl:", paypalStarterUrl);
+console.log("paypalProUrl:", paypalProUrl);
+console.log("resolved paypalUrl:", paypalUrl);
     let paypalRedirect = paypalUrl;
     if (paypalRedirect) {
       const sep = paypalRedirect.includes("?") ? "&" : "?";
