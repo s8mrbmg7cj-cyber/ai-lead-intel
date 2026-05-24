@@ -369,41 +369,28 @@
   <script>
     'use strict';
 
-    // Industries where urgent transfer question is relevant
     const URGENT_INDUSTRIES = new Set([
       'self_storage', 'hvac', 'plumbing', 'electrician', 'locksmith', 'roofing'
     ]);
 
     function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
-  console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
+      console.log('[onboarding] 🟢 redirecting', { slug, plan, businessName, freq });
+      const params = new URLSearchParams({
+        plan: plan || 'starter',
+        slug: slug || '',
+        business: businessName || '',
+      });
+      if (freq) params.set('freq', freq);
+      if (reportEmail) params.set('report_email', reportEmail);
+      window.location.href = '/onboarding/success?' + params.toString();
+    }
 
-  const params = new URLSearchParams({
-    plan: plan || 'starter',
-    slug: slug || '',
-    business: businessName || '',
-  });
-
-  if (freq) params.set('freq', freq);
-  if (reportEmail) params.set('report_email', reportEmail);
-
-  const starterPaypal = "https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-50G30112J25385417NIJG3XY";
-  const proPaypal = "https://www.paypal.com/ncp/payment/HWF8SSX9FAB98";
-
-  if (plan === "starter") {
-    window.location.href = starterPaypal;
-  } else {
-    window.location.href = proPaypal;
-  }
-
-  return;
-}
     const urlParams = new URLSearchParams(window.location.search);
     const selectedPlan = (function () {
       const raw = (urlParams.get('plan') || '').toLowerCase().trim();
       return raw === 'pro' ? 'pro' : 'starter';
     })();
     const IS_STARTER = selectedPlan === 'starter';
-    console.log('[onboarding] selected plan:', selectedPlan);
 
     (function showPlanBanner() {
       const banner = document.getElementById('plan-banner');
@@ -730,6 +717,7 @@
         btn.addEventListener('click', (e) => { e.preventDefault(); const targetSection = parseInt(btn.dataset.edit, 10); showSection(targetSection); });
       });
     }
+
     document.getElementById('btn-next').addEventListener('click', async (e) => {
       e.preventDefault();
       if (isSubmitting) return;
@@ -751,11 +739,8 @@
       if (el) el.addEventListener('change', (e) => { formData[id] = e.target.value; autoSave(); });
     });
 
-    // Industry change → show/hide urgent transfer
     const industryEl = document.getElementById('industry');
-    if (industryEl) {
-      industryEl.addEventListener('change', toggleUrgentTransferField);
-    }
+    if (industryEl) { industryEl.addEventListener('change', toggleUrgentTransferField); }
     toggleUrgentTransferField();
 
     document.querySelectorAll('#topics-grid .check-card').forEach(card => {
@@ -788,6 +773,7 @@
         autoSave();
       });
     });
+
     async function submitForm() {
       console.log('[onboarding] 📤 submitForm() entered');
       if (isSubmitting) return;
@@ -795,13 +781,15 @@
       const btn = document.getElementById('btn-next');
       const label = document.getElementById('btn-next-label');
       const arrow = document.getElementById('btn-next-arrow');
-      btn.disabled = true; label.innerHTML = '<span class="spinner"></span>';
+      btn.disabled = true;
+      label.innerHTML = '<span class="spinner"></span>';
       if (arrow) arrow.style.display = 'none';
+
       const clientSlug = slugify(formData.business_name);
       const hpWebsite = document.getElementById('website_url')?.value || '';
       const hpCompany = document.getElementById('company_size_other')?.value || '';
       const hpGotcha = document.getElementById('_gotcha')?.value || '';
-      // report_email defaults to notify_email on the backend
+
       const payload = {
         ...formData,
         plan: selectedPlan,
@@ -811,142 +799,73 @@
         company_size_other: hpCompany,
         _gotcha: hpGotcha,
       };
-      console.log('[onboarding] 📤 sending payload:', { business: payload.business_name, plan: payload.plan, slug: payload.client_slug, report_frequency: payload.report_frequency, services_offered: payload.services_offered, service_area: payload.service_area, urgent: payload.offer_urgent_transfer });
-      function reEnable() { isSubmitting = false; btn.disabled = false; label.textContent = 'Submit & schedule activation'; if (arrow) arrow.style.display = 'block'; }
+
+      console.log('[onboarding] 📤 sending payload:', {
+        business: payload.business_name,
+        plan: payload.plan,
+        slug: payload.client_slug,
+        report_frequency: payload.report_frequency,
+        services_offered: payload.services_offered,
+        service_area: payload.service_area,
+        urgent: payload.offer_urgent_transfer,
+      });
+
+      function reEnable() {
+        isSubmitting = false;
+        btn.disabled = false;
+        label.textContent = 'Submit & schedule activation';
+        if (arrow) arrow.style.display = 'block';
+      }
+
       let res;
-      try { res = await fetch('/api/onboarding-submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); }
-      catch (err) { console.error('[onboarding] ❌ network error:', err); showError('Network error. Check your connection and try again.'); reEnable(); return; }
+      try {
+        res = await fetch('/api/onboarding-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        console.error('[onboarding] ❌ network error:', err);
+        showError('Network error. Check your connection and try again.');
+        reEnable();
+        return;
+      }
+
       let result = null;
-      try { result = await res.json(); } catch (err) { showError('Unexpected server response.'); reEnable(); return; }
+      try {
+        result = await res.json();
+      } catch (err) {
+        showError('Unexpected server response.');
+        reEnable();
+        return;
+      }
+
       console.log('[onboarding] 📥 result:', result);
+
       if (!res.ok || result === null || result.success !== true) {
         const msg = (result && result.error) || `Submit failed (HTTP ${res.status})`;
-        showError(msg + ' — please email hello@aileadintel.com'); reEnable(); return;
+        showError(msg + ' — please email hello@aileadintel.com');
+        reEnable();
+        return;
       }
-      try { 
-  localStorage.removeItem(STORAGE_KEY); 
-} catch (e) {}
-label.innerHTML = 'Setup submitted successfully ✓';
-await new Promise(resolve => setTimeout(resolve, 1800));
-const canonicalSlug = result.client_slug || clientSlug;
-const canonicalPlan = result.plan || selectedPlan;
 
-/* PREMIUM SUCCESS STATE */
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
 
-document.querySelector('.card').innerHTML = `
-  <div class="activation-card" style="
-    padding:48px 32px;
-    text-align:center;
-    min-height:520px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  ">
+      const canonicalSlug = result.client_slug || clientSlug;
+      const canonicalPlan = result.plan || selectedPlan;
 
-    <div class="activation-icon">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-      </svg>
-    </div>
+      label.innerHTML = 'Setup submitted successfully ✓';
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
-    <div style="
-      font-family:'Geist Mono', monospace;
-      font-size:11px;
-      letter-spacing:0.18em;
-      text-transform:uppercase;
-      color:var(--brand);
-      margin-bottom:18px;
-      font-weight:600;
-    ">
-      AI SETUP INITIALIZED
-    </div>
+      safeRedirectToSuccess(
+        canonicalSlug,
+        canonicalPlan,
+        formData.business_name || '',
+        result.report_frequency || formData.report_frequency,
+        result.report_email || formData.notify_email
+      );
+    }
 
-    <h1 style="
-      font-size:42px;
-      line-height:1.05;
-      margin-bottom:18px;
-      font-weight:600;
-      letter-spacing:-0.04em;
-    ">
-      Your AI assistant is being prepared
-    </h1>
-
-    <p style="
-      color:var(--text-dim);
-      font-size:16px;
-      line-height:1.7;
-      max-width:580px;
-      margin:0 auto 36px auto;
-    ">
-      Saving your business profile, generating your AI receptionist,
-      and preparing your dashboard access...
-    </p>
-
-    <div style="
-      max-width:520px;
-      margin:0 auto;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      text-align:left;
-    ">
-
-      <div style="
-        background:rgba(255,255,255,0.03);
-        border:1px solid rgba(34,197,94,0.28);
-        border-radius:14px;
-        padding:16px 18px;
-      ">
-        ✅ Business profile saved
-      </div>
-
-      <div style="
-        background:rgba(255,255,255,0.03);
-        border:1px solid rgba(34,197,94,0.28);
-        border-radius:14px;
-        padding:16px 18px;
-      ">
-        ✅ AI voice configured
-      </div>
-
-      <div style="
-        background:rgba(255,106,0,0.06);
-        border:1px solid rgba(255,106,0,0.30);
-        border-radius:14px;
-        padding:16px 18px;
-        box-shadow:0 0 24px rgba(255,106,0,0.08);
-      ">
-        ⏳ Preparing dashboard access
-      </div>
-
-      <div style="
-        background:rgba(255,255,255,0.03);
-        border:1px solid rgba(255,255,255,0.08);
-        border-radius:14px;
-        padding:16px 18px;
-        color:var(--text-dim);
-      ">
-        ⏳ Redirecting to secure activation
-      </div>
-
-    </div>
-
-  </div>
-`;
-
-document.getElementById('progress').style.opacity = '0.45';
-
-document.getElementById('trust-row').style.display = 'none';
-
-await new Promise(resolve => setTimeout(resolve, 2800));
-
-safeRedirectToSuccess(
-  canonicalSlug,
-  canonicalPlan,
-  formData.business_name || '',
-  result.report_frequency || formData.report_frequency,
-  result.report_email || formData.notify_email
-);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         const activeSection = document.querySelector('.section.active');
