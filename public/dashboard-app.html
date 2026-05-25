@@ -504,7 +504,9 @@ function renderDashboard(client, calls) {
   showState('dash');
 }
 
+// AUTH + INIT
 async function init() {
+  // 1. Check session
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     console.log('[dashboard] no session — redirecting to sign-in');
@@ -512,6 +514,7 @@ async function init() {
     return;
   }
 
+  // Show user pill + logout button
   const userPill = document.getElementById('user-pill');
   const userEmail = document.getElementById('user-pill-email');
   const logoutBtn = document.getElementById('logout-btn');
@@ -527,6 +530,7 @@ async function init() {
     });
   }
 
+  // 2. Fetch client row (RLS ensures only their own row)
   const slug = getSlugFromUrl();
   let client = null;
   if (slug) {
@@ -540,6 +544,7 @@ async function init() {
     if (rows && rows[0]) client = rows[0];
   }
   if (!client) {
+    // Fall back to fetching this user's only client
     const { data: rows, error } = await supabase
       .from('clients')
       .select('*')
@@ -548,6 +553,7 @@ async function init() {
     if (error) console.error('[dashboard] owner fetch error:', error);
     if (rows && rows[0]) {
       client = rows[0];
+      // Redirect to the correct URL if slug mismatch
       if (slug && client.client_slug && slug !== client.client_slug) {
         window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug));
         return;
@@ -582,18 +588,14 @@ async function init() {
   renderDashboard(client, calls || []);
 }
 
-init();
-
-let authInitialized = false;
+// Auto-sign-out on session loss
 supabase.auth.onAuthStateChange((event) => {
-  if (!authInitialized) {
-    authInitialized = true;
-    return;
-  }
-  if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+  if (event === 'SIGNED_OUT') {
     window.location.assign('/sign-in');
   }
 });
+
+init();
 </script>
 </body>
 </html>
