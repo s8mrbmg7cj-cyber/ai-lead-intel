@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -21,7 +22,6 @@
   --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
   --warn: #f59e0b; --warn-soft: rgba(245,158,11,0.10); --warn-line: rgba(245,158,11,0.28);
   --hot: #ef4444; --hot-soft: rgba(239,68,68,0.10); --hot-line: rgba(239,68,68,0.28);
-  --cold: #3b82f6; --cold-soft: rgba(59,130,246,0.10); --cold-line: rgba(59,130,246,0.28);
 }
 html, body { height: 100%; }
 body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; }
@@ -32,11 +32,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
 .logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
 .logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; }
-.support-pill:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.user-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; max-width: 220px; }
+.user-pill-email { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.logout-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; cursor: pointer; }
+.logout-btn:hover { background: var(--hot-soft); color: var(--hot); border-color: var(--hot-line); }
+.support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; }
 .support-pill svg { color: var(--brand); }
-@media (max-width: 720px) { .topnav { padding: 12px 16px; } }
+@media (max-width: 720px) { .topnav { padding: 12px 16px; } .user-pill { display: none; } }
 .state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
 .state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
 .state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
@@ -66,7 +69,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @keyframes ringPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,106,0,0.4); } 50% { box-shadow: 0 0 0 6px rgba(255,106,0,0); } }
 .checklist-dot { width: 24px; height: 24px; border-radius: 7px; background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-faint); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .checklist-text { flex: 1; min-width: 0; }
-.checklist-label { font-size: 12.5px; font-weight: 500; color: var(--text); letter-spacing: -0.005em; }
+.checklist-label { font-size: 12.5px; font-weight: 500; color: var(--text); }
 .checklist-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
 .checklist-item.done .checklist-meta { color: var(--green); }
 .checklist-item.active .checklist-meta { color: var(--brand); }
@@ -95,7 +98,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-bottom: 20px; }
 .panel { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.panel-title { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
+.panel-title { font-size: 14px; font-weight: 600; }
 .panel-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
 .calls-list { display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow-y: auto; }
 .empty-state { padding: 32px 16px; text-align: center; }
@@ -106,7 +109,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .info-row { display: flex; flex-direction: column; gap: 3px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .info-row:last-child { border-bottom: none; padding-bottom: 0; }
 .info-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
-.info-value { font-size: 13.5px; color: var(--text); font-weight: 500; word-break: break-word; letter-spacing: -0.005em; }
+.info-value { font-size: 13.5px; color: var(--text); font-weight: 500; word-break: break-word; }
 .support-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 70%), var(--surface-input); border: 1px solid var(--brand-line); border-radius: 12px; margin-top: 14px; }
 .support-banner-icon { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px var(--brand-glow); }
 .support-banner-text { flex: 1; min-width: 0; }
@@ -124,9 +127,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
 .ai-card-label { display: inline-flex; align-items: center; gap: 7px; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
 .ai-card-label svg { color: var(--brand); }
-.ai-card-content { font-size: 13.5px; color: var(--text); line-height: 1.6; letter-spacing: -0.005em; }
+.ai-card-content { font-size: 13.5px; color: var(--text); line-height: 1.6; }
 .ai-card-content.italic { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16.5px; color: var(--text-soft); line-height: 1.5; }
-.ai-card-content.mono { font-family: 'Geist Mono', monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-soft); }
 .ai-card-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
 @media (max-width: 880px) {
   .dash { padding: 24px 16px 80px; }
@@ -135,8 +137,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .stat-value { font-size: 26px; }
   .stat.hero-stat .stat-value { font-size: 32px; }
 }
-
-/* ========== BILLING SECTION ========== */
 .billing-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
 .billing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
 .billing-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -144,7 +144,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .billing-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 4px 14px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
 .billing-title-text { display: flex; flex-direction: column; gap: 2px; }
 .billing-eyebrow { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--brand); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
-.billing-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.billing-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .billing-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; }
 .billing-status-badge .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
 .badge-active { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
@@ -157,12 +157,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .billing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 18px; }
 .billing-item { background: var(--surface-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
 .billing-item-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-.billing-item-value { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+.billing-item-value { font-size: 13.5px; font-weight: 600; color: var(--text); }
 .billing-item-value.dim { color: var(--text-dim); font-weight: 500; font-size: 11.5px; margin-top: 2px; }
 .billing-manage-text { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; margin-bottom: 16px; padding: 11px 14px; background: var(--brand-tint); border: 1px solid var(--brand-line); border-radius: 10px; }
 .billing-manage-text strong { color: var(--text); font-weight: 600; }
 .billing-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.billing-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; letter-spacing: -0.005em; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); border: 1px solid transparent; cursor: pointer; font-family: inherit; text-decoration: none; min-height: 40px; }
+.billing-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.18s; border: 1px solid transparent; cursor: pointer; font-family: inherit; text-decoration: none; min-height: 40px; }
 .billing-btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
 .billing-btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 22px var(--brand-glow); }
 .billing-btn-secondary { background: transparent; color: var(--text-dim); border-color: var(--border-3); }
@@ -174,12 +174,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .billing-inactive-sub { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 .billing-inactive-sub a { color: var(--brand); text-decoration: none; font-weight: 600; }
 .billing-inactive-sub a:hover { text-decoration: underline; }
-.dashboard-disabled .panel,
-.dashboard-disabled .stat,
-.dashboard-disabled .ai-section { opacity: 0.45; pointer-events: none; }
-.dashboard-disabled .billing-card,
-.dashboard-disabled .billing-inactive-banner,
-.dashboard-disabled .dash-head { opacity: 1; pointer-events: auto; }
+.dashboard-disabled .panel, .dashboard-disabled .stat, .dashboard-disabled .ai-section { opacity: 0.45; pointer-events: none; }
+.dashboard-disabled .billing-card, .dashboard-disabled .billing-inactive-banner, .dashboard-disabled .dash-head { opacity: 1; pointer-events: auto; }
 @media (max-width: 640px) {
   .billing-card { padding: 20px 16px; }
   .billing-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -194,6 +190,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 <nav class="topnav">
   <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
   <div class="nav-right">
+    <div class="user-pill" id="user-pill" style="display:none;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="user-pill-email" id="user-pill-email"></span>
+    </div>
+    <button class="logout-btn" id="logout-btn" type="button" style="display:none;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
     <a href="mailto:hello@aileadintel.com" class="support-pill">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
       Support
@@ -203,7 +207,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 <div class="state-wrap" id="state-loading">
   <div class="state-icon loading"><div class="spinner"></div></div>
   <div class="state-title">Loading dashboard<span class="accent">…</span></div>
-  <div class="state-desc">Hang tight — pulling your account details.</div>
+  <div class="state-desc">Verifying your session.</div>
 </div>
 <div class="state-wrap" id="state-preparing" style="display:none;">
   <div class="state-icon preparing">
@@ -211,36 +215,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
   <div class="state-eyebrow preparing"><span class="dot"></span>Setup in progress</div>
   <h1 class="state-title">Your dashboard is <span class="accent">being prepared.</span></h1>
-  <p class="state-desc" id="preparing-desc">We're building your AI right now. Once it's live and answering calls, this dashboard will fill up with leads, transcripts, and analytics in real time.</p>
+  <p class="state-desc" id="preparing-desc">We're building your AI right now. Once it's live, this dashboard will fill up with leads, transcripts, and analytics in real time.</p>
   <div class="checklist">
     <div class="checklist-item done">
       <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="checklist-text">
-        <div class="checklist-label">Onboarding submitted</div>
-        <div class="checklist-meta">Today · Complete</div>
-      </div>
+      <div class="checklist-text"><div class="checklist-label">Onboarding submitted</div><div class="checklist-meta">Today · Complete</div></div>
     </div>
     <div class="checklist-item active">
       <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg></div>
-      <div class="checklist-text">
-        <div class="checklist-label">Building your AI receptionist</div>
-        <div class="checklist-meta">In progress · You'll get setup email soon</div>
-      </div>
+      <div class="checklist-text"><div class="checklist-label">Building your AI receptionist</div><div class="checklist-meta">In progress · You'll get setup email soon</div></div>
     </div>
     <div class="checklist-item">
       <div class="checklist-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="checklist-text">
-        <div class="checklist-label">Test & go live</div>
-        <div class="checklist-meta">5–7 days · Pending</div>
-      </div>
+      <div class="checklist-text"><div class="checklist-label">Test & go live</div><div class="checklist-meta">5–7 days · Pending</div></div>
     </div>
   </div>
   <div class="state-actions" style="margin-top: 28px;">
     <a href="mailto:hello@aileadintel.com" class="btn btn-secondary">Email support</a>
-    <button class="btn btn-primary" onclick="window.location.reload()">
-      Check status
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-    </button>
+    <button class="btn btn-primary" onclick="window.location.reload()">Check status</button>
   </div>
 </div>
 <div class="state-wrap" id="state-notfound" style="display:none;">
@@ -249,7 +241,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
   <div class="state-eyebrow not-found">Not found</div>
   <h1 class="state-title">We couldn't find <span class="accent">that dashboard.</span></h1>
-  <p class="state-desc">The URL might be mistyped, or your account may be on the Starter plan (which uses email reports instead of a dashboard).</p>
+  <p class="state-desc">You may not have access to this dashboard, or the URL might be mistyped.</p>
   <div class="state-actions">
     <a href="/" class="btn btn-secondary">Back to home</a>
     <a href="mailto:hello@aileadintel.com" class="btn btn-primary">Contact support</a>
@@ -266,53 +258,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <div class="dash-pill live" id="dash-live"><span class="dot"></span>Live</div>
     </div>
   </div>
-
-  <!-- BILLING SECTION (added) -->
   <div id="billing-section"></div>
-
   <div class="stats-row">
-    <div class="stat hero-stat">
-      <div class="stat-label">Leads Captured</div>
-      <div class="stat-value" id="stat-leads">0</div>
-      <div class="stat-sub" id="stat-leads-sub">No leads yet</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Calls Answered</div>
-      <div class="stat-value" id="stat-calls">0</div>
-      <div class="stat-sub" id="stat-calls-sub">All time</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Missed Calls</div>
-      <div class="stat-value" id="stat-missed">0</div>
-      <div class="stat-sub" id="stat-missed-sub">All time</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Avg Answer</div>
-      <div class="stat-value" id="stat-answer">—</div>
-      <div class="stat-sub">Time to pickup</div>
-    </div>
+    <div class="stat hero-stat"><div class="stat-label">Leads Captured</div><div class="stat-value" id="stat-leads">0</div><div class="stat-sub" id="stat-leads-sub">No leads yet</div></div>
+    <div class="stat"><div class="stat-label">Calls Answered</div><div class="stat-value" id="stat-calls">0</div><div class="stat-sub" id="stat-calls-sub">All time</div></div>
+    <div class="stat"><div class="stat-label">Missed Calls</div><div class="stat-value" id="stat-missed">0</div><div class="stat-sub" id="stat-missed-sub">All time</div></div>
+    <div class="stat"><div class="stat-label">Avg Answer</div><div class="stat-value" id="stat-answer">—</div><div class="stat-sub">Time to pickup</div></div>
   </div>
   <div class="dash-grid">
     <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">Recent calls</div>
-        <div class="panel-sub">Live</div>
-      </div>
+      <div class="panel-head"><div class="panel-title">Recent calls</div><div class="panel-sub">Live</div></div>
       <div class="calls-list" id="calls-list">
         <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-          </div>
+          <div class="empty-state-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
           <div class="empty-state-title">No calls yet</div>
           <div class="empty-state-desc">Calls will appear here as soon as your AI receptionist starts answering.</div>
         </div>
       </div>
     </div>
     <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">Your AI front desk</div>
-        <div class="panel-sub">Account</div>
-      </div>
+      <div class="panel-head"><div class="panel-title">Your AI front desk</div><div class="panel-sub">Account</div></div>
       <div class="info-list">
         <div class="info-row"><div class="info-label">Business</div><div class="info-value" id="info-business">—</div></div>
         <div class="info-row"><div class="info-label">Plan</div><div class="info-value" id="info-plan">Pro</div></div>
@@ -321,9 +286,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
         <div class="info-row"><div class="info-label">Payment status</div><div class="info-value" id="info-payment">—</div></div>
       </div>
       <div class="support-banner">
-        <div class="support-banner-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </div>
+        <div class="support-banner-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
         <div class="support-banner-text">
           <div class="support-banner-title">Need to change something?</div>
           <div class="support-banner-desc">Hours, voice, transfer rules — email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a> and we'll update it.</div>
@@ -332,36 +295,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
   </div>
   <div class="ai-section" id="ai-section">
-    <div class="ai-section-head">
-      <div class="ai-section-title"><span class="ai-dot"></span>AI Configuration</div>
-    </div>
+    <div class="ai-section-head"><div class="ai-section-title"><span class="ai-dot"></span>AI Configuration</div></div>
     <div class="ai-grid">
       <div class="ai-card featured">
-        <div class="ai-card-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>
-          Greeting
-        </div>
+        <div class="ai-card-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>Greeting</div>
         <div class="ai-card-content italic" id="ai-greeting"><span class="ai-card-empty">Not yet configured.</span></div>
       </div>
       <div class="ai-card">
-        <div class="ai-card-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Personality
-        </div>
+        <div class="ai-card-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Personality</div>
         <div class="ai-card-content" id="ai-personality"><span class="ai-card-empty">Not yet configured.</span></div>
       </div>
       <div class="ai-card">
-        <div class="ai-card-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
-          Services summary
-        </div>
+        <div class="ai-card-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>Services summary</div>
         <div class="ai-card-content" id="ai-services"><span class="ai-card-empty">Not yet configured.</span></div>
       </div>
       <div class="ai-card">
-        <div class="ai-card-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          Transfer rules
-        </div>
+        <div class="ai-card-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Transfer rules</div>
         <div class="ai-card-content" id="ai-transfer"><span class="ai-card-empty">Not yet configured.</span></div>
       </div>
     </div>
@@ -372,6 +321,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const PAYPAL_MANAGE_URL = 'https://www.paypal.com/myaccount/autopay/';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function getSlugFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -382,9 +332,6 @@ function getSlugFromUrl() {
   if (parts.length >= 2 && parts[parts.length - 2] === 'dashboard') {
     return parts[parts.length - 1].toLowerCase().replace(/[^a-z0-9-]/g, '');
   }
-  if (parts[0] === 'dashboard' && parts[1]) {
-    return parts[1].toLowerCase().replace(/[^a-z0-9-]/g, '');
-  }
   return '';
 }
 function showState(which) {
@@ -394,31 +341,6 @@ function showState(which) {
   });
   const dash = document.getElementById('dash');
   if (dash) dash.classList.toggle('visible', which === 'dash');
-}
-async function fetchClient(slug) {
-  const url = `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`;
-  try {
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-    });
-    if (!res.ok) return null;
-    const rows = await res.json().catch(() => []);
-    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-  } catch (err) {
-    console.error('[dashboard] clients fetch exception:', err);
-    return null;
-  }
-}
-async function fetchCalls(clientId) {
-  const url = `${SUPABASE_URL}/rest/v1/calls?client_id=eq.${encodeURIComponent(clientId)}&select=*&order=created_at.desc&limit=20`;
-  try {
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-    });
-    if (!res.ok) return [];
-    const rows = await res.json().catch(() => []);
-    return Array.isArray(rows) ? rows : [];
-  } catch (err) { return []; }
 }
 function isClientReady(client) {
   if (!client) return false;
@@ -484,12 +406,9 @@ function renderCalls(calls) {
     list.appendChild(item);
   });
 }
-
-// ========== BILLING SECTION RENDER ==========
 function renderBilling(client) {
   const container = document.getElementById('billing-section');
   if (!container || !client) return;
-
   const plan = (client.plan || 'starter').toLowerCase();
   const planLabel = plan === 'pro' ? 'AI Front Desk Pro' : 'Starter';
   const planPrice = plan === 'pro' ? '$297 / month' : '$97 / month';
@@ -498,133 +417,66 @@ function renderBilling(client) {
   const isActive = client.active !== false;
   const isCancelled = status === 'cancelled';
   const isPaid = paymentStatus === 'paid';
-
   let subBadge;
-  if (isCancelled) {
-    subBadge = '<span class="billing-status-badge badge-danger"><span class="badge-dot"></span>Cancelled</span>';
-  } else if (isPaid && isActive) {
-    subBadge = '<span class="billing-status-badge badge-active"><span class="badge-dot"></span>Active</span>';
-  } else {
-    subBadge = '<span class="billing-status-badge badge-warning"><span class="badge-dot"></span>Subscription Inactive</span>';
-  }
-
-  const paymentDisplay = {
-    paid: 'Paid',
-    unpaid: 'Unpaid',
-    pending: 'Pending',
-    failed: 'Failed',
-    cancelled: 'Cancelled',
-    refunded: 'Refunded',
-  }[paymentStatus] || 'Unknown';
-
+  if (isCancelled) subBadge = '<span class="billing-status-badge badge-danger"><span class="badge-dot"></span>Cancelled</span>';
+  else if (isPaid && isActive) subBadge = '<span class="billing-status-badge badge-active"><span class="badge-dot"></span>Active</span>';
+  else subBadge = '<span class="billing-status-badge badge-warning"><span class="badge-dot"></span>Subscription Inactive</span>';
+  const paymentDisplay = { paid: 'Paid', unpaid: 'Unpaid', pending: 'Pending', failed: 'Failed', cancelled: 'Cancelled', refunded: 'Refunded' }[paymentStatus] || 'Unknown';
   let nextBillingDisplay = '—';
   if (client.next_billing_date) {
-    try {
-      const d = new Date(client.next_billing_date);
-      if (!isNaN(d.getTime())) {
-        nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      }
-    } catch (_) {}
+    try { const d = new Date(client.next_billing_date); if (!isNaN(d.getTime())) nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (_) {}
   } else if (isPaid && client.paid_at) {
-    try {
-      const d = new Date(client.paid_at);
-      if (!isNaN(d.getTime())) {
-        d.setMonth(d.getMonth() + 1);
-        nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' (est.)';
-      }
-    } catch (_) {}
+    try { const d = new Date(client.paid_at); if (!isNaN(d.getTime())) { d.setMonth(d.getMonth() + 1); nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' (est.)'; } } catch (_) {}
   }
-
   let accountStatusDisplay;
   if (isCancelled) accountStatusDisplay = 'Cancelled';
   else if (isActive && isPaid) accountStatusDisplay = 'Active';
   else if (!isActive) accountStatusDisplay = 'Inactive';
   else accountStatusDisplay = 'Pending';
-
   const inactiveBanner = (!isActive || isCancelled) ? `
     <div class="billing-inactive-banner">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div class="billing-inactive-banner-text">
         <div class="billing-inactive-title">Subscription inactive</div>
         <div class="billing-inactive-sub">Contact support to reactivate — <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a></div>
       </div>
     </div>
   ` : '';
-
   container.innerHTML = `
     ${inactiveBanner}
     <div class="billing-card">
       <div class="billing-head">
         <div class="billing-title-wrap">
-          <div class="billing-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-          </div>
-          <div class="billing-title-text">
-            <div class="billing-eyebrow">Billing &amp; Subscription</div>
-            <div class="billing-title">Manage your plan</div>
-          </div>
+          <div class="billing-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+          <div class="billing-title-text"><div class="billing-eyebrow">Billing &amp; Subscription</div><div class="billing-title">Manage your plan</div></div>
         </div>
         ${subBadge}
       </div>
-
       <div class="billing-grid">
-        <div class="billing-item">
-          <div class="billing-item-label">Current Plan</div>
-          <div class="billing-item-value">${escapeHtml(planLabel)}</div>
-          <div class="billing-item-value dim">${escapeHtml(planPrice)}</div>
-        </div>
-        <div class="billing-item">
-          <div class="billing-item-label">Payment Status</div>
-          <div class="billing-item-value">${escapeHtml(paymentDisplay)}</div>
-        </div>
-        <div class="billing-item">
-          <div class="billing-item-label">Next Billing</div>
-          <div class="billing-item-value">${escapeHtml(nextBillingDisplay)}</div>
-        </div>
-        <div class="billing-item">
-          <div class="billing-item-label">Account Status</div>
-          <div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div>
-        </div>
+        <div class="billing-item"><div class="billing-item-label">Current Plan</div><div class="billing-item-value">${escapeHtml(planLabel)}</div><div class="billing-item-value dim">${escapeHtml(planPrice)}</div></div>
+        <div class="billing-item"><div class="billing-item-label">Payment Status</div><div class="billing-item-value">${escapeHtml(paymentDisplay)}</div></div>
+        <div class="billing-item"><div class="billing-item-label">Next Billing</div><div class="billing-item-value">${escapeHtml(nextBillingDisplay)}</div></div>
+        <div class="billing-item"><div class="billing-item-label">Account Status</div><div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div></div>
       </div>
-
-      <div class="billing-manage-text">
-        Your subscription is managed through <strong>PayPal</strong>. Update your payment method, view billing history, or cancel your subscription from your PayPal billing portal.
-      </div>
-
+      <div class="billing-manage-text">Your subscription is managed through <strong>PayPal</strong>. Update your payment method, view billing history, or cancel from your PayPal billing portal.</div>
       <div class="billing-actions">
         <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-primary">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Manage Billing
         </a>
         <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-secondary">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="15" y1="9" x2="9" y2="15"/>
-            <line x1="9" y1="9" x2="15" y2="15"/>
-          </svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
           Cancel Subscription
         </a>
       </div>
     </div>
   `;
-
   const dashEl = document.getElementById('dash');
   if (dashEl) {
     if (!isActive || isCancelled) dashEl.classList.add('dashboard-disabled');
     else dashEl.classList.remove('dashboard-disabled');
   }
 }
-
 function renderDashboard(client, calls) {
   document.getElementById('dash-business').textContent = client.business_name || 'Your business';
   document.getElementById('info-business').textContent = client.business_name || '—';
@@ -651,31 +503,97 @@ function renderDashboard(client, calls) {
   renderBilling(client);
   showState('dash');
 }
+
 async function init() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    console.log('[dashboard] no session — redirecting to sign-in');
+    window.location.assign('/sign-in');
+    return;
+  }
+
+  const userPill = document.getElementById('user-pill');
+  const userEmail = document.getElementById('user-pill-email');
+  const logoutBtn = document.getElementById('logout-btn');
+  if (userPill && userEmail) {
+    userEmail.textContent = session.user.email || '';
+    userPill.style.display = 'inline-flex';
+  }
+  if (logoutBtn) {
+    logoutBtn.style.display = 'inline-flex';
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.assign('/sign-in');
+    });
+  }
+
   const slug = getSlugFromUrl();
-  if (!slug) { showState('state-notfound'); return; }
-  console.log('[dashboard] loading slug:', slug);
-  const client = await fetchClient(slug);
+  let client = null;
+  if (slug) {
+    const { data: rows, error } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('client_slug', slug)
+      .eq('owner_user_id', session.user.id)
+      .limit(1);
+    if (error) console.error('[dashboard] slug+owner fetch error:', error);
+    if (rows && rows[0]) client = rows[0];
+  }
   if (!client) {
-    console.log('[dashboard] no client found for slug');
+    const { data: rows, error } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('owner_user_id', session.user.id)
+      .limit(1);
+    if (error) console.error('[dashboard] owner fetch error:', error);
+    if (rows && rows[0]) {
+      client = rows[0];
+      if (slug && client.client_slug && slug !== client.client_slug) {
+        window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug));
+        return;
+      }
+    }
+  }
+
+  if (!client) {
+    console.log('[dashboard] no client for this user');
     showState('state-notfound');
     return;
   }
+
   if (client.plan === 'starter') {
-    console.log('[dashboard] client is on Starter — reports-only, no dashboard');
-    document.getElementById('preparing-desc').textContent = 'You\'re on the Starter plan, which uses email reports instead of a live dashboard. Check your inbox for your weekly or monthly lead report.';
+    document.getElementById('preparing-desc').textContent = "You're on the Starter plan, which uses email reports instead of a live dashboard. Check your inbox for your weekly or monthly lead report.";
     showState('state-preparing');
     return;
   }
+
   if (!isClientReady(client)) {
-    console.log('[dashboard] client not yet active — showing preparing state');
     showState('state-preparing');
     return;
   }
-  const calls = await fetchCalls(client.id);
-  renderDashboard(client, calls);
+
+  const { data: calls } = await supabase
+    .from('calls')
+    .select('*')
+    .eq('client_id', client.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  renderDashboard(client, calls || []);
 }
+
 init();
+
+let authInitialized = false;
+supabase.auth.onAuthStateChange((event) => {
+  if (!authInitialized) {
+    authInitialized = true;
+    return;
+  }
+  if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+    window.location.assign('/sign-in');
+  }
+});
 </script>
 </body>
 </html>
