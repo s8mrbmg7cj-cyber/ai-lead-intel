@@ -43,8 +43,19 @@ export default async function handler(req, res) {
 
   // Create admin client (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  });
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  },
+  realtime: {
+    enabled: false
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'auth-link-user'
+    }
+  }
+});
 
   try {
     // 1. Find the matching client row — by slug first, then fall back to notify_email
