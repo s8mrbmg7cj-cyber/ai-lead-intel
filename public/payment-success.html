@@ -3,66 +3,278 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Successful</title>
+  <title>AI Lead Intel — Setup Started</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: #0b0b0f;
+      min-height: 100vh;
+      background: #0a0a0f;
       color: white;
       font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
     }
 
     .card {
+      width: 100%;
+      max-width: 720px;
       background: #111118;
-      border: 1px solid #ff7a00;
-      padding: 40px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 500px;
-      box-shadow: 0 0 40px rgba(255,122,0,0.15);
+      border: 1px solid rgba(255,122,0,0.35);
+      border-radius: 24px;
+      padding: 42px;
+      box-shadow: 0 0 50px rgba(255,122,0,0.12);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,122,0,0.12);
+      border: 1px solid rgba(255,122,0,0.3);
+      color: #ff9d4d;
+      font-size: 13px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     h1 {
+      font-size: 36px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    .highlight {
       color: #ff7a00;
-      margin-bottom: 10px;
     }
 
     p {
-      color: #ccc;
-      line-height: 1.6;
+      color: #cfcfcf;
+      line-height: 1.7;
+      font-size: 16px;
     }
 
-    a {
-      display: inline-block;
-      margin-top: 25px;
-      padding: 14px 24px;
+    .section {
+      margin-top: 34px;
+      padding: 22px;
+      background: #181820;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .section h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      color: white;
+    }
+
+    .timeline-item {
+      margin-bottom: 12px;
+      color: #d5d5d5;
+    }
+
+    .timeline-item strong {
+      color: white;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 14px;
+      margin-top: 34px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
       background: #ff7a00;
       color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background: #ff8d24;
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255,255,255,0.14);
+      color: white;
+      background: #1a1a22;
+    }
+
+    .btn-secondary:hover {
+      background: #22222c;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .info-box {
+      background: #181820;
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .label {
+      color: #8e8e98;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .card {
+        padding: 28px;
+      }
     }
   </style>
 </head>
 <body>
+
   <div class="card">
-    <h1>Payment Successful</h1>
+
+    <div class="badge">
+      PAYMENT SUCCESSFUL
+    </div>
+
+    <h1>
+      <span class="highlight" id="clientName">
+        Your Business
+      </span>
+      AI front desk is officially being built.
+    </h1>
 
     <p>
-      Your AI front desk setup is now officially underway.
-      Our system has received your onboarding and payment.
+      Your subscription payment was received successfully and your onboarding has been submitted.
+      Our system is now configuring your AI receptionist, lead routing, dashboard setup, and automation flow.
     </p>
 
-    <p>
-      You'll receive updates as your assistant is built and tested.
-    </p>
+    <div class="info-grid">
 
-    <a href="/">Return Home</a>
+      <div class="info-box">
+        <div class="label">Selected Plan</div>
+        <div class="value" id="planName">PRO</div>
+      </div>
+
+      <div class="info-box">
+        <div class="label">Client Dashboard</div>
+        <div class="value" id="dashboardUrl">
+          /dashboard/client
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="label">Subscription Status</div>
+        <div class="value">
+          Active
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="label">Setup Status</div>
+        <div class="value">
+          Building AI Assistant
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section">
+      <h3>What happens next</h3>
+
+      <div class="timeline-item">
+        <strong>Today:</strong>
+        Your onboarding data and AI configuration are being processed.
+      </div>
+
+      <div class="timeline-item">
+        <strong>Within 24 hours:</strong>
+        Your AI front desk and dashboard setup will be finalized.
+      </div>
+
+      <div class="timeline-item">
+        <strong>Testing phase:</strong>
+        Call routing, transfers, and automation workflows are verified.
+      </div>
+
+      <div class="timeline-item">
+        <strong>Launch:</strong>
+        Your AI receptionist goes live for inbound calls and lead capture.
+      </div>
+    </div>
+
+    <div class="buttons">
+      <a
+        id="dashboardBtn"
+        class="btn btn-primary"
+        href="/"
+      >
+        Open Dashboard
+      </a>
+
+      <a
+        class="btn btn-secondary"
+        href="/"
+      >
+        Return Home
+      </a>
+    </div>
+
   </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const client =
+      params.get("client") ||
+      params.get("business") ||
+      "Your Business";
+
+    const plan =
+      (params.get("plan") || "starter").toUpperCase();
+
+    const slug =
+      params.get("slug") ||
+      client.toLowerCase().replace(/\s+/g, "-");
+
+    document.getElementById("clientName").innerText = client;
+    document.getElementById("planName").innerText = plan;
+
+    const dashboardPath = `/dashboard/${slug}`;
+
+    document.getElementById("dashboardUrl").innerText =
+      dashboardPath;
+
+    document.getElementById("dashboardBtn").href =
+      dashboardPath;
+  </script>
+
 </body>
 </html>
