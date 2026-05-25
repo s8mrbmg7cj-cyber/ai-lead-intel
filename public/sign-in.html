@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Sign in · AI Lead Intel</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a;
+  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22; --surface-input: #0d0d10;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
+  --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a; --text-muted: #52525b;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
+  --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
+  --green: #34d399; --hot: #ef4444; --hot-soft: rgba(239,68,68,0.10); --hot-line: rgba(239,68,68,0.28);
+}
+html, body { height: 100%; }
+body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,106,0,0.10), transparent 60%); pointer-events: none; z-index: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; outline: none; }
+.topnav { position: relative; z-index: 100; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(8,8,10,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
+.logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; }
+.support-pill:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.support-pill svg { color: var(--brand); }
+@media (max-width: 720px) { .topnav { padding: 12px 16px; } }
+
+.wrap { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 64px 24px 80px; }
+.hero { text-align: center; margin-bottom: 32px; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 6px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 18px; }
+.hero-eyebrow .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
+.hero-title { font-size: clamp(28px, 4vw, 36px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 14px; }
+.hero-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; max-width: 380px; margin: 0 auto; }
+
+.card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 18px; padding: 32px; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 60px rgba(0,0,0,0.45); position: relative; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
+
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; }
+.tab { padding: 10px 14px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--text-faint); transition: all 0.18s; cursor: pointer; background: transparent; }
+.tab.active { background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); color: var(--text); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.tab:not(.active):hover { color: var(--text-dim); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: panelIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes panelIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.field { margin-bottom: 16px; position: relative; }
+.field:last-of-type { margin-bottom: 20px; }
+.float-wrap { position: relative; }
+.float-input { width: 100%; padding: 22px 16px 10px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 12px; color: var(--text); font-size: 15px; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s; font-weight: 500; }
+.float-input:hover { border-color: var(--border-3); }
+.float-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-tint); background: #0c0c0f; }
+.float-label { position: absolute; left: 16px; top: 18px; font-size: 14px; color: var(--text-faint); pointer-events: none; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); font-weight: 500; }
+.float-input:focus ~ .float-label, .float-input:not(:placeholder-shown) ~ .float-label, .float-input:-webkit-autofill ~ .float-label { top: 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+.float-input:-webkit-autofill, .float-input:-webkit-autofill:hover, .float-input:-webkit-autofill:focus { -webkit-text-fill-color: var(--text) !important; -webkit-box-shadow: 0 0 0 1000px var(--surface-input) inset !important; caret-color: var(--text); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 20px; border-radius: 11px; font-size: 14px; font-weight: 600; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); border: 1px solid transparent; cursor: pointer; min-height: 46px; letter-spacing: -0.005em; }
+.btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 26px var(--brand-glow); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-danger { background: transparent; color: var(--hot); border-color: var(--hot-line); }
+.btn-danger:hover { background: var(--hot-soft); }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.form-msg { display: none; align-items: center; gap: 9px; padding: 11px 14px; border-radius: 11px; font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+.form-msg.visible { display: flex; }
+.form-msg svg { flex-shrink: 0; }
+.form-msg.error { background: var(--hot-soft); border: 1px solid var(--hot-line); color: var(--hot); }
+.form-msg.success { background: rgba(52,211,153,0.10); border: 1px solid rgba(52,211,153,0.28); color: var(--green); }
+
+.help-line { font-size: 12px; color: var(--text-faint); text-align: center; margin-top: 14px; line-height: 1.55; }
+.help-line a { color: var(--brand); font-weight: 500; }
+
+.danger-note { font-size: 12px; color: var(--text-faint); text-align: center; margin-top: 14px; line-height: 1.55; }
+.danger-note strong { color: var(--text-dim); font-weight: 600; }
+
+.bottom-link { text-align: center; margin-top: 22px; font-size: 13px; color: var(--text-faint); }
+.bottom-link a { color: var(--brand); font-weight: 500; }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
+  <a href="mailto:hello@aileadintel.com" class="support-pill">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Support
+  </a>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-eyebrow"><span class="dot"></span>Account access</div>
+    <h1 class="hero-title">Sign in to your <span class="accent">dashboard</span></h1>
+    <p class="hero-sub">Enter the email you used during onboarding and we'll take you to your dashboard.</p>
+  </header>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="signin" type="button">Sign In</button>
+      <button class="tab" data-tab="cancel" type="button">Cancel Subscription</button>
+    </div>
+
+    <!-- SIGN IN PANEL -->
+    <div class="tab-panel active" id="panel-signin">
+      <div class="form-msg" id="signin-msg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="signin-msg-text"></span>
+      </div>
+      <div class="field">
+        <div class="float-wrap">
+          <input type="email" id="signin-email" class="float-input" placeholder=" " autocomplete="email" />
+          <label class="float-label" for="signin-email">Your notification email</label>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="signin-btn" type="button">
+        <span id="signin-btn-label">Find my dashboard</span>
+      </button>
+      <div class="help-line">Use the same email you entered during onboarding.<br/>Lost access? Email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a></div>
+    </div>
+
+    <!-- CANCEL PANEL -->
+    <div class="tab-panel" id="panel-cancel">
+      <div class="form-msg" id="cancel-msg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="cancel-msg-text"></span>
+      </div>
+      <div class="field">
+        <div class="float-wrap">
+          <input type="email" id="cancel-email" class="float-input" placeholder=" " autocomplete="email" />
+          <label class="float-label" for="cancel-email">Your notification email</label>
+        </div>
+      </div>
+      <button class="btn btn-danger" id="cancel-btn" type="button">
+        <span id="cancel-btn-label">Continue to cancel</span>
+      </button>
+      <div class="danger-note">We'll verify your email, then send you to <strong>PayPal</strong> to cancel your subscription. Your AI will keep running until the end of your current billing period.</div>
+    </div>
+  </div>
+
+  <div class="bottom-link"><a href="/">← Back to homepage</a></div>
+</div>
+
+<script>
+'use strict';
+const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const PAYPAL_MANAGE_URL = 'https://www.paypal.com/myaccount/autopay/';
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + target));
+    hideMsg('signin-msg'); hideMsg('cancel-msg');
+  });
+});
+
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  const txt = document.getElementById(id + '-text');
+  if (!el || !txt) return;
+  el.classList.remove('error', 'success');
+  el.classList.add(type, 'visible');
+  txt.textContent = text;
+}
+function hideMsg(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('visible');
+}
+
+async function lookupClientByEmail(email) {
+  const clean = String(email || '').trim().toLowerCase();
+  if (!clean || !clean.includes('@')) return null;
+  // Try notify_email first
+  let url = `${SUPABASE_URL}/rest/v1/clients?notify_email=ilike.${encodeURIComponent(clean)}&select=client_slug,business_name,plan,status,active,payment_status&limit=1`;
+  try {
+    let res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
+    if (res.ok) {
+      const rows = await res.json().catch(() => []);
+      if (Array.isArray(rows) && rows[0]) return rows[0];
+    }
+    // Fallback: report_email match
+    url = `${SUPABASE_URL}/rest/v1/clients?report_email=ilike.${encodeURIComponent(clean)}&select=client_slug,business_name,plan,status,active,payment_status&limit=1`;
+    res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
+    if (res.ok) {
+      const rows = await res.json().catch(() => []);
+      if (Array.isArray(rows) && rows[0]) return rows[0];
+    }
+  } catch (err) {
+    console.error('[sign-in] lookup error:', err);
+  }
+  return null;
+}
+
+// SIGN IN
+const signinBtn = document.getElementById('signin-btn');
+let signinBusy = false;
+signinBtn.addEventListener('click', async () => {
+  if (signinBusy) return;
+  hideMsg('signin-msg');
+  const email = document.getElementById('signin-email').value.trim();
+  if (!email || !email.includes('@')) {
+    showMsg('signin-msg', 'error', 'Please enter a valid email address.');
+    return;
+  }
+  signinBusy = true;
+  const label = document.getElementById('signin-btn-label');
+  signinBtn.disabled = true;
+  label.innerHTML = '<span class="spinner"></span>';
+
+  const client = await lookupClientByEmail(email);
+
+  if (!client) {
+    showMsg('signin-msg', 'error', "We couldn't find an account with that email. Double-check it or contact support.");
+    signinBusy = false;
+    signinBtn.disabled = false;
+    label.textContent = 'Find my dashboard';
+    return;
+  }
+
+  if (!client.client_slug) {
+    showMsg('signin-msg', 'error', "Your account doesn't have a dashboard URL yet. Email support for help.");
+    signinBusy = false;
+    signinBtn.disabled = false;
+    label.textContent = 'Find my dashboard';
+    return;
+  }
+
+  // Starter plan → no dashboard, send to a friendly success-page-like view
+  if ((client.plan || '').toLowerCase() === 'starter') {
+    showMsg('signin-msg', 'success', "You're on the Starter plan — reports go to your inbox. No dashboard to sign in to. Redirecting…");
+    setTimeout(() => { window.location.assign('/onboarding/success?plan=starter&slug=' + encodeURIComponent(client.client_slug) + '&business=' + encodeURIComponent(client.business_name || '')); }, 1500);
+    return;
+  }
+
+  showMsg('signin-msg', 'success', 'Found you — opening your dashboard…');
+  setTimeout(() => { window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug)); }, 800);
+});
+
+document.getElementById('signin-email').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') signinBtn.click();
+});
+
+// CANCEL
+const cancelBtn = document.getElementById('cancel-btn');
+let cancelBusy = false;
+cancelBtn.addEventListener('click', async () => {
+  if (cancelBusy) return;
+  hideMsg('cancel-msg');
+  const email = document.getElementById('cancel-email').value.trim();
+  if (!email || !email.includes('@')) {
+    showMsg('cancel-msg', 'error', 'Please enter a valid email address.');
+    return;
+  }
+  cancelBusy = true;
+  const label = document.getElementById('cancel-btn-label');
+  cancelBtn.disabled = true;
+  label.innerHTML = '<span class="spinner"></span>';
+
+  const client = await lookupClientByEmail(email);
+
+  if (!client) {
+    showMsg('cancel-msg', 'error', "We couldn't find an account with that email. Double-check it or contact support.");
+    cancelBusy = false;
+    cancelBtn.disabled = false;
+    label.textContent = 'Continue to cancel';
+    return;
+  }
+
+  showMsg('cancel-msg', 'success', 'Verified — opening PayPal so you can cancel your subscription…');
+  setTimeout(() => { window.open(PAYPAL_MANAGE_URL, '_blank', 'noopener,noreferrer'); cancelBusy = false; cancelBtn.disabled = false; label.textContent = 'Continue to cancel'; }, 1000);
+});
+
+document.getElementById('cancel-email').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') cancelBtn.click();
+});
+</script>
+</body>
+</html>
