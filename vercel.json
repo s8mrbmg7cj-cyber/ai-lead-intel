@@ -6,10 +6,15 @@
     { "source": "/sign-in", "destination": "/sign-in.html" },
     { "source": "/signin", "destination": "/sign-in.html" },
     { "source": "/login", "destination": "/sign-in.html" },
+
+    { "source": "/payment-success", "destination": "/payment-success.html" },
+
     { "source": "/create-password", "destination": "/create-password.html" },
+
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
+
   "headers": [
     {
       "source": "/(.*)",
@@ -21,8 +26,15 @@
       ]
     }
   ],
+
   "crons": [
-    { "path": "/api/admin-tasks?task=send-report&frequency=weekly", "schedule": "0 9 * * 1" },
-    { "path": "/api/admin-tasks?task=send-report&frequency=monthly", "schedule": "0 9 1 * *" }
+    {
+      "path": "/api/admin-tasks?task=send-report&frequency=weekly",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/admin-tasks?task=send-report&frequency=monthly",
+      "schedule": "0 9 1 * *"
+    }
   ]
 }
