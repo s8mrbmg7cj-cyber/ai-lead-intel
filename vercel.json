@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
+    { "source": "/dashboard", "destination": "/sign-in.html" },
+    { "source": "/dashboard/", "destination": "/sign-in.html" },
+    { "source": "/sign-in", "destination": "/sign-in.html" },
+    { "source": "/signin", "destination": "/sign-in.html" },
+    { "source": "/login", "destination": "/sign-in.html" },
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
