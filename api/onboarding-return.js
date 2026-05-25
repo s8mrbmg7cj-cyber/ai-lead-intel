@@ -65,7 +65,8 @@ export default async function handler(req, res) {
   if (subscriptionId) params.set("paypal_sub", subscriptionId);
   params.set("paid", subscriptionId ? "1" : "0");
 
-  const redirectUrl = `${baseUrl}/onboarding/success?${params.toString()}`;
+  // After payment, send customer to create-password (they'll then sign in)
+  const redirectUrl = `${baseUrl}/create-password?${params.toString()}`;
   console.log("[paypal-return] 302 →", redirectUrl);
   res.writeHead(302, { Location: redirectUrl });
   res.end();
