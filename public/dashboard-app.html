@@ -28,7 +28,6 @@ body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; back
 body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,106,0,0.10), transparent 60%); pointer-events: none; z-index: 0; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-
 .topnav { position: relative; z-index: 100; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(8,8,10,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
 .logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
@@ -38,7 +37,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .support-pill:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
 .support-pill svg { color: var(--brand); }
 @media (max-width: 720px) { .topnav { padding: 12px 16px; } }
-
 .state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
 .state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
 .state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
@@ -72,7 +70,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .checklist-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
 .checklist-item.done .checklist-meta { color: var(--green); }
 .checklist-item.active .checklist-meta { color: var(--brand); }
-
 .dash { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 32px 28px 80px; display: none; }
 .dash.visible { display: block; }
 .dash-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 26px; gap: 16px; flex-wrap: wrap; }
@@ -116,8 +113,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .support-banner-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
 .support-banner-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 .support-banner-desc a { color: var(--brand); font-weight: 500; }
-
-/* AI CONFIG CARDS */
 .ai-section { margin-top: 4px; }
 .ai-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .ai-section-title { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 6px 13px; border-radius: 99px; font-weight: 600; }
@@ -133,13 +128,65 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-card-content.italic { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16.5px; color: var(--text-soft); line-height: 1.5; }
 .ai-card-content.mono { font-family: 'Geist Mono', monospace; font-size: 12px; white-space: pre-wrap; color: var(--text-soft); }
 .ai-card-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
-
 @media (max-width: 880px) {
   .dash { padding: 24px 16px 80px; }
   .stats-row { grid-template-columns: 1fr 1fr; }
   .dash-grid { grid-template-columns: 1fr; }
   .stat-value { font-size: 26px; }
   .stat.hero-stat .stat-value { font-size: 32px; }
+}
+
+/* ========== BILLING SECTION ========== */
+.billing-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+.billing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
+.billing-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.billing-title-wrap { display: flex; align-items: center; gap: 12px; }
+.billing-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 4px 14px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.billing-title-text { display: flex; flex-direction: column; gap: 2px; }
+.billing-eyebrow { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--brand); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.billing-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.billing-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; }
+.billing-status-badge .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
+.badge-active { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+.badge-active .badge-dot { background: var(--green); box-shadow: 0 0 8px var(--green); animation: badgePulse 1.8s ease-in-out infinite; }
+.badge-warning { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn); }
+.badge-warning .badge-dot { background: var(--warn); }
+.badge-danger { background: var(--hot-soft); border-color: var(--hot-line); color: var(--hot); }
+.badge-danger .badge-dot { background: var(--hot); }
+@keyframes badgePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.75); } }
+.billing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.billing-item { background: var(--surface-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.billing-item-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+.billing-item-value { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+.billing-item-value.dim { color: var(--text-dim); font-weight: 500; font-size: 11.5px; margin-top: 2px; }
+.billing-manage-text { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; margin-bottom: 16px; padding: 11px 14px; background: var(--brand-tint); border: 1px solid var(--brand-line); border-radius: 10px; }
+.billing-manage-text strong { color: var(--text); font-weight: 600; }
+.billing-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.billing-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; letter-spacing: -0.005em; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); border: 1px solid transparent; cursor: pointer; font-family: inherit; text-decoration: none; min-height: 40px; }
+.billing-btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
+.billing-btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 22px var(--brand-glow); }
+.billing-btn-secondary { background: transparent; color: var(--text-dim); border-color: var(--border-3); }
+.billing-btn-secondary:hover { color: var(--hot); border-color: var(--hot-line); background: var(--hot-soft); }
+.billing-inactive-banner { background: var(--hot-soft); border: 1px solid var(--hot-line); border-radius: 12px; padding: 13px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.billing-inactive-banner svg { color: var(--hot); flex-shrink: 0; }
+.billing-inactive-banner-text { flex: 1; min-width: 0; }
+.billing-inactive-title { font-size: 13px; font-weight: 600; color: var(--hot); margin-bottom: 2px; }
+.billing-inactive-sub { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.billing-inactive-sub a { color: var(--brand); text-decoration: none; font-weight: 600; }
+.billing-inactive-sub a:hover { text-decoration: underline; }
+.dashboard-disabled .panel,
+.dashboard-disabled .stat,
+.dashboard-disabled .ai-section { opacity: 0.45; pointer-events: none; }
+.dashboard-disabled .billing-card,
+.dashboard-disabled .billing-inactive-banner,
+.dashboard-disabled .dash-head { opacity: 1; pointer-events: auto; }
+@media (max-width: 640px) {
+  .billing-card { padding: 20px 16px; }
+  .billing-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .billing-item { padding: 11px 12px; }
+  .billing-actions { flex-direction: column; }
+  .billing-btn { width: 100%; }
+  .billing-head { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
@@ -153,13 +200,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </a>
   </div>
 </nav>
-
 <div class="state-wrap" id="state-loading">
   <div class="state-icon loading"><div class="spinner"></div></div>
   <div class="state-title">Loading dashboard<span class="accent">…</span></div>
   <div class="state-desc">Hang tight — pulling your account details.</div>
 </div>
-
 <div class="state-wrap" id="state-preparing" style="display:none;">
   <div class="state-icon preparing">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -198,7 +243,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </button>
   </div>
 </div>
-
 <div class="state-wrap" id="state-notfound" style="display:none;">
   <div class="state-icon not-found">
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -211,7 +255,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <a href="mailto:hello@aileadintel.com" class="btn btn-primary">Contact support</a>
   </div>
 </div>
-
 <div class="dash" id="dash">
   <div class="dash-head">
     <div class="dash-head-left">
@@ -223,6 +266,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <div class="dash-pill live" id="dash-live"><span class="dot"></span>Live</div>
     </div>
   </div>
+
+  <!-- BILLING SECTION (added) -->
+  <div id="billing-section"></div>
+
   <div class="stats-row">
     <div class="stat hero-stat">
       <div class="stat-label">Leads Captured</div>
@@ -284,8 +331,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
     </div>
   </div>
-
-  <!-- AI CONFIG SECTION -->
   <div class="ai-section" id="ai-section">
     <div class="ai-section-head">
       <div class="ai-section-title"><span class="ai-dot"></span>AI Configuration</div>
@@ -322,12 +367,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
   </div>
 </div>
-
 <script>
 'use strict';
-
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const PAYPAL_MANAGE_URL = 'https://www.paypal.com/myaccount/autopay/';
 
 function getSlugFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -343,7 +387,6 @@ function getSlugFromUrl() {
   }
   return '';
 }
-
 function showState(which) {
   ['state-loading', 'state-preparing', 'state-notfound'].forEach(id => {
     const el = document.getElementById(id);
@@ -352,7 +395,6 @@ function showState(which) {
   const dash = document.getElementById('dash');
   if (dash) dash.classList.toggle('visible', which === 'dash');
 }
-
 async function fetchClient(slug) {
   const url = `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`;
   try {
@@ -367,7 +409,6 @@ async function fetchClient(slug) {
     return null;
   }
 }
-
 async function fetchCalls(clientId) {
   const url = `${SUPABASE_URL}/rest/v1/calls?client_id=eq.${encodeURIComponent(clientId)}&select=*&order=created_at.desc&limit=20`;
   try {
@@ -379,7 +420,6 @@ async function fetchCalls(clientId) {
     return Array.isArray(rows) ? rows : [];
   } catch (err) { return []; }
 }
-
 function isClientReady(client) {
   if (!client) return false;
   const liveStatuses = ['active', 'live', 'enabled'];
@@ -387,7 +427,6 @@ function isClientReady(client) {
   if (client.active === true && liveStatuses.includes(status)) return true;
   return false;
 }
-
 function formatPhone(num) {
   if (!num) return '—';
   const digits = String(num).replace(/\D/g, '');
@@ -408,7 +447,6 @@ function escapeHtml(str) {
   if (!str && str !== 0) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
 function renderAiConfig(client) {
   const setCard = (id, value) => {
     const el = document.getElementById(id);
@@ -425,11 +463,10 @@ function renderAiConfig(client) {
   setCard('ai-services', client.services_summary);
   setCard('ai-transfer', client.transfer_behavior);
 }
-
 function renderCalls(calls) {
   const list = document.getElementById('calls-list');
   if (!list) return;
-  if (!calls || calls.length === 0) return; // keep default empty state
+  if (!calls || calls.length === 0) return;
   list.innerHTML = '';
   calls.forEach(call => {
     const item = document.createElement('div');
@@ -448,26 +485,160 @@ function renderCalls(calls) {
   });
 }
 
+// ========== BILLING SECTION RENDER ==========
+function renderBilling(client) {
+  const container = document.getElementById('billing-section');
+  if (!container || !client) return;
+
+  const plan = (client.plan || 'starter').toLowerCase();
+  const planLabel = plan === 'pro' ? 'AI Front Desk Pro' : 'Starter';
+  const planPrice = plan === 'pro' ? '$297 / month' : '$97 / month';
+  const status = (client.status || 'pending').toLowerCase();
+  const paymentStatus = (client.payment_status || 'unpaid').toLowerCase();
+  const isActive = client.active !== false;
+  const isCancelled = status === 'cancelled';
+  const isPaid = paymentStatus === 'paid';
+
+  let subBadge;
+  if (isCancelled) {
+    subBadge = '<span class="billing-status-badge badge-danger"><span class="badge-dot"></span>Cancelled</span>';
+  } else if (isPaid && isActive) {
+    subBadge = '<span class="billing-status-badge badge-active"><span class="badge-dot"></span>Active</span>';
+  } else {
+    subBadge = '<span class="billing-status-badge badge-warning"><span class="badge-dot"></span>Subscription Inactive</span>';
+  }
+
+  const paymentDisplay = {
+    paid: 'Paid',
+    unpaid: 'Unpaid',
+    pending: 'Pending',
+    failed: 'Failed',
+    cancelled: 'Cancelled',
+    refunded: 'Refunded',
+  }[paymentStatus] || 'Unknown';
+
+  let nextBillingDisplay = '—';
+  if (client.next_billing_date) {
+    try {
+      const d = new Date(client.next_billing_date);
+      if (!isNaN(d.getTime())) {
+        nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  } else if (isPaid && client.paid_at) {
+    try {
+      const d = new Date(client.paid_at);
+      if (!isNaN(d.getTime())) {
+        d.setMonth(d.getMonth() + 1);
+        nextBillingDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' (est.)';
+      }
+    } catch (_) {}
+  }
+
+  let accountStatusDisplay;
+  if (isCancelled) accountStatusDisplay = 'Cancelled';
+  else if (isActive && isPaid) accountStatusDisplay = 'Active';
+  else if (!isActive) accountStatusDisplay = 'Inactive';
+  else accountStatusDisplay = 'Pending';
+
+  const inactiveBanner = (!isActive || isCancelled) ? `
+    <div class="billing-inactive-banner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <div class="billing-inactive-banner-text">
+        <div class="billing-inactive-title">Subscription inactive</div>
+        <div class="billing-inactive-sub">Contact support to reactivate — <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a></div>
+      </div>
+    </div>
+  ` : '';
+
+  container.innerHTML = `
+    ${inactiveBanner}
+    <div class="billing-card">
+      <div class="billing-head">
+        <div class="billing-title-wrap">
+          <div class="billing-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
+          <div class="billing-title-text">
+            <div class="billing-eyebrow">Billing &amp; Subscription</div>
+            <div class="billing-title">Manage your plan</div>
+          </div>
+        </div>
+        ${subBadge}
+      </div>
+
+      <div class="billing-grid">
+        <div class="billing-item">
+          <div class="billing-item-label">Current Plan</div>
+          <div class="billing-item-value">${escapeHtml(planLabel)}</div>
+          <div class="billing-item-value dim">${escapeHtml(planPrice)}</div>
+        </div>
+        <div class="billing-item">
+          <div class="billing-item-label">Payment Status</div>
+          <div class="billing-item-value">${escapeHtml(paymentDisplay)}</div>
+        </div>
+        <div class="billing-item">
+          <div class="billing-item-label">Next Billing</div>
+          <div class="billing-item-value">${escapeHtml(nextBillingDisplay)}</div>
+        </div>
+        <div class="billing-item">
+          <div class="billing-item-label">Account Status</div>
+          <div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div>
+        </div>
+      </div>
+
+      <div class="billing-manage-text">
+        Your subscription is managed through <strong>PayPal</strong>. Update your payment method, view billing history, or cancel your subscription from your PayPal billing portal.
+      </div>
+
+      <div class="billing-actions">
+        <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Manage Billing
+        </a>
+        <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-secondary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          Cancel Subscription
+        </a>
+      </div>
+    </div>
+  `;
+
+  const dashEl = document.getElementById('dash');
+  if (dashEl) {
+    if (!isActive || isCancelled) dashEl.classList.add('dashboard-disabled');
+    else dashEl.classList.remove('dashboard-disabled');
+  }
+}
+
 function renderDashboard(client, calls) {
   document.getElementById('dash-business').textContent = client.business_name || 'Your business';
   document.getElementById('info-business').textContent = client.business_name || '—';
   document.getElementById('info-email').textContent = client.notify_email || '—';
-
   const plan = (client.plan || 'pro').toUpperCase();
   document.getElementById('dash-plan').textContent = plan;
   document.getElementById('info-plan').textContent = plan === 'PRO' ? 'AI Front Desk Pro' : 'Starter';
-
   const status = (client.status || 'active').toLowerCase();
   document.getElementById('info-status').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-
-  // Payment status
   let paymentLabel = 'Unknown';
   if (client.payment_status === 'paid') paymentLabel = 'Paid ✓';
   else if (client.payment_pending === true) paymentLabel = 'Payment pending';
   else if (client.payment_status === 'unpaid') paymentLabel = 'Unpaid';
   document.getElementById('info-payment').textContent = paymentLabel;
-
-  // Stats
   const leadCalls = (calls || []).filter(c => c.lead_captured === true);
   const missedCalls = (calls || []).filter(c => c.missed === true);
   document.getElementById('stat-leads').textContent = leadCalls.length;
@@ -475,44 +646,35 @@ function renderDashboard(client, calls) {
   document.getElementById('stat-missed').textContent = missedCalls.length;
   document.getElementById('stat-leads-sub').textContent = leadCalls.length === 0 ? 'No leads yet' : `${leadCalls.length} captured`;
   document.getElementById('stat-calls-sub').textContent = (calls || []).length === 0 ? 'No calls yet' : 'All time';
-
   renderCalls(calls);
   renderAiConfig(client);
-
+  renderBilling(client);
   showState('dash');
 }
-
 async function init() {
   const slug = getSlugFromUrl();
   if (!slug) { showState('state-notfound'); return; }
-
   console.log('[dashboard] loading slug:', slug);
   const client = await fetchClient(slug);
-
   if (!client) {
     console.log('[dashboard] no client found for slug');
     showState('state-notfound');
     return;
   }
-
   if (client.plan === 'starter') {
     console.log('[dashboard] client is on Starter — reports-only, no dashboard');
     document.getElementById('preparing-desc').textContent = 'You\'re on the Starter plan, which uses email reports instead of a live dashboard. Check your inbox for your weekly or monthly lead report.';
     showState('state-preparing');
     return;
   }
-
   if (!isClientReady(client)) {
     console.log('[dashboard] client not yet active — showing preparing state');
     showState('state-preparing');
     return;
   }
-
-  // Client is live → fetch calls and render
   const calls = await fetchCalls(client.id);
   renderDashboard(client, calls);
 }
-
 init();
 </script>
 </body>
