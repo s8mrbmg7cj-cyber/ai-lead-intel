@@ -1,3 +1,4 @@
+import ws from 'ws';
 // api/auth-link-user.js
 // Called after onboarding/payment to create a Supabase Auth user
 // and link them to their existing clients row via owner_user_id.
@@ -48,12 +49,7 @@ export default async function handler(req, res) {
     persistSession: false
   },
   realtime: {
-    enabled: false
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'auth-link-user'
-    }
+    transport: ws
   }
 });
 
