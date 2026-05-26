@@ -161,8 +161,10 @@ img { max-width: 100%; display: block; }
 
 /* Right side — Call card */
 .call-card-wrap { position: relative; }
-.call-card-wrap::before { content: ''; position: absolute; inset: -30px; background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(30px); z-index: 0; opacity: 0.5; }
-.call-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 22px; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 40px 90px rgba(0,0,0,0.55), 0 16px 36px rgba(0,0,0,0.35); }
+.call-card-wrap::before { content: ''; position: absolute; inset: -30px; background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(30px); z-index: 0; opacity: 0.5; transition: opacity 0.4s; }
+.call-card-wrap.is-playing::before { opacity: 0.85; }
+.call-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 22px; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 40px 90px rgba(0,0,0,0.55), 0 16px 36px rgba(0,0,0,0.35); transition: border-color 0.3s; }
+.call-card-wrap.is-playing .call-card { border-color: var(--brand-line); }
 .call-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.6), transparent); z-index: 2; }
 .call-card-tabs { display: flex; gap: 4px; padding: 12px; background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .call-card-tabs::-webkit-scrollbar { display: none; }
@@ -180,46 +182,81 @@ img { max-width: 100%; display: block; }
 .call-header-text { min-width: 0; overflow: hidden; }
 .call-business { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .call-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 3px; }
-.call-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); flex-shrink: 0; transition: all 0.3s; }
+
+/* Status pill with EQ bars + ring pulse */
+.call-status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border-2); flex-shrink: 0; transition: all 0.3s; position: relative; }
+.call-status.ready { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
+.call-status.loading { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
 .call-status.on-call { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
-.call-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
-.call-status.on-call .call-status-dot { background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); animation: onCallPulse 1.2s ease-in-out infinite; }
-@keyframes onCallPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
+.call-status.ended { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+.call-status.paused { color: var(--warm); background: var(--warm-soft); border-color: rgba(245,158,11,0.28); }
+.call-status.unavailable { color: var(--hot); background: var(--hot-soft); border-color: var(--hot-line); }
+.call-status-indicator { position: relative; width: 8px; height: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.call-status-indicator .dot { position: relative; z-index: 2; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.call-status.on-call .call-status-indicator .dot { box-shadow: 0 0 8px currentColor; }
+.call-status.on-call .call-status-indicator::before, .call-status.on-call .call-status-indicator::after {
+  content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border-radius: 50%;
+  background: currentColor; transform: translate(-50%, -50%); opacity: 0.4;
+  animation: ringExpand 1.6s ease-out infinite;
+}
+.call-status.on-call .call-status-indicator::after { animation-delay: 0.8s; }
+@keyframes ringExpand { 0% { width: 8px; height: 8px; opacity: 0.45; } 100% { width: 22px; height: 22px; opacity: 0; } }
+
+/* EQ bars next to status */
+.eq-bars { display: none; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px; }
+.call-status.on-call .eq-bars { display: inline-flex; }
+.eq-bar { width: 2px; background: currentColor; border-radius: 1px; height: 30%; animation: eqBar 0.9s ease-in-out infinite; transform-origin: bottom; }
+.eq-bar:nth-child(1) { animation-delay: 0.0s; }
+.eq-bar:nth-child(2) { animation-delay: 0.18s; }
+.eq-bar:nth-child(3) { animation-delay: 0.36s; }
+@keyframes eqBar { 0%, 100% { height: 25%; } 50% { height: 95%; } }
 
 /* Transcript */
 .call-transcript-wrap { position: relative; }
-.call-transcript { display: flex; flex-direction: column; gap: 12px; padding: 20px 24px; max-height: 380px; overflow-y: auto; scroll-behavior: smooth; }
+.call-transcript { display: flex; flex-direction: column; gap: 14px; padding: 20px 24px; max-height: 380px; overflow-y: auto; scroll-behavior: smooth; }
 .call-transcript::-webkit-scrollbar { width: 6px; }
 .call-transcript::-webkit-scrollbar-track { background: transparent; }
 .call-transcript::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
 .call-transcript::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
-.transcript-line { display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); animation: lineIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+.transcript-line { display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); animation: lineIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
 @keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
-.transcript-speaker { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; padding-left: 4px; }
+.transcript-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
+.transcript-speaker { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
 .transcript-speaker.ai { color: var(--brand); }
 .transcript-speaker.caller { color: var(--text-dim); }
+.transcript-timestamp { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: var(--text-faint); font-weight: 500; }
 .transcript-bubble { padding: 11px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; max-width: 92%; letter-spacing: -0.005em; }
 .transcript-bubble.ai { background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); color: var(--text); align-self: flex-start; border-top-left-radius: 5px; }
 .transcript-line.caller { align-items: flex-end; }
+.transcript-line.caller .transcript-header-row { flex-direction: row-reverse; }
 .transcript-bubble.caller { background: var(--surface-3); color: var(--text-soft); align-self: flex-end; border-top-right-radius: 5px; border: 1px solid var(--border); }
-.transcript-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; align-self: center; padding: 4px 12px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; }
+.transcript-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; align-self: center; padding: 4px 12px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; opacity: 0; animation: lineIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
 .transcript-meta.captured { color: var(--green); border-color: var(--green-line); background: var(--green-soft); }
 
 /* Audio player */
 .call-player { padding: 18px 24px 22px; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(0,0,0,0.18)); display: flex; align-items: center; gap: 14px; }
-.player-play { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 6px 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; }
+.player-play { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 6px 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; position: relative; }
+.player-play::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: var(--brand); opacity: 0; transition: opacity 0.3s; z-index: -1; filter: blur(8px); }
+.player-play.playing::before { opacity: 0.55; animation: playGlow 1.8s ease-in-out infinite; }
+@keyframes playGlow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.75; } }
 .player-play:hover { transform: scale(1.06); box-shadow: 0 10px 26px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.28); }
 .player-play:active { transform: scale(0.97); }
+.player-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .player-play svg { transition: transform 0.18s; }
-.player-play .icon-pause { display: none; }
+.player-play .icon-pause, .player-play .icon-loading { display: none; }
 .player-play.playing .icon-play { display: none; }
 .player-play.playing .icon-pause { display: block; }
+.player-play.loading .icon-play, .player-play.loading .icon-pause { display: none; }
+.player-play.loading .icon-loading { display: block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .player-progress-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-.player-progress { position: relative; height: 6px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; cursor: pointer; }
+.player-progress { position: relative; height: 6px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; cursor: pointer; transition: height 0.2s; }
+.player-progress:hover { height: 8px; }
+.player-progress.active { height: 8px; }
 .player-progress::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.05), transparent); opacity: 0; transition: opacity 0.2s; }
 .player-progress:hover::after { opacity: 1; }
-.player-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; box-shadow: 0 0 12px var(--brand-glow); transition: width 0.12s linear; }
-.player-progress-handle { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--brand), 0 2px 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
+.player-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; box-shadow: 0 0 12px var(--brand-glow); }
+.player-progress-handle { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--brand), 0 2px 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
 .player-progress:hover .player-progress-handle, .player-progress.active .player-progress-handle { opacity: 1; }
 .player-times { display: flex; justify-content: space-between; align-items: center; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; }
 .player-times .duration { color: var(--text-dim); }
@@ -227,6 +264,9 @@ img { max-width: 100%; display: block; }
 .player-volume svg { transition: color 0.18s; }
 .player-volume:hover svg { color: var(--text); }
 .transcript-fade-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 30px; background: linear-gradient(180deg, transparent, var(--surface-2) 90%); pointer-events: none; opacity: 0.6; }
+
+/* hidden audio pool — keep them in flow but invisible */
+.audio-pool { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 @media (max-width: 920px) {
   .real-call-grid { grid-template-columns: 1fr; gap: 36px; }
@@ -527,7 +567,7 @@ img { max-width: 100%; display: block; }
       </div>
 
       <div class="real-call-right fade-up">
-        <div class="call-card-wrap">
+        <div class="call-card-wrap" id="call-card-wrap">
           <div class="call-card">
             <div class="call-card-tabs" role="tablist">
               <button class="call-tab active" type="button" data-tab="landscaping" role="tab" aria-selected="true">
@@ -558,9 +598,10 @@ img { max-width: 100%; display: block; }
                   <div class="call-meta" id="call-meta">Inbound · Saturday 4:18 PM</div>
                 </div>
               </div>
-              <div class="call-status" id="call-status">
-                <span class="call-status-dot"></span>
+              <div class="call-status ready" id="call-status">
+                <span class="call-status-indicator"><span class="dot"></span></span>
                 <span id="call-status-text">Ready</span>
+                <span class="eq-bars" aria-hidden="true"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span>
               </div>
             </div>
 
@@ -575,6 +616,7 @@ img { max-width: 100%; display: block; }
               <button class="player-play" id="player-play" type="button" aria-label="Play demo">
                 <svg class="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg class="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                <svg class="icon-loading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" opacity="0.85"/></svg>
               </button>
               <div class="player-progress-wrap">
                 <div class="player-progress" id="player-progress">
@@ -583,13 +625,20 @@ img { max-width: 100%; display: block; }
                 </div>
                 <div class="player-times">
                   <span id="player-current">0:00</span>
-                  <span class="duration" id="player-duration">0:00</span>
+                  <span class="duration" id="player-duration">--:--</span>
                 </div>
               </div>
               <div class="player-volume" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
               </div>
-              <audio id="call-audio" preload="metadata"></audio>
+            </div>
+
+            <!-- Pre-loaded audio elements, one per industry, never swap src -->
+            <div class="audio-pool" aria-hidden="true">
+              <audio id="audio-landscaping" preload="metadata" playsinline crossorigin="anonymous" src="/audio/landscaping.mp3"></audio>
+              <audio id="audio-self-storage" preload="metadata" playsinline crossorigin="anonymous" src="/audio/self-storage.mp3"></audio>
+              <audio id="audio-hvac" preload="metadata" playsinline crossorigin="anonymous" src="/audio/hvac.mp3"></audio>
+              <audio id="audio-plumbing" preload="metadata" playsinline crossorigin="anonymous" src="/audio/plumbing.mp3"></audio>
             </div>
           </div>
         </div>
@@ -814,7 +863,6 @@ img { max-width: 100%; display: block; }
       </div>
     </div>
 
-    <!-- Timeline reassurance -->
     <div class="plan-modal-timeline-wrap">
       <div class="plan-modal-timeline-title">What happens after signup?</div>
       <div class="plan-modal-timeline">
@@ -911,7 +959,6 @@ document.querySelectorAll('.faq-q').forEach(btn => {
 // ====== REAL CALL DEMO ======
 (function() {
   const tabs = document.querySelectorAll('.call-tab');
-  const audio = document.getElementById('call-audio');
   const playBtn = document.getElementById('player-play');
   const progressBar = document.getElementById('player-progress');
   const progressFill = document.getElementById('player-progress-fill');
@@ -923,118 +970,135 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   const metaEl = document.getElementById('call-meta');
   const statusEl = document.getElementById('call-status');
   const statusTextEl = document.getElementById('call-status-text');
+  const cardWrap = document.getElementById('call-card-wrap');
 
-  if (!audio) return;
+  // Pre-grab the 4 audio elements (already in DOM)
+  const audioPool = {
+    'landscaping': document.getElementById('audio-landscaping'),
+    'self-storage': document.getElementById('audio-self-storage'),
+    'hvac': document.getElementById('audio-hvac'),
+    'plumbing': document.getElementById('audio-plumbing'),
+  };
 
+  if (!playBtn || !audioPool['landscaping']) return;
+
+  // Demo data
   const DEMOS = {
     'landscaping': {
-      audio: '/audio/landscaping.mp3',
       business: 'GreenLine Landscaping',
       meta: 'Inbound · Saturday 4:18 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected' },
-        { speaker: 'ai', text: "Thanks for calling GreenLine Landscaping, this is Riley — how can I help you today?" },
-        { speaker: 'caller', text: "Yeah, hey. I tried calling earlier but nobody picked up. I'm looking to get a quote on weekly lawn care." },
-        { speaker: 'ai', text: "No problem at all, sorry we missed you earlier. Happy to help get that sorted. Can I grab your name real quick?" },
-        { speaker: 'caller', text: "Sure, it's Mark Reynolds." },
-        { speaker: 'ai', text: "Got it, Mark. And the best number to reach you on — is it the one you're calling from?" },
-        { speaker: 'caller', text: "Yep, this one's fine." },
-        { speaker: 'ai', text: "Perfect. So for weekly lawn care — are we talking just mowing and edging, or were you wanting trimming and blowing included too?" },
-        { speaker: 'caller', text: "The full deal, yeah. What does that usually run?" },
-        { speaker: 'ai', text: "Yeah, totally depends on lot size, but most weekly packages with the full service fall somewhere in the forty to seventy-five range per visit. The owner will put together an exact quote once he sees the property — usually within the day." },
-        { speaker: 'caller', text: "Okay. And how soon could you guys actually start?" },
-        { speaker: 'ai', text: "We've got openings as early as next week. Once Dave gives you a call back with the quote, he can lock in a day that works for you. Sound good?" },
-        { speaker: 'caller', text: "Yeah, that works." },
-        { speaker: 'ai', text: "Awesome. I've got Mark Reynolds at this number, weekly full-service lawn care, looking to start next week. Dave will give you a ring back before end of day. Anything else I can help with?" },
-        { speaker: 'caller', text: "Nope, that's it. Thanks." },
-        { speaker: 'ai', text: "You got it, Mark. Talk soon." },
+        { type: 'meta', text: 'Call connected · 4:18:02 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling GreenLine Landscaping, this is Riley — how can I help you today?" },
+        { speaker: 'caller', t: '00:06', text: "Yeah, hey. I tried calling earlier but nobody picked up. I'm looking to get a quote on weekly lawn care." },
+        { speaker: 'ai', t: '00:13', text: "No problem at all, sorry we missed you earlier. Happy to help get that sorted. Can I grab your name real quick?" },
+        { speaker: 'caller', t: '00:19', text: "Sure, it's Mark Reynolds." },
+        { speaker: 'ai', t: '00:22', text: "Got it, Mark. And the best number to reach you on — is it the one you're calling from?" },
+        { speaker: 'caller', t: '00:27', text: "Yep, this one's fine." },
+        { speaker: 'ai', t: '00:29', text: "Perfect. So for weekly lawn care — are we talking just mowing and edging, or were you wanting trimming and blowing included too?" },
+        { speaker: 'caller', t: '00:37', text: "The full deal, yeah. What does that usually run?" },
+        { speaker: 'ai', t: '00:41', text: "Yeah, totally depends on lot size, but most weekly packages with the full service fall somewhere in the forty to seventy-five range per visit. The owner will put together an exact quote once he sees the property — usually within the day." },
+        { speaker: 'caller', t: '00:54', text: "Okay. And how soon could you guys actually start?" },
+        { speaker: 'ai', t: '00:58', text: "We've got openings as early as next week. Once Dave gives you a call back with the quote, he can lock in a day that works for you. Sound good?" },
+        { speaker: 'caller', t: '01:06', text: "Yeah, that works." },
+        { speaker: 'ai', t: '01:08', text: "Awesome. I've got Mark Reynolds at this number, weekly full-service lawn care, looking to start next week. Dave will give you a ring back before end of day. Anything else I can help with?" },
+        { speaker: 'caller', t: '01:18', text: "Nope, that's it. Thanks." },
+        { speaker: 'ai', t: '01:20', text: "You got it, Mark. Talk soon." },
         { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
       ],
     },
     'self-storage': {
-      audio: '/audio/self-storage.mp3',
       business: 'Prime Vault Self Storage',
       meta: 'Inbound · Wednesday 6:52 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected' },
-        { speaker: 'ai', text: "Thanks for calling Prime Vault Self Storage, this is Riley — how can I help?" },
-        { speaker: 'caller', text: "Hey, uh — I'm moving this weekend and I kinda need a unit pretty fast. Do you guys have anything available?" },
-        { speaker: 'ai', text: "Yeah, totally — happy to check that for you. What size were you thinking? A 10×10 fits about a one-bedroom, 10×15's more like a two-bedroom." },
-        { speaker: 'caller', text: "Probably a 10×10. Maybe a little bigger. I've got a couch, bed, like… eight or nine boxes, some chairs." },
-        { speaker: 'ai', text: "Got it. Sounds like a 10×10 should do it, but a 10×15 gives you a little wiggle room. We do have both sizes open right now." },
-        { speaker: 'caller', text: "Okay, perfect. How much is a 10×10?" },
-        { speaker: 'ai', text: "Pricing depends on whether it's climate-controlled or standard — David, the owner, will text you exact numbers within the hour, but they typically run between ninety and one-thirty a month." },
-        { speaker: 'caller', text: "Alright. And I literally need it by Saturday. Is that doable?" },
-        { speaker: 'ai', text: "Yeah, that's totally doable — we can have you set up tomorrow if you want. Let me grab a few details. Can I get your name?" },
-        { speaker: 'caller', text: "It's Jessica Hale." },
-        { speaker: 'ai', text: "Thanks, Jessica. Best callback number — the one you're on?" },
-        { speaker: 'caller', text: "Yeah." },
-        { speaker: 'ai', text: "Perfect. So Jessica Hale, looking at a 10×10, needs it by Saturday. David will reach out within the hour with sizes and pricing. Anything else I should pass along?" },
-        { speaker: 'caller', text: "No, that's perfect. Thank you so much." },
-        { speaker: 'ai', text: "Of course. Talk soon, Jessica." },
+        { type: 'meta', text: 'Call connected · 6:52:14 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling Prime Vault Self Storage, this is Riley — how can I help?" },
+        { speaker: 'caller', t: '00:05', text: "Hey, uh — I'm moving this weekend and I kinda need a unit pretty fast. Do you guys have anything available?" },
+        { speaker: 'ai', t: '00:12', text: "Yeah, totally — happy to check that for you. What size were you thinking? A 10×10 fits about a one-bedroom, 10×15's more like a two-bedroom." },
+        { speaker: 'caller', t: '00:21', text: "Probably a 10×10. Maybe a little bigger. I've got a couch, bed, like… eight or nine boxes, some chairs." },
+        { speaker: 'ai', t: '00:30', text: "Got it. Sounds like a 10×10 should do it, but a 10×15 gives you a little wiggle room. We do have both sizes open right now." },
+        { speaker: 'caller', t: '00:38', text: "Okay, perfect. How much is a 10×10?" },
+        { speaker: 'ai', t: '00:42', text: "Pricing depends on whether it's climate-controlled or standard — David, the owner, will text you exact numbers within the hour, but they typically run between ninety and one-thirty a month." },
+        { speaker: 'caller', t: '00:54', text: "Alright. And I literally need it by Saturday. Is that doable?" },
+        { speaker: 'ai', t: '01:00', text: "Yeah, that's totally doable — we can have you set up tomorrow if you want. Let me grab a few details. Can I get your name?" },
+        { speaker: 'caller', t: '01:08', text: "It's Jessica Hale." },
+        { speaker: 'ai', t: '01:10', text: "Thanks, Jessica. Best callback number — the one you're on?" },
+        { speaker: 'caller', t: '01:13', text: "Yeah." },
+        { speaker: 'ai', t: '01:14', text: "Perfect. So Jessica Hale, looking at a 10×10, needs it by Saturday. David will reach out within the hour with sizes and pricing. Anything else I should pass along?" },
+        { speaker: 'caller', t: '01:24', text: "No, that's perfect. Thank you so much." },
+        { speaker: 'ai', t: '01:27', text: "Of course. Talk soon, Jessica." },
         { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
       ],
     },
     'hvac': {
-      audio: '/audio/hvac.mp3',
       business: 'Apex Heating & Air',
       meta: 'Inbound · Tuesday 8:34 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected' },
-        { speaker: 'ai', text: "Thanks for calling Apex Heating and Air, this is Riley. How can I help you tonight?" },
-        { speaker: 'caller', text: "Hey, my AC just stopped working. Like, completely. House is already eighty-two degrees in here and my kid's trying to sleep." },
-        { speaker: 'ai', text: "Oh man, that's the worst — I'm sorry. Let's get someone out to you. Is it blowing warm air, or nothing at all?" },
-        { speaker: 'caller', text: "Nothing. Fan's running but it's just… warm air. Outside unit's not even on, I don't think." },
-        { speaker: 'ai', text: "Yeah, sounds like the condenser might've kicked out. Could be a capacitor, could be electrical. Either way it needs a tech. Can I grab your name?" },
-        { speaker: 'caller', text: "Yeah, Tom Bradley." },
-        { speaker: 'ai', text: "Thanks, Tom. And the address — what's the best one to send someone to?" },
-        { speaker: 'caller', text: "412 Oakridge Drive. How fast can someone actually get here?" },
-        { speaker: 'ai', text: "Given it's after-hours and you've got a kid in the house, I'd say this qualifies for our priority callback. Let me get the on-call tech texted right now. He'll call you back within fifteen minutes to confirm a window." },
-        { speaker: 'caller', text: "Okay, please. I really appreciate that." },
-        { speaker: 'ai', text: "Of course. Just so I have everything — Tom Bradley, 412 Oakridge, AC blowing warm air, outside unit not running. Best callback's the number you're on?" },
-        { speaker: 'caller', text: "Yeah, this number." },
-        { speaker: 'ai', text: "Got it. Hang tight, Tom. You'll hear from him within fifteen minutes." },
-        { speaker: 'caller', text: "Thank you." },
+        { type: 'meta', text: 'Call connected · 8:34:08 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling Apex Heating and Air, this is Riley. How can I help you tonight?" },
+        { speaker: 'caller', t: '00:06', text: "Hey, my AC just stopped working. Like, completely. House is already eighty-two degrees in here and my kid's trying to sleep." },
+        { speaker: 'ai', t: '00:15', text: "Oh man, that's the worst — I'm sorry. Let's get someone out to you. Is it blowing warm air, or nothing at all?" },
+        { speaker: 'caller', t: '00:22', text: "Nothing. Fan's running but it's just… warm air. Outside unit's not even on, I don't think." },
+        { speaker: 'ai', t: '00:30', text: "Yeah, sounds like the condenser might've kicked out. Could be a capacitor, could be electrical. Either way it needs a tech. Can I grab your name?" },
+        { speaker: 'caller', t: '00:39', text: "Yeah, Tom Bradley." },
+        { speaker: 'ai', t: '00:42', text: "Thanks, Tom. And the address — what's the best one to send someone to?" },
+        { speaker: 'caller', t: '00:46', text: "412 Oakridge Drive. How fast can someone actually get here?" },
+        { speaker: 'ai', t: '00:51', text: "Given it's after-hours and you've got a kid in the house, I'd say this qualifies for our priority callback. Let me get the on-call tech texted right now. He'll call you back within fifteen minutes to confirm a window." },
+        { speaker: 'caller', t: '01:04', text: "Okay, please. I really appreciate that." },
+        { speaker: 'ai', t: '01:07', text: "Of course. Just so I have everything — Tom Bradley, 412 Oakridge, AC blowing warm air, outside unit not running. Best callback's the number you're on?" },
+        { speaker: 'caller', t: '01:17', text: "Yeah, this number." },
+        { speaker: 'ai', t: '01:19', text: "Got it. Hang tight, Tom. You'll hear from him within fifteen minutes." },
+        { speaker: 'caller', t: '01:24', text: "Thank you." },
         { type: 'meta', captured: true, text: 'Hot lead · Tech notified · Summary emailed' },
       ],
     },
     'plumbing': {
-      audio: '/audio/plumbing.mp3',
       business: 'Steady Flow Plumbing',
       meta: 'Inbound · Sunday 10:11 AM',
       transcript: [
-        { type: 'meta', text: 'Call connected' },
-        { speaker: 'ai', text: "Thanks for calling Steady Flow Plumbing, this is Riley. How can I help?" },
-        { speaker: 'caller', text: "Hi — yeah, I've got water coming out from under my kitchen sink. Like a lot. I shut the valve off but the floor's already soaked." },
-        { speaker: 'ai', text: "Okay, good move shutting the valve off — that was the right call. Can I confirm — the water is fully stopped now, right?" },
-        { speaker: 'caller', text: "Yeah, it's stopped. But I mean, the cabinet's still dripping and I don't know what to do." },
-        { speaker: 'ai', text: "Totally understand. We'll get someone out today. Can I get your name?" },
-        { speaker: 'caller', text: "Linda Park." },
-        { speaker: 'ai', text: "Thanks, Linda. And do you know — is it a leak from the supply line under the sink, or is it coming from the drain trap? The pipe shaped like a U." },
-        { speaker: 'caller', text: "Uh… I think the U-shaped one? It looks cracked or something." },
-        { speaker: 'ai', text: "Okay, that's a P-trap. Good news is that's a pretty quick fix for our techs. Before I send someone — quick heads up on pricing — our weekend service call starts at one-twenty-five just to come out, and the repair itself depends on what they find. You okay with that?" },
-        { speaker: 'caller', text: "Yeah, that's fine. I just need it done." },
-        { speaker: 'ai', text: "Totally fair. What's the address?" },
-        { speaker: 'caller', text: "1847 Beacon Street." },
-        { speaker: 'ai', text: "Got it. And the best number — same as the one you're calling from?" },
-        { speaker: 'caller', text: "Yep." },
-        { speaker: 'ai', text: "Perfect. So Linda Park, 1847 Beacon, leaking P-trap, water shut off, ready for service. I'll get the on-call tech routed your way — he'll call you within thirty minutes with an arrival window. Sound good?" },
-        { speaker: 'caller', text: "Yes. Thank you so much." },
-        { speaker: 'ai', text: "You're welcome, Linda. Help's on the way." },
+        { type: 'meta', text: 'Call connected · 10:11:32 AM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling Steady Flow Plumbing, this is Riley. How can I help?" },
+        { speaker: 'caller', t: '00:05', text: "Hi — yeah, I've got water coming out from under my kitchen sink. Like a lot. I shut the valve off but the floor's already soaked." },
+        { speaker: 'ai', t: '00:14', text: "Okay, good move shutting the valve off — that was the right call. Can I confirm — the water is fully stopped now, right?" },
+        { speaker: 'caller', t: '00:22', text: "Yeah, it's stopped. But I mean, the cabinet's still dripping and I don't know what to do." },
+        { speaker: 'ai', t: '00:30', text: "Totally understand. We'll get someone out today. Can I get your name?" },
+        { speaker: 'caller', t: '00:35', text: "Linda Park." },
+        { speaker: 'ai', t: '00:37', text: "Thanks, Linda. And do you know — is it a leak from the supply line under the sink, or is it coming from the drain trap? The pipe shaped like a U." },
+        { speaker: 'caller', t: '00:46', text: "Uh… I think the U-shaped one? It looks cracked or something." },
+        { speaker: 'ai', t: '00:51', text: "Okay, that's a P-trap. Good news is that's a pretty quick fix for our techs. Before I send someone — quick heads up on pricing — our weekend service call starts at one-twenty-five just to come out, and the repair itself depends on what they find. You okay with that?" },
+        { speaker: 'caller', t: '01:08', text: "Yeah, that's fine. I just need it done." },
+        { speaker: 'ai', t: '01:11', text: "Totally fair. What's the address?" },
+        { speaker: 'caller', t: '01:13', text: "1847 Beacon Street." },
+        { speaker: 'ai', t: '01:16', text: "Got it. And the best number — same as the one you're calling from?" },
+        { speaker: 'caller', t: '01:19', text: "Yep." },
+        { speaker: 'ai', t: '01:20', text: "Perfect. So Linda Park, 1847 Beacon, leaking P-trap, water shut off, ready for service. I'll get the on-call tech routed your way — he'll call you within thirty minutes with an arrival window. Sound good?" },
+        { speaker: 'caller', t: '01:33', text: "Yes. Thank you so much." },
+        { speaker: 'ai', t: '01:35', text: "You're welcome, Linda. Help's on the way." },
         { type: 'meta', captured: true, text: 'Lead captured · Tech dispatched · Summary emailed' },
       ],
     },
   };
 
   let currentTab = 'landscaping';
-  let isPlaying = false;
+  let currentAudio = audioPool[currentTab];
   let isScrubbing = false;
+  const FALLBACK_DURATIONS = { 'landscaping': 92, 'self-storage': 92, 'hvac': 92, 'plumbing': 105 };
 
   function formatTime(s) {
-    if (!isFinite(s) || isNaN(s)) return '0:00';
+    if (!isFinite(s) || isNaN(s) || s < 0) return '0:00';
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
     return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function setStatus(stateClass, text) {
+    statusEl.className = 'call-status ' + stateClass;
+    statusTextEl.textContent = text;
+    if (stateClass === 'on-call') {
+      cardWrap.classList.add('is-playing');
+    } else {
+      cardWrap.classList.remove('is-playing');
+    }
   }
 
   function renderTranscript(key) {
@@ -1042,51 +1106,148 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     if (!demo) return;
     transcriptEl.innerHTML = '';
     demo.transcript.forEach((line, i) => {
-      const lineEl = document.createElement('div');
       if (line.type === 'meta') {
-        lineEl.className = 'transcript-meta' + (line.captured ? ' captured' : '');
-        lineEl.textContent = line.text;
-      } else {
-        lineEl.className = 'transcript-line ' + line.speaker;
-        lineEl.style.animationDelay = (i * 0.04) + 's';
-        const speakerEl = document.createElement('div');
-        speakerEl.className = 'transcript-speaker ' + line.speaker;
-        speakerEl.textContent = line.speaker === 'ai' ? 'AI Receptionist' : 'Caller';
-        const bubbleEl = document.createElement('div');
-        bubbleEl.className = 'transcript-bubble ' + line.speaker;
-        bubbleEl.textContent = line.text;
-        lineEl.appendChild(speakerEl);
-        lineEl.appendChild(bubbleEl);
+        const metaEl = document.createElement('div');
+        metaEl.className = 'transcript-meta' + (line.captured ? ' captured' : '');
+        metaEl.style.animationDelay = (i * 0.05) + 's';
+        metaEl.textContent = line.text;
+        transcriptEl.appendChild(metaEl);
+        return;
       }
+      const lineEl = document.createElement('div');
+      lineEl.className = 'transcript-line ' + line.speaker;
+      lineEl.style.animationDelay = (i * 0.05) + 's';
+
+      const headerRow = document.createElement('div');
+      headerRow.className = 'transcript-header-row';
+      const speakerEl = document.createElement('div');
+      speakerEl.className = 'transcript-speaker ' + line.speaker;
+      speakerEl.textContent = line.speaker === 'ai' ? 'AI Receptionist' : 'Caller';
+      const tsEl = document.createElement('div');
+      tsEl.className = 'transcript-timestamp';
+      tsEl.textContent = line.t || '';
+      headerRow.appendChild(speakerEl);
+      headerRow.appendChild(tsEl);
+
+      const bubbleEl = document.createElement('div');
+      bubbleEl.className = 'transcript-bubble ' + line.speaker;
+      bubbleEl.textContent = line.text;
+
+      lineEl.appendChild(headerRow);
+      lineEl.appendChild(bubbleEl);
       transcriptEl.appendChild(lineEl);
     });
     transcriptEl.scrollTop = 0;
   }
 
-  function loadDemo(key) {
+  function updateDurationDisplay(audio, key) {
+    if (audio && isFinite(audio.duration) && audio.duration > 0) {
+      durationEl.textContent = formatTime(audio.duration);
+    } else {
+      durationEl.textContent = formatTime(FALLBACK_DURATIONS[key] || 0);
+    }
+  }
+
+  function bindAudioEvents(audio, key) {
+    if (audio._aliBound) return;
+    audio._aliBound = true;
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (key === currentTab) updateDurationDisplay(audio, key);
+    });
+    audio.addEventListener('durationchange', () => {
+      if (key === currentTab) updateDurationDisplay(audio, key);
+    });
+    audio.addEventListener('play', () => {
+      if (key !== currentTab) return;
+      playBtn.classList.add('playing');
+      playBtn.classList.remove('loading');
+      setStatus('on-call', 'On Call');
+    });
+    audio.addEventListener('pause', () => {
+      if (key !== currentTab) return;
+      playBtn.classList.remove('playing');
+      playBtn.classList.remove('loading');
+      if (audio.ended || audio.currentTime === 0) {
+        setStatus('ready', 'Ready');
+      } else {
+        setStatus('paused', 'Paused');
+      }
+    });
+    audio.addEventListener('ended', () => {
+      if (key !== currentTab) return;
+      playBtn.classList.remove('playing');
+      playBtn.classList.remove('loading');
+      setStatus('ended', 'Call ended');
+    });
+    audio.addEventListener('timeupdate', () => {
+      if (key !== currentTab || isScrubbing) return;
+      const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (FALLBACK_DURATIONS[key] || 1);
+      const pct = (audio.currentTime / dur) * 100;
+      progressFill.style.width = pct + '%';
+      progressHandle.style.left = pct + '%';
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+    audio.addEventListener('waiting', () => {
+      if (key !== currentTab) return;
+      if (!audio.paused) playBtn.classList.add('loading');
+    });
+    audio.addEventListener('canplay', () => {
+      if (key !== currentTab) return;
+      playBtn.classList.remove('loading');
+      updateDurationDisplay(audio, key);
+    });
+    audio.addEventListener('error', () => {
+      console.warn('[ai-lead-intel] audio load issue for', key, audio.src);
+      // Don't show "Audio unavailable" — let user still try clicking. Browser may recover.
+    });
+  }
+
+  Object.keys(audioPool).forEach(k => {
+    if (audioPool[k]) bindAudioEvents(audioPool[k], k);
+  });
+
+  function loadDemo(key, opts) {
     const demo = DEMOS[key];
-    if (!demo) return;
+    const audio = audioPool[key];
+    if (!demo || !audio) return;
+
+    // Pause all other audio
+    Object.keys(audioPool).forEach(k => {
+      if (k !== key && audioPool[k] && !audioPool[k].paused) {
+        try { audioPool[k].pause(); audioPool[k].currentTime = 0; } catch (_) {}
+      }
+    });
+
     currentTab = key;
-    isPlaying = false;
+    currentAudio = audio;
+
+    // Reset playback position when switching
+    try { audio.currentTime = 0; } catch (_) {}
+
+    // Reset UI
     playBtn.classList.remove('playing');
-    audio.pause();
-    audio.src = demo.audio;
-    audio.currentTime = 0;
+    playBtn.classList.remove('loading');
     progressFill.style.width = '0%';
     progressHandle.style.left = '0%';
     currentTimeEl.textContent = '0:00';
-    durationEl.textContent = '0:00';
-    statusEl.classList.remove('on-call');
-    statusTextEl.textContent = 'Ready';
+    updateDurationDisplay(audio, key);
+
+    setStatus('ready', 'Ready');
     businessEl.textContent = demo.business;
     metaEl.textContent = demo.meta;
     renderTranscript(key);
+
+    // Kick metadata load if not already
+    if (audio.readyState < 1) {
+      try { audio.load(); } catch (_) {}
+    }
   }
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const key = tab.dataset.tab;
-      if (key === currentTab) return;
+      if (!DEMOS[key] || key === currentTab) return;
       tabs.forEach(t => {
         t.classList.toggle('active', t === tab);
         t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
@@ -1096,66 +1257,38 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   });
 
   playBtn.addEventListener('click', () => {
+    const audio = currentAudio;
+    if (!audio) return;
     if (audio.paused) {
-      audio.play().catch(err => {
-        console.warn('Audio play failed:', err);
-      });
+      // Show loading immediately for snappy feedback
+      playBtn.classList.add('loading');
+      setStatus('loading', 'Loading…');
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.catch(err => {
+          console.warn('[ai-lead-intel] play() rejected:', err);
+          playBtn.classList.remove('loading');
+          setStatus('ready', 'Tap to play');
+        });
+      }
     } else {
       audio.pause();
     }
   });
 
-  audio.addEventListener('play', () => {
-    isPlaying = true;
-    playBtn.classList.add('playing');
-    statusEl.classList.add('on-call');
-    statusTextEl.textContent = 'On Call';
-  });
-
-  audio.addEventListener('pause', () => {
-    isPlaying = false;
-    playBtn.classList.remove('playing');
-    if (audio.ended || audio.currentTime === 0) {
-      statusEl.classList.remove('on-call');
-      statusTextEl.textContent = 'Ready';
-    } else {
-      statusEl.classList.remove('on-call');
-      statusTextEl.textContent = 'Paused';
-    }
-  });
-
-  audio.addEventListener('ended', () => {
-    isPlaying = false;
-    playBtn.classList.remove('playing');
-    statusEl.classList.remove('on-call');
-    statusTextEl.textContent = 'Call ended';
-  });
-
-  audio.addEventListener('loadedmetadata', () => {
-    durationEl.textContent = formatTime(audio.duration);
-  });
-
-  audio.addEventListener('timeupdate', () => {
-    if (isScrubbing) return;
-    const pct = (audio.currentTime / (audio.duration || 1)) * 100;
-    progressFill.style.width = pct + '%';
-    progressHandle.style.left = pct + '%';
-    currentTimeEl.textContent = formatTime(audio.currentTime);
-  });
-
-  audio.addEventListener('error', (e) => {
-    console.warn('Audio load error for', currentTab, e);
-    statusTextEl.textContent = 'Audio unavailable';
-  });
-
   function scrub(e) {
+    const audio = currentAudio;
+    if (!audio) return;
     const rect = progressBar.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    const x = clientX - rect.left;
     const pct = Math.max(0, Math.min(1, x / rect.width));
-    if (isFinite(audio.duration)) {
-      audio.currentTime = audio.duration * pct;
+    const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (FALLBACK_DURATIONS[currentTab] || 0);
+    if (dur > 0) {
+      try { audio.currentTime = dur * pct; } catch (_) {}
       progressFill.style.width = (pct * 100) + '%';
       progressHandle.style.left = (pct * 100) + '%';
+      currentTimeEl.textContent = formatTime(dur * pct);
     }
   }
 
@@ -1189,7 +1322,22 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     window.addEventListener('touchend', onEnd);
   }, { passive: true });
 
-  // Initial load
+  // Pause when section scrolls out of view (saves battery on mobile)
+  if ('IntersectionObserver' in window) {
+    const section = document.getElementById('demo');
+    if (section) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting && currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+          }
+        });
+      }, { threshold: 0.05 });
+      io.observe(section);
+    }
+  }
+
+  // Initial render
   loadDemo('landscaping');
 })();
 
