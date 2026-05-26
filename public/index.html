@@ -139,71 +139,63 @@ img { max-width: 100%; display: block; }
 .number-badge-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
 @media (max-width: 600px) { .number-badge { flex-direction: column; text-align: center; } }
 
-/* ====== REAL CALL EXPERIENCE SECTION ====== */
-.real-call-section { padding: 96px 0; position: relative; }
-.real-call-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 65% 55% at 75% 50%, rgba(255,106,0,0.08), transparent 65%); pointer-events: none; z-index: 0; }
-.real-call-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 56px; align-items: center; position: relative; z-index: 1; }
-.real-call-left { min-width: 0; }
-.real-call-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 7px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 22px; }
+/* ====== REAL CALL EXPERIENCE SECTION — REDESIGNED ====== */
+.real-call-section { padding: 110px 0 96px; position: relative; }
+.real-call-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(255,106,0,0.07), transparent 60%); pointer-events: none; z-index: 0; }
+.real-call-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+.real-call-head { text-align: center; margin-bottom: 36px; }
+.real-call-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 7px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 20px; }
 .real-call-eyebrow .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
-.real-call-title { font-size: clamp(30px, 4.4vw, 48px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.08; margin-bottom: 20px; }
+.real-call-title { font-size: clamp(28px, 4vw, 42px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 14px; }
 .real-call-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.real-call-story { font-size: 16px; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; max-width: 500px; }
-.real-call-story strong { color: var(--text); font-weight: 600; }
-.real-call-bullets { display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
-.real-call-bullet { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 12px; transition: all 0.25s cubic-bezier(0.16,1,0.3,1); }
-.real-call-bullet:hover { border-color: var(--brand-line); transform: translateX(2px); }
-.real-call-bullet-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.25s; }
-.real-call-bullet:hover .real-call-bullet-icon { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; border-color: var(--brand); box-shadow: 0 6px 16px var(--brand-glow); }
-.real-call-bullet-text { flex: 1; min-width: 0; }
-.real-call-bullet-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.005em; }
-.real-call-bullet-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+.real-call-sub { font-size: 15.5px; color: var(--text-dim); line-height: 1.65; max-width: 520px; margin: 0 auto; }
+.real-call-sub strong { color: var(--text); font-weight: 600; }
 
-/* Right side — Call card */
+/* Tabs row above the card */
+.industry-tabs { display: flex; justify-content: center; gap: 4px; margin-bottom: 18px; padding: 5px; background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px; max-width: 560px; margin-left: auto; margin-right: auto; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; position: relative; }
+.industry-tabs::-webkit-scrollbar { display: none; }
+.industry-tab { flex: 1; min-width: 96px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-faint); cursor: pointer; background: transparent; border: 1px solid transparent; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; letter-spacing: -0.005em; position: relative; }
+.industry-tab svg { opacity: 0.55; transition: opacity 0.22s; flex-shrink: 0; }
+.industry-tab:hover { color: var(--text-dim); }
+.industry-tab.active { background: linear-gradient(180deg, rgba(255,106,0,0.16), rgba(255,106,0,0.06)); color: var(--text); border-color: var(--brand-line); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(255,106,0,0.12); }
+.industry-tab.active svg { opacity: 1; color: var(--brand); }
+
+/* Call card */
 .call-card-wrap { position: relative; }
-.call-card-wrap::before { content: ''; position: absolute; inset: -30px; background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(30px); z-index: 0; opacity: 0.5; transition: opacity 0.4s; }
+.call-card-wrap::before { content: ''; position: absolute; inset: -24px -24px -8px; background: radial-gradient(ellipse 60% 55% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(36px); z-index: 0; opacity: 0.45; transition: opacity 0.4s; }
 .call-card-wrap.is-playing::before { opacity: 0.85; }
-.call-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 22px; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 40px 90px rgba(0,0,0,0.55), 0 16px 36px rgba(0,0,0,0.35); transition: border-color 0.3s; }
+.call-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 20px; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 30px 70px rgba(0,0,0,0.5), 0 12px 28px rgba(0,0,0,0.3); transition: border-color 0.3s; }
 .call-card-wrap.is-playing .call-card { border-color: var(--brand-line); }
-.call-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.6), transparent); z-index: 2; }
-.call-card-tabs { display: flex; gap: 4px; padding: 12px; background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
-.call-card-tabs::-webkit-scrollbar { display: none; }
-.call-tab { flex: 1; min-width: 90px; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; font-weight: 600; color: var(--text-faint); cursor: pointer; background: transparent; border: 1px solid transparent; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; letter-spacing: -0.005em; }
-.call-tab svg { opacity: 0.55; transition: opacity 0.22s; flex-shrink: 0; }
-.call-tab:hover { color: var(--text-dim); }
-.call-tab.active { background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); color: var(--text); border-color: var(--border-2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
-.call-tab.active svg { opacity: 1; color: var(--brand); }
+.call-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent); z-index: 2; }
 
-/* Call header */
-.call-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; gap: 14px; border-bottom: 1px solid var(--border); }
-.call-header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.call-avatar { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 6px 16px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
-.call-avatar::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.18)); }
+/* Compact card header */
+.call-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; gap: 12px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.18); }
+.call-header-left { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+.call-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 4px 12px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+.call-avatar::after { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.18)); }
 .call-header-text { min-width: 0; overflow: hidden; }
-.call-business { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.call-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 3px; }
+.call-business { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.call-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 2px; }
 
-/* Status pill with EQ bars + ring pulse */
-.call-status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border-2); flex-shrink: 0; transition: all 0.3s; position: relative; }
+/* Status pill */
+.call-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border-2); flex-shrink: 0; transition: all 0.3s; position: relative; }
 .call-status.ready { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
 .call-status.loading { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
 .call-status.on-call { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
 .call-status.ended { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
 .call-status.paused { color: var(--warm); background: var(--warm-soft); border-color: rgba(245,158,11,0.28); }
-.call-status.unavailable { color: var(--hot); background: var(--hot-soft); border-color: var(--hot-line); }
-.call-status-indicator { position: relative; width: 8px; height: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
-.call-status-indicator .dot { position: relative; z-index: 2; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.call-status.on-call .call-status-indicator .dot { box-shadow: 0 0 8px currentColor; }
+.call-status-indicator { position: relative; width: 7px; height: 7px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.call-status-indicator .dot { position: relative; z-index: 2; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.call-status.on-call .call-status-indicator .dot { box-shadow: 0 0 7px currentColor; }
 .call-status.on-call .call-status-indicator::before, .call-status.on-call .call-status-indicator::after {
-  content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border-radius: 50%;
+  content: ''; position: absolute; top: 50%; left: 50%; width: 7px; height: 7px; border-radius: 50%;
   background: currentColor; transform: translate(-50%, -50%); opacity: 0.4;
   animation: ringExpand 1.6s ease-out infinite;
 }
 .call-status.on-call .call-status-indicator::after { animation-delay: 0.8s; }
-@keyframes ringExpand { 0% { width: 8px; height: 8px; opacity: 0.45; } 100% { width: 22px; height: 22px; opacity: 0; } }
-
-/* EQ bars next to status */
-.eq-bars { display: none; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px; }
+@keyframes ringExpand { 0% { width: 7px; height: 7px; opacity: 0.45; } 100% { width: 20px; height: 20px; opacity: 0; } }
+.eq-bars { display: none; align-items: flex-end; gap: 2px; height: 10px; margin-left: 1px; }
 .call-status.on-call .eq-bars { display: inline-flex; }
 .eq-bar { width: 2px; background: currentColor; border-radius: 1px; height: 30%; animation: eqBar 0.9s ease-in-out infinite; transform-origin: bottom; }
 .eq-bar:nth-child(1) { animation-delay: 0.0s; }
@@ -213,35 +205,36 @@ img { max-width: 100%; display: block; }
 
 /* Transcript */
 .call-transcript-wrap { position: relative; }
-.call-transcript { display: flex; flex-direction: column; gap: 14px; padding: 20px 24px; max-height: 380px; overflow-y: auto; scroll-behavior: smooth; }
-.call-transcript::-webkit-scrollbar { width: 6px; }
+.call-transcript { display: flex; flex-direction: column; gap: 12px; padding: 18px 20px 24px; height: 320px; overflow-y: auto; scroll-behavior: smooth; }
+.call-transcript::-webkit-scrollbar { width: 5px; }
 .call-transcript::-webkit-scrollbar-track { background: transparent; }
 .call-transcript::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
 .call-transcript::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
-.transcript-line { display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); animation: lineIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
+.transcript-line { display: flex; flex-direction: column; gap: 3px; opacity: 0; transform: translateY(6px); animation: lineIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
 @keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
-.transcript-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
-.transcript-speaker { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.transcript-header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 3px; }
+.transcript-speaker { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
 .transcript-speaker.ai { color: var(--brand); }
 .transcript-speaker.caller { color: var(--text-dim); }
-.transcript-timestamp { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: var(--text-faint); font-weight: 500; }
-.transcript-bubble { padding: 11px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; max-width: 92%; letter-spacing: -0.005em; }
-.transcript-bubble.ai { background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); color: var(--text); align-self: flex-start; border-top-left-radius: 5px; }
+.transcript-timestamp { font-family: 'Geist Mono', monospace; font-size: 8.5px; letter-spacing: 0.06em; color: var(--text-faint); font-weight: 500; }
+.transcript-bubble { padding: 10px 13px; border-radius: 13px; font-size: 13px; line-height: 1.5; max-width: 88%; letter-spacing: -0.005em; }
+.transcript-bubble.ai { background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); color: var(--text); align-self: flex-start; border-top-left-radius: 4px; }
 .transcript-line.caller { align-items: flex-end; }
 .transcript-line.caller .transcript-header-row { flex-direction: row-reverse; }
-.transcript-bubble.caller { background: var(--surface-3); color: var(--text-soft); align-self: flex-end; border-top-right-radius: 5px; border: 1px solid var(--border); }
-.transcript-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; align-self: center; padding: 4px 12px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; opacity: 0; animation: lineIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
+.transcript-bubble.caller { background: var(--surface-3); color: var(--text-soft); align-self: flex-end; border-top-right-radius: 4px; border: 1px solid var(--border); }
+.transcript-meta { font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; align-self: center; padding: 4px 11px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; opacity: 0; animation: lineIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
 .transcript-meta.captured { color: var(--green); border-color: var(--green-line); background: var(--green-soft); }
 
+.transcript-fade-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 36px; background: linear-gradient(180deg, transparent, var(--surface-2) 90%); pointer-events: none; }
+
 /* Audio player */
-.call-player { padding: 18px 24px 22px; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(0,0,0,0.18)); display: flex; align-items: center; gap: 14px; }
-.player-play { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 6px 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; position: relative; }
+.call-player { padding: 14px 20px 18px; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(0,0,0,0.22)); display: flex; align-items: center; gap: 14px; }
+.player-play { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 4px 14px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; position: relative; }
 .player-play::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: var(--brand); opacity: 0; transition: opacity 0.3s; z-index: -1; filter: blur(8px); }
 .player-play.playing::before { opacity: 0.55; animation: playGlow 1.8s ease-in-out infinite; }
 @keyframes playGlow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.75; } }
-.player-play:hover { transform: scale(1.06); box-shadow: 0 10px 26px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.28); }
-.player-play:active { transform: scale(0.97); }
-.player-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.player-play:hover { transform: scale(1.05); box-shadow: 0 8px 22px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.28); }
+.player-play:active { transform: scale(0.96); }
 .player-play svg { transition: transform 0.18s; }
 .player-play .icon-pause, .player-play .icon-loading { display: none; }
 .player-play.playing .icon-play { display: none; }
@@ -249,39 +242,38 @@ img { max-width: 100%; display: block; }
 .player-play.loading .icon-play, .player-play.loading .icon-pause { display: none; }
 .player-play.loading .icon-loading { display: block; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.player-progress-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-.player-progress { position: relative; height: 6px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; cursor: pointer; transition: height 0.2s; }
-.player-progress:hover { height: 8px; }
-.player-progress.active { height: 8px; }
-.player-progress::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.05), transparent); opacity: 0; transition: opacity 0.2s; }
-.player-progress:hover::after { opacity: 1; }
-.player-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; box-shadow: 0 0 12px var(--brand-glow); }
-.player-progress-handle { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--brand), 0 2px 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
+.player-progress-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.player-progress { position: relative; height: 5px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; cursor: pointer; transition: height 0.2s; }
+.player-progress:hover { height: 7px; }
+.player-progress.active { height: 7px; }
+.player-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; box-shadow: 0 0 10px var(--brand-glow); }
+.player-progress-handle { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--brand), 0 2px 6px rgba(0,0,0,0.5); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
 .player-progress:hover .player-progress-handle, .player-progress.active .player-progress-handle { opacity: 1; }
-.player-times { display: flex; justify-content: space-between; align-items: center; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; }
+.player-times { display: flex; justify-content: space-between; align-items: center; font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.04em; }
 .player-times .duration { color: var(--text-dim); }
 .player-volume { display: flex; align-items: center; gap: 4px; color: var(--text-faint); flex-shrink: 0; }
 .player-volume svg { transition: color 0.18s; }
 .player-volume:hover svg { color: var(--text); }
-.transcript-fade-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 30px; background: linear-gradient(180deg, transparent, var(--surface-2) 90%); pointer-events: none; opacity: 0.6; }
 
-/* hidden audio pool — keep them in flow but invisible */
+/* Trust strip below the card */
+.real-call-trust { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 28px; flex-wrap: wrap; }
+.real-call-trust-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; font-weight: 500; }
+.real-call-trust-item svg { color: var(--brand); flex-shrink: 0; }
+
+/* hidden audio pool */
 .audio-pool { position: absolute; width: 0; height: 0; overflow: hidden; }
 
-@media (max-width: 920px) {
-  .real-call-grid { grid-template-columns: 1fr; gap: 36px; }
-  .real-call-left { text-align: center; }
-  .real-call-eyebrow, .real-call-bullets { margin-left: auto; margin-right: auto; }
-  .real-call-story { margin-left: auto; margin-right: auto; }
-}
 @media (max-width: 560px) {
-  .real-call-section { padding: 64px 0; }
-  .call-header { padding: 16px 18px 14px; }
-  .call-transcript { padding: 16px 18px; max-height: 320px; }
-  .call-player { padding: 14px 18px 18px; }
-  .transcript-bubble { font-size: 13px; }
-  .call-tab { min-width: 72px; padding: 8px 10px; font-size: 11.5px; }
-  .real-call-bullet { padding: 12px 14px; }
+  .real-call-section { padding: 72px 0 64px; }
+  .real-call-inner { padding: 0 20px; }
+  .industry-tabs { padding: 4px; gap: 2px; }
+  .industry-tab { min-width: 76px; padding: 8px 10px; font-size: 11.5px; }
+  .industry-tab svg { display: none; }
+  .call-header { padding: 14px 16px; }
+  .call-transcript { padding: 14px 16px 20px; height: 280px; }
+  .call-player { padding: 12px 16px 16px; gap: 12px; }
+  .transcript-bubble { font-size: 12.5px; padding: 9px 12px; }
+  .real-call-trust { gap: 16px; }
 }
 
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -527,121 +519,102 @@ img { max-width: 100%; display: block; }
   </div>
 </section>
 
-<!-- ====== REAL CALL EXPERIENCE SECTION ====== -->
+<!-- ====== REAL CALL EXPERIENCE SECTION — REDESIGNED ====== -->
 <section class="real-call-section" id="demo">
-  <div class="wrap">
-    <div class="real-call-grid">
-      <div class="real-call-left fade-up">
-        <div class="real-call-eyebrow"><span class="live-dot"></span>Real scenario</div>
-        <h2 class="real-call-title">Here's what it sounds like <span class="accent">in real life.</span></h2>
-        <p class="real-call-story">Listen to actual calls handled by your AI receptionist. <strong>No scripts. No awkward pauses. No robotic voice.</strong> Just a calm, natural conversation that captures the lead and keeps your customer happy — while you stay focused on the job in front of you.</p>
-        <div class="real-call-bullets">
-          <div class="real-call-bullet">
-            <div class="real-call-bullet-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+  <div class="real-call-inner">
+    <div class="real-call-head fade-up">
+      <div class="real-call-eyebrow"><span class="live-dot"></span>Hear it for yourself</div>
+      <h2 class="real-call-title">This is what your AI <span class="accent">actually sounds like.</span></h2>
+      <p class="real-call-sub">Real calls. Real conversations. <strong>No scripts, no robotic voice.</strong> Pick an industry and press play.</p>
+    </div>
+
+    <div class="industry-tabs fade-up" role="tablist">
+      <button class="industry-tab active" type="button" data-tab="landscaping" role="tab" aria-selected="true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22c0-6 4-10 10-10"/><path d="M2 12c6 0 10 4 10 10"/><path d="M12 2v8"/></svg>
+        Landscaping
+      </button>
+      <button class="industry-tab" type="button" data-tab="self-storage" role="tab" aria-selected="false">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M3 11h18"/><path d="M7 7V4h10v3"/></svg>
+        Self Storage
+      </button>
+      <button class="industry-tab" type="button" data-tab="hvac" role="tab" aria-selected="false">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/><path d="M5.6 5.6l12.8 12.8"/><path d="M18.4 5.6L5.6 18.4"/></svg>
+        HVAC
+      </button>
+      <button class="industry-tab" type="button" data-tab="plumbing" role="tab" aria-selected="false">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h6v6"/><path d="M9 13h6v8"/><path d="M15 13l6-6"/><path d="M19 5l2 2"/></svg>
+        Plumbing
+      </button>
+    </div>
+
+    <div class="call-card-wrap fade-up" id="call-card-wrap">
+      <div class="call-card">
+        <div class="call-header">
+          <div class="call-header-left">
+            <div class="call-avatar">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative;z-index:1;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </div>
-            <div class="real-call-bullet-text">
-              <div class="real-call-bullet-title">Answers like a real receptionist</div>
-              <div class="real-call-bullet-desc">Warm, conversational, and tuned to your business — never robotic.</div>
+            <div class="call-header-text">
+              <div class="call-business" id="call-business-name">GreenLine Landscaping</div>
+              <div class="call-meta" id="call-meta">Inbound · Saturday 4:18 PM</div>
             </div>
           </div>
-          <div class="real-call-bullet">
-            <div class="real-call-bullet-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+          <div class="call-status ready" id="call-status">
+            <span class="call-status-indicator"><span class="dot"></span></span>
+            <span id="call-status-text">Ready</span>
+            <span class="eq-bars" aria-hidden="true"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span>
+          </div>
+        </div>
+
+        <div class="call-transcript-wrap">
+          <div class="call-transcript" id="call-transcript">
+            <!-- transcript injected by JS -->
+          </div>
+          <div class="transcript-fade-overlay"></div>
+        </div>
+
+        <div class="call-player">
+          <button class="player-play" id="player-play" type="button" aria-label="Play demo">
+            <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+            <svg class="icon-loading" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" opacity="0.85"/></svg>
+          </button>
+          <div class="player-progress-wrap">
+            <div class="player-progress" id="player-progress">
+              <div class="player-progress-fill" id="player-progress-fill"></div>
+              <div class="player-progress-handle" id="player-progress-handle" style="left: 0%;"></div>
             </div>
-            <div class="real-call-bullet-text">
-              <div class="real-call-bullet-title">Captures the lead, every time</div>
-              <div class="real-call-bullet-desc">Name, number, urgency, and what they need — confirmed before hangup.</div>
+            <div class="player-times">
+              <span id="player-current">0:00</span>
+              <span class="duration" id="player-duration">--:--</span>
             </div>
           </div>
-          <div class="real-call-bullet">
-            <div class="real-call-bullet-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div class="real-call-bullet-text">
-              <div class="real-call-bullet-title">Built for real businesses</div>
-              <div class="real-call-bullet-desc">Quoted pricing, hours, transfers, emergencies — handled correctly.</div>
-            </div>
+          <div class="player-volume" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           </div>
+        </div>
+
+        <div class="audio-pool" aria-hidden="true">
+          <audio id="audio-landscaping" preload="metadata" playsinline crossorigin="anonymous" src="/audio/landscaping.mp3"></audio>
+          <audio id="audio-self-storage" preload="metadata" playsinline crossorigin="anonymous" src="/audio/self-storage.mp3"></audio>
+          <audio id="audio-hvac" preload="metadata" playsinline crossorigin="anonymous" src="/audio/hvac.mp3"></audio>
+          <audio id="audio-plumbing" preload="metadata" playsinline crossorigin="anonymous" src="/audio/plumbing.mp3"></audio>
         </div>
       </div>
+    </div>
 
-      <div class="real-call-right fade-up">
-        <div class="call-card-wrap" id="call-card-wrap">
-          <div class="call-card">
-            <div class="call-card-tabs" role="tablist">
-              <button class="call-tab active" type="button" data-tab="landscaping" role="tab" aria-selected="true">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22c0-6 4-10 10-10"/><path d="M2 12c6 0 10 4 10 10"/><path d="M12 2v8"/></svg>
-                Landscaping
-              </button>
-              <button class="call-tab" type="button" data-tab="self-storage" role="tab" aria-selected="false">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M3 11h18"/><path d="M7 7V4h10v3"/></svg>
-                Self Storage
-              </button>
-              <button class="call-tab" type="button" data-tab="hvac" role="tab" aria-selected="false">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/><path d="M5.6 5.6l12.8 12.8"/><path d="M18.4 5.6L5.6 18.4"/></svg>
-                HVAC
-              </button>
-              <button class="call-tab" type="button" data-tab="plumbing" role="tab" aria-selected="false">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h6v6"/><path d="M9 13h6v8"/><path d="M15 13l6-6"/><path d="M19 5l2 2"/></svg>
-                Plumbing
-              </button>
-            </div>
-
-            <div class="call-header">
-              <div class="call-header-left">
-                <div class="call-avatar">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative;z-index:1;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                </div>
-                <div class="call-header-text">
-                  <div class="call-business" id="call-business-name">GreenLine Landscaping</div>
-                  <div class="call-meta" id="call-meta">Inbound · Saturday 4:18 PM</div>
-                </div>
-              </div>
-              <div class="call-status ready" id="call-status">
-                <span class="call-status-indicator"><span class="dot"></span></span>
-                <span id="call-status-text">Ready</span>
-                <span class="eq-bars" aria-hidden="true"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span>
-              </div>
-            </div>
-
-            <div class="call-transcript-wrap">
-              <div class="call-transcript" id="call-transcript">
-                <!-- transcript injected by JS -->
-              </div>
-              <div class="transcript-fade-overlay"></div>
-            </div>
-
-            <div class="call-player">
-              <button class="player-play" id="player-play" type="button" aria-label="Play demo">
-                <svg class="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-                <svg class="icon-loading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" opacity="0.85"/></svg>
-              </button>
-              <div class="player-progress-wrap">
-                <div class="player-progress" id="player-progress">
-                  <div class="player-progress-fill" id="player-progress-fill"></div>
-                  <div class="player-progress-handle" id="player-progress-handle" style="left: 0%;"></div>
-                </div>
-                <div class="player-times">
-                  <span id="player-current">0:00</span>
-                  <span class="duration" id="player-duration">--:--</span>
-                </div>
-              </div>
-              <div class="player-volume" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-              </div>
-            </div>
-
-            <!-- Pre-loaded audio elements, one per industry, never swap src -->
-            <div class="audio-pool" aria-hidden="true">
-              <audio id="audio-landscaping" preload="metadata" playsinline crossorigin="anonymous" src="/audio/landscaping.mp3"></audio>
-              <audio id="audio-self-storage" preload="metadata" playsinline crossorigin="anonymous" src="/audio/self-storage.mp3"></audio>
-              <audio id="audio-hvac" preload="metadata" playsinline crossorigin="anonymous" src="/audio/hvac.mp3"></audio>
-              <audio id="audio-plumbing" preload="metadata" playsinline crossorigin="anonymous" src="/audio/plumbing.mp3"></audio>
-            </div>
-          </div>
-        </div>
+    <div class="real-call-trust fade-up">
+      <div class="real-call-trust-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>
+        Real ElevenLabs voice
+      </div>
+      <div class="real-call-trust-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>
+        Tuned to your business
+      </div>
+      <div class="real-call-trust-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>
+        Captures every lead
       </div>
     </div>
   </div>
@@ -958,7 +931,7 @@ document.querySelectorAll('.faq-q').forEach(btn => {
 
 // ====== REAL CALL DEMO ======
 (function() {
-  const tabs = document.querySelectorAll('.call-tab');
+  const tabs = document.querySelectorAll('.industry-tab');
   const playBtn = document.getElementById('player-play');
   const progressBar = document.getElementById('player-progress');
   const progressFill = document.getElementById('player-progress-fill');
@@ -972,7 +945,6 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   const statusTextEl = document.getElementById('call-status-text');
   const cardWrap = document.getElementById('call-card-wrap');
 
-  // Pre-grab the 4 audio elements (already in DOM)
   const audioPool = {
     'landscaping': document.getElementById('audio-landscaping'),
     'self-storage': document.getElementById('audio-self-storage'),
@@ -982,28 +954,24 @@ document.querySelectorAll('.faq-q').forEach(btn => {
 
   if (!playBtn || !audioPool['landscaping']) return;
 
-  // Demo data
   const DEMOS = {
     'landscaping': {
       business: 'GreenLine Landscaping',
       meta: 'Inbound · Saturday 4:18 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected · 4:18:02 PM' },
-        { speaker: 'ai', t: '00:01', text: "Thanks for calling GreenLine Landscaping, this is Riley — how can I help you today?" },
-        { speaker: 'caller', t: '00:06', text: "Yeah, hey. I tried calling earlier but nobody picked up. I'm looking to get a quote on weekly lawn care." },
-        { speaker: 'ai', t: '00:13', text: "No problem at all, sorry we missed you earlier. Happy to help get that sorted. Can I grab your name real quick?" },
-        { speaker: 'caller', t: '00:19', text: "Sure, it's Mark Reynolds." },
-        { speaker: 'ai', t: '00:22', text: "Got it, Mark. And the best number to reach you on — is it the one you're calling from?" },
-        { speaker: 'caller', t: '00:27', text: "Yep, this one's fine." },
-        { speaker: 'ai', t: '00:29', text: "Perfect. So for weekly lawn care — are we talking just mowing and edging, or were you wanting trimming and blowing included too?" },
-        { speaker: 'caller', t: '00:37', text: "The full deal, yeah. What does that usually run?" },
-        { speaker: 'ai', t: '00:41', text: "Yeah, totally depends on lot size, but most weekly packages with the full service fall somewhere in the forty to seventy-five range per visit. The owner will put together an exact quote once he sees the property — usually within the day." },
-        { speaker: 'caller', t: '00:54', text: "Okay. And how soon could you guys actually start?" },
-        { speaker: 'ai', t: '00:58', text: "We've got openings as early as next week. Once Dave gives you a call back with the quote, he can lock in a day that works for you. Sound good?" },
-        { speaker: 'caller', t: '01:06', text: "Yeah, that works." },
-        { speaker: 'ai', t: '01:08', text: "Awesome. I've got Mark Reynolds at this number, weekly full-service lawn care, looking to start next week. Dave will give you a ring back before end of day. Anything else I can help with?" },
-        { speaker: 'caller', t: '01:18', text: "Nope, that's it. Thanks." },
-        { speaker: 'ai', t: '01:20', text: "You got it, Mark. Talk soon." },
+        { type: 'meta', text: 'Call connected · 4:18 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling GreenLine Landscaping, this is Riley. How can I help you today?" },
+        { speaker: 'caller', t: '00:06', text: "Hey, I'm looking to get a quote on weekly lawn care." },
+        { speaker: 'ai', t: '00:11', text: "Happy to help. Can I grab your name?" },
+        { speaker: 'caller', t: '00:14', text: "Mark Reynolds." },
+        { speaker: 'ai', t: '00:16', text: "Thanks Mark. Best number to reach you — the one you're on?" },
+        { speaker: 'caller', t: '00:20', text: "Yeah, this one's fine." },
+        { speaker: 'ai', t: '00:22', text: "Perfect. Were you wanting just mowing, or full service with trimming and blowing?" },
+        { speaker: 'caller', t: '00:28', text: "Full service. What does that usually run?" },
+        { speaker: 'ai', t: '00:32', text: "Most weekly packages fall in the forty to seventy-five range per visit, but the owner will put together an exact quote once he sees the property." },
+        { speaker: 'caller', t: '00:42', text: "Okay. How soon could you start?" },
+        { speaker: 'ai', t: '00:45', text: "We have openings as early as next week. Dave will give you a callback today to confirm." },
+        { speaker: 'caller', t: '00:52', text: "Sounds good." },
         { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
       ],
     },
@@ -1011,22 +979,18 @@ document.querySelectorAll('.faq-q').forEach(btn => {
       business: 'Prime Vault Self Storage',
       meta: 'Inbound · Wednesday 6:52 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected · 6:52:14 PM' },
-        { speaker: 'ai', t: '00:01', text: "Thanks for calling Prime Vault Self Storage, this is Riley — how can I help?" },
-        { speaker: 'caller', t: '00:05', text: "Hey, uh — I'm moving this weekend and I kinda need a unit pretty fast. Do you guys have anything available?" },
-        { speaker: 'ai', t: '00:12', text: "Yeah, totally — happy to check that for you. What size were you thinking? A 10×10 fits about a one-bedroom, 10×15's more like a two-bedroom." },
-        { speaker: 'caller', t: '00:21', text: "Probably a 10×10. Maybe a little bigger. I've got a couch, bed, like… eight or nine boxes, some chairs." },
-        { speaker: 'ai', t: '00:30', text: "Got it. Sounds like a 10×10 should do it, but a 10×15 gives you a little wiggle room. We do have both sizes open right now." },
-        { speaker: 'caller', t: '00:38', text: "Okay, perfect. How much is a 10×10?" },
-        { speaker: 'ai', t: '00:42', text: "Pricing depends on whether it's climate-controlled or standard — David, the owner, will text you exact numbers within the hour, but they typically run between ninety and one-thirty a month." },
-        { speaker: 'caller', t: '00:54', text: "Alright. And I literally need it by Saturday. Is that doable?" },
-        { speaker: 'ai', t: '01:00', text: "Yeah, that's totally doable — we can have you set up tomorrow if you want. Let me grab a few details. Can I get your name?" },
-        { speaker: 'caller', t: '01:08', text: "It's Jessica Hale." },
-        { speaker: 'ai', t: '01:10', text: "Thanks, Jessica. Best callback number — the one you're on?" },
-        { speaker: 'caller', t: '01:13', text: "Yeah." },
-        { speaker: 'ai', t: '01:14', text: "Perfect. So Jessica Hale, looking at a 10×10, needs it by Saturday. David will reach out within the hour with sizes and pricing. Anything else I should pass along?" },
-        { speaker: 'caller', t: '01:24', text: "No, that's perfect. Thank you so much." },
-        { speaker: 'ai', t: '01:27', text: "Of course. Talk soon, Jessica." },
+        { type: 'meta', text: 'Call connected · 6:52 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling Prime Vault Self Storage, this is Riley. How can I help?" },
+        { speaker: 'caller', t: '00:06', text: "I'm moving this weekend and need a unit pretty fast." },
+        { speaker: 'ai', t: '00:11', text: "Happy to check that for you. What size are you thinking?" },
+        { speaker: 'caller', t: '00:15', text: "Probably a 10×10. I've got a couch, bed, some boxes." },
+        { speaker: 'ai', t: '00:21', text: "A 10×10 should fit that, but a 10×15 gives you wiggle room. We have both open." },
+        { speaker: 'caller', t: '00:28', text: "How much is a 10×10?" },
+        { speaker: 'ai', t: '00:31', text: "Depends on climate-controlled or standard. David will text you exact pricing within the hour — usually between ninety and one-thirty a month." },
+        { speaker: 'caller', t: '00:42', text: "I need it by Saturday. Is that doable?" },
+        { speaker: 'ai', t: '00:46', text: "Yeah, we can have you set up tomorrow. Can I get your name?" },
+        { speaker: 'caller', t: '00:51', text: "Jessica Hale." },
+        { speaker: 'ai', t: '00:53', text: "Thanks Jessica. David will reach out within the hour with sizes and pricing." },
         { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
       ],
     },
@@ -1034,47 +998,39 @@ document.querySelectorAll('.faq-q').forEach(btn => {
       business: 'Apex Heating & Air',
       meta: 'Inbound · Tuesday 8:34 PM',
       transcript: [
-        { type: 'meta', text: 'Call connected · 8:34:08 PM' },
-        { speaker: 'ai', t: '00:01', text: "Thanks for calling Apex Heating and Air, this is Riley. How can I help you tonight?" },
-        { speaker: 'caller', t: '00:06', text: "Hey, my AC just stopped working. Like, completely. House is already eighty-two degrees in here and my kid's trying to sleep." },
-        { speaker: 'ai', t: '00:15', text: "Oh man, that's the worst — I'm sorry. Let's get someone out to you. Is it blowing warm air, or nothing at all?" },
-        { speaker: 'caller', t: '00:22', text: "Nothing. Fan's running but it's just… warm air. Outside unit's not even on, I don't think." },
-        { speaker: 'ai', t: '00:30', text: "Yeah, sounds like the condenser might've kicked out. Could be a capacitor, could be electrical. Either way it needs a tech. Can I grab your name?" },
-        { speaker: 'caller', t: '00:39', text: "Yeah, Tom Bradley." },
-        { speaker: 'ai', t: '00:42', text: "Thanks, Tom. And the address — what's the best one to send someone to?" },
-        { speaker: 'caller', t: '00:46', text: "412 Oakridge Drive. How fast can someone actually get here?" },
-        { speaker: 'ai', t: '00:51', text: "Given it's after-hours and you've got a kid in the house, I'd say this qualifies for our priority callback. Let me get the on-call tech texted right now. He'll call you back within fifteen minutes to confirm a window." },
-        { speaker: 'caller', t: '01:04', text: "Okay, please. I really appreciate that." },
-        { speaker: 'ai', t: '01:07', text: "Of course. Just so I have everything — Tom Bradley, 412 Oakridge, AC blowing warm air, outside unit not running. Best callback's the number you're on?" },
-        { speaker: 'caller', t: '01:17', text: "Yeah, this number." },
-        { speaker: 'ai', t: '01:19', text: "Got it. Hang tight, Tom. You'll hear from him within fifteen minutes." },
-        { speaker: 'caller', t: '01:24', text: "Thank you." },
-        { type: 'meta', captured: true, text: 'Hot lead · Tech notified · Summary emailed' },
+        { type: 'meta', text: 'Call connected · 8:34 PM' },
+        { speaker: 'ai', t: '00:01', text: "Thanks for calling Apex Heating and Air, this is Riley. How can I help tonight?" },
+        { speaker: 'caller', t: '00:06', text: "My AC just stopped working. House is already eighty-two degrees and my kid's trying to sleep." },
+        { speaker: 'ai', t: '00:13', text: "I'm sorry, let's get someone out. Is it blowing warm air, or nothing at all?" },
+        { speaker: 'caller', t: '00:19', text: "Warm air. Outside unit isn't running." },
+        { speaker: 'ai', t: '00:23', text: "Sounds like the condenser might be out. Could be capacitor or electrical. Can I grab your name?" },
+        { speaker: 'caller', t: '00:30', text: "Tom Bradley." },
+        { speaker: 'ai', t: '00:32', text: "Thanks Tom. Address?" },
+        { speaker: 'caller', t: '00:34', text: "412 Oakridge Drive." },
+        { speaker: 'ai', t: '00:37', text: "Given it's after-hours with a kid at home, this qualifies for priority callback. The on-call tech will call you within fifteen minutes." },
+        { speaker: 'caller', t: '00:47', text: "Thank you, I appreciate that." },
+        { type: 'meta', captured: true, text: 'Hot lead · Tech dispatched' },
       ],
     },
     'plumbing': {
       business: 'Steady Flow Plumbing',
       meta: 'Inbound · Sunday 10:11 AM',
       transcript: [
-        { type: 'meta', text: 'Call connected · 10:11:32 AM' },
+        { type: 'meta', text: 'Call connected · 10:11 AM' },
         { speaker: 'ai', t: '00:01', text: "Thanks for calling Steady Flow Plumbing, this is Riley. How can I help?" },
-        { speaker: 'caller', t: '00:05', text: "Hi — yeah, I've got water coming out from under my kitchen sink. Like a lot. I shut the valve off but the floor's already soaked." },
-        { speaker: 'ai', t: '00:14', text: "Okay, good move shutting the valve off — that was the right call. Can I confirm — the water is fully stopped now, right?" },
-        { speaker: 'caller', t: '00:22', text: "Yeah, it's stopped. But I mean, the cabinet's still dripping and I don't know what to do." },
-        { speaker: 'ai', t: '00:30', text: "Totally understand. We'll get someone out today. Can I get your name?" },
-        { speaker: 'caller', t: '00:35', text: "Linda Park." },
-        { speaker: 'ai', t: '00:37', text: "Thanks, Linda. And do you know — is it a leak from the supply line under the sink, or is it coming from the drain trap? The pipe shaped like a U." },
-        { speaker: 'caller', t: '00:46', text: "Uh… I think the U-shaped one? It looks cracked or something." },
-        { speaker: 'ai', t: '00:51', text: "Okay, that's a P-trap. Good news is that's a pretty quick fix for our techs. Before I send someone — quick heads up on pricing — our weekend service call starts at one-twenty-five just to come out, and the repair itself depends on what they find. You okay with that?" },
-        { speaker: 'caller', t: '01:08', text: "Yeah, that's fine. I just need it done." },
-        { speaker: 'ai', t: '01:11', text: "Totally fair. What's the address?" },
-        { speaker: 'caller', t: '01:13', text: "1847 Beacon Street." },
-        { speaker: 'ai', t: '01:16', text: "Got it. And the best number — same as the one you're calling from?" },
-        { speaker: 'caller', t: '01:19', text: "Yep." },
-        { speaker: 'ai', t: '01:20', text: "Perfect. So Linda Park, 1847 Beacon, leaking P-trap, water shut off, ready for service. I'll get the on-call tech routed your way — he'll call you within thirty minutes with an arrival window. Sound good?" },
-        { speaker: 'caller', t: '01:33', text: "Yes. Thank you so much." },
-        { speaker: 'ai', t: '01:35', text: "You're welcome, Linda. Help's on the way." },
-        { type: 'meta', captured: true, text: 'Lead captured · Tech dispatched · Summary emailed' },
+        { speaker: 'caller', t: '00:05', text: "Water's coming out under my kitchen sink. I shut the valve off but the floor's soaked." },
+        { speaker: 'ai', t: '00:13', text: "Good call shutting the valve. Water's fully stopped now?" },
+        { speaker: 'caller', t: '00:17', text: "Yeah, stopped." },
+        { speaker: 'ai', t: '00:19', text: "We'll get someone out today. Can I get your name?" },
+        { speaker: 'caller', t: '00:23', text: "Linda Park." },
+        { speaker: 'ai', t: '00:25', text: "Thanks Linda. Is the leak from the supply line or the drain trap — the U-shaped pipe?" },
+        { speaker: 'caller', t: '00:32', text: "The U-shaped one. Looks cracked." },
+        { speaker: 'ai', t: '00:35', text: "That's a P-trap. Quick fix for our techs. Weekend service call starts at one-twenty-five plus the repair. Sound okay?" },
+        { speaker: 'caller', t: '00:47', text: "Yes, I just need it done." },
+        { speaker: 'ai', t: '00:50', text: "What's the address?" },
+        { speaker: 'caller', t: '00:52', text: "1847 Beacon Street." },
+        { speaker: 'ai', t: '00:55', text: "Got it. The on-call tech will call you within thirty minutes with an arrival window." },
+        { type: 'meta', captured: true, text: 'Lead captured · Tech dispatched' },
       ],
     },
   };
@@ -1107,16 +1063,16 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     transcriptEl.innerHTML = '';
     demo.transcript.forEach((line, i) => {
       if (line.type === 'meta') {
-        const metaEl = document.createElement('div');
-        metaEl.className = 'transcript-meta' + (line.captured ? ' captured' : '');
-        metaEl.style.animationDelay = (i * 0.05) + 's';
-        metaEl.textContent = line.text;
-        transcriptEl.appendChild(metaEl);
+        const m = document.createElement('div');
+        m.className = 'transcript-meta' + (line.captured ? ' captured' : '');
+        m.style.animationDelay = (i * 0.04) + 's';
+        m.textContent = line.text;
+        transcriptEl.appendChild(m);
         return;
       }
       const lineEl = document.createElement('div');
       lineEl.className = 'transcript-line ' + line.speaker;
-      lineEl.style.animationDelay = (i * 0.05) + 's';
+      lineEl.style.animationDelay = (i * 0.04) + 's';
 
       const headerRow = document.createElement('div');
       headerRow.className = 'transcript-header-row';
@@ -1152,12 +1108,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     if (audio._aliBound) return;
     audio._aliBound = true;
 
-    audio.addEventListener('loadedmetadata', () => {
-      if (key === currentTab) updateDurationDisplay(audio, key);
-    });
-    audio.addEventListener('durationchange', () => {
-      if (key === currentTab) updateDurationDisplay(audio, key);
-    });
+    audio.addEventListener('loadedmetadata', () => { if (key === currentTab) updateDurationDisplay(audio, key); });
+    audio.addEventListener('durationchange', () => { if (key === currentTab) updateDurationDisplay(audio, key); });
     audio.addEventListener('play', () => {
       if (key !== currentTab) return;
       playBtn.classList.add('playing');
@@ -1168,11 +1120,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
       if (key !== currentTab) return;
       playBtn.classList.remove('playing');
       playBtn.classList.remove('loading');
-      if (audio.ended || audio.currentTime === 0) {
-        setStatus('ready', 'Ready');
-      } else {
-        setStatus('paused', 'Paused');
-      }
+      if (audio.ended || audio.currentTime === 0) setStatus('ready', 'Ready');
+      else setStatus('paused', 'Paused');
     });
     audio.addEventListener('ended', () => {
       if (key !== currentTab) return;
@@ -1199,20 +1148,16 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     });
     audio.addEventListener('error', () => {
       console.warn('[ai-lead-intel] audio load issue for', key, audio.src);
-      // Don't show "Audio unavailable" — let user still try clicking. Browser may recover.
     });
   }
 
-  Object.keys(audioPool).forEach(k => {
-    if (audioPool[k]) bindAudioEvents(audioPool[k], k);
-  });
+  Object.keys(audioPool).forEach(k => { if (audioPool[k]) bindAudioEvents(audioPool[k], k); });
 
-  function loadDemo(key, opts) {
+  function loadDemo(key) {
     const demo = DEMOS[key];
     const audio = audioPool[key];
     if (!demo || !audio) return;
 
-    // Pause all other audio
     Object.keys(audioPool).forEach(k => {
       if (k !== key && audioPool[k] && !audioPool[k].paused) {
         try { audioPool[k].pause(); audioPool[k].currentTime = 0; } catch (_) {}
@@ -1222,10 +1167,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     currentTab = key;
     currentAudio = audio;
 
-    // Reset playback position when switching
     try { audio.currentTime = 0; } catch (_) {}
 
-    // Reset UI
     playBtn.classList.remove('playing');
     playBtn.classList.remove('loading');
     progressFill.style.width = '0%';
@@ -1238,10 +1181,7 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     metaEl.textContent = demo.meta;
     renderTranscript(key);
 
-    // Kick metadata load if not already
-    if (audio.readyState < 1) {
-      try { audio.load(); } catch (_) {}
-    }
+    if (audio.readyState < 1) { try { audio.load(); } catch (_) {} }
   }
 
   tabs.forEach(tab => {
@@ -1260,12 +1200,11 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     const audio = currentAudio;
     if (!audio) return;
     if (audio.paused) {
-      // Show loading immediately for snappy feedback
       playBtn.classList.add('loading');
       setStatus('loading', 'Loading…');
-      const playPromise = audio.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise.catch(err => {
+      const p = audio.play();
+      if (p && typeof p.then === 'function') {
+        p.catch(err => {
           console.warn('[ai-lead-intel] play() rejected:', err);
           playBtn.classList.remove('loading');
           setStatus('ready', 'Tap to play');
@@ -1322,22 +1261,18 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     window.addEventListener('touchend', onEnd);
   }, { passive: true });
 
-  // Pause when section scrolls out of view (saves battery on mobile)
   if ('IntersectionObserver' in window) {
     const section = document.getElementById('demo');
     if (section) {
       const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
-          if (!e.isIntersecting && currentAudio && !currentAudio.paused) {
-            currentAudio.pause();
-          }
+          if (!e.isIntersecting && currentAudio && !currentAudio.paused) currentAudio.pause();
         });
       }, { threshold: 0.05 });
       io.observe(section);
     }
   }
 
-  // Initial render
   loadDemo('landscaping');
 })();
 
@@ -1346,16 +1281,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   const backdrop = document.getElementById('plan-modal-backdrop');
   const closeBtn = document.getElementById('plan-modal-close');
   if (!backdrop) return;
-  function openModal() {
-    backdrop.classList.add('open');
-    backdrop.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-  }
-  function closeModal() {
-    backdrop.classList.remove('open');
-    backdrop.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('modal-open');
-  }
+  function openModal() { backdrop.classList.add('open'); backdrop.setAttribute('aria-hidden', 'false'); document.body.classList.add('modal-open'); }
+  function closeModal() { backdrop.classList.remove('open'); backdrop.setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-open'); }
   document.querySelectorAll('[data-open-plan-modal]').forEach(btn => {
     btn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
   });
