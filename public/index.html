@@ -130,15 +130,6 @@ img { max-width: 100%; display: block; }
 .flow-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
 .flow-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
 @media (max-width: 880px) { .flow-row { grid-template-columns: 1fr; gap: 14px; } .flow-arrow { transform: rotate(90deg); margin: 0 auto; } }
-.how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; position: relative; }
-.how-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 18px; padding: 32px 28px; position: relative; z-index: 1; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
-.how-card:hover { transform: translateY(-4px); border-color: var(--border-3); box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px var(--brand-line) inset; }
-.how-num { width: 40px; height: 40px; margin-bottom: 22px; border-radius: 11px; background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 600; color: var(--brand); transition: all 0.3s; }
-.how-card:hover .how-num { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; border-color: var(--brand); box-shadow: 0 8px 20px var(--brand-glow); }
-.how-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
-.how-title { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
-.how-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
-@media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }
 .number-badge-section { padding: 28px 0; }
 .number-badge { display: flex; align-items: center; gap: 18px; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--brand-line); border-radius: 16px; padding: 22px 26px; max-width: 720px; margin: 0 auto; position: relative; overflow: hidden; }
 .number-badge::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
@@ -147,32 +138,112 @@ img { max-width: 100%; display: block; }
 .number-badge-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 4px; }
 .number-badge-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
 @media (max-width: 600px) { .number-badge { flex-direction: column; text-align: center; } }
-.scenario-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 20px; padding: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; position: relative; overflow: hidden; }
-.scenario-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.5), transparent); }
-.scenario-text { min-width: 0; }
-.scenario-time { display: inline-flex; align-items: center; gap: 6px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 12px; }
-.scenario-time .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
-.scenario-headline { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.25; margin-bottom: 14px; }
-.scenario-body { font-size: 14.5px; color: var(--text-dim); line-height: 1.65; margin-bottom: 18px; }
-.scenario-body strong { color: var(--text); font-weight: 600; }
-.scenario-bullets { display: flex; flex-direction: column; gap: 8px; }
-.scenario-bullet { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text-soft); }
-.scenario-bullet svg { color: var(--brand); flex-shrink: 0; }
-.phone-mock { width: 100%; max-width: 340px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border-2); border-radius: 24px; padding: 14px; box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset; }
-.phone-mock-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 12px; border-bottom: 1px solid var(--border); }
-.phone-mock-name { font-size: 13px; font-weight: 600; }
-.phone-mock-status { font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-.phone-mock-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 1.6s ease-in-out infinite; }
-.phone-mock-thread { display: flex; flex-direction: column; gap: 10px; padding: 14px 4px 4px; }
-.phone-line { display: flex; flex-direction: column; gap: 3px; }
-.phone-speaker { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; padding-left: 4px; }
-.phone-speaker.ai { color: var(--brand); }
-.phone-speaker.caller { color: var(--text-dim); }
-.phone-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.45; max-width: 92%; }
-.phone-bubble.ai { background: linear-gradient(135deg, var(--brand-soft), transparent); border: 1px solid var(--brand-line); color: var(--text); align-self: flex-start; border-top-left-radius: 4px; }
-.phone-bubble.caller { background: var(--surface-3); color: var(--text-soft); align-self: flex-end; border-top-right-radius: 4px; margin-left: auto; }
-.phone-meta { font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; align-self: center; margin: 4px 0; }
-@media (max-width: 720px) { .scenario-card { grid-template-columns: 1fr; padding: 24px; } }
+
+/* ====== REAL CALL EXPERIENCE SECTION ====== */
+.real-call-section { padding: 96px 0; position: relative; }
+.real-call-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 65% 55% at 75% 50%, rgba(255,106,0,0.08), transparent 65%); pointer-events: none; z-index: 0; }
+.real-call-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 56px; align-items: center; position: relative; z-index: 1; }
+.real-call-left { min-width: 0; }
+.real-call-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 7px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 22px; }
+.real-call-eyebrow .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+.real-call-title { font-size: clamp(30px, 4.4vw, 48px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.08; margin-bottom: 20px; }
+.real-call-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.real-call-story { font-size: 16px; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; max-width: 500px; }
+.real-call-story strong { color: var(--text); font-weight: 600; }
+.real-call-bullets { display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
+.real-call-bullet { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 12px; transition: all 0.25s cubic-bezier(0.16,1,0.3,1); }
+.real-call-bullet:hover { border-color: var(--brand-line); transform: translateX(2px); }
+.real-call-bullet-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.25s; }
+.real-call-bullet:hover .real-call-bullet-icon { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; border-color: var(--brand); box-shadow: 0 6px 16px var(--brand-glow); }
+.real-call-bullet-text { flex: 1; min-width: 0; }
+.real-call-bullet-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.005em; }
+.real-call-bullet-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+
+/* Right side — Call card */
+.call-card-wrap { position: relative; }
+.call-card-wrap::before { content: ''; position: absolute; inset: -30px; background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(30px); z-index: 0; opacity: 0.5; }
+.call-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 22px; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 40px 90px rgba(0,0,0,0.55), 0 16px 36px rgba(0,0,0,0.35); }
+.call-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.6), transparent); z-index: 2; }
+.call-card-tabs { display: flex; gap: 4px; padding: 12px; background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.call-card-tabs::-webkit-scrollbar { display: none; }
+.call-tab { flex: 1; min-width: 90px; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; font-weight: 600; color: var(--text-faint); cursor: pointer; background: transparent; border: 1px solid transparent; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; letter-spacing: -0.005em; }
+.call-tab svg { opacity: 0.55; transition: opacity 0.22s; flex-shrink: 0; }
+.call-tab:hover { color: var(--text-dim); }
+.call-tab.active { background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); color: var(--text); border-color: var(--border-2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.call-tab.active svg { opacity: 1; color: var(--brand); }
+
+/* Call header */
+.call-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; gap: 14px; border-bottom: 1px solid var(--border); }
+.call-header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.call-avatar { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 6px 16px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+.call-avatar::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.18)); }
+.call-header-text { min-width: 0; overflow: hidden; }
+.call-business { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.call-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 3px; }
+.call-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); flex-shrink: 0; transition: all 0.3s; }
+.call-status.on-call { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
+.call-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+.call-status.on-call .call-status-dot { background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); animation: onCallPulse 1.2s ease-in-out infinite; }
+@keyframes onCallPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
+
+/* Transcript */
+.call-transcript-wrap { position: relative; }
+.call-transcript { display: flex; flex-direction: column; gap: 12px; padding: 20px 24px; max-height: 380px; overflow-y: auto; scroll-behavior: smooth; }
+.call-transcript::-webkit-scrollbar { width: 6px; }
+.call-transcript::-webkit-scrollbar-track { background: transparent; }
+.call-transcript::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+.call-transcript::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
+.transcript-line { display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); animation: lineIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
+.transcript-speaker { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; padding-left: 4px; }
+.transcript-speaker.ai { color: var(--brand); }
+.transcript-speaker.caller { color: var(--text-dim); }
+.transcript-bubble { padding: 11px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; max-width: 92%; letter-spacing: -0.005em; }
+.transcript-bubble.ai { background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); color: var(--text); align-self: flex-start; border-top-left-radius: 5px; }
+.transcript-line.caller { align-items: flex-end; }
+.transcript-bubble.caller { background: var(--surface-3); color: var(--text-soft); align-self: flex-end; border-top-right-radius: 5px; border: 1px solid var(--border); }
+.transcript-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; align-self: center; padding: 4px 12px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; }
+.transcript-meta.captured { color: var(--green); border-color: var(--green-line); background: var(--green-soft); }
+
+/* Audio player */
+.call-player { padding: 18px 24px 22px; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(0,0,0,0.18)); display: flex; align-items: center; gap: 14px; }
+.player-play { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 6px 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; }
+.player-play:hover { transform: scale(1.06); box-shadow: 0 10px 26px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.28); }
+.player-play:active { transform: scale(0.97); }
+.player-play svg { transition: transform 0.18s; }
+.player-play .icon-pause { display: none; }
+.player-play.playing .icon-play { display: none; }
+.player-play.playing .icon-pause { display: block; }
+.player-progress-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.player-progress { position: relative; height: 6px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; cursor: pointer; }
+.player-progress::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.05), transparent); opacity: 0; transition: opacity 0.2s; }
+.player-progress:hover::after { opacity: 1; }
+.player-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; box-shadow: 0 0 12px var(--brand-glow); transition: width 0.12s linear; }
+.player-progress-handle { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--brand), 0 2px 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
+.player-progress:hover .player-progress-handle, .player-progress.active .player-progress-handle { opacity: 1; }
+.player-times { display: flex; justify-content: space-between; align-items: center; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; }
+.player-times .duration { color: var(--text-dim); }
+.player-volume { display: flex; align-items: center; gap: 4px; color: var(--text-faint); flex-shrink: 0; }
+.player-volume svg { transition: color 0.18s; }
+.player-volume:hover svg { color: var(--text); }
+.transcript-fade-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 30px; background: linear-gradient(180deg, transparent, var(--surface-2) 90%); pointer-events: none; opacity: 0.6; }
+
+@media (max-width: 920px) {
+  .real-call-grid { grid-template-columns: 1fr; gap: 36px; }
+  .real-call-left { text-align: center; }
+  .real-call-eyebrow, .real-call-bullets { margin-left: auto; margin-right: auto; }
+  .real-call-story { margin-left: auto; margin-right: auto; }
+}
+@media (max-width: 560px) {
+  .real-call-section { padding: 64px 0; }
+  .call-header { padding: 16px 18px 14px; }
+  .call-transcript { padding: 16px 18px; max-height: 320px; }
+  .call-player { padding: 14px 18px 18px; }
+  .transcript-bubble { font-size: 13px; }
+  .call-tab { min-width: 72px; padding: 8px 10px; font-size: 11.5px; }
+  .real-call-bullet { padding: 12px 14px; }
+}
+
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .why-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; display: flex; gap: 16px; align-items: flex-start; transition: all 0.2s; }
 .why-card:hover { border-color: var(--border-3); background: var(--surface-2); }
@@ -335,7 +406,7 @@ img { max-width: 100%; display: block; }
     <span>AI Lead Intel</span>
   </a>
   <div class="nav-links">
-    <a href="#how" class="nav-link">How it works</a>
+    <a href="#demo" class="nav-link">How it works</a>
     <a href="#features" class="nav-link">Features</a>
     <a href="#pricing" class="nav-link">Pricing</a>
     <a href="#faq" class="nav-link">FAQ</a>
@@ -352,7 +423,7 @@ img { max-width: 100%; display: block; }
       Get Started
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
-    <a href="#how" class="btn btn-secondary btn-large">See How It Works</a>
+    <a href="#demo" class="btn btn-secondary btn-large">Hear it in action</a>
   </div>
   <div class="trust-row">
     <div class="trust-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Answers 24/7</div>
@@ -364,7 +435,7 @@ img { max-width: 100%; display: block; }
       <div class="dash-bar"><div class="dash-bar-dots"><div class="dash-bar-dot"></div><div class="dash-bar-dot"></div><div class="dash-bar-dot"></div></div><div class="dash-bar-title">app.aileadintel.com / dashboard</div></div>
       <div class="dash-content">
         <div class="dash-head">
-          <div class="dash-title-block"><div class="eyebrow">Mission Control</div><h3 class="dash-title">Captured <span class="accent">leads</span></h3></div>
+          <div class="dash-title-block"><div class="eyebrow">Overview</div><h3 class="dash-title">Captured <span class="accent">leads</span></h3></div>
           <div class="dash-live"><div class="dash-live-dot"></div>Live</div>
         </div>
         <div class="dash-stats">
@@ -415,16 +486,118 @@ img { max-width: 100%; display: block; }
     </div>
   </div>
 </section>
-<section class="section" id="how">
+
+<!-- ====== REAL CALL EXPERIENCE SECTION ====== -->
+<section class="real-call-section" id="demo">
   <div class="wrap">
-    <div class="section-head"><div class="section-eyebrow"><span class="step-dot"></span>How it works</div><h2 class="section-title">Three steps from <span class="accent">ringing phone</span> to captured lead.</h2><p class="section-sub">No new phone number. No app to install. Your customers feel like they're talking to a friendly receptionist.</p></div>
-    <div class="how-grid">
-      <div class="how-card fade-up"><div class="how-num">1</div><div class="how-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><h3 class="how-title">A customer calls</h3><p class="how-desc">Someone calls your business — but you're on a job, with another customer, or it's after hours.</p></div>
-      <div class="how-card fade-up"><div class="how-num">2</div><div class="how-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div><h3 class="how-title">AI answers the call</h3><p class="how-desc">Your AI receptionist picks up live, greets the caller, and has a natural conversation in your tone of voice.</p></div>
-      <div class="how-card fade-up"><div class="how-num">3</div><div class="how-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><h3 class="how-title">Lead captured &amp; sent to you</h3><p class="how-desc">The AI collects what they need, you get an instant email summary, and the lead lands in your dashboard.</p></div>
+    <div class="real-call-grid">
+      <div class="real-call-left fade-up">
+        <div class="real-call-eyebrow"><span class="live-dot"></span>Real scenario</div>
+        <h2 class="real-call-title">Here's what it sounds like <span class="accent">in real life.</span></h2>
+        <p class="real-call-story">Listen to actual calls handled by your AI receptionist. <strong>No scripts. No awkward pauses. No robotic voice.</strong> Just a calm, natural conversation that captures the lead and keeps your customer happy — while you stay focused on the job in front of you.</p>
+        <div class="real-call-bullets">
+          <div class="real-call-bullet">
+            <div class="real-call-bullet-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
+            </div>
+            <div class="real-call-bullet-text">
+              <div class="real-call-bullet-title">Answers like a real receptionist</div>
+              <div class="real-call-bullet-desc">Warm, conversational, and tuned to your business — never robotic.</div>
+            </div>
+          </div>
+          <div class="real-call-bullet">
+            <div class="real-call-bullet-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+            </div>
+            <div class="real-call-bullet-text">
+              <div class="real-call-bullet-title">Captures the lead, every time</div>
+              <div class="real-call-bullet-desc">Name, number, urgency, and what they need — confirmed before hangup.</div>
+            </div>
+          </div>
+          <div class="real-call-bullet">
+            <div class="real-call-bullet-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="real-call-bullet-text">
+              <div class="real-call-bullet-title">Built for real businesses</div>
+              <div class="real-call-bullet-desc">Quoted pricing, hours, transfers, emergencies — handled correctly.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="real-call-right fade-up">
+        <div class="call-card-wrap">
+          <div class="call-card">
+            <div class="call-card-tabs" role="tablist">
+              <button class="call-tab active" type="button" data-tab="landscaping" role="tab" aria-selected="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22c0-6 4-10 10-10"/><path d="M2 12c6 0 10 4 10 10"/><path d="M12 2v8"/></svg>
+                Landscaping
+              </button>
+              <button class="call-tab" type="button" data-tab="self-storage" role="tab" aria-selected="false">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M3 11h18"/><path d="M7 7V4h10v3"/></svg>
+                Self Storage
+              </button>
+              <button class="call-tab" type="button" data-tab="hvac" role="tab" aria-selected="false">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/><path d="M5.6 5.6l12.8 12.8"/><path d="M18.4 5.6L5.6 18.4"/></svg>
+                HVAC
+              </button>
+              <button class="call-tab" type="button" data-tab="plumbing" role="tab" aria-selected="false">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h6v6"/><path d="M9 13h6v8"/><path d="M15 13l6-6"/><path d="M19 5l2 2"/></svg>
+                Plumbing
+              </button>
+            </div>
+
+            <div class="call-header">
+              <div class="call-header-left">
+                <div class="call-avatar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative;z-index:1;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div class="call-header-text">
+                  <div class="call-business" id="call-business-name">GreenLine Landscaping</div>
+                  <div class="call-meta" id="call-meta">Inbound · Saturday 4:18 PM</div>
+                </div>
+              </div>
+              <div class="call-status" id="call-status">
+                <span class="call-status-dot"></span>
+                <span id="call-status-text">Ready</span>
+              </div>
+            </div>
+
+            <div class="call-transcript-wrap">
+              <div class="call-transcript" id="call-transcript">
+                <!-- transcript injected by JS -->
+              </div>
+              <div class="transcript-fade-overlay"></div>
+            </div>
+
+            <div class="call-player">
+              <button class="player-play" id="player-play" type="button" aria-label="Play demo">
+                <svg class="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+              </button>
+              <div class="player-progress-wrap">
+                <div class="player-progress" id="player-progress">
+                  <div class="player-progress-fill" id="player-progress-fill"></div>
+                  <div class="player-progress-handle" id="player-progress-handle" style="left: 0%;"></div>
+                </div>
+                <div class="player-times">
+                  <span id="player-current">0:00</span>
+                  <span class="duration" id="player-duration">0:00</span>
+                </div>
+              </div>
+              <div class="player-volume" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              </div>
+              <audio id="call-audio" preload="metadata"></audio>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
 <section class="section">
   <div class="wrap">
     <div class="section-head"><div class="section-eyebrow"><span class="step-dot"></span>The problem</div><h2 class="section-title">Why local businesses <span class="accent">lose leads.</span></h2><p class="section-sub">Most missed calls aren't lost because customers don't want to buy. They're lost because nobody picked up.</p></div>
@@ -433,34 +606,6 @@ img { max-width: 100%; display: block; }
       <div class="why-card fade-up"><div class="why-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="why-text"><div class="why-title">No after-hours coverage</div><div class="why-desc">Half the calls come in nights and weekends. Voicemail doesn't cut it. Most callers don't leave one.</div></div></div>
       <div class="why-card fade-up"><div class="why-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="10"/></svg></div><div class="why-text"><div class="why-title">Voicemail kills leads</div><div class="why-desc">Studies show most callers won't leave a voicemail. If you don't pick up live, they call your competitor next.</div></div></div>
       <div class="why-card fade-up"><div class="why-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="why-text"><div class="why-title">Competitors answer faster</div><div class="why-desc">The first business to pick up usually wins the job. If you're #2 to respond, you've already lost.</div></div></div>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="wrap">
-    <div class="section-head"><div class="section-eyebrow"><span class="step-dot"></span>Real scenario</div><h2 class="section-title">Here's what it sounds like <span class="accent">in real life.</span></h2></div>
-    <div class="scenario-card fade-up">
-      <div class="scenario-text">
-        <div class="scenario-time"><span class="live-dot"></span>Saturday · 7:42 PM</div>
-        <div class="scenario-headline">A customer calls your business after hours.</div>
-        <div class="scenario-body">You're at dinner with your family. Your phone rings — it's a number you don't recognize. <strong>You'd normally miss the call.</strong></div>
-        <div class="scenario-body">Instead, your AI receptionist <strong>answers live on the first ring</strong>, has a real conversation, gets exactly what they need, and emails you a clean summary so you can follow up tomorrow.</div>
-        <div class="scenario-bullets">
-          <div class="scenario-bullet"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>You enjoy your dinner</div>
-          <div class="scenario-bullet"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Your customer gets a real conversation</div>
-          <div class="scenario-bullet"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Monday morning, you've got a booked job</div>
-        </div>
-      </div>
-      <div class="phone-mock">
-        <div class="phone-mock-head"><div class="phone-mock-name">Your Business · Live Call</div><div class="phone-mock-status">On Call</div></div>
-        <div class="phone-mock-thread">
-          <div class="phone-meta">7:42 PM · Call connected</div>
-          <div class="phone-line"><div class="phone-speaker ai">AI Receptionist</div><div class="phone-bubble ai">"Thanks for calling. How can I help you today?"</div></div>
-          <div class="phone-line" style="align-items: flex-end;"><div class="phone-speaker caller">Caller</div><div class="phone-bubble caller">"Hi! My AC stopped working this afternoon. Are you guys able to come out tomorrow?"</div></div>
-          <div class="phone-line"><div class="phone-speaker ai">AI Receptionist</div><div class="phone-bubble ai">"Absolutely. Can I grab your name and address so we can get someone scheduled?"</div></div>
-          <div class="phone-meta">Lead captured · Summary emailed</div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -588,7 +733,7 @@ img { max-width: 100%; display: block; }
       </div>
       <div>
         <div class="footer-col-title">Product</div>
-        <a href="#how" class="footer-link">How it works</a>
+        <a href="#demo" class="footer-link">How it works</a>
         <a href="#features" class="footer-link">Features</a>
         <a href="#pricing" class="footer-link">Pricing</a>
         <a href="#faq" class="footer-link">FAQ</a>
@@ -761,6 +906,291 @@ document.querySelectorAll('.faq-q').forEach(btn => {
       if (t) t.textContent = times[i] || 'just now';
     });
   }, 3500);
+})();
+
+// ====== REAL CALL DEMO ======
+(function() {
+  const tabs = document.querySelectorAll('.call-tab');
+  const audio = document.getElementById('call-audio');
+  const playBtn = document.getElementById('player-play');
+  const progressBar = document.getElementById('player-progress');
+  const progressFill = document.getElementById('player-progress-fill');
+  const progressHandle = document.getElementById('player-progress-handle');
+  const currentTimeEl = document.getElementById('player-current');
+  const durationEl = document.getElementById('player-duration');
+  const transcriptEl = document.getElementById('call-transcript');
+  const businessEl = document.getElementById('call-business-name');
+  const metaEl = document.getElementById('call-meta');
+  const statusEl = document.getElementById('call-status');
+  const statusTextEl = document.getElementById('call-status-text');
+
+  if (!audio) return;
+
+  const DEMOS = {
+    'landscaping': {
+      audio: '/audio/landscaping.mp3',
+      business: 'GreenLine Landscaping',
+      meta: 'Inbound · Saturday 4:18 PM',
+      transcript: [
+        { type: 'meta', text: 'Call connected' },
+        { speaker: 'ai', text: "Thanks for calling GreenLine Landscaping, this is Riley — how can I help you today?" },
+        { speaker: 'caller', text: "Yeah, hey. I tried calling earlier but nobody picked up. I'm looking to get a quote on weekly lawn care." },
+        { speaker: 'ai', text: "No problem at all, sorry we missed you earlier. Happy to help get that sorted. Can I grab your name real quick?" },
+        { speaker: 'caller', text: "Sure, it's Mark Reynolds." },
+        { speaker: 'ai', text: "Got it, Mark. And the best number to reach you on — is it the one you're calling from?" },
+        { speaker: 'caller', text: "Yep, this one's fine." },
+        { speaker: 'ai', text: "Perfect. So for weekly lawn care — are we talking just mowing and edging, or were you wanting trimming and blowing included too?" },
+        { speaker: 'caller', text: "The full deal, yeah. What does that usually run?" },
+        { speaker: 'ai', text: "Yeah, totally depends on lot size, but most weekly packages with the full service fall somewhere in the forty to seventy-five range per visit. The owner will put together an exact quote once he sees the property — usually within the day." },
+        { speaker: 'caller', text: "Okay. And how soon could you guys actually start?" },
+        { speaker: 'ai', text: "We've got openings as early as next week. Once Dave gives you a call back with the quote, he can lock in a day that works for you. Sound good?" },
+        { speaker: 'caller', text: "Yeah, that works." },
+        { speaker: 'ai', text: "Awesome. I've got Mark Reynolds at this number, weekly full-service lawn care, looking to start next week. Dave will give you a ring back before end of day. Anything else I can help with?" },
+        { speaker: 'caller', text: "Nope, that's it. Thanks." },
+        { speaker: 'ai', text: "You got it, Mark. Talk soon." },
+        { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
+      ],
+    },
+    'self-storage': {
+      audio: '/audio/self-storage.mp3',
+      business: 'Prime Vault Self Storage',
+      meta: 'Inbound · Wednesday 6:52 PM',
+      transcript: [
+        { type: 'meta', text: 'Call connected' },
+        { speaker: 'ai', text: "Thanks for calling Prime Vault Self Storage, this is Riley — how can I help?" },
+        { speaker: 'caller', text: "Hey, uh — I'm moving this weekend and I kinda need a unit pretty fast. Do you guys have anything available?" },
+        { speaker: 'ai', text: "Yeah, totally — happy to check that for you. What size were you thinking? A 10×10 fits about a one-bedroom, 10×15's more like a two-bedroom." },
+        { speaker: 'caller', text: "Probably a 10×10. Maybe a little bigger. I've got a couch, bed, like… eight or nine boxes, some chairs." },
+        { speaker: 'ai', text: "Got it. Sounds like a 10×10 should do it, but a 10×15 gives you a little wiggle room. We do have both sizes open right now." },
+        { speaker: 'caller', text: "Okay, perfect. How much is a 10×10?" },
+        { speaker: 'ai', text: "Pricing depends on whether it's climate-controlled or standard — David, the owner, will text you exact numbers within the hour, but they typically run between ninety and one-thirty a month." },
+        { speaker: 'caller', text: "Alright. And I literally need it by Saturday. Is that doable?" },
+        { speaker: 'ai', text: "Yeah, that's totally doable — we can have you set up tomorrow if you want. Let me grab a few details. Can I get your name?" },
+        { speaker: 'caller', text: "It's Jessica Hale." },
+        { speaker: 'ai', text: "Thanks, Jessica. Best callback number — the one you're on?" },
+        { speaker: 'caller', text: "Yeah." },
+        { speaker: 'ai', text: "Perfect. So Jessica Hale, looking at a 10×10, needs it by Saturday. David will reach out within the hour with sizes and pricing. Anything else I should pass along?" },
+        { speaker: 'caller', text: "No, that's perfect. Thank you so much." },
+        { speaker: 'ai', text: "Of course. Talk soon, Jessica." },
+        { type: 'meta', captured: true, text: 'Lead captured · Summary emailed' },
+      ],
+    },
+    'hvac': {
+      audio: '/audio/hvac.mp3',
+      business: 'Apex Heating & Air',
+      meta: 'Inbound · Tuesday 8:34 PM',
+      transcript: [
+        { type: 'meta', text: 'Call connected' },
+        { speaker: 'ai', text: "Thanks for calling Apex Heating and Air, this is Riley. How can I help you tonight?" },
+        { speaker: 'caller', text: "Hey, my AC just stopped working. Like, completely. House is already eighty-two degrees in here and my kid's trying to sleep." },
+        { speaker: 'ai', text: "Oh man, that's the worst — I'm sorry. Let's get someone out to you. Is it blowing warm air, or nothing at all?" },
+        { speaker: 'caller', text: "Nothing. Fan's running but it's just… warm air. Outside unit's not even on, I don't think." },
+        { speaker: 'ai', text: "Yeah, sounds like the condenser might've kicked out. Could be a capacitor, could be electrical. Either way it needs a tech. Can I grab your name?" },
+        { speaker: 'caller', text: "Yeah, Tom Bradley." },
+        { speaker: 'ai', text: "Thanks, Tom. And the address — what's the best one to send someone to?" },
+        { speaker: 'caller', text: "412 Oakridge Drive. How fast can someone actually get here?" },
+        { speaker: 'ai', text: "Given it's after-hours and you've got a kid in the house, I'd say this qualifies for our priority callback. Let me get the on-call tech texted right now. He'll call you back within fifteen minutes to confirm a window." },
+        { speaker: 'caller', text: "Okay, please. I really appreciate that." },
+        { speaker: 'ai', text: "Of course. Just so I have everything — Tom Bradley, 412 Oakridge, AC blowing warm air, outside unit not running. Best callback's the number you're on?" },
+        { speaker: 'caller', text: "Yeah, this number." },
+        { speaker: 'ai', text: "Got it. Hang tight, Tom. You'll hear from him within fifteen minutes." },
+        { speaker: 'caller', text: "Thank you." },
+        { type: 'meta', captured: true, text: 'Hot lead · Tech notified · Summary emailed' },
+      ],
+    },
+    'plumbing': {
+      audio: '/audio/plumbing.mp3',
+      business: 'Steady Flow Plumbing',
+      meta: 'Inbound · Sunday 10:11 AM',
+      transcript: [
+        { type: 'meta', text: 'Call connected' },
+        { speaker: 'ai', text: "Thanks for calling Steady Flow Plumbing, this is Riley. How can I help?" },
+        { speaker: 'caller', text: "Hi — yeah, I've got water coming out from under my kitchen sink. Like a lot. I shut the valve off but the floor's already soaked." },
+        { speaker: 'ai', text: "Okay, good move shutting the valve off — that was the right call. Can I confirm — the water is fully stopped now, right?" },
+        { speaker: 'caller', text: "Yeah, it's stopped. But I mean, the cabinet's still dripping and I don't know what to do." },
+        { speaker: 'ai', text: "Totally understand. We'll get someone out today. Can I get your name?" },
+        { speaker: 'caller', text: "Linda Park." },
+        { speaker: 'ai', text: "Thanks, Linda. And do you know — is it a leak from the supply line under the sink, or is it coming from the drain trap? The pipe shaped like a U." },
+        { speaker: 'caller', text: "Uh… I think the U-shaped one? It looks cracked or something." },
+        { speaker: 'ai', text: "Okay, that's a P-trap. Good news is that's a pretty quick fix for our techs. Before I send someone — quick heads up on pricing — our weekend service call starts at one-twenty-five just to come out, and the repair itself depends on what they find. You okay with that?" },
+        { speaker: 'caller', text: "Yeah, that's fine. I just need it done." },
+        { speaker: 'ai', text: "Totally fair. What's the address?" },
+        { speaker: 'caller', text: "1847 Beacon Street." },
+        { speaker: 'ai', text: "Got it. And the best number — same as the one you're calling from?" },
+        { speaker: 'caller', text: "Yep." },
+        { speaker: 'ai', text: "Perfect. So Linda Park, 1847 Beacon, leaking P-trap, water shut off, ready for service. I'll get the on-call tech routed your way — he'll call you within thirty minutes with an arrival window. Sound good?" },
+        { speaker: 'caller', text: "Yes. Thank you so much." },
+        { speaker: 'ai', text: "You're welcome, Linda. Help's on the way." },
+        { type: 'meta', captured: true, text: 'Lead captured · Tech dispatched · Summary emailed' },
+      ],
+    },
+  };
+
+  let currentTab = 'landscaping';
+  let isPlaying = false;
+  let isScrubbing = false;
+
+  function formatTime(s) {
+    if (!isFinite(s) || isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function renderTranscript(key) {
+    const demo = DEMOS[key];
+    if (!demo) return;
+    transcriptEl.innerHTML = '';
+    demo.transcript.forEach((line, i) => {
+      const lineEl = document.createElement('div');
+      if (line.type === 'meta') {
+        lineEl.className = 'transcript-meta' + (line.captured ? ' captured' : '');
+        lineEl.textContent = line.text;
+      } else {
+        lineEl.className = 'transcript-line ' + line.speaker;
+        lineEl.style.animationDelay = (i * 0.04) + 's';
+        const speakerEl = document.createElement('div');
+        speakerEl.className = 'transcript-speaker ' + line.speaker;
+        speakerEl.textContent = line.speaker === 'ai' ? 'AI Receptionist' : 'Caller';
+        const bubbleEl = document.createElement('div');
+        bubbleEl.className = 'transcript-bubble ' + line.speaker;
+        bubbleEl.textContent = line.text;
+        lineEl.appendChild(speakerEl);
+        lineEl.appendChild(bubbleEl);
+      }
+      transcriptEl.appendChild(lineEl);
+    });
+    transcriptEl.scrollTop = 0;
+  }
+
+  function loadDemo(key) {
+    const demo = DEMOS[key];
+    if (!demo) return;
+    currentTab = key;
+    isPlaying = false;
+    playBtn.classList.remove('playing');
+    audio.pause();
+    audio.src = demo.audio;
+    audio.currentTime = 0;
+    progressFill.style.width = '0%';
+    progressHandle.style.left = '0%';
+    currentTimeEl.textContent = '0:00';
+    durationEl.textContent = '0:00';
+    statusEl.classList.remove('on-call');
+    statusTextEl.textContent = 'Ready';
+    businessEl.textContent = demo.business;
+    metaEl.textContent = demo.meta;
+    renderTranscript(key);
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.tab;
+      if (key === currentTab) return;
+      tabs.forEach(t => {
+        t.classList.toggle('active', t === tab);
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      loadDemo(key);
+    });
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play().catch(err => {
+        console.warn('Audio play failed:', err);
+      });
+    } else {
+      audio.pause();
+    }
+  });
+
+  audio.addEventListener('play', () => {
+    isPlaying = true;
+    playBtn.classList.add('playing');
+    statusEl.classList.add('on-call');
+    statusTextEl.textContent = 'On Call';
+  });
+
+  audio.addEventListener('pause', () => {
+    isPlaying = false;
+    playBtn.classList.remove('playing');
+    if (audio.ended || audio.currentTime === 0) {
+      statusEl.classList.remove('on-call');
+      statusTextEl.textContent = 'Ready';
+    } else {
+      statusEl.classList.remove('on-call');
+      statusTextEl.textContent = 'Paused';
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    playBtn.classList.remove('playing');
+    statusEl.classList.remove('on-call');
+    statusTextEl.textContent = 'Call ended';
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    durationEl.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    if (isScrubbing) return;
+    const pct = (audio.currentTime / (audio.duration || 1)) * 100;
+    progressFill.style.width = pct + '%';
+    progressHandle.style.left = pct + '%';
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+  });
+
+  audio.addEventListener('error', (e) => {
+    console.warn('Audio load error for', currentTab, e);
+    statusTextEl.textContent = 'Audio unavailable';
+  });
+
+  function scrub(e) {
+    const rect = progressBar.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const pct = Math.max(0, Math.min(1, x / rect.width));
+    if (isFinite(audio.duration)) {
+      audio.currentTime = audio.duration * pct;
+      progressFill.style.width = (pct * 100) + '%';
+      progressHandle.style.left = (pct * 100) + '%';
+    }
+  }
+
+  progressBar.addEventListener('mousedown', (e) => {
+    isScrubbing = true;
+    progressBar.classList.add('active');
+    scrub(e);
+    const onMove = (ev) => scrub(ev);
+    const onUp = () => {
+      isScrubbing = false;
+      progressBar.classList.remove('active');
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+
+  progressBar.addEventListener('touchstart', (e) => {
+    isScrubbing = true;
+    progressBar.classList.add('active');
+    scrub(e);
+    const onMove = (ev) => scrub(ev);
+    const onEnd = () => {
+      isScrubbing = false;
+      progressBar.classList.remove('active');
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+    };
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onEnd);
+  }, { passive: true });
+
+  // Initial load
+  loadDemo('landscaping');
 })();
 
 // ====== PLAN MODAL ======
