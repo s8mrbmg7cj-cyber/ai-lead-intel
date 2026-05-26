@@ -1,7 +1,7 @@
 // api/save-setup.js
 // Saves setup page fields to a client row and marks setup_complete.
 // Auth: requires a valid Supabase user session (Authorization: Bearer <access_token>).
-// Pro users only in Step 1. Starter flow will be added in Step 2.
+// Pro users only. Starter users are routed to /confirmation by the frontend.
 
 import ws from 'ws';
 import { createClient } from '@supabase/supabase-js';
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     // Look up client + verify ownership
     const { data: rows, error: lookupErr } = await supabase
       .from('clients')
-      .select('id, owner_user_id, plan, client_slug')
+      .select('id, owner_user_id, plan, client_slug, business_name, ai_greeting')
       .eq('client_slug', clientSlug)
       .limit(1);
 
@@ -88,6 +88,8 @@ export default async function handler(req, res) {
       const s = String(v == null ? '' : v).trim();
       return max && s.length > max ? s.slice(0, max) : s;
     };
+
+    const update = {};
     const setIfPresent = (key, max) => {
       if (Object.prototype.hasOwnProperty.call(body, key)) {
         const v = trim(body[key], max);
@@ -95,7 +97,6 @@ export default async function handler(req, res) {
       }
     };
 
-    const update = {};
     setIfPresent('forwarding_number', 50);
     setIfPresent('business_hours', 500);
     setIfPresent('business_type', 100);
@@ -104,7 +105,24 @@ export default async function handler(req, res) {
     setIfPresent('emergency_rules', 2000);
     setIfPresent('service_area', 500);
     setIfPresent('services_offered', 2000);
-    setIfPresent('ai_personality', 500);
+
+    // Validate personality
+    if (Object.prototype.hasOwnProperty.call(body, 'ai_personality')) {
+      const p = trim(body.ai_personality, 50);
+      if (p && !['warm', 'professional', 'direct'].includes(p)) {
+        return res.status(400).json({ success: false, error: 'Invalid ai_personality value' });
+      }
+      update.ai_personality = p || null;
+    }
+
+    // If caller_greeting is set, mirror it into ai_greeting so dashboard shows it.
+    // (ai_greeting is the field the dashboard's AI Config card currently reads.)
+    if (Object.prototype.hasOwnProperty.call(update, 'caller_greeting') && update.caller_greeting) {
+      update.ai_greeting = update.caller_greeting;
+    } else if (!client.ai_greeting) {
+      // Fallback default if neither exists
+      update.ai_greeting = `Thanks for calling ${client.business_name || 'us'}. How can I help today?`;
+    }
 
     update.setup_complete = true;
     update.setup_completed_at = new Date().toISOString();
