@@ -394,10 +394,10 @@ function renderAiConfig(client) {
       el.textContent = trimmed;
     }
   };
-  setCard('ai-greeting', client.ai_greeting);
+  setCard('ai-greeting', client.caller_greeting || client.ai_greeting);
   setCard('ai-personality', client.ai_personality);
-  setCard('ai-services', client.services_summary);
-  setCard('ai-transfer', client.transfer_behavior);
+  setCard('ai-services', client.services_summary || client.services_offered);
+  setCard('ai-transfer', client.transfer_behavior || client.emergency_rules);
 }
 function renderCalls(calls) {
   const list = document.getElementById('calls-list');
@@ -587,8 +587,15 @@ async function init() {
     return;
   }
 
-  // Starter customers see the setup page, not the dashboard
+  // Starter customers do not get dashboard access (Option A)
   if ((client.plan || '').toLowerCase() === 'starter') {
+    window.location.assign('/confirmation');
+    return;
+  }
+
+  // Pro setup gate — must finish setup before viewing dashboard
+  if (client.setup_complete !== true) {
+    console.log('[dashboard] setup_complete=false — redirecting to /setup');
     window.location.assign('/setup');
     return;
   }
