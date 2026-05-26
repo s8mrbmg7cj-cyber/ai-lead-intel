@@ -1,8 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+
   "rewrites": [
     { "source": "/dashboard", "destination": "/sign-in.html" },
     { "source": "/dashboard/", "destination": "/sign-in.html" },
+
     { "source": "/sign-in", "destination": "/sign-in.html" },
     { "source": "/signin", "destination": "/sign-in.html" },
     { "source": "/login", "destination": "/sign-in.html" },
@@ -10,6 +12,8 @@
     { "source": "/payment-success", "destination": "/payment-success.html" },
 
     { "source": "/create-password", "destination": "/create-password.html" },
+
+    { "source": "/setup", "destination": "/setup.html" },
 
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
@@ -19,10 +23,22 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     }
   ],
