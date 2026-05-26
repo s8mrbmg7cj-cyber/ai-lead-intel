@@ -170,12 +170,12 @@ if (justCreated) {
   showMsg('signin-msg', 'info', 'Account created. Sign in with the password you just set.');
 }
 
-// If already signed in, redirect to dashboard
+// If already signed in, route them appropriately
 (async function checkExistingSession() {
   const { data } = await supabase.auth.getSession();
   if (data && data.session) {
     console.log('[signin] existing session — redirecting');
-    await redirectToDashboard();
+    await routeUserAfterSignIn();
   }
 })();
 
@@ -188,28 +188,37 @@ function showMsg(id, type, text) {
 }
 function hideMsg(id) { document.getElementById(id).classList.remove('visible'); }
 
-async function lookupSlugForCurrentUser() {
+async function lookupClientForCurrentUser() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return null;
   const { data: rows, error } = await supabase
     .from('clients')
-    .select('client_slug, plan, business_name')
+    .select('client_slug, plan, business_name, setup_complete')
     .eq('owner_user_id', session.user.id)
     .limit(1);
   if (error) {
-    console.error('[signin] slug lookup error:', error);
+    console.error('[signin] client lookup error:', error);
     return null;
   }
   return rows && rows[0] ? rows[0] : null;
 }
 
-async function redirectToDashboard() {
-  const client = await lookupSlugForCurrentUser();
+async function routeUserAfterSignIn() {
+  const client = await lookupClientForCurrentUser();
   if (!client || !client.client_slug) {
     showMsg('signin-msg', 'error', 'Signed in, but we couldn\'t find your account. Email support.');
     return;
   }
-  if ((client.plan || '').toLowerCase() === 'starter') {
+  const plan = (client.plan || '').toLowerCase();
+
+  // Option A — Starter users always go to /confirmation, no dashboard
+  if (plan === 'starter') {
+    window.location.assign('/confirmation');
+    return;
+  }
+
+  // Pro — gate on setup_complete
+  if (client.setup_complete !== true) {
     window.location.assign('/setup');
     return;
   }
@@ -250,8 +259,8 @@ signinBtn.addEventListener('click', async () => {
       return;
     }
 
-    showMsg('signin-msg', 'success', 'Signed in — opening your dashboard…');
-    setTimeout(redirectToDashboard, 600);
+    showMsg('signin-msg', 'success', 'Signed in — opening your account…');
+    setTimeout(routeUserAfterSignIn, 500);
   } catch (err) {
     console.error('[signin] exception:', err);
     showMsg('signin-msg', 'error', 'Network error. Please try again.');
