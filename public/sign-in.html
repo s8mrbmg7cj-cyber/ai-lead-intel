@@ -210,7 +210,7 @@ async function redirectToDashboard() {
     return;
   }
   if ((client.plan || '').toLowerCase() === 'starter') {
-    window.location.assign('/onboarding/success?plan=starter&slug=' + encodeURIComponent(client.client_slug) + '&business=' + encodeURIComponent(client.business_name || ''));
+    window.location.assign('/setup');
     return;
   }
   window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug));
