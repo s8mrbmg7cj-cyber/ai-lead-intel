@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Get started — AI Lead Intel</title>
+  <title>Start your 7-day free trial — AI Lead Intel</title>
   <script src="/error-reporter.js" defer></script>
-  <meta name="description" content="Set up your AI front desk in under 60 seconds." />
+  <meta name="description" content="Start your 7-day free trial. No charge today. We build and launch your AI receptionist during the trial period." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
@@ -48,14 +48,19 @@
     @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
     .hero-title { font-size: clamp(34px, 5vw, 48px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 16px; }
     .hero-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-sub { font-size: 16px; color: var(--text-dim); line-height: 1.55; max-width: 480px; margin: 0 auto; }
+    .hero-sub { font-size: 16px; color: var(--text-dim); line-height: 1.55; max-width: 520px; margin: 0 auto; }
+    .hero-sub strong { color: var(--text); font-weight: 600; }
     .plan-banner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 22px; background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 60%), linear-gradient(180deg, var(--surface-input) 0%, var(--surface-2) 100%); border: 1px solid var(--brand-line); border-radius: 12px; position: relative; overflow: hidden; }
     .plan-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
     .plan-banner-icon { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px var(--brand-glow); }
     .plan-banner-text { flex: 1; min-width: 0; }
     .plan-banner-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--brand); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
     .plan-banner-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
-    .plan-banner-price { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-dim); letter-spacing: 0.02em; font-weight: 500; flex-shrink: 0; }
+    .plan-banner-price { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-dim); letter-spacing: 0.02em; font-weight: 500; flex-shrink: 0; text-align: right; }
+    .plan-banner-price .trial-tag { display: block; font-size: 9.5px; color: var(--brand); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-top: 2px; }
+    .trial-strip { display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 28px; padding: 12px 18px; background: rgba(255,106,0,0.05); border: 1px solid rgba(255,106,0,0.16); border-radius: 12px; }
+    .trial-strip-item { display: inline-flex; align-items: center; gap: 6px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--text); font-weight: 500; }
+    .trial-strip-item svg { color: var(--brand); flex-shrink: 0; }
     .progress { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding: 0 4px; }
     .progress-step { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
     .progress-num { width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2); border: 1.5px solid var(--border-2); color: var(--text-faint); font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
@@ -165,7 +170,12 @@
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
     .activation-title { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; text-align: center; margin-bottom: 8px; line-height: 1.2; }
     .activation-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .activation-sub { font-size: 13.5px; color: var(--text-dim); text-align: center; line-height: 1.55; max-width: 380px; margin: 0 auto; }
+    .activation-sub { font-size: 13.5px; color: var(--text-dim); text-align: center; line-height: 1.55; max-width: 420px; margin: 0 auto; }
+    .activation-sub strong { color: var(--text); font-weight: 600; }
+    .trial-explainer { margin: 18px auto 0; max-width: 460px; padding: 14px 16px; background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .trial-explainer-row { display: flex; align-items: flex-start; gap: 10px; font-size: 12.5px; color: var(--text-soft); line-height: 1.5; text-align: left; }
+    .trial-explainer-row svg { color: var(--brand); flex-shrink: 0; margin-top: 2px; }
+    .trial-explainer-row strong { color: var(--text); font-weight: 600; }
     .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
     .review-section { background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; transition: border-color 0.15s; }
     .review-section:hover { border-color: var(--border-2); }
@@ -224,6 +234,8 @@
       .activation-card { padding: 22px 18px; }
       .activation-title { font-size: 19px; }
       .plan-banner-price { display: none; }
+      .trial-strip { gap: 12px; padding: 10px 14px; }
+      .trial-strip-item { font-size: 10.5px; }
     }
   </style>
 </head>
@@ -237,9 +249,9 @@
   </nav>
   <div class="wrap">
     <header class="hero">
-      <div class="hero-eyebrow"><span class="dot"></span>Setup · Under 60 seconds</div>
-      <h1 class="hero-title">Set up your <span class="accent">AI front desk</span></h1>
-      <p class="hero-sub">Tell us about your business, configure how your AI handles calls, and we'll have it answering in 5–7 days.</p>
+      <div class="hero-eyebrow"><span class="dot"></span>7-Day Free Trial · No charge today</div>
+      <h1 class="hero-title">Start your <span class="accent">7-day free trial</span></h1>
+      <p class="hero-sub">Tell us about your business and we'll build your AI receptionist during your trial. <strong>You won't be charged until day 8</strong> — cancel anytime through PayPal.</p>
     </header>
     <div class="plan-banner" id="plan-banner" style="display:none;">
       <div class="plan-banner-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -247,14 +259,23 @@
         <div class="plan-banner-label">Selected plan</div>
         <div class="plan-banner-name" id="plan-banner-name">Starter</div>
       </div>
-      <div class="plan-banner-price" id="plan-banner-price">$97 / month</div>
+      <div class="plan-banner-price">
+        <span id="plan-banner-price">$97 / month</span>
+        <span class="trial-tag">After 7-day free trial</span>
+      </div>
+    </div>
+    <div class="trial-strip">
+      <div class="trial-strip-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>7-day free trial</div>
+      <div class="trial-strip-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>No charge today</div>
+      <div class="trial-strip-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
+      <div class="trial-strip-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Live within 7 days</div>
     </div>
     <div class="progress" id="progress">
       <div class="progress-step active" data-step="1"><div class="progress-num"><span>1</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="progress-label">Business</div></div>
       <div class="progress-line" data-line="1"></div>
       <div class="progress-step" data-step="2"><div class="progress-num"><span>2</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="progress-label">AI Setup</div></div>
       <div class="progress-line" data-line="2"></div>
-      <div class="progress-step" data-step="3"><div class="progress-num"><span>3</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="progress-label">Activate</div></div>
+      <div class="progress-step" data-step="3"><div class="progress-num"><span>3</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="progress-label">Start Trial</div></div>
     </div>
     <div class="card">
       <div class="form-error" id="form-error">
@@ -360,19 +381,33 @@
           <div class="field"><div class="float-wrap"><select class="float-select" id="pricing_rule"><option value=""></option><option value="yes_specific">Yes — give exact prices when asked</option><option value="yes_ranges">Yes — give price ranges only</option><option value="no_quote">No — say "I'll have someone send you a quote"</option><option value="no_transfer">No — transfer pricing questions to me</option></select><label class="float-label" for="pricing_rule">Should the AI give pricing on calls?</label></div><div class="field-hint">If you don't set this, the AI may improvise prices.</div></div>
           <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="pricing_examples" placeholder=" "></textarea><label class="float-label" for="pricing_examples">Common prices the AI should know <span class="opt">— optional</span></label></div><div class="field-hint">One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"</div></div>
           <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="notes" placeholder=" "></textarea><label class="float-label" for="notes">Anything else we should know? <span class="opt">— optional</span></label></div><div class="field-hint">Special hours, common questions, things the AI should never say.</div></div>
-          <div class="legal-note">By submitting, you agree to our <a href="/privacy" target="_blank">Privacy Policy</a><span class="sep">·</span><a href="/terms" target="_blank">Terms</a></div>
+          <div class="legal-note">By submitting, you agree to our <a href="/privacy" target="_blank">Privacy Policy</a><span class="sep">·</span><a href="/terms" target="_blank">Terms</a>. You authorize a recurring subscription that begins billing after your 7-day free trial. Cancel anytime through PayPal.</div>
         </div>
       </section>
       <section class="section" data-section="3">
         <div class="section-head">
-          <div class="section-eyebrow"><span class="step-dot"></span>Step 3 · Activate</div>
-          <h2 class="section-title">Your AI assistant is <span class="accent">almost ready</span></h2>
-          <p class="section-sub">Submit and you'll be taken to PayPal to start your subscription.</p>
+          <div class="section-eyebrow"><span class="step-dot"></span>Step 3 · Start Free Trial</div>
+          <h2 class="section-title">Ready to start your <span class="accent">7-day free trial</span></h2>
+          <p class="section-sub">Submit and you'll be taken to PayPal to authorize your subscription. No charge today.</p>
         </div>
         <div class="activation-card">
           <div class="activation-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-          <div class="activation-title">Ready to <span class="accent">launch setup</span></div>
-          <div class="activation-sub">Submit below and you'll be taken to PayPal to start your subscription. After payment, your AI setup begins.</div>
+          <div class="activation-title">Start your <span class="accent">free trial</span></div>
+          <div class="activation-sub">Submit below and authorize your subscription through PayPal. <strong>No charge for 7 days.</strong> Your AI receptionist is built and tested during your trial.</div>
+          <div class="trial-explainer">
+            <div class="trial-explainer-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <div><strong>Today:</strong> Authorize subscription · No charge</div>
+            </div>
+            <div class="trial-explainer-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <div><strong>Days 1–7:</strong> We build, configure, and launch your AI</div>
+            </div>
+            <div class="trial-explainer-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <div><strong>Day 8:</strong> Billing begins automatically · Cancel anytime before</div>
+            </div>
+          </div>
         </div>
         <div class="review-list" id="review-content"></div>
       </section>
@@ -387,9 +422,10 @@
       </div>
     </div>
     <div class="trust-row" id="trust-row">
-      <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Live in 5–7 days</div>
+      <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>7-day free trial</div>
+      <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No charge today</div>
       <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
-      <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No long contracts</div>
+      <div class="trust-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Live within 7 days</div>
     </div>
   </div>
   <script>
@@ -694,7 +730,7 @@
       const nextLabel = document.getElementById('btn-next-label');
       const nextArrow = document.getElementById('btn-next-arrow');
       backBtn.disabled = section <= 1;
-      if (section === TOTAL) { nextLabel.textContent = 'Submit & continue to PayPal'; nextBtn.classList.add('btn-launch'); }
+      if (section === TOTAL) { nextLabel.textContent = 'Start Free Trial → PayPal'; nextBtn.classList.add('btn-launch'); }
       else { nextLabel.textContent = 'Continue'; nextBtn.classList.remove('btn-launch'); }
       if (nextArrow) nextArrow.style.display = 'block';
       currentSection = section;
@@ -819,12 +855,9 @@
       });
     });
 
-    // ========================================================
-    // SUBMIT HANDLER — PayPal redirect FIRST, no race conditions
-    // ========================================================
     async function submitForm() {
-      console.log('[onboarding] 📤 submitForm() entered');
-      if (isSubmitting) { console.warn('[onboarding] 🛑 already submitting — blocked'); return; }
+      console.log('[onboarding] submitForm() entered');
+      if (isSubmitting) { console.warn('[onboarding] already submitting — blocked'); return; }
       isSubmitting = true;
 
       const btn = document.getElementById('btn-next');
@@ -837,11 +870,11 @@
       function reEnable() {
         isSubmitting = false;
         btn.disabled = false;
-        label.textContent = 'Submit & continue to PayPal';
+        label.textContent = 'Start Free Trial → PayPal';
         if (arrow) arrow.style.display = 'block';
       }
       function hardFail(userMsg, tech) {
-        console.error('[onboarding] ❌ HARD FAIL:', userMsg, tech || '');
+        console.error('[onboarding] HARD FAIL:', userMsg, tech || '');
         showError(userMsg + ' — email hello@aileadintel.com if this continues.');
         reEnable();
       }
@@ -859,10 +892,9 @@
         company_size_other: hpCompany,
         _gotcha: hpGotcha,
       };
-      console.log('[onboarding] 📤 payload:', { business: payload.business_name, plan: payload.plan, slug: payload.client_slug });
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => { console.warn('[onboarding] ⏰ timeout 30s'); controller.abort(); }, 30000);
+      const timeoutId = setTimeout(() => { controller.abort(); }, 30000);
 
       let response;
       try {
@@ -879,18 +911,13 @@
       }
       clearTimeout(timeoutId);
 
-      console.log('[onboarding] 📥 RAW RESPONSE:', response);
-      console.log('[onboarding] 📥 STATUS:', response.status);
-
       let rawText;
       try { rawText = await response.text(); }
       catch (err) { return hardFail('Could not read server response.', err); }
-      console.log('[onboarding] 📥 RAW TEXT:', rawText);
 
       let result;
       try { result = JSON.parse(rawText); }
-      catch (err) { console.error('[onboarding] ❌ JSON PARSE FAILED:', err); return hardFail('Server returned an invalid response.', err); }
-      console.log('[onboarding] 📥 PARSED JSON:', result);
+      catch (err) { return hardFail('Server returned an invalid response.', err); }
 
       if (!response.ok || result === null || result.success !== true) {
         const apiMsg = (result && result.error) || `Submit failed (HTTP ${response.status})`;
@@ -902,17 +929,14 @@
       const canonicalSlug = result.client_slug || clientSlug;
       const canonicalPlan = result.plan || selectedPlan;
       const paypalUrl = result.paypal_redirect;
-      console.log('[onboarding] 💳 PAYPAL URL:', paypalUrl);
 
       if (typeof paypalUrl === 'string' && paypalUrl.startsWith('https://')) {
         label.innerHTML = 'Redirecting to PayPal…';
-        console.log('[onboarding] ✅ redirecting to PayPal');
         await new Promise(r => setTimeout(r, 400));
         window.location.assign(paypalUrl);
         return;
       }
 
-      console.warn('[onboarding] ⚠️ paypal_redirect missing — using fallback');
       label.innerHTML = 'Submitted ✓';
       await new Promise(r => setTimeout(r, 1000));
       safeRedirectToSuccess(canonicalSlug, canonicalPlan, formData.business_name || '', result.report_frequency || formData.report_frequency, result.report_email || formData.notify_email);
@@ -930,7 +954,7 @@
     updateAIPreview();
     updateEmergencyPreview();
     refreshAllFloatStates();
-    console.log('[onboarding] ✅ initialized');
+    console.log('[onboarding] initialized');
   </script>
 </body>
 </html>
