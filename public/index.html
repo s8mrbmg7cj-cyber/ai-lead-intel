@@ -152,7 +152,6 @@ img { max-width: 100%; display: block; }
 .real-call-sub { font-size: 15.5px; color: var(--text-dim); line-height: 1.65; max-width: 520px; margin: 0 auto; }
 .real-call-sub strong { color: var(--text); font-weight: 600; }
 
-/* Tabs row above the card */
 .industry-tabs { display: flex; justify-content: center; gap: 4px; margin-bottom: 18px; padding: 5px; background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px; max-width: 560px; margin-left: auto; margin-right: auto; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; position: relative; }
 .industry-tabs::-webkit-scrollbar { display: none; }
 .industry-tab { flex: 1; min-width: 96px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-faint); cursor: pointer; background: transparent; border: 1px solid transparent; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; letter-spacing: -0.005em; position: relative; }
@@ -161,7 +160,6 @@ img { max-width: 100%; display: block; }
 .industry-tab.active { background: linear-gradient(180deg, rgba(255,106,0,0.16), rgba(255,106,0,0.06)); color: var(--text); border-color: var(--brand-line); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(255,106,0,0.12); }
 .industry-tab.active svg { opacity: 1; color: var(--brand); }
 
-/* Call card */
 .call-card-wrap { position: relative; }
 .call-card-wrap::before { content: ''; position: absolute; inset: -24px -24px -8px; background: radial-gradient(ellipse 60% 55% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(36px); z-index: 0; opacity: 0.45; transition: opacity 0.4s; }
 .call-card-wrap.is-playing::before { opacity: 0.85; }
@@ -169,7 +167,6 @@ img { max-width: 100%; display: block; }
 .call-card-wrap.is-playing .call-card { border-color: var(--brand-line); }
 .call-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.55), transparent); z-index: 2; }
 
-/* Compact card header */
 .call-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; gap: 12px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.18); }
 .call-header-left { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
 .call-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 4px 12px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
@@ -178,7 +175,6 @@ img { max-width: 100%; display: block; }
 .call-business { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .call-meta { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 2px; }
 
-/* Status pill */
 .call-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border-2); flex-shrink: 0; transition: all 0.3s; position: relative; }
 .call-status.ready { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
 .call-status.loading { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
@@ -203,7 +199,6 @@ img { max-width: 100%; display: block; }
 .eq-bar:nth-child(3) { animation-delay: 0.36s; }
 @keyframes eqBar { 0%, 100% { height: 25%; } 50% { height: 95%; } }
 
-/* Transcript */
 .call-transcript-wrap { position: relative; }
 .call-transcript { display: flex; flex-direction: column; gap: 12px; padding: 18px 20px 24px; height: 320px; overflow-y: auto; scroll-behavior: smooth; }
 .call-transcript::-webkit-scrollbar { width: 5px; }
@@ -227,7 +222,6 @@ img { max-width: 100%; display: block; }
 
 .transcript-fade-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 36px; background: linear-gradient(180deg, transparent, var(--surface-2) 90%); pointer-events: none; }
 
-/* Audio player */
 .call-player { padding: 14px 20px 18px; border-top: 1px solid var(--border); background: linear-gradient(180deg, transparent, rgba(0,0,0,0.22)); display: flex; align-items: center; gap: 14px; }
 .player-play { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 4px 14px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.22); flex-shrink: 0; border: 1px solid transparent; position: relative; }
 .player-play::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: var(--brand); opacity: 0; transition: opacity 0.3s; z-index: -1; filter: blur(8px); }
@@ -255,12 +249,10 @@ img { max-width: 100%; display: block; }
 .player-volume svg { transition: color 0.18s; }
 .player-volume:hover svg { color: var(--text); }
 
-/* Trust strip below the card */
 .real-call-trust { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 28px; flex-wrap: wrap; }
 .real-call-trust-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; font-weight: 500; }
 .real-call-trust-item svg { color: var(--brand); flex-shrink: 0; }
 
-/* hidden audio pool */
 .audio-pool { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 @media (max-width: 560px) {
@@ -274,6 +266,110 @@ img { max-width: 100%; display: block; }
   .call-player { padding: 12px 16px 16px; gap: 12px; }
   .transcript-bubble { font-size: 12.5px; padding: 9px 12px; }
   .real-call-trust { gap: 16px; }
+}
+
+/* ====== LIVE AI DEMO SECTION (Call Riley) ====== */
+.lad-section { padding: 96px 0 110px; position: relative; }
+.lad-section *, .lad-section *::before, .lad-section *::after { box-sizing: border-box; }
+.lad-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 65% 55% at 30% 50%, rgba(255,106,0,0.09), transparent 60%); pointer-events: none; z-index: 0; }
+.lad-wrap { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.lad-grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: 64px; align-items: center; }
+.lad-left { min-width: 0; }
+.lad-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 7px 14px; border-radius: 99px; margin-bottom: 22px; }
+.lad-eyebrow .lad-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); animation: lad-pulse 1.6s ease-in-out infinite; }
+@keyframes lad-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
+.lad-title { font-size: clamp(30px, 4.5vw, 48px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.08; margin-bottom: 18px; color: var(--text); }
+.lad-title .lad-accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.lad-sub { font-size: 16px; color: var(--text-dim); line-height: 1.65; margin-bottom: 26px; max-width: 480px; }
+.lad-features { list-style: none; padding: 0; margin: 0 0 30px; display: flex; flex-direction: column; gap: 11px; max-width: 420px; }
+.lad-features li { display: flex; align-items: center; gap: 11px; font-size: 14.5px; color: var(--text-soft); letter-spacing: -0.005em; }
+.lad-check { width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); display: flex; align-items: center; justify-content: center; }
+.lad-cta-wrap { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.lad-cta { display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 18px 30px; border-radius: 14px; background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%); color: #fff !important; text-decoration: none; font-size: 15.5px; font-weight: 700; letter-spacing: -0.005em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 4px rgba(255,106,0,0.35), 0 16px 40px var(--brand-glow); position: relative; overflow: hidden; transition: transform 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s; min-height: 56px; }
+.lad-cta::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent); transition: left 0.7s; }
+.lad-cta:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 4px 8px rgba(255,106,0,0.4), 0 22px 50px rgba(255,106,0,0.42); }
+.lad-cta:hover::before { left: 100%; }
+.lad-cta:active { transform: translateY(0); }
+.lad-cta-icon { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.18); animation: lad-call-ring 2s ease-in-out infinite; }
+@keyframes lad-call-ring {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(-12deg); }
+  20% { transform: rotate(10deg); }
+  30% { transform: rotate(-8deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(0deg); }
+}
+.lad-number { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--text-soft); letter-spacing: 0.04em; font-weight: 500; }
+.lad-number-label { font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+.lad-number a { color: inherit; text-decoration: none; transition: color 0.18s; }
+.lad-number a:hover { color: var(--brand-2); }
+
+.lad-card-wrap { position: relative; perspective: 1200px; }
+.lad-card-wrap::before { content: ''; position: absolute; inset: -32px; background: radial-gradient(ellipse 65% 55% at 50% 50%, var(--brand-glow), transparent 65%); filter: blur(40px); z-index: 0; opacity: 0.7; animation: lad-glow-breathe 4s ease-in-out infinite; }
+@keyframes lad-glow-breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.85; } }
+.lad-card { position: relative; z-index: 1; background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--brand-line); border-radius: 22px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 40px 90px rgba(0,0,0,0.55), 0 16px 36px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,106,0,0.06); animation: lad-card-float 6s ease-in-out infinite; }
+@keyframes lad-card-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.lad-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.7), transparent); z-index: 3; }
+.lad-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.22); }
+.lad-card-header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lad-avatar-wrap { position: relative; width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.lad-avatar-wrap::before, .lad-avatar-wrap::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--brand); opacity: 0; animation: lad-avatar-ring 2.4s ease-out infinite; }
+.lad-avatar-wrap::after { animation-delay: 1.2s; }
+@keyframes lad-avatar-ring { 0% { transform: scale(0.7); opacity: 0.7; } 100% { transform: scale(1.6); opacity: 0; } }
+.lad-avatar { position: relative; z-index: 2; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(255,106,0,0.45), inset 0 1px 0 rgba(255,255,255,0.3); }
+.lad-avatar::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.lad-card-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; line-height: 1.2; margin-bottom: 3px; }
+.lad-card-role { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.08em; }
+.lad-live-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 99px; background: var(--green-soft); border: 1px solid var(--green-line); font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); flex-shrink: 0; }
+.lad-live-pill .lad-live-dot { position: relative; width: 7px; height: 7px; }
+.lad-live-pill .lad-live-dot::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.lad-live-pill .lad-live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--green); opacity: 0.55; animation: lad-dot-pulse 1.4s ease-out infinite; }
+@keyframes lad-dot-pulse { 0% { transform: scale(1); opacity: 0.55; } 100% { transform: scale(2.6); opacity: 0; } }
+.lad-card-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.lad-line { display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); animation: lad-line-in 0.55s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes lad-line-in { to { opacity: 1; transform: translateY(0); } }
+.lad-line:nth-child(1) { animation-delay: 0.15s; }
+.lad-line:nth-child(2) { animation-delay: 0.45s; }
+.lad-line:nth-child(3) { animation-delay: 0.85s; }
+.lad-line:nth-child(4) { animation-delay: 1.25s; }
+.lad-line-speaker { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; padding: 0 4px; }
+.lad-line.lad-ai .lad-line-speaker { color: var(--brand); }
+.lad-line.lad-caller .lad-line-speaker { color: var(--text-dim); text-align: right; }
+.lad-bubble { padding: 11px 14px; border-radius: 13px; font-size: 13.5px; line-height: 1.55; max-width: 90%; letter-spacing: -0.005em; color: var(--text); }
+.lad-line.lad-ai .lad-bubble { background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); align-self: flex-start; border-top-left-radius: 5px; }
+.lad-line.lad-caller { align-items: flex-end; }
+.lad-line.lad-caller .lad-bubble { background: var(--surface-3); color: var(--text-soft); border: 1px solid var(--border); align-self: flex-end; border-top-right-radius: 5px; }
+.lad-line.lad-typing { opacity: 0; animation: lad-line-in 0.55s cubic-bezier(0.16,1,0.3,1) 1.65s forwards; }
+.lad-typing-bubble { display: inline-flex; align-items: center; gap: 5px; padding: 12px 16px; border-radius: 13px; border-top-left-radius: 5px; background: linear-gradient(135deg, var(--brand-soft), transparent 130%); border: 1px solid var(--brand-line); }
+.lad-typing-bubble span { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); opacity: 0.5; animation: lad-typing 1.2s ease-in-out infinite; }
+.lad-typing-bubble span:nth-child(2) { animation-delay: 0.18s; }
+.lad-typing-bubble span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes lad-typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+.lad-card-foot { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.18); font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-dim); letter-spacing: 0.06em; }
+.lad-card-foot-left { display: inline-flex; align-items: center; gap: 8px; }
+.lad-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.lad-eq span { width: 2.5px; background: var(--brand); border-radius: 1px; height: 30%; animation: lad-eq 0.9s ease-in-out infinite; transform-origin: bottom; }
+.lad-eq span:nth-child(1) { animation-delay: 0.0s; }
+.lad-eq span:nth-child(2) { animation-delay: 0.18s; }
+.lad-eq span:nth-child(3) { animation-delay: 0.36s; }
+.lad-eq span:nth-child(4) { animation-delay: 0.10s; }
+@keyframes lad-eq { 0%, 100% { height: 25%; } 50% { height: 95%; } }
+.lad-call-duration { color: var(--text-soft); }
+@media (max-width: 960px) {
+  .lad-grid { grid-template-columns: 1fr; gap: 48px; }
+  .lad-left { text-align: center; }
+  .lad-features { margin-left: auto; margin-right: auto; align-items: flex-start; }
+  .lad-sub { margin-left: auto; margin-right: auto; }
+  .lad-cta-wrap { align-items: center; }
+}
+@media (max-width: 600px) {
+  .lad-section { padding: 64px 0 76px; }
+  .lad-card-header { padding: 14px 16px; }
+  .lad-card-body { padding: 16px; gap: 10px; }
+  .lad-card-foot { padding: 12px 16px; }
+  .lad-bubble { font-size: 12.5px; padding: 10px 12px; }
+  .lad-cta { width: 100%; padding: 16px 22px; font-size: 15px; }
+  .lad-features { max-width: 100%; }
 }
 
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -378,7 +474,6 @@ img { max-width: 100%; display: block; }
 .fade-up { opacity: 0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 
-/* ====== PLAN SELECTOR MODAL ====== */
 .plan-modal-backdrop { position: fixed; inset: 0; z-index: 1000; background: rgba(8,8,10,0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; align-items: center; justify-content: center; padding: 24px; animation: backdropIn 0.25s ease-out; overflow-y: auto; }
 .plan-modal-backdrop.open { display: flex; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
@@ -519,7 +614,6 @@ img { max-width: 100%; display: block; }
   </div>
 </section>
 
-<!-- ====== REAL CALL EXPERIENCE SECTION — REDESIGNED ====== -->
 <section class="real-call-section" id="demo">
   <div class="real-call-inner">
     <div class="real-call-head fade-up">
@@ -567,9 +661,7 @@ img { max-width: 100%; display: block; }
         </div>
 
         <div class="call-transcript-wrap">
-          <div class="call-transcript" id="call-transcript">
-            <!-- transcript injected by JS -->
-          </div>
+          <div class="call-transcript" id="call-transcript"></div>
           <div class="transcript-fade-overlay"></div>
         </div>
 
@@ -616,6 +708,110 @@ img { max-width: 100%; display: block; }
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>
         Captures every lead
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== LIVE AI DEMO SECTION (Call Riley) ====== -->
+<section class="lad-section" id="live-demo">
+  <div class="lad-wrap">
+    <div class="lad-grid">
+
+      <div class="lad-left fade-up">
+        <div class="lad-eyebrow">
+          <span class="lad-eyebrow-dot"></span>
+          Live AI Demo
+        </div>
+        <h2 class="lad-title">Talk to Riley <span class="lad-accent">live right now.</span></h2>
+        <p class="lad-sub">Call our AI receptionist yourself and experience a real conversation in real time — no forms, no waiting, no sales rep.</p>
+
+        <ul class="lad-features">
+          <li>
+            <span class="lad-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Answers instantly
+          </li>
+          <li>
+            <span class="lad-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Sounds human
+          </li>
+          <li>
+            <span class="lad-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Captures lead info
+          </li>
+          <li>
+            <span class="lad-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Works 24/7
+          </li>
+        </ul>
+
+        <div class="lad-cta-wrap">
+          <a href="tel:+19067622478" class="lad-cta" aria-label="Call Riley at (906) 762-2478">
+            <span class="lad-cta-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </span>
+            Call Riley Now
+          </a>
+          <div class="lad-number">
+            <span class="lad-number-label">Direct line</span>
+            <a href="tel:+19067622478">(906) 762-2478</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="lad-card-wrap fade-up" aria-hidden="true">
+        <div class="lad-card">
+          <div class="lad-card-header">
+            <div class="lad-card-header-left">
+              <div class="lad-avatar-wrap">
+                <div class="lad-avatar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative; z-index:1;">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/>
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <div class="lad-card-name">Riley · AI Receptionist</div>
+                <div class="lad-card-role">Live call · Just now</div>
+              </div>
+            </div>
+            <div class="lad-live-pill">
+              <span class="lad-live-dot"></span>
+              Live Call Active
+            </div>
+          </div>
+
+          <div class="lad-card-body">
+            <div class="lad-line lad-ai">
+              <div class="lad-line-speaker">AI Receptionist</div>
+              <div class="lad-bubble">Thanks for calling. How can I help you today?</div>
+            </div>
+            <div class="lad-line lad-caller">
+              <div class="lad-line-speaker">Caller</div>
+              <div class="lad-bubble">Yeah, I need help with my AC unit.</div>
+            </div>
+            <div class="lad-line lad-ai">
+              <div class="lad-line-speaker">AI Receptionist</div>
+              <div class="lad-bubble">Absolutely. Can I grab your address?</div>
+            </div>
+            <div class="lad-line lad-typing lad-caller">
+              <div class="lad-line-speaker">Caller</div>
+              <div class="lad-typing-bubble">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lad-card-foot">
+            <div class="lad-card-foot-left">
+              <div class="lad-eq"><span></span><span></span><span></span><span></span></div>
+              On Call
+            </div>
+            <div class="lad-call-duration">00:14</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -756,6 +952,7 @@ img { max-width: 100%; display: block; }
       <div>
         <div class="footer-col-title">Product</div>
         <a href="#demo" class="footer-link">How it works</a>
+        <a href="#live-demo" class="footer-link">Call Riley</a>
         <a href="#features" class="footer-link">Features</a>
         <a href="#pricing" class="footer-link">Pricing</a>
         <a href="#faq" class="footer-link">FAQ</a>
@@ -781,7 +978,6 @@ img { max-width: 100%; display: block; }
   </div>
 </footer>
 
-<!-- ====== PLAN SELECTOR MODAL ====== -->
 <div class="plan-modal-backdrop" id="plan-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="plan-modal-title" aria-hidden="true">
   <div class="plan-modal">
     <button class="plan-modal-close" id="plan-modal-close" type="button" aria-label="Close">
@@ -861,7 +1057,6 @@ img { max-width: 100%; display: block; }
 </div>
 
 <script>
-// Fade-up reveal
 (function() {
   const els = document.querySelectorAll('.fade-up');
   if (!('IntersectionObserver' in window)) { els.forEach(el => el.classList.add('visible')); return; }
@@ -871,7 +1066,6 @@ img { max-width: 100%; display: block; }
   els.forEach(el => io.observe(el));
 })();
 
-// FAQ accordion
 document.querySelectorAll('.faq-q').forEach(btn => {
   btn.addEventListener('click', () => {
     const item = btn.closest('.faq-item');
@@ -881,7 +1075,6 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   });
 });
 
-// Live activity feed
 (function() {
   const feed = document.getElementById('live-feed-list');
   if (!feed) return;
@@ -929,7 +1122,6 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   }, 3500);
 })();
 
-// ====== REAL CALL DEMO ======
 (function() {
   const tabs = document.querySelectorAll('.industry-tab');
   const playBtn = document.getElementById('player-play');
@@ -1050,11 +1242,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   function setStatus(stateClass, text) {
     statusEl.className = 'call-status ' + stateClass;
     statusTextEl.textContent = text;
-    if (stateClass === 'on-call') {
-      cardWrap.classList.add('is-playing');
-    } else {
-      cardWrap.classList.remove('is-playing');
-    }
+    if (stateClass === 'on-call') cardWrap.classList.add('is-playing');
+    else cardWrap.classList.remove('is-playing');
   }
 
   function renderTranscript(key) {
@@ -1107,26 +1296,22 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   function bindAudioEvents(audio, key) {
     if (audio._aliBound) return;
     audio._aliBound = true;
-
     audio.addEventListener('loadedmetadata', () => { if (key === currentTab) updateDurationDisplay(audio, key); });
     audio.addEventListener('durationchange', () => { if (key === currentTab) updateDurationDisplay(audio, key); });
     audio.addEventListener('play', () => {
       if (key !== currentTab) return;
-      playBtn.classList.add('playing');
-      playBtn.classList.remove('loading');
+      playBtn.classList.add('playing'); playBtn.classList.remove('loading');
       setStatus('on-call', 'On Call');
     });
     audio.addEventListener('pause', () => {
       if (key !== currentTab) return;
-      playBtn.classList.remove('playing');
-      playBtn.classList.remove('loading');
+      playBtn.classList.remove('playing'); playBtn.classList.remove('loading');
       if (audio.ended || audio.currentTime === 0) setStatus('ready', 'Ready');
       else setStatus('paused', 'Paused');
     });
     audio.addEventListener('ended', () => {
       if (key !== currentTab) return;
-      playBtn.classList.remove('playing');
-      playBtn.classList.remove('loading');
+      playBtn.classList.remove('playing'); playBtn.classList.remove('loading');
       setStatus('ended', 'Call ended');
     });
     audio.addEventListener('timeupdate', () => {
@@ -1137,18 +1322,9 @@ document.querySelectorAll('.faq-q').forEach(btn => {
       progressHandle.style.left = pct + '%';
       currentTimeEl.textContent = formatTime(audio.currentTime);
     });
-    audio.addEventListener('waiting', () => {
-      if (key !== currentTab) return;
-      if (!audio.paused) playBtn.classList.add('loading');
-    });
-    audio.addEventListener('canplay', () => {
-      if (key !== currentTab) return;
-      playBtn.classList.remove('loading');
-      updateDurationDisplay(audio, key);
-    });
-    audio.addEventListener('error', () => {
-      console.warn('[ai-lead-intel] audio load issue for', key, audio.src);
-    });
+    audio.addEventListener('waiting', () => { if (key !== currentTab) return; if (!audio.paused) playBtn.classList.add('loading'); });
+    audio.addEventListener('canplay', () => { if (key !== currentTab) return; playBtn.classList.remove('loading'); updateDurationDisplay(audio, key); });
+    audio.addEventListener('error', () => { console.warn('[ai-lead-intel] audio load issue for', key, audio.src); });
   }
 
   Object.keys(audioPool).forEach(k => { if (audioPool[k]) bindAudioEvents(audioPool[k], k); });
@@ -1157,30 +1333,21 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     const demo = DEMOS[key];
     const audio = audioPool[key];
     if (!demo || !audio) return;
-
     Object.keys(audioPool).forEach(k => {
       if (k !== key && audioPool[k] && !audioPool[k].paused) {
         try { audioPool[k].pause(); audioPool[k].currentTime = 0; } catch (_) {}
       }
     });
-
-    currentTab = key;
-    currentAudio = audio;
-
+    currentTab = key; currentAudio = audio;
     try { audio.currentTime = 0; } catch (_) {}
-
-    playBtn.classList.remove('playing');
-    playBtn.classList.remove('loading');
-    progressFill.style.width = '0%';
-    progressHandle.style.left = '0%';
+    playBtn.classList.remove('playing'); playBtn.classList.remove('loading');
+    progressFill.style.width = '0%'; progressHandle.style.left = '0%';
     currentTimeEl.textContent = '0:00';
     updateDurationDisplay(audio, key);
-
     setStatus('ready', 'Ready');
     businessEl.textContent = demo.business;
     metaEl.textContent = demo.meta;
     renderTranscript(key);
-
     if (audio.readyState < 1) { try { audio.load(); } catch (_) {} }
   }
 
@@ -1210,9 +1377,7 @@ document.querySelectorAll('.faq-q').forEach(btn => {
           setStatus('ready', 'Tap to play');
         });
       }
-    } else {
-      audio.pause();
-    }
+    } else { audio.pause(); }
   });
 
   function scrub(e) {
@@ -1232,42 +1397,24 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   }
 
   progressBar.addEventListener('mousedown', (e) => {
-    isScrubbing = true;
-    progressBar.classList.add('active');
-    scrub(e);
+    isScrubbing = true; progressBar.classList.add('active'); scrub(e);
     const onMove = (ev) => scrub(ev);
-    const onUp = () => {
-      isScrubbing = false;
-      progressBar.classList.remove('active');
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    const onUp = () => { isScrubbing = false; progressBar.classList.remove('active'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
   });
 
   progressBar.addEventListener('touchstart', (e) => {
-    isScrubbing = true;
-    progressBar.classList.add('active');
-    scrub(e);
+    isScrubbing = true; progressBar.classList.add('active'); scrub(e);
     const onMove = (ev) => scrub(ev);
-    const onEnd = () => {
-      isScrubbing = false;
-      progressBar.classList.remove('active');
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onEnd);
-    };
-    window.addEventListener('touchmove', onMove);
-    window.addEventListener('touchend', onEnd);
+    const onEnd = () => { isScrubbing = false; progressBar.classList.remove('active'); window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
+    window.addEventListener('touchmove', onMove); window.addEventListener('touchend', onEnd);
   }, { passive: true });
 
   if ('IntersectionObserver' in window) {
     const section = document.getElementById('demo');
     if (section) {
       const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (!e.isIntersecting && currentAudio && !currentAudio.paused) currentAudio.pause();
-        });
+        entries.forEach(e => { if (!e.isIntersecting && currentAudio && !currentAudio.paused) currentAudio.pause(); });
       }, { threshold: 0.05 });
       io.observe(section);
     }
@@ -1276,16 +1423,13 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   loadDemo('landscaping');
 })();
 
-// ====== PLAN MODAL ======
 (function() {
   const backdrop = document.getElementById('plan-modal-backdrop');
   const closeBtn = document.getElementById('plan-modal-close');
   if (!backdrop) return;
   function openModal() { backdrop.classList.add('open'); backdrop.setAttribute('aria-hidden', 'false'); document.body.classList.add('modal-open'); }
   function closeModal() { backdrop.classList.remove('open'); backdrop.setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-open'); }
-  document.querySelectorAll('[data-open-plan-modal]').forEach(btn => {
-    btn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
-  });
+  document.querySelectorAll('[data-open-plan-modal]').forEach(btn => { btn.addEventListener('click', (e) => { e.preventDefault(); openModal(); }); });
   closeBtn.addEventListener('click', closeModal);
   backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
