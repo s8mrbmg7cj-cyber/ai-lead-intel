@@ -2,7 +2,8 @@
  * AI Lead Intel — Admin Metrics API
  *
  * Returns aggregated business metrics for /admin/command dashboard.
- * Auth: delegates to /api/admin-check (single source of truth).
+ * Auth: uses requireAdmin() from lib/auth.js — same source of truth as
+ * all other admin endpoints.
  *
  * Real data: Revenue, Leads, Customer Success, Errors, AI/Vapi usage
  * Scaffolded: Marketing channels, external service health (clearly placeholder)
@@ -13,6 +14,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '../lib/auth.js';
 
 // ============================================================
 // CONFIG
@@ -21,37 +23,6 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 
 const PLAN_PRICES = { starter: 97, pro: 297 };
-
-// ============================================================
-// AUTH — delegate to /api/admin-check (same source of truth
-// your auth-guard.js uses). This way the signed admin_session
-// cookie is validated by your existing auth code, not guessed at.
-// ============================================================
-async function isAdminAuthenticated(req) {
-  const cookie = req.headers.cookie || '';
-  if (!cookie.includes('admin_session=')) return false;
-
-  // Build absolute URL to internal admin-check endpoint
-  const host = req.headers.host || 'aileadintel.com';
-  const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
-  const checkUrl = `${proto}://${host}/api/admin-check`;
-
-  try {
-    const r = await fetch(checkUrl, {
-      method: 'GET',
-      headers: {
-        cookie,
-        'user-agent': req.headers['user-agent'] || 'admin-metrics-internal',
-      },
-    });
-    if (r.status !== 200) return false;
-    const data = await r.json().catch(() => ({}));
-    return !!data.success;
-  } catch (err) {
-    console.error('[admin-metrics] admin-check call failed:', err.message);
-    return false;
-  }
-}
 
 // ============================================================
 // HELPERS
@@ -393,11 +364,9 @@ export default async function handler(req, res) {
     return;
   }
 
-  const authorized = await isAdminAuthenticated(req);
-  if (!authorized) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
+  // Auth — uses your existing HMAC session verification.
+  // requireAdmin sends the 401 response itself if not authorized.
+  if (!requireAdmin(req, res)) return;
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     res.status(500).json({ error: 'Supabase not configured', detail: 'Missing SUPABASE_URL or SUPABASE_SERVICE_KEY' });
