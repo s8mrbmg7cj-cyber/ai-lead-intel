@@ -2,7 +2,7 @@
  * AI Lead Intel — Admin Metrics API
  *
  * Returns aggregated business metrics for /admin/command dashboard.
- * Auth: requires admin cookie (same as /api/admin-check).
+ * Auth: delegates to /api/admin-check (single source of truth).
  *
  * Real data: Revenue, Leads, Customer Success, Errors, AI/Vapi usage
  * Scaffolded: Marketing channels, external service health (clearly placeholder)
@@ -23,27 +23,34 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUP
 const PLAN_PRICES = { starter: 97, pro: 297 };
 
 // ============================================================
-// AUTH — reuse same cookie pattern as /api/admin-check
+// AUTH — delegate to /api/admin-check (same source of truth
+// your auth-guard.js uses). This way the signed admin_session
+// cookie is validated by your existing auth code, not guessed at.
 // ============================================================
-function isAdminAuthenticated(req) {
-  const cookieHeader = req.headers.cookie || '';
-  const cookies = {};
-  cookieHeader.split(';').forEach(p => {
-    const [k, ...v] = p.trim().split('=');
-    if (k) cookies[k] = v.join('=');
-  });
+async function isAdminAuthenticated(req) {
+  const cookie = req.headers.cookie || '';
+  if (!cookie.includes('admin_session=')) return false;
 
-  const ADMIN_COOKIE_NAMES = ['admin_session', 'admin_token', 'mcr_admin', 'admin_auth'];
-  const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD;
+  // Build absolute URL to internal admin-check endpoint
+  const host = req.headers.host || 'aileadintel.com';
+  const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
+  const checkUrl = `${proto}://${host}/api/admin-check`;
 
-  for (const name of ADMIN_COOKIE_NAMES) {
-    if (cookies[name]) {
-      if (!ADMIN_SECRET) return true;
-      if (cookies[name] === ADMIN_SECRET) return true;
-      if (cookies[name].length > 8) return true;
-    }
+  try {
+    const r = await fetch(checkUrl, {
+      method: 'GET',
+      headers: {
+        cookie,
+        'user-agent': req.headers['user-agent'] || 'admin-metrics-internal',
+      },
+    });
+    if (r.status !== 200) return false;
+    const data = await r.json().catch(() => ({}));
+    return !!data.success;
+  } catch (err) {
+    console.error('[admin-metrics] admin-check call failed:', err.message);
+    return false;
   }
-  return false;
 }
 
 // ============================================================
@@ -376,7 +383,7 @@ function getScaffoldedAI() {
 }
 
 // ============================================================
-// HANDLER (ES module default export)
+// HANDLER
 // ============================================================
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
@@ -386,7 +393,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  if (!isAdminAuthenticated(req)) {
+  const authorized = await isAdminAuthenticated(req);
+  if (!authorized) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
