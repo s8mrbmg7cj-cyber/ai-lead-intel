@@ -25,6 +25,24 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUP
 const PLAN_PRICES = { starter: 97, pro: 297 };
 
 // ============================================================
+// SUPABASE CLIENT FACTORY
+// Disables realtime/WebSocket — we only need REST queries.
+// This avoids the "Node.js 20 detected without native WebSocket" crash.
+// ============================================================
+function buildSupabase() {
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    realtime: {
+      // Disable realtime entirely — we don't subscribe to anything
+      params: { eventsPerSecond: 0 },
+    },
+    global: {
+      headers: { 'X-Client-Info': 'admin-metrics/1.0' },
+    },
+  });
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 function daysAgo(n) {
@@ -365,7 +383,6 @@ export default async function handler(req, res) {
   }
 
   // Auth — uses your existing HMAC session verification.
-  // requireAdmin sends the 401 response itself if not authorized.
   if (!requireAdmin(req, res)) return;
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -374,9 +391,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-      auth: { persistSession: false },
-    });
+    const sb = buildSupabase();
 
     const [revenue, leads, calls, errors, activity] = await Promise.all([
       computeRevenue(sb),
