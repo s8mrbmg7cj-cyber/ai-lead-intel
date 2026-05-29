@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>AI Lead Intel — Founder Command Center</title>
+<!-- Auth guard MUST be first script -->
+<script src="/admin/auth-guard.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #04050a; --bg-2: #07080e; --bg-3: #0a0c14;
+  --surface: #0d0f17; --surface-2: #11141d; --surface-3: #161a24; --surface-input: #0a0c13;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.16);
+  --text: #f5f7fa; --text-soft: #c8cdd6; --text-dim: #8a92a3; --text-faint: #5a6173; --text-muted: #3d4252;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.35); --brand-soft: rgba(255,106,0,0.10);
+  --brand-line: rgba(255,106,0,0.26);
+  --cyan: #00d4ff; --cyan-soft: rgba(0,212,255,0.10); --cyan-line: rgba(0,212,255,0.30);
+  --violet: #a78bfa; --violet-soft: rgba(167,139,250,0.10); --violet-line: rgba(167,139,250,0.30);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+  --pink: #f472b6; --pink-soft: rgba(244,114,182,0.10); --pink-line: rgba(244,114,182,0.30);
+  --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.10); --amber-line: rgba(251,191,36,0.30);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.10); --red-line: rgba(248,113,113,0.30);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  letter-spacing: -0.011em; -webkit-font-smoothing: antialiased;
+  line-height: 1.55; overflow-x: hidden;
+  min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,106,0,0.08), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 90%, rgba(0,212,255,0.05), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(167,139,250,0.05), transparent 60%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* ====== TOP BAR ====== */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 24px;
+  background: rgba(8,10,16,0.75);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+.topbar::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,106,0,0.45), transparent);
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand-mark { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; flex-shrink: 0; }
+.brand-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.brand-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.brand-title { font-size: 13.5px; font-weight: 700; letter-spacing: -0.01em; line-height: 1; white-space: nowrap; }
+.brand-sub { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+
+.tb-spacer { flex: 1; }
+
+.tb-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border-radius: 99px;
+  font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  color: var(--text-dim); flex-shrink: 0;
+}
+.tb-pill.live { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+.tb-pill.live .dot { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.6s ease-in-out infinite; }
+.tb-pill.error { color: var(--red); background: var(--red-soft); border-color: var(--red-line); }
+.tb-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.65); } }
+
+.tb-time { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; }
+
+.tb-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 13px; border-radius: 8px;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  color: var(--text-soft); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+}
+.tb-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.tb-btn svg { color: var(--text-faint); }
+.tb-btn:hover svg { color: var(--brand); }
+.tb-btn.refreshing svg { animation: spin 0.9s linear infinite; color: var(--brand); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ====== HEADER STRIP ====== */
+.header-strip {
+  position: relative; z-index: 1;
+  max-width: 1480px; margin: 0 auto;
+  padding: 32px 24px 8px;
+}
+.header-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--brand); font-weight: 700;
+  margin-bottom: 12px;
+}
+.header-eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+.header-title { font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 8px; }
+.header-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.header-sub { font-size: 14px; color: var(--text-dim); max-width: 680px; }
+
+/* ====== MAIN GRID ====== */
+.main {
+  position: relative; z-index: 1;
+  max-width: 1480px; margin: 0 auto;
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 28px;
+}
+
+/* ====== SECTION ====== */
+.section { display: flex; flex-direction: column; gap: 14px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 0 2px; }
+.section-head-left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; min-width: 0; }
+.section-icon-wrap { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; transform: translateY(6px); }
+.section-title-block { display: flex; flex-direction: column; gap: 3px; }
+.section-eyebrow { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; }
+.section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.section-meta { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.08em; flex-shrink: 0; }
+
+/* ====== CARD ====== */
+.card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+.card:hover { border-color: var(--border-3); }
+.card.accent::before { background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.card.accent { border-color: var(--brand-line); }
+.card.accent:hover { box-shadow: 0 0 0 1px var(--brand-line) inset, 0 12px 36px rgba(255,106,0,0.12); }
+
+.card-label {
+  font-family: 'Geist Mono', monospace; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-faint); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-label .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+.card-value {
+  font-family: 'Geist Mono', monospace; font-size: 30px; font-weight: 700;
+  letter-spacing: -0.025em; line-height: 1; color: var(--text);
+  display: flex; align-items: baseline; gap: 6px;
+}
+.card-value .unit { font-size: 16px; color: var(--text-dim); font-weight: 600; }
+.card-value .prefix { font-size: 18px; color: var(--text-dim); font-weight: 600; }
+.card.accent .card-value { color: var(--brand); }
+.card-delta {
+  font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600;
+  margin-top: 8px; display: inline-flex; align-items: center; gap: 5px;
+  letter-spacing: 0.04em;
+}
+.card-delta.up { color: var(--green); }
+.card-delta.down { color: var(--red); }
+.card-delta.flat { color: var(--text-faint); }
+.card-sub { font-size: 11.5px; color: var(--text-faint); margin-top: 8px; line-height: 1.5; }
+
+/* ====== METRIC GRIDS ====== */
+.kpi-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+}
+.kpi-grid.compact { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1080px) { .kpi-grid, .kpi-grid.compact { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .kpi-grid, .kpi-grid.compact { grid-template-columns: 1fr 1fr; } }
+
+/* ====== SPARKLINE ====== */
+.sparkline-wrap {
+  margin-top: 10px;
+  height: 38px;
+  position: relative;
+}
+.sparkline { width: 100%; height: 100%; display: block; }
+
+/* ====== ROW LAYOUTS ====== */
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.row-mixed { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+@media (max-width: 1080px) { .row-2, .row-3, .row-mixed { grid-template-columns: 1fr; } }
+
+/* ====== STATUS LINE ====== */
+.status-line {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.status-line + .status-line { margin-top: 8px; }
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  position: relative;
+}
+.status-dot.operational { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.operational::before { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--green); opacity: 0.4; animation: ring 1.8s ease-out infinite; }
+@keyframes ring { 0% { transform: scale(0.7); opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+.status-dot.partial { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.status-dot.degraded { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.status-dot.standby { background: var(--text-faint); }
+.status-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.status-info { flex: 1; min-width: 0; }
+.status-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; line-height: 1.2; }
+.status-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); margin-top: 2px; letter-spacing: 0.04em; }
+.status-meta { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-soft); flex-shrink: 0; letter-spacing: 0.04em; }
+.status-meta.dim { color: var(--text-faint); }
+
+/* ====== PLACEHOLDER BADGE ====== */
+.placeholder-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: 99px;
+  font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--amber-soft); border: 1px solid var(--amber-line);
+  color: var(--amber); margin-left: 8px;
+}
+.placeholder-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.placeholder-note {
+  font-size: 12px; color: var(--text-faint); font-style: italic;
+  padding: 12px; background: var(--surface-input);
+  border: 1px dashed var(--border-2); border-radius: 10px;
+  text-align: center; margin-top: 8px;
+}
+
+/* ====== ACTIVITY FEED ====== */
+.feed-list { display: flex; flex-direction: column; gap: 6px; max-height: 380px; overflow-y: auto; padding-right: 4px; }
+.feed-list::-webkit-scrollbar { width: 4px; }
+.feed-list::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+.feed-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.15s;
+}
+.feed-item:hover { border-color: var(--border-2); }
+.feed-icon {
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.feed-icon.brand { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-line); }
+.feed-icon.green { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+.feed-icon.red { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
+.feed-icon.cyan { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-line); }
+.feed-text { flex: 1; min-width: 0; }
+.feed-title { font-size: 12.5px; font-weight: 500; color: var(--text); letter-spacing: -0.005em; line-height: 1.35; }
+.feed-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); margin-top: 3px; letter-spacing: 0.03em; word-break: break-all; }
+.feed-time { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); flex-shrink: 0; letter-spacing: 0.04em; padding-top: 1px; }
+.feed-empty { padding: 18px; text-align: center; color: var(--text-faint); font-size: 12px; }
+
+/* ====== ROADMAP ====== */
+.roadmap-grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 880px) { .roadmap-grid { grid-template-columns: 1fr; } }
+.roadmap-col {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  padding: 18px 16px;
+}
+.roadmap-col-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.roadmap-col-title { font-size: 12.5px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+.roadmap-col-count {
+  font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; padding: 2px 7px; border-radius: 5px;
+  background: var(--surface-3); color: var(--text-dim);
+}
+.roadmap-col.features .roadmap-col-title svg { color: var(--brand); }
+.roadmap-col.bugs .roadmap-col-title svg { color: var(--red); }
+.roadmap-col.improvements .roadmap-col-title svg { color: var(--cyan); }
+.roadmap-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 9px 10px; border-radius: 8px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  font-size: 12px; line-height: 1.45;
+  margin-bottom: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.roadmap-item:hover { border-color: var(--border-2); background: var(--surface-3); }
+.roadmap-checkbox {
+  width: 13px; height: 13px; border: 1.5px solid var(--text-faint);
+  border-radius: 3px; flex-shrink: 0; margin-top: 2px;
+  transition: all 0.15s; cursor: pointer;
+}
+.roadmap-checkbox:hover { border-color: var(--brand); }
+.roadmap-checkbox.done { background: var(--brand); border-color: var(--brand); }
+.roadmap-checkbox.done::after { content: ''; display: block; width: 4px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: translate(3px, 0.5px) rotate(45deg); }
+.roadmap-item.done .roadmap-text { color: var(--text-faint); text-decoration: line-through; }
+.roadmap-text { flex: 1; color: var(--text-soft); }
+.roadmap-priority {
+  font-family: 'Geist Mono', monospace; font-size: 8.5px; font-weight: 700;
+  letter-spacing: 0.12em; padding: 2px 5px; border-radius: 3px;
+  flex-shrink: 0; margin-top: 1px;
+}
+.roadmap-priority.high { background: var(--red-soft); color: var(--red); }
+.roadmap-priority.med { background: var(--amber-soft); color: var(--amber); }
+.roadmap-priority.low { background: var(--surface-3); color: var(--text-dim); }
+
+/* ====== KNOWLEDGE GRAPH SECTION ====== */
+.kg-frame {
+  width: 100%; height: 620px; border: 1px solid var(--border-2);
+  border-radius: 14px; overflow: hidden; background: var(--bg);
+  position: relative;
+}
+.kg-frame iframe { width: 100%; height: 100%; border: none; display: block; }
+.kg-actions { display: flex; gap: 8px; }
+.kg-open-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 8px;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  font-size: 12px; font-weight: 600; color: var(--text-soft);
+  transition: all 0.15s;
+}
+.kg-open-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--brand-line); }
+
+/* ====== LOADING / ERROR STATES ====== */
+.skeleton-block {
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.error-block {
+  padding: 22px; text-align: center;
+  background: var(--red-soft); border: 1px solid var(--red-line);
+  border-radius: 12px; color: var(--red);
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+}
+.error-block strong { display: block; font-size: 13px; margin-bottom: 6px; color: var(--text); font-family: 'Geist', sans-serif; font-weight: 600; }
+
+/* ====== BOOT OVERLAY ====== */
+.boot-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.boot-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-content { text-align: center; }
+.boot-logo {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 30px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+  margin: 0 auto 18px;
+  animation: bootPulse 1.4s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.boot-logo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+@keyframes bootPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+  50% { transform: scale(1.05); box-shadow: 0 0 50px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+}
+.boot-text {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--brand); font-weight: 700;
+}
+.boot-sub {
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  color: var(--text-faint); margin-top: 8px; letter-spacing: 0.08em;
+}
+
+/* ====== MOBILE ====== */
+@media (max-width: 720px) {
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .brand-text { display: none; }
+  .tb-time { display: none; }
+  .tb-btn span { display: none; }
+  .header-strip { padding: 22px 16px 8px; }
+  .main { padding: 16px; gap: 22px; }
+  .card { padding: 14px 16px; }
+  .card-value { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT OVERLAY -->
+<div class="boot-overlay" id="boot-overlay">
+  <div class="boot-content">
+    <div class="boot-logo"></div>
+    <div class="boot-text">Initializing</div>
+    <div class="boot-sub" id="boot-sub">Authenticating · Loading metrics</div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-text">
+      <div class="brand-title">AI Lead Intel</div>
+      <div class="brand-sub">Command Center</div>
+    </div>
+  </div>
+
+  <div class="tb-spacer"></div>
+
+  <div class="tb-pill live" id="system-pill"><span class="dot"></span><span id="system-pill-text">System Online</span></div>
+  <div class="tb-time" id="last-update">—</div>
+
+  <button class="tb-btn" id="btn-refresh" title="Refresh data">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+    <span>Refresh</span>
+  </button>
+  <a class="tb-btn" href="/admin" title="Back to admin">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    <span>Admin</span>
+  </a>
+</div>
+
+<!-- HEADER -->
+<header class="header-strip">
+  <div class="header-eyebrow"><span class="pip"></span>Founder Command Center</div>
+  <h1 class="header-title">Run your business <span class="accent">from one screen.</span></h1>
+  <p class="header-sub">Live operational intelligence across revenue, leads, AI agents, and system health. Every signal that matters, in one place.</p>
+</header>
+
+<!-- MAIN -->
+<main class="main" id="main-content"></main>
+
+<script>
+'use strict';
+
+// ============================================================
+// STATE
+// ============================================================
+const STATE = {
+  data: null,
+  loading: true,
+  error: null,
+  lastFetch: null,
+};
+
+// ============================================================
+// FETCH METRICS
+// ============================================================
+async function fetchMetrics() {
+  STATE.loading = true;
+  STATE.error = null;
+  try {
+    const r = await fetch('/api/admin-metrics', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+    });
+    if (r.status === 401) {
+      window.location.href = '/admin/login?return=' + encodeURIComponent(location.pathname);
+      return;
+    }
+    if (!r.ok) {
+      const text = await r.text().catch(() => '');
+      throw new Error(`HTTP ${r.status}: ${text.slice(0, 200) || 'Request failed'}`);
+    }
+    const data = await r.json();
+    STATE.data = data;
+    STATE.lastFetch = new Date();
+    STATE.loading = false;
+    render();
+  } catch (err) {
+    console.error('[command-center] fetch failed:', err);
+    STATE.error = err.message;
+    STATE.loading = false;
+    render();
+  }
+}
+
+// ============================================================
+// FORMATTERS
+// ============================================================
+function fmtCurrency(n) {
+  if (n == null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('en-US').format(Math.round(n));
+}
+function fmtNumber(n) {
+  if (n == null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('en-US').format(n);
+}
+function fmtPct(n, decimals = 1) {
+  if (n == null || isNaN(n)) return '—';
+  return n.toFixed(decimals) + '%';
+}
+function fmtRelativeTime(iso) {
+  if (!iso) return '—';
+  const t = new Date(iso).getTime();
+  const diff = Date.now() - t;
+  const sec = Math.floor(diff / 1000);
+  if (sec < 60) return sec + 's ago';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return min + 'm ago';
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return hr + 'h ago';
+  const d = Math.floor(hr / 24);
+  if (d < 30) return d + 'd ago';
+  return new Date(iso).toLocaleDateString();
+}
+function fmtDuration(sec) {
+  if (!sec) return '—';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + 'm ' + (s < 10 ? '0' : '') + s + 's';
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// ICONS
+// ============================================================
+const ICON = {
+  revenue: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  users: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  phone: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  target: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  brain: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15A2.5 2.5 0 0 0 9.5 22a2.5 2.5 0 0 0 2.5-2.5V4.5A2.5 2.5 0 0 0 9.5 2zM14.5 2A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-5 0V4.5A2.5 2.5 0 0 1 14.5 2z"/></svg>',
+  pulse: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  bolt: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  layers: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+  shield: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  rocket: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>',
+  star: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  globe: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  alert: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>',
+  bug: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="6" width="8" height="14" rx="4"/><path d="M19 7l-3 2M5 7l3 2M19 13h-3M5 13h3M19 19l-3-2M5 19l3-2"/></svg>',
+  sparkle: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg>',
+  graph: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="6" y1="9" x2="6" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/></svg>',
+  arrowUp: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+  arrowDown: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
+  arrowRight: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+};
+
+// ============================================================
+// SPARKLINE
+// ============================================================
+function renderSparkline(values, color) {
+  if (!values || values.length === 0) return '';
+  const max = Math.max(...values, 1);
+  const w = 100, h = 38;
+  const stepX = values.length > 1 ? w / (values.length - 1) : w;
+  const points = values.map((v, i) => {
+    const x = i * stepX;
+    const y = h - (v / max) * (h - 4) - 2;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+  const fillPoints = `0,${h} ${points} ${w},${h}`;
+  const colorId = 'sg-' + Math.random().toString(36).slice(2, 9);
+  return `
+    <div class="sparkline-wrap">
+      <svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="${colorId}" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="${color}" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points="${fillPoints}" fill="url(#${colorId})"/>
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+  `;
+}
+
+// ============================================================
+// DELTA INDICATOR
+// ============================================================
+function deltaBadge(pct, suffix = 'vs prev 30d') {
+  if (pct == null || pct === 0) return `<div class="card-delta flat">${ICON.arrowRight}<span>0% ${suffix}</span></div>`;
+  if (pct > 0) return `<div class="card-delta up">${ICON.arrowUp}<span>+${pct}% ${suffix}</span></div>`;
+  return `<div class="card-delta down">${ICON.arrowDown}<span>${pct}% ${suffix}</span></div>`;
+}
+
+// ============================================================
+// SECTION HEADER
+// ============================================================
+function sectionHead(eyebrow, title, iconHtml, color, meta = '', placeholder = false) {
+  return `
+    <div class="section-head">
+      <div class="section-head-left">
+        <div class="section-icon-wrap" style="background:${color}22; border:1px solid ${color}44; color:${color}">${iconHtml}</div>
+        <div class="section-title-block">
+          <div class="section-eyebrow">${escapeHtml(eyebrow)}</div>
+          <div class="section-title">${escapeHtml(title)}${placeholder ? '<span class="placeholder-badge"><span class="dot"></span>Placeholder</span>' : ''}</div>
+        </div>
+      </div>
+      ${meta ? `<div class="section-meta">${escapeHtml(meta)}</div>` : ''}
+    </div>
+  `;
+}
+
+// ============================================================
+// RENDER: SECTIONS
+// ============================================================
+function renderRevenue(data) {
+  const r = data.revenue;
+  return `
+    <section class="section">
+      ${sectionHead('Section 01', 'Revenue', ICON.revenue, 'var(--brand)', `MRR · $${fmtCurrency(r.mrr)}`)}
+      <div class="kpi-grid">
+        <div class="card accent">
+          <div class="card-label"><span class="pulse-dot"></span>MRR</div>
+          <div class="card-value"><span class="prefix">$</span>${fmtCurrency(r.mrr)}</div>
+          <div class="card-sub">ARR ${'$' + fmtCurrency(r.arr)} · ${r.counts.active} active</div>
+        </div>
+        <div class="card">
+          <div class="card-label">New Customers · 30d</div>
+          <div class="card-value">${fmtNumber(r.new_customers_30d)}</div>
+          ${deltaBadge(r.new_customers_change_pct)}
+        </div>
+        <div class="card">
+          <div class="card-label">Churn Rate · 30d</div>
+          <div class="card-value">${fmtPct(r.churn_rate_30d)}</div>
+          <div class="card-sub">${r.churned_30d} cancelled</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Revenue Growth</div>
+          <div class="card-value">${r.revenue_growth_pct > 0 ? '+' : ''}${fmtPct(r.revenue_growth_pct, 0)}</div>
+          <div class="card-sub">Signups vs prior 30d</div>
+        </div>
+      </div>
+
+      <div class="row-mixed">
+        <div class="card">
+          <div class="card-label">Weekly Signups · 12 weeks</div>
+          ${renderSparkline(r.weekly_signups, '#ff6a00')}
+          <div class="card-sub" style="margin-top:14px">${r.weekly_signups.reduce((a,b)=>a+b,0)} total signups in window</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Customer Mix</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+            <div>
+              <div style="font-family:'Geist Mono',monospace;font-size:24px;font-weight:700;color:var(--text);line-height:1">${r.counts.starter}</div>
+              <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px">Starter</div>
+            </div>
+            <div>
+              <div style="font-family:'Geist Mono',monospace;font-size:24px;font-weight:700;color:var(--brand);line-height:1">${r.counts.pro}</div>
+              <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px">Pro</div>
+            </div>
+            <div>
+              <div style="font-family:'Geist Mono',monospace;font-size:24px;font-weight:700;color:var(--text);line-height:1">${r.counts.pending}</div>
+              <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px">Pending</div>
+            </div>
+            <div>
+              <div style="font-family:'Geist Mono',monospace;font-size:24px;font-weight:700;color:var(--text-dim);line-height:1">${r.counts.cancelled}</div>
+              <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px">Cancelled</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderLeads(data) {
+  const l = data.leads;
+  const c = data.calls;
+  return `
+    <section class="section">
+      ${sectionHead('Section 02', 'Leads & Calls', ICON.phone, '#00d4ff', `${l.total} leads · ${c.total} calls`)}
+      <div class="kpi-grid">
+        <div class="card">
+          <div class="card-label">Total Leads</div>
+          <div class="card-value">${fmtNumber(l.total)}</div>
+          <div class="card-sub">${l.last_30d} in last 30 days</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Qualified Leads</div>
+          <div class="card-value">${fmtNumber(l.qualified)}</div>
+          <div class="card-sub">${l.total > 0 ? Math.round((l.qualified / l.total) * 100) : 0}% of total</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Booked Calls</div>
+          <div class="card-value">${fmtNumber(l.booked)}</div>
+          <div class="card-sub">Conversion ${fmtPct(l.conversion_rate)}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Missed Calls Recovered</div>
+          <div class="card-value">${fmtNumber(l.recovered)}</div>
+          <div class="card-sub">AI rescued</div>
+        </div>
+      </div>
+
+      <div class="row-mixed">
+        <div class="card">
+          <div class="card-label">Call Volume · 12 weeks</div>
+          ${renderSparkline(c.weekly, '#00d4ff')}
+          <div class="card-sub" style="margin-top:14px">${c.last_30d} calls · last 30d ${deltaBadge(c.change_pct, '').replace(/<div class="card-delta[^"]*">/, '').replace('</div>', '')}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Lead Funnel</div>
+          <div style="margin-top:6px">
+            ${funnelBar('Total', l.total, l.total, '#00d4ff')}
+            ${funnelBar('Qualified', l.qualified, l.total, '#a78bfa')}
+            ${funnelBar('Booked', l.booked, l.total, '#34d399')}
+            ${funnelBar('Recovered', l.recovered, l.total, '#fbbf24')}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function funnelBar(label, value, max, color) {
+  const pct = max > 0 ? Math.max(2, (value / max) * 100) : 2;
+  return `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10.5px;color:var(--text-dim);letter-spacing:0.06em;margin-bottom:5px">
+        <span>${escapeHtml(label)}</span>
+        <span>${fmtNumber(value)}</span>
+      </div>
+      <div style="height:6px;background:var(--surface-input);border-radius:99px;overflow:hidden;border:1px solid var(--border)">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${color},${color}aa);border-radius:99px;box-shadow:0 0 8px ${color}66"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMarketing(data) {
+  const m = data.marketing;
+  return `
+    <section class="section">
+      ${sectionHead('Section 03', 'Marketing', ICON.target, '#fbbf24', 'Not connected', true)}
+      <div class="kpi-grid">
+        ${marketingCard('Meta Ads', m.meta_ads, ICON.target)}
+        ${marketingCard('Google Ads', m.google_ads, ICON.search)}
+        ${marketingCard('SEO', m.seo, ICON.globe)}
+        ${marketingCard('Organic', m.organic, ICON.users)}
+      </div>
+      <div class="placeholder-note">
+        Marketing channels are not yet connected. Wire Meta Ads API, Google Ads API, Search Console, and analytics to populate this section with live spend, impressions, conversions, and CPA.
+      </div>
+    </section>
+  `;
+}
+
+function marketingCard(name, data, iconHtml) {
+  return `
+    <div class="card">
+      <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${escapeHtml(name)}</span>
+        <span style="color:var(--amber);opacity:0.5">${iconHtml}</span>
+      </div>
+      <div class="card-value" style="color:var(--text-faint);font-size:22px">— —</div>
+      <div class="card-sub" style="color:var(--amber);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase">Not Connected</div>
+    </div>
+  `;
+}
+
+function renderAI(data) {
+  const a = data.ai;
+  return `
+    <section class="section">
+      ${sectionHead('Section 04', 'AI Agents', ICON.brain, '#a78bfa', `${a.vapi.calls_30d || 0} Vapi calls · 30d`)}
+      <div class="kpi-grid">
+        ${aiCard('Claude', 'Reasoning, copy, strategy', a.claude.status, a.claude.model, a.claude.requests_30d, '#a78bfa', ICON.star)}
+        ${aiCard('ChatGPT', 'Backup AI', a.chatgpt.status, a.chatgpt.model, a.chatgpt.requests_30d, '#34d399', ICON.star)}
+        ${aiCardVapi(a.vapi)}
+        ${aiCard('Internal Agents', 'Custom workflows', a.internal.status, `${a.internal.agents} agents`, a.internal.tasks_30d, '#f472b6', ICON.bolt)}
+      </div>
+    </section>
+  `;
+}
+
+function aiCard(name, desc, status, model, requests, color, iconHtml) {
+  return `
+    <div class="card">
+      <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${escapeHtml(name)}</span>
+        <span style="color:${color}">${iconHtml}</span>
+      </div>
+      <div class="card-value" style="color:${color};font-size:18px;text-transform:capitalize">${escapeHtml(status)}</div>
+      <div class="card-sub">${escapeHtml(model || '—')}</div>
+      <div class="card-sub">${requests != null ? fmtNumber(requests) + ' requests · 30d' : '<span style="color:var(--amber);font-family:\'Geist Mono\',monospace;font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase">Tracking not connected</span>'}</div>
+    </div>
+  `;
+}
+
+function aiCardVapi(vapi) {
+  return `
+    <div class="card accent">
+      <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span><span class="pulse-dot"></span>Vapi · AI Voice</span>
+        <span style="color:var(--brand)">${ICON.pulse}</span>
+      </div>
+      <div class="card-value">${fmtNumber(vapi.calls_30d || 0)}</div>
+      <div class="card-sub">Calls answered · 30d</div>
+      <div class="card-sub">${escapeHtml(vapi.voice || '—')}${vapi.avg_duration_seconds ? ' · avg ' + fmtDuration(vapi.avg_duration_seconds) : ''}</div>
+    </div>
+  `;
+}
+
+function renderHealth(data) {
+  const h = data.health;
+  const e = data.errors;
+  return `
+    <section class="section">
+      ${sectionHead('Section 05', 'System Health', ICON.shield, '#34d399', `${e.last_24h || 0} errors · 24h`)}
+      <div class="row-mixed">
+        <div class="card">
+          <div class="card-label">Infrastructure Status</div>
+          ${healthRow('Vercel', h.vercel, ICON.rocket, 'Deployment + edge')}
+          ${healthRow('Supabase', h.supabase, ICON.layers, 'Database + auth')}
+          ${healthRow('Twilio', h.twilio, ICON.phone, 'SMS + voice routing')}
+          ${healthRow('Resend', h.resend, ICON.layers, 'Transactional email')}
+          <div class="placeholder-note" style="margin-top:14px;font-size:11px">
+            Service uptime values are placeholders. Wire native status APIs for live readings.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Error Log · Live</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;color:${e.last_24h > 0 ? 'var(--red)' : 'var(--green)'};font-weight:700;letter-spacing:0.1em">${e.last_24h || 0} · 24h</span>
+          </div>
+          <div class="feed-list" style="max-height:240px;margin-top:8px">
+            ${(e.recent && e.recent.length) ? e.recent.map(err => `
+              <div class="feed-item">
+                <div class="feed-icon red">${ICON.alert}</div>
+                <div class="feed-text">
+                  <div class="feed-title">${escapeHtml(err.message)}</div>
+                  <div class="feed-sub">${escapeHtml(err.source)} · ${escapeHtml(err.severity)}</div>
+                </div>
+                <div class="feed-time">${fmtRelativeTime(err.created_at)}</div>
+              </div>
+            `).join('') : `<div class="feed-empty">No errors recorded</div>`}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function healthRow(name, svc, iconHtml, sub) {
+  const status = svc.status || 'operational';
+  const uptime = svc.uptime_pct != null ? svc.uptime_pct + '%' : '—';
+  return `
+    <div class="status-line">
+      <div class="status-icon" style="background:var(--surface-3);color:var(--text-dim)">${iconHtml}</div>
+      <div class="status-info">
+        <div class="status-name">${escapeHtml(name)}</div>
+        <div class="status-sub">${escapeHtml(sub)}</div>
+      </div>
+      <div class="status-meta">${uptime}</div>
+      <div class="status-dot ${status}"></div>
+    </div>
+  `;
+}
+
+function renderSuccess(data) {
+  const s = data.success;
+  return `
+    <section class="section">
+      ${sectionHead('Section 06', 'Customer Success', ICON.users, '#34d399', `${s.active_clients} active`)}
+      <div class="kpi-grid compact">
+        <div class="card">
+          <div class="card-label">Active Clients</div>
+          <div class="card-value">${fmtNumber(s.active_clients)}</div>
+          <div class="card-sub">${s.starter_count} Starter · ${s.pro_count} Pro</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Retention</div>
+          <div class="card-value">${fmtPct(s.retention_pct)}</div>
+          <div class="card-sub">Active vs cancelled lifetime</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Avg Usage · 30d</div>
+          <div class="card-value">${s.avg_calls_per_client_30d}<span class="unit"> calls</span></div>
+          <div class="card-sub">Per active client</div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// ============================================================
+// ROADMAP (managed locally in localStorage)
+// ============================================================
+function loadRoadmap() {
+  try {
+    const stored = localStorage.getItem('command_roadmap');
+    if (stored) return JSON.parse(stored);
+  } catch (_) {}
+  return {
+    features: [
+      { id: 'f1', text: 'Founder Command Center', priority: 'high', done: true },
+      { id: 'f2', text: 'Knowledge graph (OS map)', priority: 'high', done: true },
+      { id: 'f3', text: 'Wire Meta Ads + Google Ads APIs', priority: 'high', done: false },
+      { id: 'f4', text: 'Automated daily progress emails during trial', priority: 'med', done: false },
+      { id: 'f5', text: 'About page + founder video', priority: 'med', done: false },
+      { id: 'f6', text: 'ServiceTitan / Jobber integration story', priority: 'low', done: false },
+    ],
+    bugs: [
+      { id: 'b1', text: 'Audit Pro setup form copy for trial messaging', priority: 'med', done: false },
+      { id: 'b2', text: 'Review email templates in /api/send-setup-email.js', priority: 'med', done: false },
+    ],
+    improvements: [
+      { id: 'i1', text: 'Shorten Starter setup form (currently too long)', priority: 'high', done: false },
+      { id: 'i2', text: 'Add 8+ testimonials with photos', priority: 'high', done: false },
+      { id: 'i3', text: 'Add live uptime monitoring (real Vercel/Supabase APIs)', priority: 'med', done: false },
+      { id: 'i4', text: 'Add cancel button in dashboard (deferred)', priority: 'low', done: false },
+    ],
+  };
+}
+function saveRoadmap(rm) {
+  try { localStorage.setItem('command_roadmap', JSON.stringify(rm)); } catch (_) {}
+}
+
+function renderRoadmap() {
+  const rm = loadRoadmap();
+  const totalOpen = [...rm.features, ...rm.bugs, ...rm.improvements].filter(x => !x.done).length;
+  return `
+    <section class="section">
+      ${sectionHead('Section 07', 'Roadmap', ICON.sparkle, '#f472b6', `${totalOpen} open items`)}
+      <div class="roadmap-grid">
+        ${roadmapCol('Features', 'features', rm.features, ICON.sparkle)}
+        ${roadmapCol('Bugs', 'bugs', rm.bugs, ICON.bug)}
+        ${roadmapCol('Improvements', 'improvements', rm.improvements, ICON.bolt)}
+      </div>
+    </section>
+  `;
+}
+
+function roadmapCol(title, key, items, iconHtml) {
+  const openCount = items.filter(x => !x.done).length;
+  return `
+    <div class="roadmap-col ${key}">
+      <div class="roadmap-col-head">
+        <div class="roadmap-col-title">${iconHtml}<span>${escapeHtml(title)}</span></div>
+        <div class="roadmap-col-count">${openCount}/${items.length}</div>
+      </div>
+      ${items.map(item => `
+        <div class="roadmap-item ${item.done ? 'done' : ''}">
+          <div class="roadmap-checkbox ${item.done ? 'done' : ''}" data-toggle="${key}:${item.id}"></div>
+          <div class="roadmap-text">${escapeHtml(item.text)}</div>
+          <div class="roadmap-priority ${item.priority}">${item.priority.toUpperCase()}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function attachRoadmapHandlers() {
+  document.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const [colKey, itemId] = el.dataset.toggle.split(':');
+      const rm = loadRoadmap();
+      const item = (rm[colKey] || []).find(x => x.id === itemId);
+      if (item) {
+        item.done = !item.done;
+        saveRoadmap(rm);
+        rerenderRoadmap();
+      }
+    });
+  });
+}
+
+function rerenderRoadmap() {
+  const roadmapSection = document.getElementById('roadmap-slot');
+  if (roadmapSection) {
+    roadmapSection.innerHTML = renderRoadmap();
+    attachRoadmapHandlers();
+  }
+}
+
+// ============================================================
+// KNOWLEDGE GRAPH
+// ============================================================
+function renderKnowledgeGraph() {
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div class="section-head-left">
+          <div class="section-icon-wrap" style="background:#00d4ff22;border:1px solid #00d4ff44;color:#00d4ff">${ICON.graph}</div>
+          <div class="section-title-block">
+            <div class="section-eyebrow">Section 08</div>
+            <div class="section-title">Knowledge Graph</div>
+          </div>
+        </div>
+        <div class="kg-actions">
+          <a href="/os.html" target="_blank" class="kg-open-btn">
+            Open full view
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="kg-frame">
+        <iframe src="/os.html" title="AI Lead Intel OS Knowledge Graph" loading="lazy"></iframe>
+      </div>
+    </section>
+  `;
+}
+
+// ============================================================
+// ACTIVITY FEED
+// ============================================================
+function renderActivity(data) {
+  const a = data.activity;
+  if (!a || !a.recent || a.recent.length === 0) {
+    return `
+      <section class="section">
+        ${sectionHead('Activity', 'Recent Activity', ICON.pulse, '#34d399', 'Live')}
+        <div class="card">
+          <div class="feed-empty">No recent activity</div>
+        </div>
+      </section>
+    `;
+  }
+  return `
+    <section class="section">
+      ${sectionHead('Activity', 'Recent Activity', ICON.pulse, '#34d399', `${a.recent.length} events`)}
+      <div class="card">
+        <div class="feed-list">
+          ${a.recent.map(ev => `
+            <div class="feed-item">
+              <div class="feed-icon cyan">${ICON.pulse}</div>
+              <div class="feed-text">
+                <div class="feed-title">${escapeHtml(ev.action)}</div>
+                ${ev.details && ev.details !== '{}' ? `<div class="feed-sub">${escapeHtml(ev.details).slice(0, 200)}</div>` : ''}
+              </div>
+              <div class="feed-time">${fmtRelativeTime(ev.created_at)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+// ============================================================
+// RENDER ORCHESTRATOR
+// ============================================================
+function render() {
+  const main = document.getElementById('main-content');
+
+  if (STATE.error) {
+    main.innerHTML = `
+      <div class="error-block">
+        <strong>Failed to load metrics</strong>
+        ${escapeHtml(STATE.error)}
+      </div>
+    `;
+    document.getElementById('boot-overlay').classList.add('hidden');
+    document.getElementById('system-pill').className = 'tb-pill error';
+    document.getElementById('system-pill-text').textContent = 'Connection Error';
+    return;
+  }
+
+  if (!STATE.data) {
+    main.innerHTML = `
+      <div class="skeleton-block" style="height:200px"></div>
+      <div class="skeleton-block" style="height:280px"></div>
+      <div class="skeleton-block" style="height:240px"></div>
+    `;
+    return;
+  }
+
+  const d = STATE.data;
+  main.innerHTML = `
+    ${renderRevenue(d)}
+    ${renderLeads(d)}
+    ${renderMarketing(d)}
+    ${renderAI(d)}
+    ${renderHealth(d)}
+    ${renderSuccess(d)}
+    <div id="roadmap-slot">${renderRoadmap()}</div>
+    ${renderKnowledgeGraph()}
+    ${renderActivity(d)}
+  `;
+
+  attachRoadmapHandlers();
+
+  // Update top bar
+  document.getElementById('last-update').textContent = 'Updated ' + STATE.lastFetch.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('system-pill').className = 'tb-pill live';
+  document.getElementById('system-pill-text').textContent = 'System Online';
+
+  // Hide boot overlay
+  setTimeout(() => {
+    document.getElementById('boot-overlay').classList.add('hidden');
+  }, 250);
+}
+
+// ============================================================
+// REFRESH
+// ============================================================
+const refreshBtn = document.getElementById('btn-refresh');
+refreshBtn.addEventListener('click', async () => {
+  refreshBtn.classList.add('refreshing');
+  await fetchMetrics();
+  setTimeout(() => refreshBtn.classList.remove('refreshing'), 300);
+});
+
+// Auto-refresh every 60 seconds
+setInterval(fetchMetrics, 60000);
+
+// ============================================================
+// INIT
+// ============================================================
+fetchMetrics();
+</script>
+</body>
+</html>
