@@ -12,7 +12,7 @@
  *   → 200 { revenue, leads, marketing, ai, health, success, errors, activity }
  */
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 // ============================================================
 // CONFIG
@@ -26,8 +26,6 @@ const PLAN_PRICES = { starter: 97, pro: 297 };
 // AUTH — reuse same cookie pattern as /api/admin-check
 // ============================================================
 function isAdminAuthenticated(req) {
-  // Read the admin cookie. Adjust cookie name if yours differs.
-  // Common patterns: 'admin_session', 'admin_token', 'mcr_admin'
   const cookieHeader = req.headers.cookie || '';
   const cookies = {};
   cookieHeader.split(';').forEach(p => {
@@ -40,10 +38,8 @@ function isAdminAuthenticated(req) {
 
   for (const name of ADMIN_COOKIE_NAMES) {
     if (cookies[name]) {
-      // Match against secret (your existing admin-login probably sets this)
-      if (!ADMIN_SECRET) return true; // permissive if no secret configured
+      if (!ADMIN_SECRET) return true;
       if (cookies[name] === ADMIN_SECRET) return true;
-      // Or the cookie might just be any non-empty value if your login sets a session UUID
       if (cookies[name].length > 8) return true;
     }
   }
@@ -86,14 +82,12 @@ async function computeRevenue(sb) {
   const cancelled = all.filter(c => c.status === 'cancelled');
   const pending = all.filter(c => c.status === 'pending');
 
-  // MRR from active subscriptions
   let mrr = 0;
   active.forEach(c => {
     const price = PLAN_PRICES[c.plan] || 0;
     mrr += price;
   });
 
-  // New customers (last 30d vs prior 30d)
   const now = Date.now();
   const d30 = now - 30 * 24 * 60 * 60 * 1000;
   const d60 = now - 60 * 24 * 60 * 60 * 1000;
@@ -104,7 +98,6 @@ async function computeRevenue(sb) {
     return t >= d60 && t < d30;
   }).length;
 
-  // Churn (cancelled in last 30d / active at start of period)
   const churnedLast30 = cancelled.filter(c => {
     const t = c.status_changed_at ? new Date(c.status_changed_at).getTime() : 0;
     return t >= d30;
@@ -115,7 +108,6 @@ async function computeRevenue(sb) {
     ? Math.round((churnedLast30 / baseAtStartOfMonth) * 1000) / 10
     : 0;
 
-  // ARR (annualized MRR)
   const arr = mrr * 12;
 
   return {
@@ -125,7 +117,7 @@ async function computeRevenue(sb) {
     new_customers_change_pct: pctChange(new30, newPrior30),
     churn_rate_30d: churnRate,
     churned_30d: churnedLast30,
-    revenue_growth_pct: pctChange(new30 * 97, newPrior30 * 97), // approx
+    revenue_growth_pct: pctChange(new30 * 97, newPrior30 * 97),
     counts: {
       total: all.length,
       active: active.length,
@@ -135,7 +127,6 @@ async function computeRevenue(sb) {
       starter: all.filter(c => c.plan === 'starter').length,
       pro: all.filter(c => c.plan === 'pro').length,
     },
-    // Last 12 weeks of new signups for sparkline
     weekly_signups: buildWeeklySignups(all, 12),
   };
 }
@@ -154,7 +145,6 @@ function buildWeeklySignups(clients, weeks) {
 }
 
 async function computeLeads(sb) {
-  // Try leads table
   let totalLeads = 0, qualifiedLeads = 0, bookedLeads = 0, recoveredLeads = 0;
   let last30 = 0, prior30 = 0;
   let weekly = new Array(12).fill(0);
@@ -162,7 +152,7 @@ async function computeLeads(sb) {
   try {
     const { data: leads, error } = await sb
       .from('leads')
-      .select('id, created_at, status, qualified, booked, recovered')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
 
@@ -174,7 +164,6 @@ async function computeLeads(sb) {
 
       leads.forEach(l => {
         const t = new Date(l.created_at).getTime();
-        // Best-effort field detection
         const isQualified = l.qualified === true || l.status === 'qualified' || l.status === 'hot';
         const isBooked = l.booked === true || l.status === 'booked';
         const isRecovered = l.recovered === true || l.status === 'recovered' || l.status === 'saved';
@@ -192,7 +181,7 @@ async function computeLeads(sb) {
         }
       });
     }
-  } catch (_) { /* leads table may not exist or have different schema */ }
+  } catch (_) {}
 
   return {
     total: totalLeads,
@@ -216,7 +205,7 @@ async function computeCalls(sb) {
   try {
     const { data: calls, error } = await sb
       .from('calls')
-      .select('id, created_at, duration, duration_seconds, status')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(2000);
 
@@ -256,14 +245,11 @@ async function computeCalls(sb) {
 
 async function computeCustomerSuccess(sb, revenueData) {
   const active = revenueData.counts.active;
-  const total = revenueData.counts.total;
   const cancelled = revenueData.counts.cancelled;
 
-  // Retention = active / (active + cancelled) — a coarse proxy
   const denom = active + cancelled;
   const retention = denom > 0 ? Math.round((active / denom) * 1000) / 10 : 100;
 
-  // Usage proxy: average calls per active client in last 30d
   let avgUsage = 0;
   try {
     const { count: calls30 } = await sb
@@ -291,7 +277,7 @@ async function computeErrors(sb) {
   try {
     const { data: errors, error } = await sb
       .from('error_log')
-      .select('id, created_at, message, error_message, level, severity, route, source')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(50);
 
@@ -309,7 +295,7 @@ async function computeErrors(sb) {
 
       recent = errors.slice(0, 6).map(e => ({
         id: e.id,
-        message: (e.message || e.error_message || 'Unknown error').slice(0, 120),
+        message: String(e.message || e.error_message || 'Unknown error').slice(0, 120),
         source: e.source || e.route || '—',
         severity: e.severity || e.level || 'error',
         created_at: e.created_at,
@@ -326,7 +312,7 @@ async function computeActivity(sb) {
   try {
     const { data: activities, error } = await sb
       .from('activity_log')
-      .select('id, created_at, action, event, user_id, client_id, metadata, details')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -351,30 +337,19 @@ function getScaffoldedMarketing() {
   return {
     _placeholder: true,
     meta_ads: {
-      spend_30d: null,
-      impressions: null,
-      clicks: null,
-      conversions: null,
-      cpa: null,
-      status: 'not_connected',
+      spend_30d: null, impressions: null, clicks: null,
+      conversions: null, cpa: null, status: 'not_connected',
     },
     google_ads: {
-      spend_30d: null,
-      impressions: null,
-      clicks: null,
-      conversions: null,
-      cpa: null,
-      status: 'not_connected',
+      spend_30d: null, impressions: null, clicks: null,
+      conversions: null, cpa: null, status: 'not_connected',
     },
     seo: {
-      organic_traffic_30d: null,
-      ranking_keywords: null,
-      avg_position: null,
-      status: 'not_connected',
+      organic_traffic_30d: null, ranking_keywords: null,
+      avg_position: null, status: 'not_connected',
     },
     organic: {
-      direct_visits_30d: null,
-      referral_visits_30d: null,
+      direct_visits_30d: null, referral_visits_30d: null,
       status: 'not_connected',
     },
   };
@@ -401,10 +376,9 @@ function getScaffoldedAI() {
 }
 
 // ============================================================
-// HANDLER
+// HANDLER (ES module default export)
 // ============================================================
-module.exports = async function handler(req, res) {
-  // CORS / cache
+export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   if (req.method !== 'GET') {
@@ -412,14 +386,13 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  // Auth
   if (!isAdminAuthenticated(req)) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-    res.status(500).json({ error: 'Supabase not configured' });
+    res.status(500).json({ error: 'Supabase not configured', detail: 'Missing SUPABASE_URL or SUPABASE_SERVICE_KEY' });
     return;
   }
 
@@ -428,7 +401,6 @@ module.exports = async function handler(req, res) {
       auth: { persistSession: false },
     });
 
-    // Run everything in parallel
     const [revenue, leads, calls, errors, activity] = await Promise.all([
       computeRevenue(sb),
       computeLeads(sb),
@@ -439,15 +411,13 @@ module.exports = async function handler(req, res) {
 
     const success = await computeCustomerSuccess(sb, revenue);
 
-    // Merge real Vapi data into AI section
     const ai = getScaffoldedAI();
     ai.vapi.calls_30d = calls.last_30d;
     if (calls.avg_duration_seconds > 0) {
       ai.vapi.avg_duration_seconds = calls.avg_duration_seconds;
     }
-    ai._placeholder = false; // Vapi is real, rest still placeholder
+    ai._placeholder = false;
 
-    // Merge real error count into health
     const health = getScaffoldedHealth();
     health.errors_24h = errors.last_24h;
     health.errors_7d = errors.last_7d;
@@ -468,4 +438,4 @@ module.exports = async function handler(req, res) {
     console.error('[admin-metrics] error:', err);
     res.status(500).json({ error: 'Failed to compute metrics', message: err.message });
   }
-};
+}
