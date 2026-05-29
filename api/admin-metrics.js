@@ -2,50 +2,71 @@
  * AI Lead Intel — Admin Metrics API
  *
  * Returns aggregated business metrics for /admin/command dashboard.
- * Auth: uses requireAdmin() from lib/auth.js — same source of truth as
- * all other admin endpoints.
- *
- * Real data: Revenue, Leads, Customer Success, Errors, AI/Vapi usage
- * Scaffolded: Marketing channels, external service health (clearly placeholder)
- *
- * GET /api/admin-metrics
- *   → 401 if not admin
- *   → 200 { revenue, leads, marketing, ai, health, success, errors, activity }
+ * Uses raw fetch() against Supabase REST API — same pattern as admin-login.js.
+ * No @supabase/supabase-js dependency = no WebSocket issues.
  */
 
-import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '../lib/auth.js';
 
 // ============================================================
 // CONFIG
 // ============================================================
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 
 const PLAN_PRICES = { starter: 97, pro: 297 };
 
 // ============================================================
-// SUPABASE CLIENT FACTORY
-// Disables realtime/WebSocket — we only need REST queries.
-// This avoids the "Node.js 20 detected without native WebSocket" crash.
+// SUPABASE REST HELPER
 // ============================================================
-function buildSupabase() {
-  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    realtime: {
-      // Disable realtime entirely — we don't subscribe to anything
-      params: { eventsPerSecond: 0 },
-    },
-    global: {
-      headers: { 'X-Client-Info': 'admin-metrics/1.0' },
+async function sbQuery(table, query = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query ? '?' + query : ''}`;
+  const r = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
     },
   });
+  if (!r.ok) {
+    const text = await r.text().catch(() => '');
+    throw new Error(`Supabase ${table} query failed: ${r.status} ${text.slice(0, 200)}`);
+  }
+  return r.json();
+}
+
+async function sbQuerySafe(table, query = '') {
+  try {
+    return await sbQuery(table, query);
+  } catch (err) {
+    console.warn(`[admin-metrics] ${table} query failed:`, err.message);
+    return [];
+  }
+}
+
+async function sbCount(table, query = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query ? '?' + query : ''}`;
+  try {
+    const r = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Prefer: 'count=exact',
+      },
+    });
+    const range = r.headers.get('content-range') || '';
+    const total = parseInt(range.split('/')[1] || '0', 10);
+    return isNaN(total) ? 0 : total;
+  } catch (_) {
+    return 0;
+  }
 }
 
 // ============================================================
 // HELPERS
 // ============================================================
-function daysAgo(n) {
+function daysAgoISO(n) {
   const d = new Date();
   d.setDate(d.getDate() - n);
   return d.toISOString();
@@ -64,13 +85,11 @@ function pctChange(curr, prev) {
 // ============================================================
 // METRIC COMPUTATIONS
 // ============================================================
-async function computeRevenue(sb) {
-  const { data: clients, error } = await sb
-    .from('clients')
-    .select('id, plan, status, created_at, status_changed_at')
-    .order('created_at', { ascending: false });
-
-  if (error) throw new Error('clients query failed: ' + error.message);
+async function computeRevenue() {
+  const clients = await sbQuery(
+    'clients',
+    'select=id,plan,status,created_at,status_changed_at&order=created_at.desc'
+  );
 
   const all = clients || [];
   const active = all.filter(c => c.status === 'active');
@@ -140,44 +159,38 @@ function buildWeeklySignups(clients, weeks) {
   return buckets;
 }
 
-async function computeLeads(sb) {
+async function computeLeads() {
   let totalLeads = 0, qualifiedLeads = 0, bookedLeads = 0, recoveredLeads = 0;
   let last30 = 0, prior30 = 0;
   let weekly = new Array(12).fill(0);
 
-  try {
-    const { data: leads, error } = await sb
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(2000);
+  const leads = await sbQuerySafe('leads', 'select=*&order=created_at.desc&limit=2000');
 
-    if (!error && leads) {
-      totalLeads = leads.length;
-      const now = Date.now();
-      const d30 = now - 30 * 24 * 60 * 60 * 1000;
-      const d60 = now - 60 * 24 * 60 * 60 * 1000;
+  if (Array.isArray(leads)) {
+    totalLeads = leads.length;
+    const now = Date.now();
+    const d30 = now - 30 * 24 * 60 * 60 * 1000;
+    const d60 = now - 60 * 24 * 60 * 60 * 1000;
 
-      leads.forEach(l => {
-        const t = new Date(l.created_at).getTime();
-        const isQualified = l.qualified === true || l.status === 'qualified' || l.status === 'hot';
-        const isBooked = l.booked === true || l.status === 'booked';
-        const isRecovered = l.recovered === true || l.status === 'recovered' || l.status === 'saved';
+    leads.forEach(l => {
+      const t = new Date(l.created_at).getTime();
+      const isQualified = l.qualified === true || l.status === 'qualified' || l.status === 'hot';
+      const isBooked = l.booked === true || l.status === 'booked';
+      const isRecovered = l.recovered === true || l.status === 'recovered' || l.status === 'saved';
 
-        if (isQualified) qualifiedLeads++;
-        if (isBooked) bookedLeads++;
-        if (isRecovered) recoveredLeads++;
+      if (isQualified) qualifiedLeads++;
+      if (isBooked) bookedLeads++;
+      if (isRecovered) recoveredLeads++;
 
-        if (t >= d30) last30++;
-        else if (t >= d60) prior30++;
+      if (t >= d30) last30++;
+      else if (t >= d60) prior30++;
 
-        const weeksAgo = Math.floor((now - t) / (7 * 24 * 60 * 60 * 1000));
-        if (weeksAgo >= 0 && weeksAgo < 12) {
-          weekly[12 - 1 - weeksAgo] += 1;
-        }
-      });
-    }
-  } catch (_) {}
+      const weeksAgo = Math.floor((now - t) / (7 * 24 * 60 * 60 * 1000));
+      if (weeksAgo >= 0 && weeksAgo < 12) {
+        weekly[12 - 1 - weeksAgo] += 1;
+      }
+    });
+  }
 
   return {
     total: totalLeads,
@@ -193,42 +206,36 @@ async function computeLeads(sb) {
   };
 }
 
-async function computeCalls(sb) {
+async function computeCalls() {
   let totalCalls = 0, callsLast30 = 0, callsPrior30 = 0;
   let avgDuration = 0;
   let weekly = new Array(12).fill(0);
 
-  try {
-    const { data: calls, error } = await sb
-      .from('calls')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(2000);
+  const calls = await sbQuerySafe('calls', 'select=*&order=created_at.desc&limit=2000');
 
-    if (!error && calls) {
-      totalCalls = calls.length;
-      const now = Date.now();
-      const d30 = now - 30 * 24 * 60 * 60 * 1000;
-      const d60 = now - 60 * 24 * 60 * 60 * 1000;
-      let durSum = 0, durCount = 0;
+  if (Array.isArray(calls)) {
+    totalCalls = calls.length;
+    const now = Date.now();
+    const d30 = now - 30 * 24 * 60 * 60 * 1000;
+    const d60 = now - 60 * 24 * 60 * 60 * 1000;
+    let durSum = 0, durCount = 0;
 
-      calls.forEach(c => {
-        const t = new Date(c.created_at).getTime();
-        if (t >= d30) callsLast30++;
-        else if (t >= d60) callsPrior30++;
+    calls.forEach(c => {
+      const t = new Date(c.created_at).getTime();
+      if (t >= d30) callsLast30++;
+      else if (t >= d60) callsPrior30++;
 
-        const dur = safeNumber(c.duration_seconds ?? c.duration, 0);
-        if (dur > 0) { durSum += dur; durCount += 1; }
+      const dur = safeNumber(c.duration_seconds ?? c.duration, 0);
+      if (dur > 0) { durSum += dur; durCount += 1; }
 
-        const weeksAgo = Math.floor((now - t) / (7 * 24 * 60 * 60 * 1000));
-        if (weeksAgo >= 0 && weeksAgo < 12) {
-          weekly[12 - 1 - weeksAgo] += 1;
-        }
-      });
+      const weeksAgo = Math.floor((now - t) / (7 * 24 * 60 * 60 * 1000));
+      if (weeksAgo >= 0 && weeksAgo < 12) {
+        weekly[12 - 1 - weeksAgo] += 1;
+      }
+    });
 
-      avgDuration = durCount > 0 ? Math.round(durSum / durCount) : 0;
-    }
-  } catch (_) {}
+    avgDuration = durCount > 0 ? Math.round(durSum / durCount) : 0;
+  }
 
   return {
     total: totalCalls,
@@ -239,23 +246,17 @@ async function computeCalls(sb) {
   };
 }
 
-async function computeCustomerSuccess(sb, revenueData) {
+async function computeCustomerSuccess(revenueData) {
   const active = revenueData.counts.active;
   const cancelled = revenueData.counts.cancelled;
 
   const denom = active + cancelled;
   const retention = denom > 0 ? Math.round((active / denom) * 1000) / 10 : 100;
 
-  let avgUsage = 0;
-  try {
-    const { count: calls30 } = await sb
-      .from('calls')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', daysAgo(30));
-    if (active > 0 && calls30) {
-      avgUsage = Math.round((calls30 / active) * 10) / 10;
-    }
-  } catch (_) {}
+  const calls30 = await sbCount('calls', `created_at=gte.${daysAgoISO(30)}`);
+  const avgUsage = (active > 0 && calls30)
+    ? Math.round((calls30 / active) * 10) / 10
+    : 0;
 
   return {
     active_clients: active,
@@ -266,88 +267,59 @@ async function computeCustomerSuccess(sb, revenueData) {
   };
 }
 
-async function computeErrors(sb) {
+async function computeErrors() {
   let total = 0, last24h = 0, last7d = 0;
   let recent = [];
 
-  try {
-    const { data: errors, error } = await sb
-      .from('error_log')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
+  const errors = await sbQuerySafe('error_log', 'select=*&order=created_at.desc&limit=50');
 
-    if (!error && errors) {
-      total = errors.length;
-      const now = Date.now();
-      const d1 = now - 24 * 60 * 60 * 1000;
-      const d7 = now - 7 * 24 * 60 * 60 * 1000;
+  if (Array.isArray(errors)) {
+    total = errors.length;
+    const now = Date.now();
+    const d1 = now - 24 * 60 * 60 * 1000;
+    const d7 = now - 7 * 24 * 60 * 60 * 1000;
 
-      errors.forEach(e => {
-        const t = new Date(e.created_at).getTime();
-        if (t >= d1) last24h++;
-        if (t >= d7) last7d++;
-      });
+    errors.forEach(e => {
+      const t = new Date(e.created_at).getTime();
+      if (t >= d1) last24h++;
+      if (t >= d7) last7d++;
+    });
 
-      recent = errors.slice(0, 6).map(e => ({
-        id: e.id,
-        message: String(e.message || e.error_message || 'Unknown error').slice(0, 120),
-        source: e.source || e.route || '—',
-        severity: e.severity || e.level || 'error',
-        created_at: e.created_at,
-      }));
-    }
-  } catch (_) {}
+    recent = errors.slice(0, 6).map(e => ({
+      id: e.id,
+      message: String(e.message || e.error_message || 'Unknown error').slice(0, 120),
+      source: e.source || e.route || '—',
+      severity: e.severity || e.level || 'error',
+      created_at: e.created_at,
+    }));
+  }
 
   return { total, last_24h: last24h, last_7d: last7d, recent };
 }
 
-async function computeActivity(sb) {
-  let recent = [];
+async function computeActivity() {
+  const activities = await sbQuerySafe('activity_log', 'select=*&order=created_at.desc&limit=20');
 
-  try {
-    const { data: activities, error } = await sb
-      .from('activity_log')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (!error && activities) {
-      recent = activities.map(a => ({
-        id: a.id,
-        action: a.action || a.event || 'activity',
-        details: typeof a.details === 'string' ? a.details : JSON.stringify(a.metadata || a.details || {}),
-        created_at: a.created_at,
-      }));
-    }
-  } catch (_) {}
+  const recent = Array.isArray(activities) ? activities.map(a => ({
+    id: a.id,
+    action: a.action || a.event || 'activity',
+    details: typeof a.details === 'string' ? a.details : JSON.stringify(a.metadata || a.details || {}),
+    created_at: a.created_at,
+  })) : [];
 
   return { recent };
 }
 
 // ============================================================
-// SCAFFOLDED (placeholder) sections
-// TODO: wire real APIs when ready
+// SCAFFOLDED sections (clearly placeholder)
 // ============================================================
 function getScaffoldedMarketing() {
   return {
     _placeholder: true,
-    meta_ads: {
-      spend_30d: null, impressions: null, clicks: null,
-      conversions: null, cpa: null, status: 'not_connected',
-    },
-    google_ads: {
-      spend_30d: null, impressions: null, clicks: null,
-      conversions: null, cpa: null, status: 'not_connected',
-    },
-    seo: {
-      organic_traffic_30d: null, ranking_keywords: null,
-      avg_position: null, status: 'not_connected',
-    },
-    organic: {
-      direct_visits_30d: null, referral_visits_30d: null,
-      status: 'not_connected',
-    },
+    meta_ads: { spend_30d: null, impressions: null, clicks: null, conversions: null, cpa: null, status: 'not_connected' },
+    google_ads: { spend_30d: null, impressions: null, clicks: null, conversions: null, cpa: null, status: 'not_connected' },
+    seo: { organic_traffic_30d: null, ranking_keywords: null, avg_position: null, status: 'not_connected' },
+    organic: { direct_visits_30d: null, referral_visits_30d: null, status: 'not_connected' },
   };
 }
 
@@ -382,26 +354,23 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Auth — uses your existing HMAC session verification.
   if (!requireAdmin(req, res)) return;
 
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
     res.status(500).json({ error: 'Supabase not configured', detail: 'Missing SUPABASE_URL or SUPABASE_SERVICE_KEY' });
     return;
   }
 
   try {
-    const sb = buildSupabase();
-
     const [revenue, leads, calls, errors, activity] = await Promise.all([
-      computeRevenue(sb),
-      computeLeads(sb),
-      computeCalls(sb),
-      computeErrors(sb),
-      computeActivity(sb),
+      computeRevenue(),
+      computeLeads(),
+      computeCalls(),
+      computeErrors(),
+      computeActivity(),
     ]);
 
-    const success = await computeCustomerSuccess(sb, revenue);
+    const success = await computeCustomerSuccess(revenue);
 
     const ai = getScaffoldedAI();
     ai.vapi.calls_30d = calls.last_30d;
