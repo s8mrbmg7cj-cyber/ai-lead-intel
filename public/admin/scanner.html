@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>AI Scanner · Admin — AI Lead Intel</title>
+<script src="/admin/auth-guard.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #04050a; --bg-2: #07080e;
+  --surface: #0d0f17; --surface-2: #11141d; --surface-3: #161a24; --surface-input: #0a0c13;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.16);
+  --text: #f5f7fa; --text-soft: #c8cdd6; --text-dim: #8a92a3; --text-faint: #5a6173;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.35); --brand-soft: rgba(255,106,0,0.10); --brand-line: rgba(255,106,0,0.26);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+  --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.10); --amber-line: rgba(251,191,36,0.30);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.10); --red-line: rgba(248,113,113,0.30);
+  --cyan: #00d4ff; --cyan-soft: rgba(0,212,255,0.10); --cyan-line: rgba(0,212,255,0.30);
+}
+html, body { min-height: 100%; }
+body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; line-height: 1.55; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,106,0,0.08), transparent 60%); }
+body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%); -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%); }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* TOPBAR */
+.topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 16px; padding: 14px 24px; background: rgba(8,10,16,0.75); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border-bottom: 1px solid var(--border); }
+.topbar::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
+.brand-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.brand-text { font-size: 13.5px; font-weight: 700; }
+.brand-sub { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 600; margin-top: 1px; }
+.tb-spacer { flex: 1; }
+.tb-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 99px; font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; background: var(--violet-soft); border: 1px solid var(--violet-line); color: #a78bfa; }
+.tb-pill.live { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+.tb-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.65); } }
+.tb-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text-soft); font-size: 12.5px; font-weight: 500; transition: all 0.15s; }
+.tb-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+
+/* HEADER */
+.wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+.header-strip { margin-bottom: 28px; }
+.header-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #a78bfa; font-weight: 700; margin-bottom: 12px; }
+.header-eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 6px #a78bfa; animation: pulse 1.6s ease-in-out infinite; }
+.header-title { font-size: clamp(26px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 8px; }
+.header-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.header-sub { font-size: 14px; color: var(--text-dim); max-width: 720px; }
+
+/* INPUT CARD */
+.input-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; margin-bottom: 24px; }
+.input-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #a78bfa, transparent); }
+.input-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.input-card-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--violet-soft); border: 1px solid var(--violet-line); display: flex; align-items: center; justify-content: center; color: #a78bfa; }
+.input-card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.input-card-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.08em; margin-top: 2px; }
+
+.form-grid { display: grid; gap: 14px; grid-template-columns: 1.6fr 1fr; margin-bottom: 14px; }
+@media (max-width: 720px) { .form-grid { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+.field-input, .field-select, .field-textarea { width: 100%; padding: 11px 13px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 10px; color: var(--text); font-size: 13.5px; font-weight: 500; outline: none; transition: all 0.18s; }
+.field-textarea { min-height: 90px; resize: vertical; font-family: 'Geist Mono', monospace; font-size: 12.5px; line-height: 1.6; }
+.field-input:focus, .field-select:focus, .field-textarea:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.15); background: var(--surface-3); }
+.field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.4'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+.run-btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 10px; background: linear-gradient(135deg, #a78bfa, #8b6df0); color: #fff; font-size: 13.5px; font-weight: 700; letter-spacing: -0.005em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 20px rgba(167,139,250,0.32); transition: all 0.2s; }
+.run-btn:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 10px 28px rgba(167,139,250,0.4); }
+.run-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.field-error { font-size: 12px; color: var(--red); margin-top: 4px; min-height: 16px; }
+
+/* OUTPUT STREAM */
+.output-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; display: none; }
+.output-card.active { display: block; }
+.output-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.output-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.output-head-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.output-head-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand-soft); border: 1px solid var(--brand-line); display: flex; align-items: center; justify-content: center; color: var(--brand); flex-shrink: 0; }
+.output-head-icon.streaming { animation: stagePulse 1.2s ease-in-out infinite; }
+@keyframes stagePulse { 0%, 100% { box-shadow: 0 0 0 0 var(--brand-glow); } 50% { box-shadow: 0 0 0 6px transparent; } }
+.output-head-text { min-width: 0; }
+.output-head-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.output-head-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 3px; }
+.output-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; flex-shrink: 0; }
+.output-meta.streaming { color: var(--brand); }
+
+/* Raw stream box */
+.stream-box { background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; padding: 16px; max-height: 280px; overflow-y: auto; font-family: 'Geist Mono', monospace; font-size: 11.5px; line-height: 1.65; color: var(--text-soft); white-space: pre-wrap; word-wrap: break-word; }
+.stream-box.collapsed { display: none; }
+.stream-box::-webkit-scrollbar { width: 5px; }
+.stream-box::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+.stream-cursor { display: inline-block; width: 7px; height: 13px; background: var(--brand); vertical-align: text-bottom; animation: cursorBlink 1s steps(2) infinite; margin-left: 2px; box-shadow: 0 0 6px var(--brand-glow); }
+@keyframes cursorBlink { 50% { opacity: 0; } }
+
+.toggle-stream { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; border: 1px solid var(--border); background: transparent; transition: all 0.15s; }
+.toggle-stream:hover { color: var(--text); border-color: var(--border-3); }
+
+/* PARSED REPORT */
+.parsed-report { display: none; margin-top: 22px; }
+.parsed-report.active { display: block; }
+
+.parsed-section { background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+.parsed-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.parsed-section-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 8px; }
+.parsed-section-title svg { color: var(--brand); }
+.parsed-section-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; }
+
+.score-row { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; padding: 8px 0; }
+.score-circle { width: 84px; height: 84px; border-radius: 50%; background: conic-gradient(var(--brand) var(--p), var(--surface-3) 0); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+.score-circle::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: var(--surface-input); }
+.score-circle-num { position: relative; font-family: 'Geist Mono', monospace; font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.03em; }
+.score-summary { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; }
+
+.findings-grid { display: flex; flex-direction: column; gap: 8px; }
+.finding-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; }
+.finding-sev { font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 1px; min-width: 50px; text-align: center; }
+.finding-sev.high { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
+.finding-sev.med { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-line); }
+.finding-sev.low { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-line); }
+.finding-sev.good { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+.finding-cont { flex: 1; min-width: 0; }
+.finding-cont-area { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 3px; }
+.finding-cont-title { font-size: 13px; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 4px; }
+.finding-cont-detail { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+.finding-cont-loss { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--red); margin-top: 5px; letter-spacing: 0.04em; }
+
+.win-tier-block + .win-tier-block { margin-top: 10px; }
+.win-tier-head { display: flex; align-items: center; gap: 9px; font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; font-weight: 700; }
+.win-tier-head .pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.win-tier-head .pip.quick { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.win-tier-head .pip.medium { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.win-tier-head .pip.major { background: var(--brand); box-shadow: 0 0 6px var(--brand); }
+.win-item-row { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+.win-item-title { font-size: 13px; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 3px; }
+.win-item-detail { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.win-item-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.win-item-chip { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); padding: 2px 6px; border-radius: 4px; background: var(--surface-3); }
+
+.talking-points-list { padding-left: 4px; }
+.talking-point { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
+.talking-point + .talking-point { border-top: 1px solid var(--border); }
+.talking-point-num { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; color: var(--brand); letter-spacing: 0.04em; flex-shrink: 0; padding-top: 1px; min-width: 22px; }
+.talking-point-text { font-size: 13px; color: var(--text-soft); line-height: 1.6; flex: 1; }
+
+.copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text-dim); font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.15s; }
+.copy-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-3); }
+.copy-btn.copied { background: var(--green-soft); border-color: var(--green-line); color: var(--green); }
+
+/* Estimate row */
+.estimate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 600px) { .estimate-row { grid-template-columns: 1fr; } }
+.estimate-tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.estimate-tile-label { font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--text-faint); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
+.estimate-tile-value { font-family: 'Geist Mono', monospace; font-size: 18px; font-weight: 700; color: var(--green); letter-spacing: -0.015em; }
+
+.error-banner { background: var(--red-soft); border: 1px solid var(--red-line); color: var(--red); padding: 14px 16px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 12px; margin-top: 14px; }
+.error-banner strong { color: var(--text); font-family: 'Geist', sans-serif; font-weight: 700; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/admin" class="brand" style="text-decoration:none">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-text">AI Lead Intel</div>
+      <div class="brand-sub">Admin · Scanner</div>
+    </div>
+  </a>
+  <div class="tb-spacer"></div>
+  <div class="tb-pill" id="status-pill"><span class="dot"></span><span id="status-pill-text">Ready</span></div>
+  <a class="tb-btn" href="/admin">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    <span>Back</span>
+  </a>
+</nav>
+
+<div class="wrap">
+  <div class="header-strip">
+    <div class="header-eyebrow"><span class="pip"></span>Sales Tool · Claude-powered</div>
+    <h1 class="header-title">AI Business <span class="accent">Audit Scanner</span></h1>
+    <p class="header-sub">Run real Claude analysis on any business URL. Use on sales calls to find specific revenue opportunities and arm yourself with talking points before the conversation.</p>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-card">
+    <div class="input-card-head">
+      <div class="input-card-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15A2.5 2.5 0 0 0 9.5 22a2.5 2.5 0 0 0 2.5-2.5V4.5A2.5 2.5 0 0 0 9.5 2zM14.5 2A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-5 0V4.5A2.5 2.5 0 0 1 14.5 2z"/></svg>
+      </div>
+      <div>
+        <div class="input-card-title">Run AI Audit</div>
+        <div class="input-card-sub">Claude Opus · ~30–60s · ~$0.10 per scan</div>
+      </div>
+    </div>
+    <form id="scan-form">
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label" for="website">Business Website</label>
+          <input class="field-input" type="url" id="website" name="website" required placeholder="https://example-plumbing.com" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="industry">Industry</label>
+          <select class="field-select" id="industry" name="industry">
+            <option value="">Infer from website</option>
+            <option value="HVAC">HVAC</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Landscaping">Landscaping</option>
+            <option value="Roofing">Roofing</option>
+            <option value="Self Storage">Self Storage</option>
+            <option value="Pest Control">Pest Control</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Garage Door">Garage Door</option>
+            <option value="Tree Service">Tree Service</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label class="field-label" for="notes">Sales Notes (optional)</label>
+        <textarea class="field-textarea" id="notes" name="notes" placeholder="What you know about them — pain points they mentioned, current setup, why they're talking to us, etc."></textarea>
+      </div>
+      <button class="run-btn" type="submit" id="run-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span id="run-btn-text">Run AI Scan</span>
+      </button>
+      <div class="field-error" id="form-error"></div>
+    </form>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-card" id="output-card">
+    <div class="output-head">
+      <div class="output-head-left">
+        <div class="output-head-icon" id="output-head-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15A2.5 2.5 0 0 0 9.5 22a2.5 2.5 0 0 0 2.5-2.5V4.5A2.5 2.5 0 0 0 9.5 2zM14.5 2A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-5 0V4.5A2.5 2.5 0 0 1 14.5 2z"/></svg>
+        </div>
+        <div class="output-head-text">
+          <div class="output-head-title" id="output-head-title">Claude is analyzing…</div>
+          <div class="output-head-sub" id="output-head-sub">Streaming response</div>
+        </div>
+      </div>
+      <div class="output-meta streaming" id="output-meta">Live</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);letter-spacing:0.12em;text-transform:uppercase;font-weight:700">Raw Stream</div>
+      <button class="toggle-stream" type="button" id="toggle-stream">Hide</button>
+    </div>
+    <div class="stream-box" id="stream-box"><span id="stream-text"></span><span class="stream-cursor" id="stream-cursor"></span></div>
+
+    <div class="parsed-report" id="parsed-report"></div>
+
+    <div id="error-slot"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const $ = sel => document.querySelector(sel);
+
+const form = $('#scan-form');
+const runBtn = $('#run-btn');
+const runBtnText = $('#run-btn-text');
+const errorEl = $('#form-error');
+const outputCard = $('#output-card');
+const streamText = $('#stream-text');
+const streamCursor = $('#stream-cursor');
+const streamBox = $('#stream-box');
+const outputHeadTitle = $('#output-head-title');
+const outputHeadSub = $('#output-head-sub');
+const outputMeta = $('#output-meta');
+const outputHeadIcon = $('#output-head-icon');
+const parsedReport = $('#parsed-report');
+const errorSlot = $('#error-slot');
+const statusPill = $('#status-pill');
+const statusPillText = $('#status-pill-text');
+const toggleStreamBtn = $('#toggle-stream');
+
+let currentAbortController = null;
+
+toggleStreamBtn.addEventListener('click', () => {
+  streamBox.classList.toggle('collapsed');
+  toggleStreamBtn.textContent = streamBox.classList.contains('collapsed') ? 'Show' : 'Hide';
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorEl.textContent = '';
+  errorSlot.innerHTML = '';
+  parsedReport.classList.remove('active');
+  parsedReport.innerHTML = '';
+  streamText.textContent = '';
+  streamCursor.style.display = 'inline-block';
+  streamBox.classList.remove('collapsed');
+  toggleStreamBtn.textContent = 'Hide';
+
+  const website = $('#website').value.trim();
+  const industry = $('#industry').value.trim();
+  const notes = $('#notes').value.trim();
+
+  if (!website) { errorEl.textContent = 'Please enter a website URL.'; return; }
+  if (!/^https?:\/\/.+\..+/.test(website)) { errorEl.textContent = 'Please enter a full URL (https://...)'; return; }
+
+  // UI: streaming state
+  runBtn.disabled = true;
+  runBtnText.textContent = 'Streaming…';
+  outputCard.classList.add('active');
+  outputHeadTitle.textContent = 'Claude is analyzing ' + website + '…';
+  outputHeadSub.textContent = 'Streaming response';
+  outputMeta.textContent = 'Live';
+  outputMeta.classList.add('streaming');
+  outputHeadIcon.classList.add('streaming');
+  statusPill.className = 'tb-pill';
+  statusPillText.textContent = 'Scanning';
+
+  outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  currentAbortController = new AbortController();
+
+  try {
+    const r = await fetch('/api/admin-scanner', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ website, industry, notes }),
+      signal: currentAbortController.signal,
+    });
+
+    if (r.status === 401) {
+      window.location.href = '/admin/login?return=' + encodeURIComponent(location.pathname);
+      return;
+    }
+    if (!r.ok) {
+      const text = await r.text().catch(() => '');
+      throw new Error(`HTTP ${r.status}: ${text.slice(0, 200) || 'Request failed'}`);
+    }
+
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let errorPayload = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      // Check for error marker
+      const errIdx = chunk.indexOf('__ERROR__:');
+      if (errIdx >= 0) {
+        if (errIdx > 0) {
+          buffer += chunk.slice(0, errIdx);
+          streamText.textContent = buffer;
+        }
+        try { errorPayload = JSON.parse(chunk.slice(errIdx + 10)); } catch (_) { errorPayload = { message: chunk.slice(errIdx + 10) }; }
+        break;
+      }
+      buffer += chunk;
+      streamText.textContent = buffer;
+      streamBox.scrollTop = streamBox.scrollHeight;
+    }
+
+    if (errorPayload) throw new Error(errorPayload.message || errorPayload.error || 'Scanner error');
+
+    // Done streaming — try to parse JSON
+    streamCursor.style.display = 'none';
+    outputHeadTitle.textContent = 'Audit complete';
+    outputHeadSub.textContent = website;
+    outputMeta.textContent = 'Done';
+    outputMeta.classList.remove('streaming');
+    outputHeadIcon.classList.remove('streaming');
+    statusPill.className = 'tb-pill live';
+    statusPillText.textContent = 'Complete';
+
+    const cleaned = buffer.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
+    let parsed = null;
+    try { parsed = JSON.parse(cleaned); } catch (e) {
+      console.warn('[scanner] JSON parse failed', e);
+    }
+
+    if (parsed) renderParsed(parsed);
+    else {
+      errorSlot.innerHTML = `<div class="error-banner"><strong>Claude returned non-JSON output.</strong> The raw response is shown above. This usually means the prompt needs tuning. Try again or refine your sales notes.</div>`;
+    }
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      outputHeadTitle.textContent = 'Cancelled';
+      return;
+    }
+    console.error('[scanner] error:', err);
+    streamCursor.style.display = 'none';
+    outputHeadTitle.textContent = 'Scan failed';
+    outputHeadSub.textContent = err.message;
+    outputMeta.textContent = 'Error';
+    outputMeta.classList.remove('streaming');
+    outputHeadIcon.classList.remove('streaming');
+    statusPill.className = 'tb-pill';
+    statusPillText.textContent = 'Error';
+    errorSlot.innerHTML = `<div class="error-banner"><strong>Scanner failed</strong>${escapeHtml(err.message)}</div>`;
+  } finally {
+    runBtn.disabled = false;
+    runBtnText.textContent = 'Run AI Scan';
+    currentAbortController = null;
+  }
+});
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function fmtNum(n) { return new Intl.NumberFormat('en-US').format(Math.round(n || 0)); }
+
+function renderParsed(d) {
+  parsedReport.classList.add('active');
+
+  const score = Math.max(0, Math.min(100, d.score || 0));
+  const findings = Array.isArray(d.findings) ? d.findings : [];
+  const wins = d.wins || { quick: [], medium: [], major: [] };
+  const est = d.estimate || {};
+  const talkingPoints = Array.isArray(d.talking_points) ? d.talking_points : [];
+
+  parsedReport.innerHTML = `
+    <!-- Score -->
+    <div class="parsed-section">
+      <div class="parsed-section-head">
+        <div class="parsed-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>Opportunity Score</span>
+        </div>
+        <button class="copy-btn" type="button" data-copy="full">Copy report</button>
+      </div>
+      <div class="score-row">
+        <div class="score-circle" style="--p: ${score}%">
+          <div class="score-circle-num">${score}</div>
+        </div>
+        <div class="score-summary">${escapeHtml(d.summary || '')}</div>
+      </div>
+    </div>
+
+    <!-- Estimate -->
+    <div class="parsed-section">
+      <div class="parsed-section-head">
+        <div class="parsed-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>Revenue Estimate</span>
+        </div>
+      </div>
+      <div class="estimate-row">
+        <div class="estimate-tile">
+          <div class="estimate-tile-label">Monthly Recovery</div>
+          <div class="estimate-tile-value">$${fmtNum(est.monthly_low)} – $${fmtNum(est.monthly_high)}</div>
+        </div>
+        <div class="estimate-tile">
+          <div class="estimate-tile-label">Annual Recovery</div>
+          <div class="estimate-tile-value">$${fmtNum(est.annual_low)} – $${fmtNum(est.annual_high)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Talking Points -->
+    ${talkingPoints.length ? `
+    <div class="parsed-section">
+      <div class="parsed-section-head">
+        <div class="parsed-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Sales Talking Points</span>
+        </div>
+        <button class="copy-btn" type="button" data-copy="talking">Copy</button>
+      </div>
+      <div class="talking-points-list">
+        ${talkingPoints.map((tp, i) => `
+          <div class="talking-point">
+            <div class="talking-point-num">0${i + 1}</div>
+            <div class="talking-point-text">${escapeHtml(tp)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Findings -->
+    <div class="parsed-section">
+      <div class="parsed-section-head">
+        <div class="parsed-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Findings · ${findings.length}</span>
+        </div>
+      </div>
+      <div class="findings-grid">
+        ${findings.map(f => `
+          <div class="finding-item">
+            <div class="finding-sev ${escapeHtml(f.severity || 'med')}">${escapeHtml(f.severity || 'med')}</div>
+            <div class="finding-cont">
+              <div class="finding-cont-area">${escapeHtml(f.area || '')}</div>
+              <div class="finding-cont-title">${escapeHtml(f.title || '')}</div>
+              <div class="finding-cont-detail">${escapeHtml(f.detail || '')}</div>
+              ${f.estimated_monthly_loss ? `<div class="finding-cont-loss">~ $${fmtNum(f.estimated_monthly_loss)}/mo at risk</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Wins -->
+    <div class="parsed-section">
+      <div class="parsed-section-head">
+        <div class="parsed-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Action Plan</span>
+        </div>
+      </div>
+      ${winTier('quick', 'Quick Wins', wins.quick)}
+      ${winTier('medium', 'Medium Wins', wins.medium)}
+      ${winTier('major', 'Major Wins', wins.major)}
+    </div>
+  `;
+
+  attachCopyHandlers(d);
+}
+
+function winTier(key, label, items) {
+  if (!items || !items.length) return '';
+  return `
+    <div class="win-tier-block">
+      <div class="win-tier-head"><span class="pip ${key}"></span>${label} · ${items.length}</div>
+      ${items.map(w => `
+        <div class="win-item-row">
+          <div class="win-item-title">${escapeHtml(w.title || '')}</div>
+          <div class="win-item-detail">${escapeHtml(w.detail || '')}</div>
+          <div class="win-item-meta">
+            ${w.effort ? `<span class="win-item-chip">Effort · ${escapeHtml(w.effort)}</span>` : ''}
+            ${w.timeline ? `<span class="win-item-chip">${escapeHtml(w.timeline)}</span>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function attachCopyHandlers(d) {
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const kind = btn.dataset.copy;
+      let text;
+      if (kind === 'talking' && d.talking_points) {
+        text = d.talking_points.map((t, i) => `${i + 1}. ${t}`).join('\n\n');
+      } else {
+        text = buildFullText(d);
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.classList.add('copied');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 1200);
+      } catch (_) {}
+    });
+  });
+}
+
+function buildFullText(d) {
+  const lines = [];
+  lines.push(`AI AUDIT — Score: ${d.score}/100`);
+  lines.push('');
+  lines.push('SUMMARY: ' + (d.summary || ''));
+  lines.push('');
+  if (d.estimate) {
+    lines.push(`Revenue estimate: $${fmtNum(d.estimate.monthly_low)}–$${fmtNum(d.estimate.monthly_high)}/mo`);
+    lines.push('');
+  }
+  if (d.talking_points && d.talking_points.length) {
+    lines.push('TALKING POINTS:');
+    d.talking_points.forEach((tp, i) => lines.push(`${i + 1}. ${tp}`));
+    lines.push('');
+  }
+  if (d.findings && d.findings.length) {
+    lines.push('FINDINGS:');
+    d.findings.forEach(f => {
+      lines.push(`[${(f.severity || 'med').toUpperCase()}] ${f.area}: ${f.title}`);
+      lines.push(`  ${f.detail}`);
+      if (f.estimated_monthly_loss) lines.push(`  ~$${fmtNum(f.estimated_monthly_loss)}/mo at risk`);
+    });
+    lines.push('');
+  }
+  if (d.wins) {
+    ['quick', 'medium', 'major'].forEach(tier => {
+      const items = d.wins[tier] || [];
+      if (!items.length) return;
+      lines.push(`${tier.toUpperCase()} WINS:`);
+      items.forEach(w => {
+        lines.push(`  • ${w.title} — ${w.detail}`);
+      });
+      lines.push('');
+    });
+  }
+  return lines.join('\n');
+}
+</script>
+</body>
+</html>
