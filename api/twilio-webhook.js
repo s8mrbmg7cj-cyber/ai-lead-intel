@@ -1,26 +1,33 @@
 // =====================================================================
-//  api/twilio-webhook.js  —  AI Lead Intel   (ESM — matches "type":"module")
-//  Handles two Twilio callbacks and writes them into the ali_ spine:
-//    1) Inbound SMS  (a lead replying)        -> log + activity event
-//    2) Status callback (delivered / failed)  -> update status / flag breakage
+//  api/twilio-webhook.js  —  AI Lead Intel   (ESM, REST-only)
+//  Writes Twilio events into the ali_ spine using Supabase's REST API
+//  via plain fetch. NO @supabase/supabase-js, NO Realtime, NO WebSocket.
 //
 //  Register BOTH in Twilio pointing at this same URL:
 //    • Messaging "A message comes in"  → https://aileadintel.com/api/twilio-webhook
 //    • Messaging "status callback URL" → https://aileadintel.com/api/twilio-webhook
 // =====================================================================
 
-import { createClient } from '@supabase/supabase-js';
-
 const SUPABASE_URL         = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;   // service-role key
 
-let _sb = null;
-function db() {
+// Minimal Supabase REST helper (PostgREST). No client library = no realtime.
+async function sb(path, { method = 'GET', body, prefer } = {}) {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY env var (check Vercel + Redeploy)');
   }
-  if (!_sb) _sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } });
-  return _sb;
+  const headers = {
+    apikey: SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+  if (prefer) headers.Prefer = prefer;
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method, headers, body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!resp.ok) throw new Error(`Supabase REST ${resp.status}: ${await resp.text()}`);
+  const txt = await resp.text();
+  return txt ? JSON.parse(txt) : null;
 }
 
 function field(body, ...keys) {
@@ -28,67 +35,68 @@ function field(body, ...keys) {
   return null;
 }
 
-async function accountByTwilioNumber(num) {
+async function accountByNumber(num) {
   if (!num) return null;
-  const { data } = await db()
-    .from('ali_accounts')
-    .select('id')
-    .eq('phone_number', num)
-    .maybeSingle();
-  return data;
+  const rows = await sb(`ali_accounts?select=id&phone_number=eq.${encodeURIComponent(num)}&limit=1`);
+  return rows?.[0] ?? null;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('method not allowed');
 
   try {
-    const supabase = db();
     const b = req.body || {};
     const messageStatus  = field(b, 'MessageStatus', 'SmsStatus');
     const businessNumber = field(b, 'To');
     const fromNumber     = field(b, 'From');
     const twilioSid      = field(b, 'MessageSid', 'SmsSid');
 
-    // ── CASE 1: delivery status callback ──
+    // ── CASE 1: delivery status callback (delivered / failed) ──
     if (messageStatus && field(b, 'MessageSid')) {
       const mapped = (messageStatus === 'delivered') ? 'delivered'
                    : (messageStatus === 'failed' || messageStatus === 'undelivered') ? 'failed'
                    : 'sent';
-      await supabase.from('ali_sms_messages').update({ status: mapped }).eq('twilio_sid', field(b, 'MessageSid'));
+      await sb(`ali_sms_messages?twilio_sid=eq.${encodeURIComponent(field(b, 'MessageSid'))}`,
+        { method: 'PATCH', body: { status: mapped }, prefer: 'return=minimal' });
 
       if (mapped === 'failed') {
-        const acct = await accountByTwilioNumber(field(b, 'From'));
-        await supabase.from('ali_system_status').upsert({
-          account_id: acct?.id ?? null,
-          component: 'Twilio (SMS)',
-          status: 'warn',
-          detail: `Delivery failure ${field(b, 'ErrorCode') ?? ''}`.trim(),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'account_id,component' });
+        const acct = await accountByNumber(field(b, 'From'));
+        await sb('ali_system_status?on_conflict=account_id,component', {
+          method: 'POST',
+          prefer: 'resolution=merge-duplicates,return=minimal',
+          body: {
+            account_id: acct?.id ?? null,
+            component: 'Twilio (SMS)',
+            status: 'warn',
+            detail: `Delivery failure ${field(b, 'ErrorCode') ?? ''}`.trim(),
+            updated_at: new Date().toISOString(),
+          },
+        });
       }
       return res.status(200).send('<Response/>');
     }
 
     // ── CASE 2: inbound SMS — a lead is replying ──
-    const account = await accountByTwilioNumber(businessNumber);
+    const account = await accountByNumber(businessNumber);
     if (!account) {
       console.warn('twilio-webhook: no ali_accounts row for number', businessNumber);
       return res.status(200).send('<Response/>');
     }
 
-    await supabase.from('ali_sms_messages').insert({
-      account_id: account.id,
-      twilio_sid: twilioSid,
-      direction: 'inbound',
-      contact_number: fromNumber,
-      status: 'delivered',
+    await sb('ali_sms_messages', {
+      method: 'POST', prefer: 'return=minimal',
+      body: {
+        account_id: account.id, twilio_sid: twilioSid,
+        direction: 'inbound', contact_number: fromNumber, status: 'delivered',
+      },
     });
 
-    await supabase.from('ali_events').insert({
-      account_id: account.id,
-      event_type: 'sms',
-      title: 'Lead replied',
-      subtitle: `${fromNumber} re-engaged`,
+    await sb('ali_events', {
+      method: 'POST', prefer: 'return=minimal',
+      body: {
+        account_id: account.id, event_type: 'sms',
+        title: 'Lead replied', subtitle: `${fromNumber} re-engaged`,
+      },
     });
 
     return res.status(200).send('<Response/>');
