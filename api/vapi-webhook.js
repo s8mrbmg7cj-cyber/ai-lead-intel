@@ -1,27 +1,34 @@
 // =====================================================================
-//  api/vapi-webhook.js  —  AI Lead Intel   (ESM — matches "type":"module")
-//  Receives Vapi call events and writes them into the ali_ event spine.
+//  api/vapi-webhook.js  —  AI Lead Intel   (ESM, REST-only)
+//  Writes Vapi call events into the ali_ spine using Supabase's REST API
+//  via plain fetch. NO @supabase/supabase-js, NO Realtime, NO WebSocket.
 //  A missed call that gets a text-back is marked `recovered`, which fires
 //  the database trigger that logs Revenue Saved automatically.
 //
 //  Webhook URL to register in Vapi:  https://aileadintel.com/api/vapi-webhook
 // =====================================================================
 
-import { createClient } from '@supabase/supabase-js';
-
-// Env vars (read here, but the client is built lazily inside the handler,
-// so a missing/unredeployed var can NEVER crash the module at load time).
 const SUPABASE_URL         = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;   // service-role key (bypasses RLS)
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;   // service-role key
 const VAPI_WEBHOOK_SECRET  = process.env.VAPI_WEBHOOK_SECRET;    // optional shared secret
 
-let _sb = null;
-function db() {
+// Minimal Supabase REST helper (PostgREST). No client library = no realtime.
+async function sb(path, { method = 'GET', body, prefer } = {}) {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY env var (check Vercel + Redeploy)');
   }
-  if (!_sb) _sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } });
-  return _sb;
+  const headers = {
+    apikey: SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+  if (prefer) headers.Prefer = prefer;
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method, headers, body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!resp.ok) throw new Error(`Supabase REST ${resp.status}: ${await resp.text()}`);
+  const txt = await resp.text();
+  return txt ? JSON.parse(txt) : null;
 }
 
 // ── Map the Vapi payload → our fields. Adjust if your assistant differs. ──
@@ -63,20 +70,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const supabase = db();                 // env checked here; errors are returned, not silent
     const ev = readEvent(req.body);
 
     if (ev.type && ev.type !== 'end-of-call-report') {
       return res.status(200).json({ ok: true, ignored: ev.type });
     }
 
-    const { data: account, error: acctErr } = await supabase
-      .from('ali_accounts')
-      .select('id, phone_number')
-      .eq('phone_number', ev.businessNumber)
-      .maybeSingle();
-    if (acctErr) throw acctErr;
-
+    const accounts = await sb(
+      `ali_accounts?select=id,phone_number&phone_number=eq.${encodeURIComponent(ev.businessNumber ?? '')}&limit=1`);
+    const account = accounts?.[0] ?? null;
     if (!account) {
       console.warn('vapi-webhook: no ali_accounts row for number', ev.businessNumber);
       return res.status(200).json({ ok: true, note: 'no matching account', dialed: ev.businessNumber });
@@ -84,9 +86,9 @@ export default async function handler(req, res) {
 
     const status = classifyCall(ev.endedReason);
 
-    const { data: call, error: callErr } = await supabase
-      .from('ali_calls')
-      .insert({
+    const inserted = await sb('ali_calls', {
+      method: 'POST', prefer: 'return=representation',
+      body: {
         account_id:    account.id,
         vapi_call_id:  ev.vapiCallId,
         caller_number: ev.callerNumber,
@@ -94,12 +96,11 @@ export default async function handler(req, res) {
         is_after_hours: isAfterHours(),
         started_at:    ev.startedAt,
         duration_sec:  ev.durationSec,
-      })
-      .select('id')
-      .single();
-    if (callErr) throw callErr;
+      },
+    });
+    const call = inserted?.[0];
 
-    if (status === 'missed' && ev.callerNumber) {
+    if (status === 'missed' && ev.callerNumber && call) {
       const recoveredAt = new Date();
       const startedAt = new Date(ev.startedAt);
       const responseSec = Math.max(0, Math.round((recoveredAt - startedAt) / 1000)) || 5;
@@ -107,22 +108,24 @@ export default async function handler(req, res) {
       try {
         // send FROM this client's own number (multi-tenant), not a global one
         await sendTextBack(account.phone_number, ev.callerNumber);
-        await supabase.from('ali_sms_messages').insert({
-          account_id: account.id, direction: 'outbound', contact_number: ev.callerNumber,
-          status: 'sent', related_call_id: call.id,
+        await sb('ali_sms_messages', {
+          method: 'POST', prefer: 'return=minimal',
+          body: {
+            account_id: account.id, direction: 'outbound',
+            contact_number: ev.callerNumber, status: 'sent', related_call_id: call.id,
+          },
         });
       } catch (smsErr) {
         console.error('text-back failed:', smsErr.message);
       }
 
-      const { error: updErr } = await supabase
-        .from('ali_calls')
-        .update({ recovered: true, recovered_at: recoveredAt.toISOString(), response_sec: responseSec })
-        .eq('id', call.id);
-      if (updErr) throw updErr;
+      await sb(`ali_calls?id=eq.${call.id}`, {
+        method: 'PATCH', prefer: 'return=minimal',
+        body: { recovered: true, recovered_at: recoveredAt.toISOString(), response_sec: responseSec },
+      });
     }
 
-    return res.status(200).json({ ok: true, call_id: call.id, status });
+    return res.status(200).json({ ok: true, call_id: call?.id ?? null, status });
   } catch (err) {
     console.error('vapi-webhook error:', err);
     return res.status(500).json({ error: err.message });
