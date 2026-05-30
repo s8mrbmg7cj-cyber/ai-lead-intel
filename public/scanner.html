@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>AI Opportunity Scanner — AI Lead Intel</title>
+<meta name="description" content="Free AI audit of your local business. Get a personalized revenue opportunity score and action plan in under 60 seconds." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #04050a; --bg-2: #07080e; --bg-3: #0a0c14;
+  --surface: #0d0f17; --surface-2: #11141d; --surface-3: #161a24; --surface-input: #0a0c13;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.16);
+  --text: #f5f7fa; --text-soft: #c8cdd6; --text-dim: #8a92a3; --text-faint: #5a6173; --text-muted: #3d4252;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.35); --brand-soft: rgba(255,106,0,0.10);
+  --brand-line: rgba(255,106,0,0.26);
+  --cyan: #00d4ff; --cyan-soft: rgba(0,212,255,0.10); --cyan-line: rgba(0,212,255,0.30);
+  --violet: #a78bfa; --violet-soft: rgba(167,139,250,0.10); --violet-line: rgba(167,139,250,0.30);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+  --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.10); --amber-line: rgba(251,191,36,0.30);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.10); --red-line: rgba(248,113,113,0.30);
+}
+html { scroll-behavior: smooth; }
+html, body { min-height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; line-height: 1.55;
+  overflow-x: hidden; min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,106,0,0.10), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 90%, rgba(0,212,255,0.05), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(167,139,250,0.05), transparent 60%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select { font-family: inherit; }
+
+/* TOP BAR */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  background: rgba(8,10,16,0.72);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+.topbar::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
+.brand-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.brand-text { font-size: 13.5px; font-weight: 700; letter-spacing: -0.01em; }
+.brand-sub { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 600; margin-top: 1px; }
+.tb-link { font-size: 13px; color: var(--text-dim); font-weight: 500; transition: color 0.15s; }
+.tb-link:hover { color: var(--text); }
+
+/* WRAP */
+.wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+/* HERO */
+.hero { padding: 64px 0 32px; text-align: center; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--brand); font-weight: 700;
+  background: var(--brand-soft); border: 1px solid var(--brand-line);
+  padding: 7px 14px; border-radius: 99px; margin-bottom: 24px;
+}
+.hero-eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.65); } }
+.hero h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 18px; }
+.hero h1 .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-size: 16px; color: var(--text-dim); max-width: 600px; margin: 0 auto 14px; line-height: 1.6; }
+.hero-trust { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin-top: 22px; }
+.hero-trust-item { display: inline-flex; align-items: center; gap: 6px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.04em; }
+.hero-trust-item svg { color: var(--brand); }
+
+/* CARD BASE */
+.card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2); border-radius: 18px;
+  padding: 32px; position: relative; overflow: hidden;
+}
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.45), transparent); }
+@media (max-width: 600px) { .card { padding: 22px 18px; border-radius: 14px; } }
+
+/* INTAKE FORM */
+.form-section { margin: 16px 0 80px; }
+.form-grid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+.field-label { font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+.field-input, .field-select {
+  width: 100%; padding: 13px 14px;
+  background: var(--surface-input); border: 1px solid var(--border-2);
+  border-radius: 10px; color: var(--text); font-size: 14px; font-weight: 500;
+  outline: none; transition: all 0.18s;
+}
+.field-input::placeholder { color: var(--text-faint); }
+.field-input:focus, .field-select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); background: var(--surface-3); }
+.field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.4'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+
+.submit-btn {
+  width: 100%; margin-top: 22px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 24px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
+  color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -0.005em;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 4px rgba(255,106,0,0.3), 0 14px 36px var(--brand-glow);
+  cursor: pointer; transition: transform 0.22s, box-shadow 0.22s; position: relative; overflow: hidden;
+}
+.submit-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transition: left 0.6s; }
+.submit-btn:hover::before { left: 100%; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 4px 8px rgba(255,106,0,0.4), 0 22px 50px rgba(255,106,0,0.45); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.field-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 16px; }
+.legal-note { text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 14px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+
+/* ============================================================
+   ANALYZING SEQUENCE
+   ============================================================ */
+.analyzing-card { display: none; }
+.analyzing-card.active { display: block; }
+.scan-head { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.scan-pulse-wrap { position: relative; width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.scan-pulse-wrap::before, .scan-pulse-wrap::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--brand); opacity: 0; animation: scanRing 2s ease-out infinite; }
+.scan-pulse-wrap::after { animation-delay: 1s; }
+@keyframes scanRing { 0% { transform: scale(0.7); opacity: 0.7; } 100% { transform: scale(1.5); opacity: 0; } }
+.scan-pulse-core { position: relative; z-index: 2; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 20px var(--brand-glow); display: flex; align-items: center; justify-content: center; color: #fff; }
+.scan-pulse-core::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
+.scan-head-text { min-width: 0; flex: 1; }
+.scan-head-eyebrow { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 4px; }
+.scan-head-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.scan-progress-pct { font-family: 'Geist Mono', monospace; font-size: 24px; font-weight: 700; color: var(--brand); flex-shrink: 0; letter-spacing: -0.02em; }
+
+.scan-progress-bar { height: 4px; background: var(--surface-input); border-radius: 99px; overflow: hidden; margin-bottom: 22px; position: relative; }
+.scan-progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); border-radius: 99px; width: 0%; transition: width 0.4s ease; box-shadow: 0 0 10px var(--brand-glow); }
+
+.scan-stages { display: flex; flex-direction: column; gap: 8px; }
+.scan-stage {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  opacity: 0.4;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.scan-stage.running { opacity: 1; border-color: var(--brand-line); background: linear-gradient(180deg, var(--brand-soft), var(--surface-input)); }
+.scan-stage.done { opacity: 0.85; border-color: var(--green-line); }
+.scan-stage-icon {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--surface-3); color: var(--text-faint);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.3s;
+}
+.scan-stage.running .scan-stage-icon { background: var(--brand-soft); color: var(--brand); animation: stageSpin 1.4s linear infinite; }
+.scan-stage.done .scan-stage-icon { background: var(--green-soft); color: var(--green); animation: none; }
+@keyframes stageSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.scan-stage-text { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-soft); letter-spacing: -0.005em; }
+.scan-stage.done .scan-stage-text { color: var(--text); }
+.scan-stage-tick { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.08em; flex-shrink: 0; }
+.scan-stage.done .scan-stage-tick { color: var(--green); }
+
+/* ============================================================
+   REPORT
+   ============================================================ */
+.report-section { display: none; margin: 32px 0 80px; }
+.report-section.active { display: block; }
+.report-block + .report-block { margin-top: 18px; }
+
+/* Score card */
+.score-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--brand-line); border-radius: 20px; padding: 36px 32px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px var(--brand-line) inset, 0 30px 60px rgba(255,106,0,0.08); }
+.score-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 10%, var(--brand) 50%, transparent 90%); }
+.score-grid { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; }
+@media (max-width: 720px) { .score-grid { grid-template-columns: 1fr; text-align: center; gap: 18px; } }
+.score-ring-wrap { position: relative; width: 160px; height: 160px; flex-shrink: 0; }
+@media (max-width: 720px) { .score-ring-wrap { margin: 0 auto; } }
+.score-ring { transform: rotate(-90deg); }
+.score-ring-bg { fill: none; stroke: var(--surface-3); stroke-width: 10; }
+.score-ring-fg { fill: none; stroke: url(#scoreGrad); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1); filter: drop-shadow(0 0 10px var(--brand-glow)); }
+.score-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-ring-num { font-family: 'Geist Mono', monospace; font-size: 48px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; }
+.score-ring-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint); margin-top: 6px; font-weight: 700; }
+.score-text-block { min-width: 0; }
+.score-eyebrow { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 7px; }
+.score-eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
+.score-title { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 8px; }
+.score-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.score-detail { font-size: 14.5px; color: var(--text-dim); line-height: 1.6; }
+.score-detail strong { color: var(--text); }
+
+/* Revenue estimate strip */
+.revenue-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+@media (max-width: 600px) { .revenue-strip { grid-template-columns: 1fr; } }
+.revenue-tile { background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 12px; padding: 16px; }
+.revenue-tile-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); font-weight: 700; margin-bottom: 8px; }
+.revenue-tile-value { font-family: 'Geist Mono', monospace; font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: -0.015em; line-height: 1; }
+.revenue-tile-sub { font-size: 11px; color: var(--text-faint); margin-top: 6px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+
+/* Section header inside report */
+.report-block { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 26px 28px; }
+@media (max-width: 600px) { .report-block { padding: 20px 18px; } }
+.block-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.block-eyebrow { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); font-weight: 700; margin-bottom: 4px; }
+.block-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.block-meta { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.06em; }
+
+/* Findings list */
+.finding { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-top: 1px solid var(--border); }
+.finding:first-of-type { border-top: none; padding-top: 4px; }
+.finding-sev {
+  font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 5px; flex-shrink: 0;
+  margin-top: 2px; min-width: 56px; text-align: center;
+}
+.finding-sev.high { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
+.finding-sev.med { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-line); }
+.finding-sev.low { background: var(--cyan-soft); color: var(--cyan); border: 1px solid var(--cyan-line); }
+.finding-sev.good { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+.finding-body { flex: 1; min-width: 0; }
+.finding-area { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 4px; }
+.finding-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 5px; line-height: 1.3; }
+.finding-detail { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.finding-loss { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text-faint); margin-top: 6px; letter-spacing: 0.04em; }
+.finding-loss strong { color: var(--red); }
+
+/* Wins */
+.wins-tier { background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; }
+.wins-tier:last-child { margin-bottom: 0; }
+.wins-tier-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.wins-tier-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.wins-tier.quick .wins-tier-icon { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-line); }
+.wins-tier.medium .wins-tier-icon { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-line); }
+.wins-tier.major .wins-tier-icon { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-line); }
+.wins-tier-title { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; flex: 1; }
+.wins-tier-count { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.08em; padding: 2px 7px; border-radius: 5px; background: var(--surface-3); }
+.win-item { padding: 10px 0; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+.win-item:first-of-type { border-top: none; padding-top: 0; }
+.win-num { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; color: var(--text-faint); letter-spacing: 0.04em; flex-shrink: 0; padding-top: 1px; min-width: 22px; }
+.win-body { flex: 1; min-width: 0; }
+.win-title { font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 4px; }
+.win-detail { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+.win-meta { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.win-meta-chip { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); padding: 2px 7px; border-radius: 5px; background: var(--surface-3); border: 1px solid var(--border); }
+
+/* Final CTA */
+.final-cta {
+  text-align: center; padding: 40px 28px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--brand-line); border-radius: 18px;
+  margin-top: 18px; position: relative; overflow: hidden;
+}
+.final-cta::before { content: ''; position: absolute; top: -50%; left: -10%; right: -10%; height: 80%; background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--brand-glow), transparent 70%); filter: blur(40px); pointer-events: none; }
+.final-cta-content { position: relative; z-index: 1; }
+.final-cta-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 16px; }
+.final-cta-eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
+.final-cta h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 12px; }
+.final-cta h2 .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.final-cta-sub { font-size: 14.5px; color: var(--text-dim); max-width: 520px; margin: 0 auto 24px; line-height: 1.6; }
+.final-cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 28px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%);
+  color: #fff !important; font-size: 15px; font-weight: 700;
+  text-decoration: none; transition: all 0.22s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 20px var(--brand-glow);
+}
+.final-cta-btn:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 18px 40px rgba(255,106,0,0.42); }
+.final-cta-trust { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 18px; font-size: 11.5px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+.final-cta-trust span { display: inline-flex; align-items: center; gap: 6px; }
+.final-cta-trust svg { color: var(--brand); }
+
+/* Footer */
+.footer { padding: 32px 24px; text-align: center; border-top: 1px solid var(--border); margin-top: 60px; position: relative; z-index: 1; }
+.footer-text { font-size: 12px; color: var(--text-faint); font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+
+/* Loading button state */
+.btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spinAnim 0.8s linear infinite; }
+@keyframes spinAnim { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 18px; }
+  .hero { padding: 44px 0 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/" class="brand" style="text-decoration:none">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-text">AI Lead Intel</div>
+      <div class="brand-sub">Scanner</div>
+    </div>
+  </a>
+  <a href="/" class="tb-link">← Back to site</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow"><span class="pip"></span>AI Opportunity Scanner</div>
+    <h1>See what your business is <span class="accent">leaving on the table.</span></h1>
+    <p class="hero-sub">Our AI analyzes your business across 8 critical areas — missed calls, slow response, reviews, SEO, lead conversion, and more — then shows you exactly where the revenue is hiding.</p>
+    <div class="hero-trust">
+      <div class="hero-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>Free · No credit card</div>
+      <div class="hero-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>Under 60 seconds</div>
+      <div class="hero-trust-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>Personalized to your business</div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="form-section" id="form-section">
+    <div class="card">
+      <form id="scanner-form" novalidate>
+        <div class="form-grid">
+          <div class="field full">
+            <label class="field-label" for="business_name">Business Name</label>
+            <input class="field-input" type="text" id="business_name" name="business_name" required maxlength="200" placeholder="e.g. Steady Flow Plumbing" autocomplete="organization" />
+          </div>
+          <div class="field full">
+            <label class="field-label" for="website">Website</label>
+            <input class="field-input" type="url" id="website" name="website" required maxlength="300" placeholder="https://yourbusiness.com" autocomplete="url" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="owner_name">Your Name</label>
+            <input class="field-input" type="text" id="owner_name" name="owner_name" required maxlength="100" placeholder="First and last" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="industry">Industry</label>
+            <select class="field-select" id="industry" name="industry" required>
+              <option value="">Select industry…</option>
+              <option value="HVAC">HVAC</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Landscaping">Landscaping / Lawn Care</option>
+              <option value="Roofing">Roofing</option>
+              <option value="Self Storage">Self Storage</option>
+              <option value="Pest Control">Pest Control</option>
+              <option value="Cleaning">Cleaning Services</option>
+              <option value="Garage Door">Garage Door</option>
+              <option value="Tree Service">Tree Service</option>
+              <option value="Other">Other Service Business</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="email">Email</label>
+            <input class="field-input" type="email" id="email" name="email" required maxlength="150" placeholder="you@business.com" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="phone">Phone</label>
+            <input class="field-input" type="tel" id="phone" name="phone" required maxlength="30" placeholder="(555) 555-1234" autocomplete="tel" />
+          </div>
+        </div>
+        <div class="field-error" id="form-error"></div>
+        <button class="submit-btn" type="submit" id="submit-btn">
+          <span id="submit-btn-text">Run My Free Scan</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <p class="legal-note">Your information is private. We'll email your report and follow up — no spam.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ANALYZING -->
+  <section class="form-section" id="analyzing-section" style="display:none">
+    <div class="card analyzing-card active">
+      <div class="scan-head">
+        <div class="scan-pulse-wrap">
+          <div class="scan-pulse-core">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+        </div>
+        <div class="scan-head-text">
+          <div class="scan-head-eyebrow">AI Audit in progress</div>
+          <div class="scan-head-title" id="scan-title">Analyzing your business…</div>
+        </div>
+        <div class="scan-progress-pct" id="scan-pct">0%</div>
+      </div>
+      <div class="scan-progress-bar"><div class="scan-progress-fill" id="scan-progress-fill"></div></div>
+      <div class="scan-stages" id="scan-stages"></div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="report-section" id="report-section">
+    <!-- Score Card -->
+    <div class="score-card">
+      <div class="score-grid">
+        <div class="score-ring-wrap">
+          <svg class="score-ring" width="160" height="160" viewBox="0 0 160 160">
+            <defs>
+              <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff6a00"/>
+                <stop offset="100%" stop-color="#ff9a00"/>
+              </linearGradient>
+            </defs>
+            <circle class="score-ring-bg" cx="80" cy="80" r="68"></circle>
+            <circle class="score-ring-fg" id="score-ring-fg" cx="80" cy="80" r="68" stroke-dasharray="427" stroke-dashoffset="427"></circle>
+          </svg>
+          <div class="score-ring-text">
+            <div class="score-ring-num" id="score-num">—</div>
+            <div class="score-ring-label">Opportunity</div>
+          </div>
+        </div>
+        <div class="score-text-block">
+          <div class="score-eyebrow"><span class="pip"></span>Audit Complete</div>
+          <h2 class="score-title">Your <span class="accent">Revenue Opportunity Score</span></h2>
+          <p class="score-detail" id="score-detail">Loading your results…</p>
+        </div>
+      </div>
+      <div class="revenue-strip">
+        <div class="revenue-tile">
+          <div class="revenue-tile-label">Monthly Recovery Potential</div>
+          <div class="revenue-tile-value" id="rev-monthly">—</div>
+          <div class="revenue-tile-sub">Recoverable with AI receptionist</div>
+        </div>
+        <div class="revenue-tile">
+          <div class="revenue-tile-label">Annual Recovery Potential</div>
+          <div class="revenue-tile-value" id="rev-annual">—</div>
+          <div class="revenue-tile-sub">12-month projection</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Findings -->
+    <div class="report-block">
+      <div class="block-head">
+        <div>
+          <div class="block-eyebrow">Section 01 · Findings</div>
+          <div class="block-title">Where you're losing revenue</div>
+        </div>
+        <div class="block-meta" id="findings-count">—</div>
+      </div>
+      <div id="findings-list"></div>
+    </div>
+
+    <!-- Wins -->
+    <div class="report-block">
+      <div class="block-head">
+        <div>
+          <div class="block-eyebrow">Section 02 · Action Plan</div>
+          <div class="block-title">Wins ranked by impact and effort</div>
+        </div>
+        <div class="block-meta">9 recommendations</div>
+      </div>
+      <div id="wins-list"></div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="final-cta">
+      <div class="final-cta-content">
+        <div class="final-cta-eyebrow"><span class="pip"></span>Ready to recover this revenue?</div>
+        <h2>Deploy Riley — your AI receptionist — <span class="accent">in 5–7 days.</span></h2>
+        <p class="final-cta-sub">Start your 7-day free trial. We'll build, deploy, and tune your AI receptionist to capture every lead from day one.</p>
+        <a href="/" class="final-cta-btn">
+          Start 7-Day Free Trial
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div class="final-cta-trust">
+          <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>No charge today</span>
+          <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</span>
+          <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>Live within 7 days</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-text">© AI Lead Intel · Apex Growth Investments LLC · hello@aileadintel.com</div>
+</footer>
+
+<script>
+'use strict';
+
+// ============================================================
+// SCAN STAGES (theater)
+// ============================================================
+const STAGES = [
+  { id: 's1', icon: 'globe', text: 'Crawling website and meta data' },
+  { id: 's2', icon: 'map', text: 'Pulling Google Business Profile signals' },
+  { id: 's3', icon: 'star', text: 'Analyzing review patterns and sentiment' },
+  { id: 's4', icon: 'social', text: 'Scanning Facebook and Instagram presence' },
+  { id: 's5', icon: 'phone', text: 'Modeling missed call patterns' },
+  { id: 's6', icon: 'leads', text: 'Evaluating lead conversion flow' },
+  { id: 's7', icon: 'ads', text: 'Auditing ad spend efficiency' },
+  { id: 's8', icon: 'shield', text: 'Comparing competitor weaknesses' },
+  { id: 's9', icon: 'brain', text: 'Generating personalized action plan' },
+];
+
+const STAGE_ICONS = {
+  globe: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  map: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21 1 6"/></svg>',
+  star: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  social: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>',
+  phone: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  leads: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>',
+  ads: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
+  shield: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  brain: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15A2.5 2.5 0 0 0 9.5 22a2.5 2.5 0 0 0 2.5-2.5V4.5A2.5 2.5 0 0 0 9.5 2zM14.5 2A2.5 2.5 0 0 1 17 4.5v15a2.5 2.5 0 0 1-5 0V4.5A2.5 2.5 0 0 1 14.5 2z"/></svg>',
+  check: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>',
+};
+
+function buildStages() {
+  const el = document.getElementById('scan-stages');
+  el.innerHTML = STAGES.map(s => `
+    <div class="scan-stage" data-stage="${s.id}">
+      <div class="scan-stage-icon">${STAGE_ICONS[s.icon]}</div>
+      <div class="scan-stage-text">${s.text}</div>
+      <div class="scan-stage-tick">PENDING</div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function fmtNum(n) {
+  return new Intl.NumberFormat('en-US').format(Math.round(n));
+}
+
+// ============================================================
+// FORM SUBMISSION
+// ============================================================
+const form = document.getElementById('scanner-form');
+const errorEl = document.getElementById('form-error');
+const submitBtn = document.getElementById('submit-btn');
+const submitBtnText = document.getElementById('submit-btn-text');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorEl.textContent = '';
+
+  const fd = new FormData(form);
+  const data = {
+    business_name: (fd.get('business_name') || '').trim(),
+    website: (fd.get('website') || '').trim(),
+    owner_name: (fd.get('owner_name') || '').trim(),
+    email: (fd.get('email') || '').trim(),
+    phone: (fd.get('phone') || '').trim(),
+    industry: (fd.get('industry') || '').trim(),
+  };
+
+  // Light client validation
+  if (!data.business_name) return showError('Please enter your business name.');
+  if (!data.website) return showError('Please enter your website.');
+  if (!/^https?:\/\/.+\..+/.test(data.website)) return showError('Please enter a full website URL (https://...).');
+  if (!data.owner_name) return showError('Please enter your name.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return showError('Please enter a valid email.');
+  if (data.phone.length < 7) return showError('Please enter a valid phone number.');
+  if (!data.industry) return showError('Please select your industry.');
+
+  // Show submitting state
+  submitBtn.disabled = true;
+  submitBtnText.textContent = 'Starting scan…';
+
+  // Kick off the API call AND the animation in parallel.
+  // We require BOTH to finish before showing the report — so the analysis
+  // always looks like it took the full animation length.
+  const apiPromise = fetch('/api/scanner-submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }).then(async r => {
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(j.error || 'Request failed');
+    }
+    return r.json();
+  });
+
+  // Switch to analyzing view
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('analyzing-section').style.display = 'block';
+  buildStages();
+  document.getElementById('analyzing-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const animPromise = runAnalysisAnimation();
+
+  try {
+    const [result] = await Promise.all([apiPromise, animPromise]);
+    renderReport(result);
+  } catch (err) {
+    console.error('[scanner] error:', err);
+    document.getElementById('analyzing-section').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    submitBtn.disabled = false;
+    submitBtnText.textContent = 'Run My Free Scan';
+    showError(err.message === 'Too many scans. Try again later.'
+      ? 'You\'ve run several scans recently. Please try again in an hour.'
+      : 'Scan failed. Please check your details and try again.');
+  }
+});
+
+function showError(msg) {
+  errorEl.textContent = msg;
+  submitBtn.disabled = false;
+  submitBtnText.textContent = 'Run My Free Scan';
+}
+
+// ============================================================
+// ANIMATION
+// ============================================================
+function runAnalysisAnimation() {
+  return new Promise(resolve => {
+    const titleEl = document.getElementById('scan-title');
+    const pctEl = document.getElementById('scan-pct');
+    const fillEl = document.getElementById('scan-progress-fill');
+    const TOTAL_DURATION = 11500; // 11.5 seconds total
+    const stageDuration = TOTAL_DURATION / STAGES.length;
+    let i = 0;
+
+    function runStage() {
+      if (i > 0) {
+        const prev = document.querySelector(`[data-stage="${STAGES[i-1].id}"]`);
+        if (prev) {
+          prev.classList.remove('running');
+          prev.classList.add('done');
+          const tick = prev.querySelector('.scan-stage-tick');
+          if (tick) tick.innerHTML = STAGE_ICONS.check;
+        }
+      }
+
+      if (i >= STAGES.length) {
+        pctEl.textContent = '100%';
+        fillEl.style.width = '100%';
+        titleEl.textContent = 'Report ready';
+        setTimeout(resolve, 350);
+        return;
+      }
+
+      const stage = STAGES[i];
+      const el = document.querySelector(`[data-stage="${stage.id}"]`);
+      if (el) {
+        el.classList.add('running');
+        const tick = el.querySelector('.scan-stage-tick');
+        if (tick) tick.textContent = 'RUNNING';
+      }
+      titleEl.textContent = stage.text + '…';
+
+      // Animate progress smoothly across the stage's duration
+      const startPct = (i / STAGES.length) * 100;
+      const endPct = ((i + 1) / STAGES.length) * 100;
+      const stageStart = Date.now();
+      const tick = setInterval(() => {
+        const elapsed = Date.now() - stageStart;
+        const ratio = Math.min(1, elapsed / stageDuration);
+        const pct = startPct + (endPct - startPct) * ratio;
+        pctEl.textContent = Math.round(pct) + '%';
+        fillEl.style.width = pct.toFixed(1) + '%';
+        if (ratio >= 1) clearInterval(tick);
+      }, 60);
+
+      i++;
+      setTimeout(runStage, stageDuration);
+    }
+
+    runStage();
+  });
+}
+
+// ============================================================
+// REPORT RENDER
+// ============================================================
+function renderReport(data) {
+  document.getElementById('analyzing-section').style.display = 'none';
+  const report = document.getElementById('report-section');
+  report.classList.add('active');
+
+  // Score
+  document.getElementById('score-num').textContent = data.score;
+  const circumference = 2 * Math.PI * 68; // ~427
+  const offset = circumference - (data.score / 100) * circumference;
+  setTimeout(() => {
+    document.getElementById('score-ring-fg').setAttribute('stroke-dashoffset', offset);
+  }, 80);
+
+  const tier = data.score < 40 ? 'massive' : data.score < 60 ? 'significant' : data.score < 80 ? 'moderate' : 'modest';
+  const tierDesc = {
+    massive: 'You\'re leaving a <strong>massive amount of revenue</strong> on the table.',
+    significant: 'You have <strong>significant revenue opportunity</strong> waiting to be recovered.',
+    moderate: 'There\'s <strong>moderate opportunity</strong> for revenue growth.',
+    modest: 'You\'re doing well — and there\'s still <strong>room to optimize</strong>.',
+  };
+  const highCount = data.findings.filter(f => f.severity === 'high').length;
+  document.getElementById('score-detail').innerHTML = `
+    ${tierDesc[tier]} We found <strong>${highCount} high-severity issue${highCount !== 1 ? 's' : ''}</strong> across ${data.findings.length} problem areas. The good news: most are fixable in days, not months.
+  `;
+
+  // Revenue
+  document.getElementById('rev-monthly').textContent = `$${fmtNum(data.estimate.monthly_low)} – $${fmtNum(data.estimate.monthly_high)}`;
+  document.getElementById('rev-annual').textContent = `$${fmtNum(data.estimate.annual_low)} – $${fmtNum(data.estimate.annual_high)}`;
+
+  // Findings
+  const highSorted = [...data.findings].sort((a, b) => {
+    const order = { high: 0, med: 1, low: 2, good: 3 };
+    return order[a.severity] - order[b.severity];
+  });
+  const issuesText = `${highSorted.filter(f => f.severity === 'high').length} high · ${highSorted.filter(f => f.severity === 'med').length} medium`;
+  document.getElementById('findings-count').textContent = issuesText;
+  document.getElementById('findings-list').innerHTML = highSorted.map(f => `
+    <div class="finding">
+      <div class="finding-sev ${escapeHtml(f.severity)}">${escapeHtml(f.severity)}</div>
+      <div class="finding-body">
+        <div class="finding-area">${escapeHtml(f.area)}</div>
+        <div class="finding-title">${escapeHtml(f.title)}</div>
+        <div class="finding-detail">${escapeHtml(f.detail)}</div>
+        ${f.estimated_loss_low || f.estimated_loss_high ? `<div class="finding-loss">Estimated loss: <strong>$${fmtNum(f.estimated_loss_low || 0)}–$${fmtNum(f.estimated_loss_high || 0)}/mo</strong></div>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  // Wins
+  const wins = data.wins;
+  document.getElementById('wins-list').innerHTML = `
+    ${winsTier('quick', 'Quick Wins · Deployable in days', wins.quick)}
+    ${winsTier('medium', 'Medium Wins · 2–4 weeks', wins.medium)}
+    ${winsTier('major', 'Major Wins · 4–10 weeks', wins.major)}
+  `;
+
+  report.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function winsTier(key, label, items) {
+  const icons = {
+    quick: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    medium: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    major: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  };
+  return `
+    <div class="wins-tier ${key}">
+      <div class="wins-tier-head">
+        <div class="wins-tier-icon">${icons[key]}</div>
+        <div class="wins-tier-title">${escapeHtml(label)}</div>
+        <div class="wins-tier-count">${items.length}</div>
+      </div>
+      ${items.map((w, i) => `
+        <div class="win-item">
+          <div class="win-num">0${i + 1}</div>
+          <div class="win-body">
+            <div class="win-title">${escapeHtml(w.title)}</div>
+            <div class="win-detail">${escapeHtml(w.detail)}</div>
+            <div class="win-meta">
+              ${w.effort ? `<span class="win-meta-chip">Effort · ${escapeHtml(w.effort)}</span>` : ''}
+              ${w.timeline ? `<span class="win-meta-chip">Timeline · ${escapeHtml(w.timeline)}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
