@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI Lead Intel — Mission Control</title>
+<style>
+/* ============================================================
+   AI LEAD INTEL — MISSION CONTROL  (the operating system)
+   Daily homepage. Answers: what's making money, what's broken,
+   who needs help, what's failing, what to do today, competitors,
+   what to build next, opportunities, risks, company health.
+   Self-contained. Demo data now; hooks documented at end of script.
+   ============================================================ */
+:root{
+  --bg:#06070c; --bg2:#0a0d16; --panel:rgba(17,21,33,.72); --panel2:rgba(22,27,42,.6);
+  --brd:rgba(120,140,200,.14); --brd2:rgba(120,140,200,.26);
+  --txt:#e9edf7; --dim:#8b93ac; --faint:#5a6379;
+  --blue:#5b8cff; --violet:#9b6bff; --green:#22d3a7; --gold:#ffc24b; --red:#ff6b7d; --amber:#ff9f43;
+  --r:18px; --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font);color:var(--txt);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1100px 700px at 78% -8%,rgba(91,140,255,.10),transparent 55%),
+    radial-gradient(900px 650px at 0% 108%,rgba(155,107,255,.10),transparent 55%),
+    var(--bg);
+  display:flex;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-thumb{background:rgba(120,140,200,.22);border-radius:6px;}
+a{color:inherit;text-decoration:none;}
+
+/* ---------- Sidebar ---------- */
+.side{position:fixed;top:0;left:0;bottom:0;width:230px;z-index:50;display:flex;flex-direction:column;
+  padding:20px 14px;background:linear-gradient(180deg,rgba(10,13,22,.9),rgba(8,10,16,.75));
+  border-right:1px solid var(--brd);backdrop-filter:blur(20px);}
+.logo{display:flex;align-items:center;gap:11px;padding:4px 8px 18px;}
+.logo .orb{width:32px;height:32px;border-radius:9px;position:relative;
+  background:conic-gradient(from 200deg,var(--blue),var(--violet),var(--green),var(--blue));box-shadow:0 0 20px rgba(91,140,255,.5);}
+.logo .orb::after{content:"";position:absolute;inset:6px;border-radius:5px;background:var(--bg);}
+.logo b{font-size:14px;font-weight:650;letter-spacing:.2px;}
+.logo span{display:block;font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-top:1px;}
+.nav{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.nav .lbl{font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);padding:14px 12px 6px;}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:13.5px;color:var(--dim);cursor:pointer;transition:.15s;}
+.nav a:hover{color:var(--txt);background:rgba(255,255,255,.04);}
+.nav a.active{color:#fff;background:linear-gradient(90deg,rgba(91,140,255,.22),rgba(155,107,255,.10));border:1px solid rgba(91,140,255,.3);}
+.nav a .ic{width:17px;text-align:center;font-size:14px;opacity:.9;}
+.nav a .badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(255,107,125,.18);color:var(--red);}
+.side .health-mini{margin-top:auto;background:var(--panel);border:1px solid var(--brd);border-radius:14px;padding:13px;}
+.side .health-mini .t{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);}
+.side .health-mini .n{font-size:26px;font-weight:720;color:var(--green);margin-top:3px;}
+.side .health-mini .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden;}
+.side .health-mini .bar i{display:block;height:100%;width:82%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:3px;}
+
+/* ---------- Main ---------- */
+.main{margin-left:230px;flex:1;padding:26px 34px 60px;max-width:1500px;}
+.topbar{display:flex;align-items:flex-end;gap:18px;margin-bottom:26px;}
+.topbar h1{font-size:25px;font-weight:700;letter-spacing:-.3px;}
+.topbar .sub{color:var(--dim);font-size:13.5px;margin-top:3px;}
+.topbar .clock{margin-left:auto;text-align:right;}
+.topbar .clock .d{font-size:13px;color:var(--dim);}
+.topbar .clock .t{font-size:20px;font-weight:650;font-variant-numeric:tabular-nums;}
+
+.view{display:none;animation:fade .35s ease;}
+.view.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--brd);border-radius:var(--r);backdrop-filter:blur(18px);padding:20px;}
+.card h2{font-size:15px;font-weight:640;display:flex;align-items:center;gap:9px;margin-bottom:4px;}
+.card .csub{font-size:12px;color:var(--faint);margin-bottom:16px;}
+.grid{display:grid;gap:16px;}
+.tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:7px;font-weight:700;}
+.tag.ok{background:rgba(34,211,167,.14);color:var(--green);}
+.tag.warn{background:rgba(255,159,67,.16);color:var(--amber);}
+.tag.bad{background:rgba(255,107,125,.16);color:var(--red);}
+.tag.info{background:rgba(91,140,255,.16);color:var(--blue);}
+.pill{font-size:11px;color:var(--dim);}
+.delta.up{color:var(--green);} .delta.down{color:var(--red);}
+
+/* hero overview */
+.hero{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-bottom:16px;}
+.gauge-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.gauge{position:relative;width:190px;height:190px;}
+.gauge svg{transform:rotate(-90deg);}
+.gauge .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.gauge .val b{font-size:48px;font-weight:760;line-height:1;}
+.gauge .val span{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-top:4px;}
+.gauge-card .label{margin-top:14px;font-size:13px;color:var(--dim);}
+.gauge-card .label b{color:var(--green);}
+
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.kpi{background:var(--panel);border:1px solid var(--brd);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;justify-content:space-between;}
+.kpi .l{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);}
+.kpi .v{font-size:30px;font-weight:720;margin-top:8px;letter-spacing:-.5px;}
+.kpi .v.green{color:var(--green);}.kpi .v.blue{color:var(--blue);}.kpi .v.violet{color:var(--violet);}
+.kpi .f{font-size:12px;margin-top:8px;color:var(--dim);}
+.spark{height:34px;margin-top:10px;}
+
+/* today's focus */
+.focus-card{margin-bottom:16px;}
+.focus{display:flex;flex-direction:column;gap:10px;}
+.act{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:var(--panel2);border:1px solid var(--brd);transition:.15s;cursor:pointer;}
+.act:hover{border-color:var(--brd2);transform:translateX(3px);}
+.act .rank{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:760;font-size:13px;flex:none;}
+.act .body{flex:1;}
+.act .body .t{font-size:14px;font-weight:600;}
+.act .body .d{font-size:12.5px;color:var(--dim);margin-top:2px;}
+.act .impact{text-align:right;flex:none;}
+.act .impact .m{font-size:16px;font-weight:700;color:var(--green);}
+.act .impact .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.8px;}
+
+/* glance grid (answers the 10 questions) */
+.glance{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.gcard{background:var(--panel);border:1px solid var(--brd);border-radius:16px;padding:17px;cursor:pointer;transition:.18s;position:relative;overflow:hidden;}
+.gcard:hover{border-color:var(--brd2);transform:translateY(-3px);}
+.gcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);}
+.gcard.green::before{background:var(--green);}.gcard.red::before{background:var(--red);}.gcard.amber::before{background:var(--amber);}.gcard.violet::before{background:var(--violet);}
+.gcard .q{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.7px;}
+.gcard .a{font-size:21px;font-weight:700;margin-top:8px;letter-spacing:-.3px;}
+.gcard .x{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.4;}
+.gcard .go{font-size:11px;color:var(--blue);margin-top:11px;}
+
+/* tables / lists */
+.row{display:flex;align-items:center;gap:14px;padding:13px 4px;border-bottom:1px solid var(--brd);}
+.row:last-child{border-bottom:none;}
+.row .av{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none;background:rgba(91,140,255,.16);color:#bcd0ff;}
+.row .grow{flex:1;}
+.row .name{font-size:13.5px;font-weight:600;}
+.row .meta{font-size:12px;color:var(--faint);margin-top:1px;}
+.row .right{text-align:right;}
+.hbar{width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;}
+.hbar i{display:block;height:100%;border-radius:3px;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:1100px){.glance{grid-template-columns:repeat(2,1fr);}.hero{grid-template-columns:1fr;}.kpis{grid-template-columns:1fr;}.two{grid-template-columns:1fr;}}
+@media(max-width:760px){.side{transform:translateX(-100%);}.main{margin-left:0;padding:18px;}.glance{grid-template-columns:1fr;}}
+
+/* system map */
+#mapWrap{position:relative;height:560px;border-radius:var(--r);overflow:hidden;border:1px solid var(--brd);background:#05060a;}
+#mapCanvas{width:100%;height:100%;display:block;cursor:grab;}
+.map-legend{position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap;}
+.map-legend .lg{font-size:10px;color:var(--dim);background:rgba(10,13,22,.7);border:1px solid var(--brd);padding:4px 9px;border-radius:8px;display:flex;align-items:center;gap:6px;}
+.map-legend .lg i{width:8px;height:8px;border-radius:50%;}
+.note{font-size:12px;color:var(--faint);background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.22);border-radius:11px;padding:11px 14px;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start;}
+.note b{color:var(--amber);}
+</style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="side">
+  <div class="logo"><div class="orb"></div><div><b>AI Lead Intel</b><span>Mission Control</span></div></div>
+  <nav class="nav" id="nav">
+    <div class="lbl">Command</div>
+    <a data-view="overview" class="active"><span class="ic">◎</span> Overview</a>
+    <a data-view="revenue"><span class="ic">$</span> Revenue Center</a>
+    <a data-view="customers"><span class="ic">♥</span> Customer Health <span class="badge">3</span></a>
+    <a data-view="systems"><span class="ic">⚡</span> System Health <span class="badge">2</span></a>
+    <div class="lbl">Growth</div>
+    <a data-view="growth"><span class="ic">↗</span> Growth Engine</a>
+    <a data-view="competitors"><span class="ic">⚔</span> Competitor Intel</a>
+    <a data-view="roadmap"><span class="ic">⚑</span> Risks &amp; Roadmap</a>
+  </nav>
+  <div class="health-mini">
+    <div class="t">Company Health</div><div class="n">82</div>
+    <div class="bar"><i></i></div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <h1 id="greeting">Good morning, Andrew</h1>
+      <div class="sub" id="oneliner">Loading the state of the business…</div>
+    </div>
+    <div class="clock"><div class="d" id="dateStr">—</div><div class="t" id="timeStr">—</div></div>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section class="view active" id="view-overview">
+    <div class="hero">
+      <div class="card gauge-card">
+        <div class="gauge">
+          <svg width="190" height="190" viewBox="0 0 190 190">
+            <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14"/>
+            <circle id="gaugeArc" cx="95" cy="95" r="82" fill="none" stroke="url(#gg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"/>
+            <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3a7"/><stop offset="1" stop-color="#5b8cff"/></linearGradient></defs>
+          </svg>
+          <div class="val"><b id="healthNum">0</b><span>Health Score</span></div>
+        </div>
+        <div class="label">Up <b>+4 pts</b> vs last week · Grade <b>B+</b></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="l">Revenue Saved · MTD</div><div class="v green" id="kRev">$0</div><div class="f"><span class="delta up">▲ 18%</span> vs last month</div><canvas class="spark" id="spark1"></canvas></div>
+        <div class="kpi"><div class="l">Monthly Recurring Rev</div><div class="v blue" id="kMrr">$0</div><div class="f"><span class="delta up">▲ 2 new</span> Pro this week</div><canvas class="spark" id="spark2"></canvas></div>
+        <div class="kpi"><div class="l">Active Customers</div><div class="v violet" id="kCust">0</div><div class="f"><span class="delta up">▲ 3</span> trials converting</div><canvas class="spark" id="spark3"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card focus-card">
+      <h2>🎯 Today's Focus</h2>
+      <div class="csub">Ranked by revenue impact — what to work on right now (AI Recommendations engine)</div>
+      <div class="focus" id="focusList"></div>
+    </div>
+
+    <div class="glance" id="glance"></div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>📡 Live Activity</h2>
+      <div class="csub">Real-time events across all customers — calls, recoveries, replies, revenue</div>
+      <div id="liveFeed"></div>
+    </div>
+  </section>
+
+  <!-- ===== REVENUE ===== -->
+  <section class="view" id="view-revenue">
+    <div class="kpis" style="margin-bottom:16px">
+      <div class="kpi"><div class="l">Revenue Saved (MTD)</div><div class="v green">$18,420</div><div class="f">Recovered missed calls × close rate × avg job value</div></div>
+      <div class="kpi"><div class="l">Est. Revenue Generated</div><div class="v blue">$37,380</div><div class="f">Booked appointments attributed to AI</div></div>
+      <div class="kpi"><div class="l">Blended ROI</div><div class="v violet">63×</div><div class="f">Revenue vs platform cost across customers</div></div>
+    </div>
+    <div class="two">
+      <div class="card"><h2>What's making money</h2><div class="csub">Top revenue drivers this month</div><div id="revDrivers"></div></div>
+      <div class="card"><h2>Revenue by customer</h2><div class="csub">Where the value is concentrated</div><div id="revByCust"></div></div>
+    </div>
+  </section>
+
+  <!-- ===== CUSTOMERS ===== -->
+  <section class="view" id="view-customers">
+    <div class="note">⚠ <div><b>Needs real data.</b> Health scores below are illustrative. Wire to Supabase customer + usage tables (see hooks in code) to make this live.</div></div>
+    <div class="card"><h2>♥ Customer Health</h2><div class="csub">Sorted by churn risk — who to call today</div><div id="custList"></div></div>
+  </section>
+
+  <!-- ===== SYSTEMS ===== -->
+  <section class="view" id="view-systems">
+    <div class="two" style="margin-bottom:16px">
+      <div class="card"><h2>⚡ Automations</h2><div class="csub">What's running and what's failing</div><div id="autoList"></div></div>
+      <div class="card"><h2>Integrations</h2><div class="csub">Connected services status</div><div id="intList"></div></div>
+    </div>
+    <div class="card">
+      <h2>🧠 System Map</h2><div class="csub">Live wiring of every system — click a node for detail · drag to pan · scroll to zoom</div>
+      <div id="mapWrap">
+        <div class="map-legend">
+          <span class="lg"><i style="background:#fff"></i>Core</span>
+          <span class="lg"><i style="background:#5b8cff"></i>Systems</span>
+          <span class="lg"><i style="background:#9b6bff"></i>Pages</span>
+          <span class="lg"><i style="background:#22d3a7"></i>Integrations</span>
+          <span class="lg"><i style="background:#ffc24b"></i>AI</span>
+        </div>
+        <canvas id="mapCanvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GROWTH ===== -->
+  <section class="view" id="view-growth">
+    <div class="kpis" style="margin-bottom:16px">
+      <div class="kpi"><div class="l">Trials Active</div><div class="v blue">14</div><div class="f"><span class="delta up">▲ 5</span> this week</div></div>
+      <div class="kpi"><div class="l">Trial → Paid CVR</div><div class="v green">31%</div><div class="f"><span class="delta up">▲ 4pts</span> after onboarding fix</div></div>
+      <div class="kpi"><div class="l">Pipeline Value</div><div class="v violet">$8.3k</div><div class="f">MRR if trials convert</div></div>
+    </div>
+    <div class="card"><h2>↗ Biggest opportunities</h2><div class="csub">Ranked by estimated upside</div><div id="oppList"></div></div>
+  </section>
+
+  <!-- ===== COMPETITORS ===== -->
+  <section class="view" id="view-competitors">
+    <div class="note">⚠ <div><b>Needs a data source.</b> Competitor moves require a feed (news/pricing scrape or manual entry). Below is seeded illustrative intel — see hooks.</div></div>
+    <div class="card"><h2>⚔ Competitor Intelligence</h2><div class="csub">What Smith.ai, CallRail, Goodcall & My AI Front Desk are doing</div><div id="compList"></div></div>
+  </section>
+
+  <!-- ===== ROADMAP ===== -->
+  <section class="view" id="view-roadmap">
+    <div class="two">
+      <div class="card"><h2>⚑ Biggest risks</h2><div class="csub">What could cost you revenue or customers</div><div id="riskList"></div></div>
+      <div class="card"><h2>🛠 What to build next</h2><div class="csub">Scored against your 5 development rules</div><div id="featList"></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =====================================================================
+   DEMO DATA  (replace with Supabase / AI calls — see hooks at bottom)
+   ===================================================================== */
+const DATA = {
+  health: 82,
+  revenueSaved: 18420, mrr: 4158, customers: 14,
+
+  focus: [ // AI Recommendations — answers "what to work on today" (#5)
+    {t:"Call Summit Self Storage — usage dropped 40%", d:"Churn risk. No logins in 9 days; missed-call recovery still firing but owner disengaged.", impact:"$297", k:"MRR at risk", c:"red"},
+    {t:"Twilio SMS error rate climbing (7 failures)", d:"Texts to 2 customers' leads failing. Likely A2P registration. Fix before it costs booked jobs.", impact:"~$1.4k", k:"leads at risk", c:"amber"},
+    {t:"Convert 3 trials ending in 48h", d:"Sunrise HVAC, Apex Roofing, GreenScape all hit activation. Send the ROI report + a nudge.", impact:"$891", k:"new MRR", c:"green"},
+    {t:"Publish 'AI receptionist' landing variant", d:"Matches top search demand. Current headline under-indexes on the keyword customers actually use.", impact:"+0.8% CVR", k:"acquisition", c:"blue"},
+  ],
+
+  glance:[ // the 10 questions, summarized
+    {q:"What's making money",a:"Missed Call Recovery",x:"$18.4k saved MTD · 62% recovery rate",go:"Revenue Center →",c:"green",view:"revenue"},
+    {q:"What's broken",a:"2 automations failing",x:"Twilio SMS + 1 booking webhook",go:"System Health →",c:"red",view:"systems"},
+    {q:"Who needs help",a:"3 customers at risk",x:"Summit Storage, Bayside Plumbing +1",go:"Customer Health →",c:"amber",view:"customers"},
+    {q:"Biggest opportunity",a:"$2.6k/mo upside",x:"Upsell 6 Starter accounts to Pro",go:"Growth Engine →",c:"violet",view:"growth"},
+    {q:"Biggest risk",a:"Single Twilio number",x:"No failover if the line goes down",go:"Risks →",c:"red",view:"roadmap"},
+    {q:"Competitors",a:"3 moves this week",x:"CallRail cut pricing; Goodcall added booking",go:"Competitor Intel →",c:"blue",view:"competitors"},
+    {q:"Build next",a:"Revenue Center v2",x:"Highest ROI-proof per dev rules",go:"Roadmap →",c:"violet",view:"roadmap"},
+    {q:"Company health",a:"82 / 100 · B+",x:"Up 4 pts — response speed improved",go:"Overview",c:"green",view:"overview"},
+  ],
+
+  feed:[
+    {type:'missed-call',title:'Missed call recovered',sub:'HVAC lead · text-back in 11s',at:new Date(Date.now()-120000)},
+    {type:'revenue',title:'Revenue logged',sub:'+$420 job booked',at:new Date(Date.now()-300000)},
+    {type:'sms',title:'Lead replied',sub:'"Yes, what times are open?"',at:new Date(Date.now()-600000)},
+    {type:'call',title:'Call answered',sub:'+1 906 555 0148',at:new Date(Date.now()-900000)},
+  ],
+  revDrivers:[
+    {n:"Missed Call Recovery",v:"$18,420",p:62,c:"#22d3a7",m:"137 calls recovered"},
+    {n:"Appointment Booking",v:"$9,340",p:34,c:"#5b8cff",m:"89 jobs booked"},
+    {n:"After-hours capture",v:"$6,120",p:22,c:"#9b6bff",m:"41 leads · 6pm–8am"},
+    {n:"SMS re-engagement",v:"$3,500",p:14,c:"#ffc24b",m:"48% reply rate"},
+  ],
+  revByCust:[
+    {n:"Apex Roofing",v:"$6,800",p:90,c:"#22d3a7"},
+    {n:"Sunrise HVAC",v:"$4,210",p:62,c:"#5b8cff"},
+    {n:"Bayside Plumbing",v:"$3,150",p:46,c:"#9b6bff"},
+    {n:"GreenScape Lawn",v:"$2,090",p:30,c:"#ffc24b"},
+    {n:"Summit Self Storage",v:"$1,170",p:17,c:"#ff6b7d"},
+  ],
+  customersList:[
+    {n:"Summit Self Storage",ind:"Self Storage · Pro",score:34,risk:"High churn risk",note:"No login 9d · usage −40%",c:"#ff6b7d"},
+    {n:"Bayside Plumbing",ind:"Plumbing · Starter",score:51,risk:"Watch",note:"SMS failures hurting recovery",c:"#ff9f43"},
+    {n:"Metro Med Spa",ind:"Med Spa · Starter",score:58,risk:"Watch",note:"Low booking conversion",c:"#ff9f43"},
+    {n:"Sunrise HVAC",ind:"HVAC · Pro",score:79,risk:"Healthy",note:"Strong recovery + bookings",c:"#22d3a7"},
+    {n:"Apex Roofing",ind:"Roofing · Pro",score:91,risk:"Champion",note:"63× ROI · referral candidate",c:"#22d3a7"},
+    {n:"GreenScape Lawn",ind:"Landscaping · Starter",score:84,risk:"Healthy",note:"Trial converted, ramping",c:"#22d3a7"},
+  ],
+  automations:[
+    {n:"Missed-call text-back",s:"ok",d:"Firing · avg 11s"},
+    {n:"Appointment booking webhook",s:"bad",d:"1 endpoint timing out (Metro Med Spa)"},
+    {n:"Owner email notifications",s:"ok",d:"Delivering · 99.6%"},
+    {n:"SMS two-way",s:"warn",d:"7 send failures · likely A2P"},
+    {n:"Monthly report generation",s:"ok",d:"Next run Jun 1"},
+    {n:"Lead capture (forms+voice)",s:"ok",d:"100% capture"},
+  ],
+  integrations:[
+    {n:"Vapi (Voice)",s:"ok"},{n:"Twilio (SMS)",s:"warn"},{n:"Resend (Email)",s:"ok"},
+    {n:"Supabase (DB)",s:"ok"},{n:"PayPal (Billing)",s:"ok"},{n:"Vercel (Hosting)",s:"ok"},
+    {n:"GitHub (Deploys)",s:"ok"},{n:"Claude (AI)",s:"ok"},{n:"ChatGPT (AI)",s:"ok"},
+  ],
+  opportunities:[
+    {t:"Upsell 6 Starter → Pro",d:"All 6 hit usage that justifies advanced reporting.",v:"+$1,200/mo",c:"violet"},
+    {t:"Reactivate 4 churned trials",d:"Dropped at number-forwarding step. New setup flow fixes it.",v:"+$388/mo",c:"blue"},
+    {t:"Add Self Storage to landing",d:"Your #1 target industry has no dedicated page.",v:"+CVR",c:"green"},
+    {t:"Referral ask to Apex Roofing",d:"63× ROI champion — prime for a case study + referral.",v:"+2 deals",c:"green"},
+  ],
+  competitors:[
+    {n:"CallRail",t:"Cut entry pricing ~15%",d:"Pressures Starter. Lean on ROI proof, not price.",tag:"warn"},
+    {n:"Goodcall",t:"Added native booking",d:"Closes a gap. Your booking + revenue attribution still differentiates.",tag:"info"},
+    {n:"Smith.ai",t:"Pushing 'human + AI' angle",d:"Positions against pure-AI. Counter with speed + 24/7 + cost.",tag:"info"},
+    {n:"My AI Front Desk",t:"Heavy on 'AI receptionist' SEO",d:"Owns the keyword you under-index on. Ship the landing variant.",tag:"bad"},
+  ],
+  risks:[
+    {t:"Single Twilio number, no failover",sev:"High",d:"If the line drops, recovery stops for everyone.",c:"bad"},
+    {t:"Revenue attribution unaudited",sev:"Med",d:"'Revenue saved' math must stay defensible — it's your whole pitch.",c:"warn"},
+    {t:"3 customers disengaged",sev:"High",d:"$891 MRR with no recent logins.",c:"bad"},
+    {t:"No usage-based churn alerts",sev:"Med",d:"You find out about churn after it happens, not before.",c:"warn"},
+  ],
+  features:[
+    {t:"Revenue Center v2",why:"Proves ROI (#1 anti-churn lever)",score:"5/5",c:"violet"},
+    {t:"Churn-risk alerts",why:"Keeps customers · reduces support",score:"4/5",c:"blue"},
+    {t:"Industry landing pages",why:"Gets customers (Self Storage first)",score:"4/5",c:"green"},
+    {t:"Monthly auto-reports",why:"Proves value · retention",score:"4/5",c:"green"},
+    {t:"AI Opportunity Scanner",why:"Premium upsell · perceived value",score:"3/5",c:"amber"},
+  ],
+};
+
+/* =====================================================================
+   RENDER HELPERS
+   ===================================================================== */
+const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const sevColor={ok:'var(--green)',warn:'var(--amber)',bad:'var(--red)',info:'var(--blue)'};
+function countUp(node,target,prefix='',suffix=''){let v=0;const step=target/40;const id=setInterval(()=>{v+=step;if(v>=target){v=target;clearInterval(id);}node.textContent=prefix+Math.round(v).toLocaleString()+suffix;},16);}
+
+function renderOverview(){
+  // gauge
+  const arc=$('#gaugeArc'),C=515;arc.style.transition='stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)';
+  setTimeout(()=>arc.style.strokeDashoffset=C*(1-DATA.health/100),120);
+  countUp($('#healthNum'),DATA.health);
+  countUp($('#kRev'),DATA.revenueSaved,'$');countUp($('#kMrr'),DATA.mrr,'$');countUp($('#kCust'),DATA.customers);
+  // focus
+  const f=$('#focusList');f.innerHTML='';DATA.focus.forEach((a,i)=>{
+    const colors={red:'var(--red)',amber:'var(--amber)',green:'var(--green)',blue:'var(--blue)'};
+    const r=el('div','act');
+    r.innerHTML=`<div class="rank" style="background:${colors[a.c]}22;color:${colors[a.c]}">${i+1}</div>
+      <div class="body"><div class="t">${a.t}</div><div class="d">${a.d}</div></div>
+      <div class="impact"><div class="m">${a.impact}</div><div class="k">${a.k}</div></div>`;
+    f.appendChild(r);});
+  // glance
+  const g=$('#glance');g.innerHTML='';DATA.glance.forEach(c=>{
+    const card=el('div','gcard '+c.c);
+    card.innerHTML=`<div class="q">${c.q}</div><div class="a">${c.a}</div><div class="x">${c.x}</div><div class="go">${c.go}</div>`;
+    card.onclick=()=>switchView(c.view);g.appendChild(card);});
+  // sparks
+  ['spark1','spark2','spark3'].forEach((id,k)=>drawSpark(id,k));
+  renderFeed();
+}
+function renderFeed(){
+  const f=$('#liveFeed'); if(!f) return; f.innerHTML='';
+  const colors={call:'#5b8cff','missed-call':'#ff9f43',revenue:'#22d3a7',sms:'#9b6bff',lead:'#5b8cff'};
+  const list=DATA.feed||[];
+  if(!list.length){ f.innerHTML='<div class="meta" style="padding:12px;color:var(--faint)">No activity yet — events appear here as calls and texts come in.</div>'; return; }
+  list.forEach(e=>{ const col=colors[e.type]||'#5b8cff';
+    const t=e.at? new Date(e.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+    f.appendChild(el('div','row',`<span style="width:9px;height:9px;border-radius:50%;background:${col};box-shadow:0 0 8px ${col};flex:none;margin-top:5px"></span><div class="grow"><div class="name">${e.title}</div><div class="meta">${e.sub||''}</div></div><span class="pill">${t}</span>`)); });
+}
+function drawSpark(id,seed){const cv=document.getElementById(id);if(!cv)return;const dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||220,h=34;cv.width=w*dpr;cv.height=h*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  const cols=['#22d3a7','#5b8cff','#9b6bff'];const n=24;let pts=[];let v=10+seed*5;
+  for(let i=0;i<n;i++){v+=(Math.sin(i*0.6+seed)+Math.random()*0.8)*3;pts.push(Math.max(2,v));}
+  const max=Math.max(...pts),min=Math.min(...pts);c.beginPath();
+  pts.forEach((p,i)=>{const x=i/(n-1)*w,y=h-((p-min)/(max-min+.01))*(h-6)-3;i?c.lineTo(x,y):c.moveTo(x,y);});
+  const grad=c.createLinearGradient(0,0,w,0);grad.addColorStop(0,cols[seed]+'55');grad.addColorStop(1,cols[seed]);
+  c.strokeStyle=grad;c.lineWidth=2;c.stroke();
+}
+function bar(p,c){return `<div class="hbar"><i style="width:${p}%;background:${c}"></i></div>`;}
+
+function renderRevenue(){
+  const d=$('#revDrivers');d.innerHTML='';DATA.revDrivers.forEach(x=>{
+    d.appendChild(el('div','row',`<div class="grow"><div class="name">${x.n}</div><div class="meta">${x.m}</div></div><div class="right" style="display:flex;align-items:center;gap:12px">${bar(x.p,x.c)}<b style="color:${x.c};min-width:70px;text-align:right">${x.v}</b></div>`));});
+  const c=$('#revByCust');c.innerHTML='';DATA.revByCust.forEach(x=>{
+    c.appendChild(el('div','row',`<div class="grow"><div class="name">${x.n}</div></div><div class="right" style="display:flex;align-items:center;gap:12px">${bar(x.p,x.c)}<b style="min-width:64px;text-align:right">${x.v}</b></div>`));});
+}
+function renderCustomers(){
+  const l=$('#custList');l.innerHTML='';DATA.customersList.forEach(x=>{
+    const init=x.n.split(' ').map(w=>w[0]).slice(0,2).join('');
+    l.appendChild(el('div','row',`<div class="av">${init}</div>
+      <div class="grow"><div class="name">${x.n}</div><div class="meta">${x.ind} · ${x.note}</div></div>
+      <div class="right" style="display:flex;align-items:center;gap:14px">${bar(x.score,x.c)}<b style="min-width:34px;color:${x.c}">${x.score}</b><span class="tag ${x.score<45?'bad':x.score<65?'warn':'ok'}" style="min-width:96px;text-align:center">${x.risk}</span></div>`));});
+}
+function renderSystems(){
+  const a=$('#autoList');a.innerHTML='';DATA.automations.forEach(x=>{
+    a.appendChild(el('div','row',`<div class="grow"><div class="name">${x.n}</div><div class="meta">${x.d}</div></div><span class="tag ${x.s}">${x.s==='ok'?'Running':x.s==='warn'?'Degraded':'Failing'}</span>`));});
+  const i=$('#intList');i.innerHTML='';DATA.integrations.forEach(x=>{
+    i.appendChild(el('div','row',`<div class="grow"><div class="name">${x.n}</div></div><span class="tag ${x.s}">${x.s==='ok'?'Connected':x.s==='warn'?'Degraded':'Down'}</span>`));});
+}
+function renderGrowth(){const o=$('#oppList');o.innerHTML='';const cc={violet:'var(--violet)',blue:'var(--blue)',green:'var(--green)'};
+  DATA.opportunities.forEach(x=>{o.appendChild(el('div','row',`<div class="grow"><div class="name">${x.t}</div><div class="meta">${x.d}</div></div><b style="color:${cc[x.c]};min-width:90px;text-align:right">${x.v}</b>`));});}
+function renderCompetitors(){const l=$('#compList');l.innerHTML='';DATA.competitors.forEach(x=>{
+  l.appendChild(el('div','row',`<div class="grow"><div class="name">${x.n} — ${x.t}</div><div class="meta">${x.d}</div></div><span class="tag ${x.tag}">${x.tag==='bad'?'Act':x.tag==='warn'?'Watch':'Note'}</span>`));});}
+function renderRoadmap(){
+  const r=$('#riskList');r.innerHTML='';DATA.risks.forEach(x=>{
+    r.appendChild(el('div','row',`<div class="grow"><div class="name">${x.t}</div><div class="meta">${x.d}</div></div><span class="tag ${x.c}">${x.sev}</span>`));});
+  const f=$('#featList');f.innerHTML='';const cc={violet:'var(--violet)',blue:'var(--blue)',green:'var(--green)',amber:'var(--amber)'};
+  DATA.features.forEach(x=>{f.appendChild(el('div','row',`<div class="grow"><div class="name">${x.t}</div><div class="meta">${x.why}</div></div><b style="color:${cc[x.c]}">${x.score}</b>`));});
+}
+
+/* =====================================================================
+   VIEW ROUTER
+   ===================================================================== */
+const rendered={};
+function switchView(v){
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===v));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='revenue'&&!rendered.revenue){renderRevenue();rendered.revenue=1;}
+  if(v==='customers'&&!rendered.customers){renderCustomers();rendered.customers=1;}
+  if(v==='systems'){if(!rendered.systems){renderSystems();rendered.systems=1;}initMap();}
+  if(v==='growth'&&!rendered.growth){renderGrowth();rendered.growth=1;}
+  if(v==='competitors'&&!rendered.competitors){renderCompetitors();rendered.competitors=1;}
+  if(v==='roadmap'&&!rendered.roadmap){renderRoadmap();rendered.roadmap=1;}
+}
+document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>switchView(a.dataset.view));
+
+/* clock + greeting */
+function tick(){const n=new Date();const hr=n.getHours();
+  $('#greeting').textContent=(hr<12?'Good morning':hr<18?'Good afternoon':'Good evening')+', Andrew';
+  $('#dateStr').textContent=n.toLocaleDateString([], {weekday:'long',month:'short',day:'numeric'});
+  $('#timeStr').textContent=n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+$('#oneliner').textContent="Health 82/100 · $18.4k saved this month · 2 things need fixing · 3 customers need attention";
+tick();setInterval(tick,1000);renderOverview();
+
+/* =====================================================================
+   ░░ LIVE DATA — reads real numbers from Supabase (ali_company_snapshot) ░░
+   ---------------------------------------------------------------------
+   Fill in the two values below. If they're blank, or the call fails, the
+   page silently keeps showing demo data — so it never looks broken.
+
+   For real numbers to appear you must be LOGGED IN as a platform admin
+   (same Supabase login as the rest of aileadintel.com). The anon key is
+   safe to expose; RLS + the security-definer function protect the data.
+   ===================================================================== */
+const SUPABASE_URL = '';        // <-- paste: Supabase ▸ Settings ▸ API ▸ Project URL
+const SUPABASE_ANON_KEY = '';   // <-- paste: Supabase ▸ Settings ▸ API ▸ anon public key
+
+const SRC_LABEL = { missed_call_recovery:'Missed Call Recovery', after_hours:'After-hours capture',
+  booking:'Appointment Booking', sms_reengage:'SMS re-engagement', manual:'Manual' };
+const DRIVER_COLORS = ['#22d3a7','#5b8cff','#9b6bff','#ffc24b','#ff9f43'];
+
+async function loadLiveData(){
+  if(!SUPABASE_URL || !SUPABASE_ANON_KEY){ console.info('[Mission Control] No Supabase config set — showing demo data.'); return; }
+  try{
+    if(!window.supabase){
+      await new Promise((res,rej)=>{const s=document.createElement('script');
+        s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload=res; s.onerror=rej; document.head.appendChild(s);});
+    }
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await sb.rpc('ali_company_snapshot');
+    if(error){ console.warn('[Mission Control] live data unavailable (showing demo):', error.message); return; }
+    applyLive(data);
+  }catch(e){ console.warn('[Mission Control] live load failed (showing demo):', e.message); }
+}
+
+function applyLive(s){
+  if(!s) return;
+  const num = v => Number(v)||0;
+  const statusCls = st => st==='ok' ? 'ok' : st==='down' ? 'bad' : 'warn';   // idle/warn -> warn
+
+  if(s.revenueSaved!=null)  DATA.revenueSaved = num(s.revenueSaved);
+  if(s.mrr!=null)           DATA.mrr          = num(s.mrr);
+  if(s.customers!=null)     DATA.customers    = num(s.customers);
+  if(s.companyHealth!=null) DATA.health       = num(s.companyHealth);
+
+  if(Array.isArray(s.customersList) && s.customersList.length){
+    DATA.customersList = s.customersList.map(c=>{
+      const sc = num(c.score);
+      return { n:c.name, ind:`${c.industry||''} · ${c.plan||''}`, score:sc,
+        risk: sc<45?'High churn risk':sc<65?'Watch':sc<85?'Healthy':'Champion',
+        note:'', c: sc<45?'#ff6b7d':sc<65?'#ff9f43':'#22d3a7' };
+    });
+    if(s.companyHealth==null)
+      DATA.health = Math.round(DATA.customersList.reduce((a,c)=>a+c.score,0)/DATA.customersList.length);
+  }
+
+  if(Array.isArray(s.revDrivers) && s.revDrivers.length){
+    const max = Math.max(...s.revDrivers.map(d=>num(d.amount))) || 1;
+    DATA.revDrivers = s.revDrivers.map((d,i)=>({
+      n: SRC_LABEL[d.source]||d.source, v:'$'+num(d.amount).toLocaleString(),
+      p: Math.round(num(d.amount)/max*100), c: DRIVER_COLORS[i%DRIVER_COLORS.length], m:'' }));
+  }
+
+  if(Array.isArray(s.systems))     DATA.integrations = s.systems.map(x=>({n:x.component, d:x.detail||'', s:statusCls(x.status)}));
+  if(Array.isArray(s.automations)) DATA.automations  = s.automations.map(x=>({n:x.component, d:x.detail||'', s:statusCls(x.status)}));
+  if(Array.isArray(s.feed))        DATA.feed         = s.feed.map(e=>({type:e.type, title:e.title, sub:e.subtitle||'', at:e.at}));
+
+  // rebuild the glance cards (the 10 questions) from live numbers
+  const failures = Array.isArray(s.failures) ? s.failures.length : (DATA.automations||[]).filter(a=>a.s!=='ok').length;
+  const atRisk = DATA.customersList.filter(c=>c.score<65);
+  DATA.glance = [
+    {q:"What's making money", a:'$'+DATA.revenueSaved.toLocaleString(), x:`${num(s.callsRecovered)} calls recovered this month`, go:'Revenue Center →', c:'green', view:'revenue'},
+    {q:"What's broken", a: failures+' '+(failures===1?'issue':'issues'), x: failures?'Check System Health':'All systems operational', go:'System Health →', c: failures?'red':'green', view:'systems'},
+    {q:"Calls today", a: ''+num(s.callsToday), x:`${num(s.missedToday)} missed / recovered`, go:'System Health →', c:'blue', view:'systems'},
+    {q:"Today's leads", a: ''+num(s.leadsToday), x:`${num(s.apptsToday)} appointments booked`, go:'Growth Engine →', c:'violet', view:'growth'},
+    {q:"Revenue generated", a:'$'+num(s.revenueGenerated).toLocaleString(), x:'Booked jobs attributed to AI', go:'Revenue Center →', c:'green', view:'revenue'},
+    {q:"Active customers", a: ''+DATA.customers, x:'Across all plans', go:'Customer Health →', c:'blue', view:'customers'},
+    {q:"Who needs help", a: atRisk.length+' at risk', x: atRisk.map(c=>c.n).slice(0,2).join(', ')||'None right now', go:'Customer Health →', c:'amber', view:'customers'},
+    {q:"Company health", a: DATA.health+' / 100', x: DATA.health>=80?'Healthy':DATA.health>=60?'Watch':'Needs attention', go:'Overview', c: DATA.health>=80?'green':DATA.health>=60?'amber':'red', view:'overview'},
+  ];
+
+  // re-render whatever's on screen with the real numbers
+  Object.keys(rendered).forEach(k=>delete rendered[k]);
+  renderOverview();
+  $('#oneliner').textContent =
+    `Live · $${DATA.revenueSaved.toLocaleString()} saved · ${num(s.callsRecovered)} calls recovered · ${DATA.customers} customers · health ${DATA.health}`;
+  console.info('[Mission Control] live data loaded.');
+}
+
+loadLiveData();
+
+/* =====================================================================
+   SYSTEM MAP  (the network graph, folded in as a System Health view)
+   ===================================================================== */
+const CATS={core:'#ffffff',system:'#5b8cff',page:'#9b6bff',integration:'#22d3a7',ai:'#ffc24b'};
+const MN=[
+  {id:'brain',label:'AI Lead Intel',cat:'core',r:40},
+  {id:'lead',label:'Lead Capture',cat:'system'},{id:'miss',label:'Missed Call Recovery',cat:'system'},
+  {id:'sms',label:'SMS Automation',cat:'system'},{id:'email',label:'Email Automation',cat:'system'},
+  {id:'book',label:'Appointment Booking',cat:'system'},{id:'rev',label:'Revenue Tracking',cat:'system'},
+  {id:'ai',label:'AI Analysis',cat:'system'},{id:'rep',label:'Business Reports',cat:'system'},
+  {id:'dash',label:'Dashboard',cat:'page'},{id:'admin',label:'Admin',cat:'page'},{id:'setup',label:'Setup',cat:'page'},{id:'land',label:'Landing',cat:'page'},
+  {id:'vapi',label:'Vapi',cat:'integration'},{id:'twilio',label:'Twilio',cat:'integration',status:'warn'},{id:'resend',label:'Resend',cat:'integration'},
+  {id:'supa',label:'Supabase',cat:'integration'},{id:'paypal',label:'PayPal',cat:'integration'},{id:'vercel',label:'Vercel',cat:'integration'},{id:'gh',label:'GitHub',cat:'integration'},
+  {id:'claude',label:'Claude',cat:'ai'},{id:'gpt',label:'ChatGPT',cat:'ai'},
+];
+const ME=[['brain','lead'],['brain','miss'],['brain','sms'],['brain','email'],['brain','book'],['brain','rev'],['brain','ai'],['brain','rep'],
+  ['brain','dash'],['brain','admin'],['brain','setup'],['brain','land'],['miss','vapi'],['lead','vapi'],['sms','twilio'],['miss','twilio'],
+  ['email','resend'],['rep','resend'],['rev','supa'],['lead','supa'],['ai','supa'],['ai','claude'],['ai','gpt'],['dash','rev'],['land','lead'],
+  ['setup','sms'],['admin','ai'],['brain','gh'],['brain','vercel'],['book','supa'],['rev','paypal']];
+const mById=Object.fromEntries(MN.map(n=>[n.id,n]));
+let mapInit=false,mcv,mc,mW,mH,mDPR,mcam,mhover,msel,mt=0,mdrag,mlx,mly,mraf;
+function initMap(){
+  if(mapInit){return;} mapInit=true;
+  mcv=document.getElementById('mapCanvas');mc=mcv.getContext('2d');mDPR=Math.min(devicePixelRatio||1,2);
+  mcam={x:0,y:0,zoom:0.62,tx:0,ty:0,tz:0.62};
+  const sys=MN.filter(n=>n.cat==='system'),out=MN.filter(n=>['page','integration','ai'].includes(n.cat));
+  mById.brain.x=0;mById.brain.y=0;mById.brain.br=40;
+  sys.forEach((n,i)=>{const a=i/sys.length*6.283-1.57;n.x=Math.cos(a)*250;n.y=Math.sin(a)*250;n.br=20;});
+  out.forEach((n,i)=>{const a=i/out.length*6.283-1.4;n.x=Math.cos(a)*510;n.y=Math.sin(a)*510;n.br=16;});
+  function rs(){mW=mcv.clientWidth;mH=mcv.clientHeight;mcv.width=mW*mDPR;mcv.height=mH*mDPR;mc.setTransform(mDPR,0,0,mDPR,0,0);}
+  rs();new ResizeObserver(rs).observe(document.getElementById('mapWrap'));
+  const w2s=(x,y)=>[(x-mcam.x)*mcam.zoom+mW/2,(y-mcam.y)*mcam.zoom+mH/2];
+  const s2w=(x,y)=>[(x-mW/2)/mcam.zoom+mcam.x,(y-mH/2)/mcam.zoom+mcam.y];
+  mcv.onmousedown=e=>{mdrag=1;mlx=e.clientX;mly=e.clientY;mcv.style.cursor='grabbing';};
+  window.addEventListener('mouseup',()=>{mdrag=0;if(mcv)mcv.style.cursor='grab';});
+  mcv.onmousemove=e=>{const r=mcv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    if(mdrag){mcam.x-=(e.clientX-mlx)/mcam.zoom;mcam.y-=(e.clientY-mly)/mcam.zoom;mcam.tx=mcam.x;mcam.ty=mcam.y;mlx=e.clientX;mly=e.clientY;}
+    const[wx,wy]=s2w(mx,my);mhover=null;for(const n of MN){const d=(n.br||16)+5;if((n.x-wx)**2+(n.y-wy)**2<d*d){mhover=n;break;}}
+    mcv.style.cursor=mhover?'pointer':(mdrag?'grabbing':'grab');};
+  mcv.onclick=e=>{const r=mcv.getBoundingClientRect();const[wx,wy]=s2w(e.clientX-r.left,e.clientY-r.top);
+    for(const n of MN){const d=(n.br||16)+5;if((n.x-wx)**2+(n.y-wy)**2<d*d){msel=(msel===n?null:n);return;}}msel=null;};
+  mcv.onwheel=e=>{e.preventDefault();const r=mcv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;const[wx,wy]=s2w(mx,my);
+    mcam.tz=Math.min(2,Math.max(0.4,mcam.tz*(e.deltaY<0?1.12:0.89)));mcam.zoom=mcam.tz;mcam.x=wx-(mx-mW/2)/mcam.zoom;mcam.y=wy-(my-mH/2)/mcam.zoom;mcam.tx=mcam.x;mcam.ty=mcam.y;};
+  const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;};
+  function frame(now){mt=now;mcam.x+=(mcam.tx-mcam.x)*.12;mcam.y+=(mcam.ty-mcam.y)*.12;mcam.zoom+=(mcam.tz-mcam.zoom)*.12;
+    mc.clearRect(0,0,mW,mH);
+    ME.forEach(([a,b])=>{const na=mById[a],nb=mById[b];const[x1,y1]=w2s(na.x,na.y),[x2,y2]=w2s(nb.x,nb.y);
+      const rel=msel&&(a===msel.id||b===msel.id);const warn=na.status==='warn'||nb.status==='warn';
+      mc.strokeStyle=hexA(warn?'#ff9f43':rel?'#7ea2ff':'#5b8cff',rel?.5:warn?.4:.13);mc.lineWidth=rel?1.6:1;
+      mc.beginPath();mc.moveTo(x1,y1);mc.lineTo(x2,y2);mc.stroke();
+      const p=(mt*0.00018+(a.length))%1,px=x1+(x2-x1)*p,py=y1+(y2-y1)*p;
+      mc.fillStyle=hexA(warn?'#ff9f43':'#5b8cff',rel?.9:.45);mc.beginPath();mc.arc(px,py,rel?2.6:1.6,0,7);mc.fill();});
+    MN.forEach(n=>{const[sx,sy]=w2s(n.x,n.y);const col=n.status==='warn'?'#ff9f43':CATS[n.cat];let r=(n.br||16)*mcam.zoom*(1+Math.sin(mt*0.003+n.x)*.04);
+      if(mhover===n||msel===n)r*=1.16;const g=mc.createRadialGradient(sx,sy,0,sx,sy,r*2.6);g.addColorStop(0,hexA(col,.3));g.addColorStop(1,hexA(col,0));
+      mc.fillStyle=g;mc.beginPath();mc.arc(sx,sy,r*2.6,0,7);mc.fill();
+      if(n.cat==='core'){const lg=mc.createLinearGradient(sx-r,sy-r,sx+r,sy+r);lg.addColorStop(0,'#5b8cff');lg.addColorStop(.5,'#9b6bff');lg.addColorStop(1,'#22d3a7');mc.fillStyle=lg;}
+      else mc.fillStyle=hexA(col,.16);
+      mc.beginPath();mc.arc(sx,sy,r,0,7);mc.fill();
+      mc.lineWidth=msel===n?2.6:1.5;mc.strokeStyle=hexA(col,(mhover===n||msel===n)?1:.7);mc.beginPath();mc.arc(sx,sy,r,0,7);mc.stroke();
+      if(n.cat==='core'){mc.fillStyle='rgba(6,7,12,.92)';mc.beginPath();mc.arc(sx,sy,r*.62,0,7);mc.fill();mc.fillStyle='#fff';mc.font='600 13px Inter';mc.textAlign='center';mc.textBaseline='middle';mc.fillText('AI',sx,sy);}
+      if(mcam.zoom>.5||mhover===n||n.cat==='core'){mc.fillStyle='#e9edf7';mc.font=`500 ${Math.max(10,10*mcam.zoom)}px Inter`;mc.textAlign='center';mc.textBaseline='top';mc.fillText(n.label,sx,sy+r+5);}
+    });
+    if(msel){const[sx,sy]=w2s(msel.x,msel.y);mc.fillStyle='rgba(10,13,22,.92)';mc.strokeStyle=hexA(CATS[msel.cat],.5);mc.lineWidth=1;
+      const tw=Math.max(120,mc.measureText(msel.label).width+24);roundRect(mc,sx+14,sy-14,tw,30,8);mc.fill();mc.stroke();
+      mc.fillStyle='#fff';mc.font='600 12px Inter';mc.textAlign='left';mc.textBaseline='middle';mc.fillText(msel.label,sx+24,sy+1);}
+    mraf=requestAnimationFrame(frame);}
+  function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+  requestAnimationFrame(frame);
+}
+
+/* =====================================================================
+   ░░ DATA / AI HOOKS — what's demo vs. what needs wiring ░░
+   ---------------------------------------------------------------------
+   This is the front-end OPERATING SYSTEM shell. The whole `DATA` object
+   above is demo. To make Mission Control real, feed each block from your
+   stack. Everything renders from DATA, so you only change the loaders.
+
+   REAL once you build the event spine (Supabase):
+     • DATA.revenueSaved / mrr / customers  ← aggregate views
+     • DATA.revDrivers / revByCust          ← revenue_events grouped
+     • DATA.automations / integrations      ← system_status table + webhook health
+     • DATA.health                          ← Business Health Score formula
+     • System Map node.status               ← system_status
+
+   NEEDS REAL LOGIC OR A FEED (flagged in UI with ⚠):
+     • DATA.customers[].score  ← Customer Health model (usage, recovery,
+       logins, revenue). Define the formula, then compute server-side.
+     • DATA.focus / DATA.features / DATA.risks  ← AI Recommendations.
+       Send the day's metrics to Claude with a prompt like:
+       "Given these metrics, rank the 3 highest-$$ actions for the owner."
+       Return JSON → DATA.focus.
+     • DATA.competitors  ← needs a source: manual entry table, a pricing/
+       news scrape, or an analyst feed. No source = no real intel.
+
+   WIRING PATTERN (example):
+     async function load(){
+       const { data } = await supabase.rpc('mission_control_snapshot');
+       Object.assign(DATA, data);
+       renderOverview(); rendered={};  // force re-render of open view
+     }
+     // call load() on start + every 60s, behind your existing auth,
+     // scoped per account_id via Supabase Row Level Security.
+
+   Build order (from ROADMAP.md): event spine + attribution rule FIRST.
+   Then Revenue Center is real, then Health Score, then everything here
+   lights up with real numbers.
+   ===================================================================== */
+</script>
+</body>
+</html>
