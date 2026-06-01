@@ -145,6 +145,21 @@ a{color:inherit;text-decoration:none;}
 .map-legend .lg i{width:8px;height:8px;border-radius:50%;}
 .note{font-size:12px;color:var(--faint);background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.22);border-radius:11px;padding:11px 14px;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start;}
 .note b{color:var(--amber);}
+/* login gate */
+.mc-gate{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(5,6,12,.86);backdrop-filter:blur(8px);}
+.mc-gate.show{display:flex;}
+.mc-gate .box{width:380px;max-width:90vw;background:var(--panel);border:1px solid var(--brd2);border-radius:18px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.55);}
+.mc-gate h3{font-size:19px;font-weight:700;margin-bottom:5px;}
+.mc-gate p{font-size:13px;color:var(--dim);margin-bottom:6px;line-height:1.5;}
+.mc-gate label{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);display:block;margin:14px 0 5px;}
+.mc-gate input{width:100%;height:44px;border-radius:11px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--txt);padding:0 13px;font-size:14px;outline:none;font-family:inherit;}
+.mc-gate input:focus{border-color:rgba(91,140,255,.6);}
+.mc-gate button{width:100%;height:46px;margin-top:20px;border:none;border-radius:11px;font-size:14px;font-weight:650;color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--blue),var(--violet));}
+.mc-gate button:disabled{opacity:.6;cursor:default;}
+.mc-gate .msg{font-size:12.5px;margin-top:14px;min-height:18px;line-height:1.45;word-break:break-word;}
+.mc-gate .msg.err{color:var(--red);} .mc-gate .msg.ok{color:var(--green);}
+.mc-gate .skip{display:block;margin-top:16px;text-align:center;font-size:12px;color:var(--faint);cursor:pointer;}
+.mc-gate .skip:hover{color:var(--dim);}
 </style>
 </head>
 <body>
@@ -279,6 +294,21 @@ a{color:inherit;text-decoration:none;}
     </div>
   </section>
 </main>
+
+<!-- ============ LOGIN GATE (for live data) ============ -->
+<div class="mc-gate" id="mcGate">
+  <div class="box">
+    <h3>Sign in to Mission Control</h3>
+    <p>Log in with your AI Lead Intel admin account to load live data.</p>
+    <label>Email</label>
+    <input id="gEmail" type="email" autocomplete="username" />
+    <label>Password</label>
+    <input id="gPass" type="password" autocomplete="current-password" />
+    <button id="gBtn">Sign in</button>
+    <div class="msg" id="gMsg"></div>
+    <span class="skip" id="gSkip">View demo data instead</span>
+  </div>
+</div>
 
 <script>
 /* =====================================================================
@@ -496,18 +526,43 @@ const SRC_LABEL = { missed_call_recovery:'Missed Call Recovery', after_hours:'Af
   booking:'Appointment Booking', sms_reengage:'SMS re-engagement', manual:'Manual' };
 const DRIVER_COLORS = ['#22d3a7','#5b8cff','#9b6bff','#ffc24b','#ff9f43'];
 
+let _sbClient = null;
+async function getClient(){
+  if(!window.supabase){
+    await new Promise((res,rej)=>{const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload=res; s.onerror=rej; document.head.appendChild(s);});
+  }
+  if(!_sbClient) _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,
+    { auth:{ persistSession:true, autoRefreshToken:true } });
+  return _sbClient;
+}
+function showGate(msg, cls){ const g=$('#mcGate'); if(!g) return; g.classList.add('show');
+  if(msg!==undefined){ const m=$('#gMsg'); if(m){ m.textContent=msg; m.className='msg '+(cls||''); } } }
+function hideGate(){ const g=$('#mcGate'); if(g) g.classList.remove('show'); }
+
 async function loadLiveData(){
-  if(!SUPABASE_URL || !SUPABASE_ANON_KEY){ console.info('[Mission Control] No Supabase config set — showing demo data.'); return; }
+  if(!SUPABASE_URL || !SUPABASE_ANON_KEY){ console.info('[Mission Control] No Supabase config set — showing demo data.'); return false; }
   try{
-    if(!window.supabase){
-      await new Promise((res,rej)=>{const s=document.createElement('script');
-        s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload=res; s.onerror=rej; document.head.appendChild(s);});
-    }
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const sb = await getClient();
     const { data, error } = await sb.rpc('ali_company_snapshot');
-    if(error){ console.warn('[Mission Control] live data unavailable (showing demo):', error.message); return; }
-    applyLive(data);
-  }catch(e){ console.warn('[Mission Control] live load failed (showing demo):', e.message); }
+    if(error){
+      console.warn('[Mission Control] live data unavailable (showing demo):', error.message);
+      if(/not authorized/i.test(error.message)){
+        const { data:u } = await sb.auth.getUser();
+        if(u && u.user){
+          showGate(`Signed in as ${u.user.email}, but this account is not a platform admin yet. Add this UID to ali_platform_admins, then reload:  ${u.user.id}`, 'err');
+        } else {
+          showGate('Sign in with your admin account to load live data.');
+        }
+      } else {
+        showGate('Live data error: '+error.message, 'err');
+      }
+      return false;
+    }
+    applyLive(data); hideGate();
+    console.info('[Mission Control] live data loaded.');
+    return true;
+  }catch(e){ console.warn('[Mission Control] live load failed (showing demo):', e.message); return false; }
 }
 
 function applyLive(s){
@@ -564,7 +619,33 @@ function applyLive(s){
   console.info('[Mission Control] live data loaded.');
 }
 
-loadLiveData();
+async function signIn(){
+  const email=($('#gEmail').value||'').trim(), pass=$('#gPass').value||'';
+  if(!email||!pass){ showGate('Enter your email and password.', 'err'); return; }
+  const btn=$('#gBtn'); btn.disabled=true; btn.textContent='Signing in…';
+  try{
+    const sb = await getClient();
+    const { error } = await sb.auth.signInWithPassword({ email, password:pass });
+    if(error){ showGate('Sign-in failed: '+error.message, 'err'); }
+    else { showGate('Signed in — loading…', 'ok'); await loadLiveData(); }
+  }catch(e){ showGate('Sign-in error: '+e.message, 'err'); }
+  btn.disabled=false; btn.textContent='Sign in';
+}
+
+async function initLive(){
+  if(!SUPABASE_URL || !SUPABASE_ANON_KEY){ console.info('[Mission Control] No Supabase config — demo mode.'); return; }
+  try{
+    const sb = await getClient();
+    const { data:sess } = await sb.auth.getSession();
+    if(sess && sess.session){ await loadLiveData(); }   // already logged in → try live
+    else { showGate(); }                                 // ask to sign in
+  }catch(e){ console.warn('[Mission Control] init failed (demo):', e.message); }
+}
+
+if($('#gBtn')) $('#gBtn').onclick = signIn;
+if($('#gSkip')) $('#gSkip').onclick = hideGate;
+if($('#gPass')) $('#gPass').addEventListener('keydown', e=>{ if(e.key==='Enter') signIn(); });
+initLive();
 
 /* =====================================================================
    SYSTEM MAP  (the network graph, folded in as a System Health view)
