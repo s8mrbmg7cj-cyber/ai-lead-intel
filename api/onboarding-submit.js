@@ -1,6 +1,7 @@
 // api/onboarding-submit.js
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
+import { buildPaypalRedirect } from '../lib/paypal-redirect.js';
 
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 const PLAN_PRICING = { starter: { amount: 97.00 }, pro: { amount: 297.00 } };
@@ -344,20 +345,16 @@ export default async function handler(req, res) {
     try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
 
     // Build PayPal redirect URL
-    const paypalStarterUrl = process.env.PAYPAL_STARTER_URL || "";
-    const paypalProUrl = process.env.PAYPAL_PRO_URL || "";
-    const paypalUrl = (clientRow.plan || data.plan) === "pro" ? paypalProUrl : paypalStarterUrl;
-    console.log("[paypal debug]");
-console.log("clientRow.plan:", clientRow.plan);
-console.log("data.plan:", data.plan);
-console.log("paypalStarterUrl:", paypalStarterUrl);
-console.log("paypalProUrl:", paypalProUrl);
-console.log("resolved paypalUrl:", paypalUrl);
-    let paypalRedirect = paypalUrl;
-    if (paypalRedirect) {
-      const sep = paypalRedirect.includes("?") ? "&" : "?";
-      paypalRedirect = `${paypalRedirect}${sep}custom_id=${encodeURIComponent(clientRow.client_slug)}`;
-    }
+    const r = buildPaypalRedirect({
+  plan: clientRow.plan || data.plan,
+  clientSlug: clientRow.client_slug,
+});
+console.log('[onboarding] paypal:', JSON.stringify(r.log));
+if (!r.ok) {
+  console.error('[onboarding] paypal misconfig:', r.error);
+  return res.status(502).json({ error: 'PayPal checkout is not configured correctly: ' + r.error });
+}
+const paypalRedirect = r.redirect;
 
     const responseBody = {
       success: true,
