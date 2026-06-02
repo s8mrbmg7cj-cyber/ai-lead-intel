@@ -1,5 +1,4 @@
 import ws from 'ws';
-import { sendSetupEmail } from '../lib/onboarding-helpers.js';
 // api/auth-link-user.js
 // Called after onboarding/payment to create a Supabase Auth user
 // and link them to their existing clients row via owner_user_id.
@@ -130,19 +129,6 @@ export default async function handler(req, res) {
       });
     }
     console.log('[auth-link-user] ✅ linked user', newUser.id, 'to client', client.client_slug);
-
-    // 5. Send the welcome / setup email (best-effort — never block success on it)
-    try {
-      const emailResult = await sendSetupEmail({
-        toEmail: email,
-        businessName: client.business_name,
-        clientSlug: client.client_slug,
-      });
-      console.log('[auth-link-user] setup email:', emailResult.ok ? 'sent' : 'failed');
-    } catch (e) {
-      console.error('[auth-link-user] setup email error:', e.message);
-    }
-
     return res.status(200).json({
       success: true,
       client_slug: client.client_slug,
