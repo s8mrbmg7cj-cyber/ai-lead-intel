@@ -1,8 +1,8 @@
 // api/onboarding-return.js
 // PayPal sends customers here after successful subscription.
-// Looks up client, marks paid, sends the setup email, then redirects:
-//   - Pro     → /create-password  (then auto-signed-in → /setup → dashboard)
-//   - Starter → /confirmation     (no dashboard access, no password needed)
+// Looks up client, marks paid, sends the setup email (Pro), then redirects:
+//   - Pro     → /create-password
+//   - Starter → /confirmation  (no password, no dashboard, no setup email)
 export default async function handler(req, res) {
   console.log("[paypal-return] hit:", { query: req.query });
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   const subscriptionId = (req.query.subscription_id || req.query.ba_token || "").toString();
   const customIdFromQuery = (req.query.custom_id || "").toString();
   let client = null;
+  let matchedBy = null;   // 'custom_id' | 'subscription_id' | 'fallback'
   if (supabaseUrl && supabaseKey) {
     const headers = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
     // 1. Try custom_id (slug) — set by PayPal redirect URL in onboarding-submit.js
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
         );
         if (r.ok) {
           const rows = await r.json().catch(() => []);
-          if (rows[0]) client = rows[0];
+          if (rows[0]) { client = rows[0]; matchedBy = "custom_id"; }
         }
       } catch (e) {
         console.warn("[paypal-return] custom_id lookup:", e.message);
@@ -37,13 +38,13 @@ export default async function handler(req, res) {
         );
         if (r.ok) {
           const rows = await r.json().catch(() => []);
-          if (rows[0]) client = rows[0];
+          if (rows[0]) { client = rows[0]; matchedBy = "subscription_id"; }
         }
       } catch (e) {
         console.warn("[paypal-return] sub_id lookup:", e.message);
       }
     }
-    // 3. Fallback — most recent unpaid
+    // 3. Fallback — most recent unpaid (a GUESS — we won't email on this match)
     if (!client) {
       try {
         const r = await fetch(
@@ -52,13 +53,15 @@ export default async function handler(req, res) {
         );
         if (r.ok) {
           const rows = await r.json().catch(() => []);
-          if (rows[0]) client = rows[0];
+          if (rows[0]) { client = rows[0]; matchedBy = "fallback"; }
         }
       } catch (e) {
         console.warn("[paypal-return] fallback lookup:", e.message);
       }
     }
-    // Mark client paid + active
+    console.log("[paypal-return] client match:", { matchedBy, slug: client?.client_slug, plan: client?.plan });
+
+    // Mark client paid + active (only when we actually have a subscription id)
     if (client && subscriptionId) {
       try {
         await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${client.id}`, {
@@ -76,33 +79,36 @@ export default async function handler(req, res) {
       } catch (e) {
         console.error("[paypal-return] update failed:", e.message);
       }
+    }
 
-      // ── SETUP EMAIL: fire immediately after payment is confirmed ──
-      // Awaited before the redirect (the function can freeze after res.end()).
-      // send-setup-email is idempotent (dedups on setup_email_sent), so a
-      // PayPal double-fire won't send twice.
-      // PRO ONLY: Starter has no password / no dashboard, so it gets the
-      // /confirmation page instead — not a "Create My Password" email.
-      if (client.client_slug && (client.plan || "").toLowerCase() === "pro") {
-        try {
-          const er = await fetch(`${baseUrl}/api/send-setup-email`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-internal-secret": process.env.SUPABASE_WEBHOOK_SECRET || "",
-            },
-            body: JSON.stringify({ client_slug: client.client_slug }),
-          });
-          if (er.ok) {
-            console.log("[paypal-return] ✅ setup email triggered for", client.client_slug);
-          } else {
-            const t = await er.text().catch(() => "");
-            console.error("[paypal-return] ⚠️ setup email failed:", er.status, t.slice(0, 300));
-          }
-        } catch (e) {
-          console.error("[paypal-return] ⚠️ setup email trigger error:", e.message);
+    // ── SETUP EMAIL (Pro only) ──
+    // Fires on a CONFIDENT match (slug or subscription id) even if PayPal
+    // didn't include subscription_id. Not on the "most recent unpaid" guess.
+    // send-setup-email dedups, so a PayPal double-return won't send twice.
+    const planLower = (client?.plan || "").toLowerCase();
+    const confidentMatch = matchedBy === "custom_id" || matchedBy === "subscription_id";
+    if (client && client.client_slug && confidentMatch && planLower === "pro") {
+      console.log("[paypal-return] → triggering setup email for", client.client_slug);
+      try {
+        const er = await fetch(`${baseUrl}/api/send-setup-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-internal-secret": process.env.SUPABASE_WEBHOOK_SECRET || "",
+          },
+          body: JSON.stringify({ client_slug: client.client_slug }),
+        });
+        const t = await er.text().catch(() => "");
+        if (er.ok) {
+          console.log("[paypal-return] ✅ setup email triggered:", t.slice(0, 200));
+        } else {
+          console.error("[paypal-return] ⚠️ setup email failed:", er.status, t.slice(0, 300));
         }
+      } catch (e) {
+        console.error("[paypal-return] ⚠️ setup email trigger error:", e.message);
       }
+    } else {
+      console.log("[paypal-return] setup email NOT triggered:", { confidentMatch, plan: planLower, hasSlug: !!client?.client_slug });
     }
   }
   // Build redirect params (kept for both flows)
@@ -119,10 +125,8 @@ export default async function handler(req, res) {
   // PLAN-BASED ROUTING
   let redirectPath;
   if (plan === "pro") {
-    // Pro: create password → setup → dashboard
     redirectPath = "/create-password";
   } else {
-    // Starter: confirmation only (no dashboard, no password)
     redirectPath = "/confirmation";
   }
   const redirectUrl = `${baseUrl}${redirectPath}?${params.toString()}`;
