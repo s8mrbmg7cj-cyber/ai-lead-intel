@@ -129,6 +129,29 @@ export default async function handler(req, res) {
       });
     }
     console.log('[auth-link-user] ✅ linked user', newUser.id, 'to client', client.client_slug);
+
+    // 5. Trigger the setup email (calls your existing /api/send-setup-email).
+    //    Best-effort: never block account creation if the email call hiccups.
+    try {
+      const base = process.env.SITE_URL || 'https://aileadintel.com';
+      const emailRes = await fetch(`${base}/api/send-setup-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.SUPABASE_WEBHOOK_SECRET || '',
+        },
+        body: JSON.stringify({ client_slug: client.client_slug }),
+      });
+      if (emailRes.ok) {
+        console.log('[auth-link-user] ✅ setup email triggered for', client.client_slug);
+      } else {
+        const t = await emailRes.text().catch(() => '');
+        console.error('[auth-link-user] ⚠️ setup email trigger failed:', emailRes.status, t.slice(0, 300));
+      }
+    } catch (e) {
+      console.error('[auth-link-user] ⚠️ setup email trigger error:', e.message);
+    }
+
     return res.status(200).json({
       success: true,
       client_slug: client.client_slug,
