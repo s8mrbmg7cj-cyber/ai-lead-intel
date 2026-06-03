@@ -1,7 +1,7 @@
 // api/onboarding-submit.js
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
-import { createSubscriptionRedirect } from '../lib/paypal-redirect.js';
+import { buildPaypalRedirect } from '../lib/paypal-redirect.js';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 const PLAN_PRICING = { starter: { amount: 97.00 }, pro: { amount: 297.00 } };
 const INDUSTRY_LABELS = { self_storage: "Self Storage", hvac: "HVAC", plumbing: "Plumbing", electrician: "Electrician", landscaping: "Landscaping / Lawn Care", auto_detailing: "Auto Detailing", auto_repair: "Auto Repair", salon: "Salon / Spa", pest_control: "Pest Control", cleaning: "Cleaning Services", roofing: "Roofing", locksmith: "Locksmith", real_estate: "Real Estate", dental: "Dental / Medical", other: "Other" };
@@ -311,38 +311,29 @@ export default async function handler(req, res) {
     }
     const clientRow = clientResult.row;
 
-    // ── Create the PayPal subscription via the REST API ──
-    // We control the return_url (embedding ?slug) and capture the subscription id,
-    // so onboarding-return.js can reliably identify the client after payment.
-    const sub = await createSubscriptionRedirect({
+    // ── Build the PayPal redirect from the hosted subscribe links ──
+    // Uses PAYPAL_STARTER_URL / PAYPAL_PRO_URL (already set in Vercel). No API
+    // keys required. NOTE: hosted subscribe links do NOT return a subscription id
+    // here and do NOT capture custom_id, so after payment the client is matched
+    // manually for now (you get an ntfy + owner email on every onboarding).
+    const sub = buildPaypalRedirect({
       plan: clientRow.plan || data.plan,
       clientSlug: clientRow.client_slug,
-      returnUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}`,
-      cancelUrl: `https://aileadintel.com/onboarding?canceled=1`,
     });
     if (!sub.ok) {
       // Log the real reason and alert the owner; the customer only sees a soft message.
-      console.error("[onboarding] paypal create error:", sub.error);
+      console.error("[onboarding] paypal redirect error:", sub.error, JSON.stringify(sub.log || {}));
       await safePaypalFailAlert(data, finalSlug, sub.error);
       return res.status(502).json({
         success: false,
         error: "Checkout is temporarily unavailable. Please try again in a few minutes — if it keeps happening, email hello@aileadintel.com.",
       });
     }
-    console.log("[onboarding] paypal subscription created:", sub.subscriptionId);
-    // Store the subscription id on the client row (second reliable identifier).
-    try {
-      await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientRow.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=minimal" },
-        body: JSON.stringify({ payment_external_id: sub.subscriptionId }),
-      });
-    } catch (e) {
-      console.error("[onboarding] failed to store subscription id:", e.message);
-    }
+    console.log("[onboarding] paypal redirect built:", sub.redirect);
 
-    // PayPal succeeded → now it's safe to notify the owner and send the customer
-    // their welcome email (so a failed checkout never sends a "you're all set" email).
+    // PayPal redirect is good → now it's safe to notify the owner and send the
+    // customer their welcome email (so a failed checkout never sends a "you're all
+    // set" email).
     try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
 
     const paypalRedirect = sub.redirect;   // the PayPal approval URL
