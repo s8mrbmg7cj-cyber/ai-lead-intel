@@ -14,7 +14,10 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUP
 const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY || '';
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || '';
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
-const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com'; // sandbox: https://api-m.sandbox.paypal.com
+const PAYPAL_ENV = process.env.PAYPAL_ENV || 'live'; // matches lib/paypal-redirect.js
+const PAYPAL_API_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+const PAYPAL_STARTER_PLAN_ID = process.env.PAYPAL_STARTER_PLAN_ID || '';
+const PAYPAL_PRO_PLAN_ID = process.env.PAYPAL_PRO_PLAN_ID || '';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || '';
@@ -55,15 +58,20 @@ async function checkVapi() {
 }
 
 async function checkPaypal() {
-  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) return { status: 'fail', detail: 'missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET' };
+  const missing = [];
+  if (!PAYPAL_CLIENT_ID) missing.push('PAYPAL_CLIENT_ID');
+  if (!PAYPAL_CLIENT_SECRET) missing.push('PAYPAL_CLIENT_SECRET');
+  if (!PAYPAL_STARTER_PLAN_ID) missing.push('PAYPAL_STARTER_PLAN_ID');
+  if (!PAYPAL_PRO_PLAN_ID) missing.push('PAYPAL_PRO_PLAN_ID');
+  if (missing.length) return { status: 'fail', detail: `missing ${missing.join(', ')}` };
   try {
     const r = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
       method: 'POST',
       headers: { Authorization: `Basic ${b64(PAYPAL_CLIENT_ID + ':' + PAYPAL_CLIENT_SECRET)}`, 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'grant_type=client_credentials',
     });
-    const where = PAYPAL_API_BASE.includes('sandbox') ? 'sandbox' : 'live';
-    return r.ok ? { status: 'ok', detail: `auth ok (${where})` } : { status: 'fail', detail: `HTTP ${r.status} — bad creds or wrong env (live vs sandbox)` };
+    if (r.ok) return { status: 'ok', detail: `auth ok + plan IDs set (${PAYPAL_ENV})` };
+    return { status: 'fail', detail: `HTTP ${r.status} — bad creds or wrong PAYPAL_ENV (live vs sandbox)` };
   } catch (e) { return { status: 'fail', detail: String(e.message || e) }; }
 }
 
@@ -111,12 +119,15 @@ export default async function handler(req, res) {
       envRow('VAPI_PRIVATE_KEY', VAPI_PRIVATE_KEY),
       envRow('PAYPAL_CLIENT_ID', PAYPAL_CLIENT_ID),
       envRow('PAYPAL_CLIENT_SECRET', PAYPAL_CLIENT_SECRET),
+      envRow('PAYPAL_STARTER_PLAN_ID', PAYPAL_STARTER_PLAN_ID),
+      envRow('PAYPAL_PRO_PLAN_ID', PAYPAL_PRO_PLAN_ID),
       envRow('TWILIO_ACCOUNT_SID', TWILIO_ACCOUNT_SID),
       envRow('TWILIO_AUTH_TOKEN', TWILIO_AUTH_TOKEN),
     ],
     optional: [
       envRow('NTFY_TOPIC', NTFY_TOPIC),
       envRow('CLAUDE_MODEL', process.env.CLAUDE_MODEL || ''),
+      envRow('PAYPAL_ENV', process.env.PAYPAL_ENV || ''),
       envRow('HEALTH_KEY', HEALTH_KEY),
     ],
   };
