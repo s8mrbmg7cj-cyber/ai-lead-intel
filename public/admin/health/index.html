@@ -292,7 +292,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div class="overall-text">
       <div class="overall-status" id="overall-status">Checking...</div>
       <div class="overall-title" id="overall-title">Running diagnostics</div>
-      <div class="overall-sub" id="overall-sub">Querying Supabase, Twilio, and Vapi</div>
+      <div class="overall-sub" id="overall-sub">Querying Supabase, Twilio, Vapi, and PayPal</div>
     </div>
   </div>
 
@@ -323,6 +323,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
       <div class="check-value" id="vapi-value">—</div>
       <div class="check-meta" id="vapi-meta">AI assistants</div>
+    </div>
+
+    <div class="check-card" id="check-paypal">
+      <div class="check-head">
+        <div class="check-name">PayPal</div>
+        <div class="check-badge loading"><span class="check-badge-dot"></span><span>Checking</span></div>
+      </div>
+      <div class="check-value" id="paypal-value">—</div>
+      <div class="check-meta" id="paypal-meta">Checkout links</div>
+    </div>
+
+    <div class="check-card" id="check-pool">
+      <div class="check-head">
+        <div class="check-name">Phone Pool</div>
+        <div class="check-badge loading"><span class="check-badge-dot"></span><span>Checking</span></div>
+      </div>
+      <div class="check-value" id="pool-value">—</div>
+      <div class="check-meta" id="pool-meta">Free numbers</div>
     </div>
   </div>
 
@@ -389,6 +407,7 @@ async function runHealthCheck() {
     const res = await fetch('/api/health-check', { cache: 'no-store' });
     const data = await res.json();
     render(data);
+    await renderExtras();
   } catch (e) {
     console.error('[health] fetch failed:', e);
     setOverall('down', 'Down', "We couldn't reach the health endpoint", 'Check Vercel deployments');
@@ -452,6 +471,63 @@ function render(data) {
     setOverall('degraded', 'Partial outage', `${broken.join(', ')} ${broken.length === 1 ? 'is' : 'are'} unreachable`, 'Other systems still working');
   } else {
     setOverall('down', 'Major outage', 'Critical systems are down', 'Check Vercel logs and env vars');
+  }
+}
+
+// Checks the original /api/health-check doesn't cover: PayPal + phone pool.
+async function renderExtras() {
+  try {
+    const res = await fetch('/api/health-extras', { cache: 'no-store' });
+    const ex = await res.json();
+
+    // PayPal
+    const pv = document.getElementById('paypal-value');
+    if (ex.paypal && ex.paypal.ok) {
+      setBadge('check-paypal', 'ok', 'Operational');
+      pv.classList.remove('error-msg');
+      pv.textContent = 'Ready';
+      document.getElementById('paypal-meta').textContent = ex.paypal.detail || 'Checkout configured';
+    } else {
+      setBadge('check-paypal', 'error', 'Down');
+      pv.textContent = 'Error';
+      pv.classList.add('error-msg');
+      document.getElementById('paypal-meta').textContent = (ex.paypal && ex.paypal.detail) || 'Not configured';
+    }
+
+    // Phone pool
+    const lv = document.getElementById('pool-value');
+    if (ex.pool && ex.pool.ok) {
+      setBadge('check-pool', 'ok', 'Operational');
+      lv.classList.remove('error-msg');
+      lv.textContent = ex.pool.free;
+      document.getElementById('pool-meta').textContent = ex.pool.detail || 'Numbers available';
+    } else {
+      setBadge('check-pool', 'error', 'Down');
+      if (ex.pool && typeof ex.pool.free === 'number') {
+        lv.classList.remove('error-msg');
+        lv.textContent = ex.pool.free;
+      } else {
+        lv.textContent = 'Error';
+        lv.classList.add('error-msg');
+      }
+      document.getElementById('pool-meta').textContent = (ex.pool && ex.pool.detail) || 'Pool unavailable';
+    }
+
+    // Fold PayPal into the overall banner so the page never shows a false green:
+    // if PayPal is down but everything else looked healthy, drop to "Action needed".
+    const banner = document.getElementById('overall-banner');
+    if (ex.paypal && !ex.paypal.ok && banner.classList.contains('healthy')) {
+      setOverall('degraded', 'Action needed', 'PayPal checkout is not configured', ex.paypal.detail || 'Set the PayPal links and redeploy');
+    }
+  } catch (e) {
+    console.error('[health] extras fetch failed:', e);
+    ['paypal', 'pool'].forEach(function (k) {
+      setBadge('check-' + k, 'error', 'Unknown');
+      const v = document.getElementById(k + '-value');
+      v.textContent = '—';
+      v.classList.remove('error-msg');
+      document.getElementById(k + '-meta').textContent = 'Add /api/health-extras to enable this check';
+    });
   }
 }
 
