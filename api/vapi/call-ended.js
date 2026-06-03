@@ -2,49 +2,51 @@ export const config = {
   maxDuration: 30,
 };
 import crypto from "crypto";
-function verifyVapiSignature(req) {
-  try {
-    const signature = req.headers["x-vapi-signature"];
 
-    if (!signature) {
-      console.error("Missing Vapi signature");
-      return false;
-    }
+// ─────────────────────────────────────────────
+// VERIFY THE REQUEST IS REALLY FROM VAPI
+// ─────────────────────────────────────────────
+// Vapi sends the secret you configured (assistant.server.secret) as a plain
+// header called `x-vapi-secret`. Older setups used an HMAC in `x-vapi-signature`.
+// We accept either, and — so first-time testing isn't blocked — we allow the
+// request through if no VAPI_WEBHOOK_SECRET is configured yet (with a warning).
+// Set VAPI_WEBHOOK_SECRET in Vercel (provision.js sends the same value to Vapi)
+// to lock this down before real clients.
+function verifyVapi(req) {
+  const secret = process.env.VAPI_WEBHOOK_SECRET;
 
-    const secret = process.env.VAPI_WEBHOOK_SECRET;
-
-    if (!secret) {
-      console.error("Missing VAPI_WEBHOOK_SECRET");
-      return false;
-    }
-
-    const rawBody =
-      typeof req.body === "string"
-        ? req.body
-        : JSON.stringify(req.body);
-
-    const expectedSignature = crypto
-      .createHmac("sha256", secret)
-      .update(rawBody)
-      .digest("hex");
-
-    return signature === expectedSignature;
-  } catch (err) {
-    console.error("Signature verification failed:", err);
-    return false;
+  if (!secret) {
+    console.warn("VAPI_WEBHOOK_SECRET not set — skipping webhook auth (set it before launch).");
+    return true;
   }
+
+  // 1) Plain shared-secret header (Vapi's default).
+  const headerSecret = req.headers["x-vapi-secret"];
+  if (headerSecret && headerSecret === secret) return true;
+
+  // 2) HMAC signature fallback (older scheme).
+  const signature = req.headers["x-vapi-signature"];
+  if (signature) {
+    try {
+      const rawBody = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+      const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+      if (signature === expected) return true;
+    } catch (err) {
+      console.error("Signature check error:", err);
+    }
+  }
+
+  console.error("Webhook auth failed — no matching x-vapi-secret or x-vapi-signature.");
+  return false;
 }
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const validSignature = verifyVapiSignature(req);
-
-  if (!validSignature) {
-    return res.status(401).json({
-      error: "Invalid webhook signature",
-    });
+  if (!verifyVapi(req)) {
+    return res.status(401).json({ error: "Invalid webhook auth" });
   }
 
   try {
@@ -61,8 +63,7 @@ export default async function handler(req, res) {
 
     const assistantId = call.assistantId || call.assistant?.id || null;
 
-    console.log("CALL ENDED:");
-    console.log("Assistant ID:", assistantId);
+    console.log("CALL ENDED — assistant:", assistantId);
 
     // ─────────────────────────────────────────────
     // LOOK UP CLIENT
@@ -72,40 +73,25 @@ export default async function handler(req, res) {
 
     if (!client) {
       console.error("NO CLIENT FOUND FOR ASSISTANT:", assistantId);
-
-      return res.status(200).json({
-        success: false,
-        error: "No matching client",
-      });
+      return res.status(200).json({ success: false, error: "No matching client" });
     }
 
     console.log("CLIENT FOUND:", client.business_name);
 
-    const transcript =
-      message.transcript || formatTranscript(message.messages);
+    const transcript = message.transcript || formatTranscript(message.messages);
 
     const callData = {
       vapi_call_id: call.id,
       assistant_id: assistantId,
       phone_number_id: call.phoneNumberId || null,
-      caller_number:
-        customer.number || call.customer?.number || "Unknown",
+      caller_number: customer.number || call.customer?.number || "Unknown",
       caller_name: customer.name || null,
-      duration_seconds: Math.round(
-        call.duration || message.durationSeconds || 0
-      ),
+      duration_seconds: Math.round(call.duration || message.durationSeconds || 0),
       call_status: call.status || "ended",
-      ended_reason:
-        message.endedReason || call.endedReason || "unknown",
+      ended_reason: message.endedReason || call.endedReason || "unknown",
       transcript,
-      summary:
-        message.summary ||
-        message.analysis?.summary ||
-        null,
-      recording_url:
-        message.recordingUrl ||
-        call.recordingUrl ||
-        null,
+      summary: message.summary || message.analysis?.summary || null,
+      recording_url: message.recordingUrl || call.recordingUrl || null,
       raw_payload: payload,
       client_uuid: client.id,
     };
@@ -118,10 +104,8 @@ export default async function handler(req, res) {
 
     callData.lead_score = leadAnalysis.score;
     callData.outcome = leadAnalysis.outcome;
-    callData.asked_for_transfer =
-      leadAnalysis.askedForTransfer;
-    callData.asked_for_pricing =
-      leadAnalysis.askedForPricing;
+    callData.asked_for_transfer = leadAnalysis.askedForTransfer;
+    callData.asked_for_pricing = leadAnalysis.askedForPricing;
 
     // ─────────────────────────────────────────────
     // SAVE CALL
@@ -133,21 +117,14 @@ export default async function handler(req, res) {
     // SEND CLIENT EMAIL
     // ─────────────────────────────────────────────
 
-    await sendClientEmail({
-      client,
-      callData,
-      leadAnalysis,
-    });
+    await sendClientEmail({ client, callData, leadAnalysis });
 
     // ─────────────────────────────────────────────
     // HOT LEAD ALERT
     // ─────────────────────────────────────────────
 
     if (leadAnalysis.score === "HOT") {
-      await sendPushNotification({
-        client,
-        callData,
-      });
+      await sendPushNotification({ client, callData });
     }
 
     return res.status(200).json({
@@ -157,36 +134,37 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error("WEBHOOK ERROR:", error);
-
-    return res.status(200).json({
-      error: error.message,
-    });
+    return res.status(200).json({ error: error.message });
   }
 }
 
 // ─────────────────────────────────────────────
 // CLIENT LOOKUP
 // ─────────────────────────────────────────────
+// FIX: provision.js stores the Vapi assistant id in `vapi_assistant_id`, not
+// `assistant_id`. Query that column first, and fall back to the legacy column
+// for any older rows so nothing breaks either way.
 
 async function getClientByAssistantId(assistantId) {
-  const url =
-    `${process.env.SUPABASE_URL}/rest/v1/clients` +
-    `?assistant_id=eq.${assistantId}&select=*`;
+  if (!assistantId) return null;
 
-  const response = await fetch(url, {
-    headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-    },
-  });
+  const base = `${process.env.SUPABASE_URL}/rest/v1/clients`;
+  const headers = {
+    apikey: process.env.SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+  };
 
-  const data = await response.json();
+  // Primary: the column provision actually writes.
+  let resp = await fetch(`${base}?vapi_assistant_id=eq.${assistantId}&select=*`, { headers });
+  let data = await resp.json().catch(() => []);
+  if (Array.isArray(data) && data.length > 0) return data[0];
 
-  if (!Array.isArray(data) || data.length === 0) {
-    return null;
-  }
+  // Fallback: legacy column, in case any old rows used it.
+  resp = await fetch(`${base}?assistant_id=eq.${assistantId}&select=*`, { headers });
+  data = await resp.json().catch(() => []);
+  if (Array.isArray(data) && data.length > 0) return data[0];
 
-  return data[0];
+  return null;
 }
 
 // ─────────────────────────────────────────────
@@ -194,8 +172,7 @@ async function getClientByAssistantId(assistantId) {
 // ─────────────────────────────────────────────
 
 async function saveToSupabase(callData) {
-  const url =
-    `${process.env.SUPABASE_URL}/rest/v1/calls`;
+  const url = `${process.env.SUPABASE_URL}/rest/v1/calls`;
 
   const response = await fetch(url, {
     method: "POST",
@@ -210,10 +187,8 @@ async function saveToSupabase(callData) {
 
   if (!response.ok) {
     const err = await response.text();
-
     console.error("SUPABASE SAVE FAILED:");
     console.error(err);
-
     throw new Error("Failed saving call");
   }
 
@@ -224,89 +199,45 @@ async function saveToSupabase(callData) {
 // EMAIL CLIENT
 // ─────────────────────────────────────────────
 
-async function sendClientEmail({
-  client,
-  callData,
-  leadAnalysis,
-}) {
+async function sendClientEmail({ client, callData, leadAnalysis }) {
   const resendKey = process.env.RESEND_API_KEY;
-
   if (!resendKey) {
     console.log("NO RESEND KEY");
     return;
   }
 
-  const scoreEmoji = {
-    HOT: "🔥",
-    WARM: "🟡",
-    COLD: "🔵",
-    NONE: "⚪",
-  };
-
-  const emoji =
-    scoreEmoji[leadAnalysis.score] || "⚪";
+  const scoreEmoji = { HOT: "🔥", WARM: "🟡", COLD: "🔵", NONE: "⚪" };
+  const emoji = scoreEmoji[leadAnalysis.score] || "⚪";
 
   const html = `
     <div style="font-family:sans-serif;padding:24px;background:#111827;color:white;">
       <h1>${emoji} New Call Lead</h1>
-
-      <p><strong>Business:</strong> ${client.business_name}</p>
-
-      <p><strong>Caller:</strong>
-      ${escapeHtml(callData.caller_number)}</p>
-
-      <p><strong>Lead Score:</strong>
-      ${leadAnalysis.score}</p>
-
-      <p><strong>Outcome:</strong>
-      ${escapeHtml(leadAnalysis.outcome)}</p>
-
-      <p><strong>Duration:</strong>
-      ${callData.duration_seconds}s</p>
-
-      ${
-        callData.summary
-          ? `
-          <h2>Summary</h2>
-          <p>${escapeHtml(callData.summary)}</p>
-        `
-          : ""
-      }
-
-      ${
-        callData.transcript
-          ? `
-          <h2>Transcript</h2>
-          <pre style="white-space:pre-wrap;">${escapeHtml(
-            callData.transcript
-          )}</pre>
-        `
-          : ""
-      }
+      <p><strong>Business:</strong> ${escapeHtml(client.business_name)}</p>
+      <p><strong>Caller:</strong> ${escapeHtml(callData.caller_number)}</p>
+      <p><strong>Lead Score:</strong> ${leadAnalysis.score}</p>
+      <p><strong>Outcome:</strong> ${escapeHtml(leadAnalysis.outcome)}</p>
+      <p><strong>Duration:</strong> ${callData.duration_seconds}s</p>
+      ${callData.summary ? `<h2>Summary</h2><p>${escapeHtml(callData.summary)}</p>` : ""}
+      ${callData.transcript ? `<h2>Transcript</h2><pre style="white-space:pre-wrap;">${escapeHtml(callData.transcript)}</pre>` : ""}
     </div>
   `;
 
-  const response = await fetch(
-    "https://api.resend.com/emails",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "AI Lead Intel <onboarding@resend.dev>",
-        to: [client.notify_email],
-        subject:
-          `${emoji} ${leadAnalysis.score} Lead - ${client.business_name}`,
-        html,
-      }),
-    }
-  );
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "AI Lead Intel <onboarding@resend.dev>",
+      to: [client.notify_email],
+      subject: `${emoji} ${leadAnalysis.score} Lead - ${client.business_name}`,
+      html,
+    }),
+  });
 
   if (!response.ok) {
     const err = await response.text();
-
     console.error("EMAIL FAILED:");
     console.error(err);
   } else {
@@ -318,12 +249,8 @@ async function sendClientEmail({
 // PUSH ALERTS
 // ─────────────────────────────────────────────
 
-async function sendPushNotification({
-  client,
-  callData,
-}) {
+async function sendPushNotification({ client, callData }) {
   const topic = process.env.NTFY_TOPIC;
-
   if (!topic) return;
 
   try {
@@ -334,11 +261,8 @@ async function sendPushNotification({
         Priority: "high",
         Tags: "fire,phone",
       },
-      body:
-        `${client.business_name}\n` +
-        `Caller: ${callData.caller_number}`,
+      body: `${client.business_name}\nCaller: ${callData.caller_number}`,
     });
-
     console.log("PUSH SENT");
   } catch (err) {
     console.error("PUSH FAILED:", err);
@@ -352,30 +276,11 @@ async function sendPushNotification({
 function analyzeLead(transcript) {
   const t = (transcript || "").toLowerCase();
 
-  const hotSignals = [
-    "ready to book",
-    "want to rent",
-    "reserve",
-    "sign up",
-    "i'll take it",
-    "move in",
-  ];
+  const hotSignals = ["ready to book", "want to rent", "reserve", "sign up", "i'll take it", "move in"];
+  const warmSignals = ["pricing", "price", "cost", "available", "availability", "hours", "how much"];
 
-  const warmSignals = [
-    "pricing",
-    "price",
-    "cost",
-    "available",
-    "availability",
-    "hours",
-    "how much",
-  ];
-
-  const askedForTransfer =
-    /human|manager|representative|real person/i.test(t);
-
-  const askedForPricing =
-    /price|pricing|cost|monthly/i.test(t);
+  const askedForTransfer = /human|manager|representative|real person/i.test(t);
+  const askedForPricing = /price|pricing|cost|monthly/i.test(t);
 
   let score = "COLD";
   let outcome = "General inquiry";
@@ -390,13 +295,9 @@ function analyzeLead(transcript) {
 
   if (score !== "HOT") {
     let warmCount = 0;
-
     for (const signal of warmSignals) {
-      if (t.includes(signal)) {
-        warmCount++;
-      }
+      if (t.includes(signal)) warmCount++;
     }
-
     if (warmCount >= 2) {
       score = "WARM";
       outcome = "Interested lead";
@@ -408,12 +309,7 @@ function analyzeLead(transcript) {
     outcome = "Short call";
   }
 
-  return {
-    score,
-    outcome,
-    askedForTransfer,
-    askedForPricing,
-  };
+  return { score, outcome, askedForTransfer, askedForPricing };
 }
 
 // ─────────────────────────────────────────────
@@ -421,18 +317,11 @@ function analyzeLead(transcript) {
 // ─────────────────────────────────────────────
 
 function formatTranscript(messages) {
-  if (!messages || !Array.isArray(messages)) {
-    return "";
-  }
-
+  if (!messages || !Array.isArray(messages)) return "";
   return messages
     .filter((m) => m.role && m.message)
     .map((m) => {
-      const role =
-        m.role === "assistant" || m.role === "bot"
-          ? "AI"
-          : "Caller";
-
+      const role = m.role === "assistant" || m.role === "bot" ? "AI" : "Caller";
       return `${role}: ${m.message}`;
     })
     .join("\n");
@@ -444,7 +333,6 @@ function formatTranscript(messages) {
 
 function escapeHtml(str) {
   if (!str) return "";
-
   return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
