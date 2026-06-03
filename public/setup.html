@@ -297,7 +297,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
                 </div>
               </div>
               <div class="voice-card-desc">Friendly, conversational, and welcoming.</div>
-              <div class="voice-card-preview disabled" data-preview="warm_female" data-src="/audio/voice-samples/warm_female.mp3" role="button" tabindex="0">
+              <div class="voice-card-preview" data-preview="warm_female" role="button" tabindex="0">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 Preview Voice
               </div>
@@ -316,7 +316,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
                 </div>
               </div>
               <div class="voice-card-desc">Clear, polished, and professional.</div>
-              <div class="voice-card-preview disabled" data-preview="professional_female" data-src="/audio/voice-samples/professional_female.mp3" role="button" tabindex="0">
+              <div class="voice-card-preview" data-preview="professional_female" role="button" tabindex="0">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 Preview Voice
               </div>
@@ -335,7 +335,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
                 </div>
               </div>
               <div class="voice-card-desc">Relaxed, patient, and trustworthy.</div>
-              <div class="voice-card-preview disabled" data-preview="calm_male" data-src="/audio/voice-samples/calm_male.mp3" role="button" tabindex="0">
+              <div class="voice-card-preview" data-preview="calm_male" role="button" tabindex="0">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 Preview Voice
               </div>
@@ -354,7 +354,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
                 </div>
               </div>
               <div class="voice-card-desc">Confident, premium, and authoritative.</div>
-              <div class="voice-card-preview disabled" data-preview="deep_male" data-src="/audio/voice-samples/deep_male.mp3" role="button" tabindex="0">
+              <div class="voice-card-preview" data-preview="deep_male" role="button" tabindex="0">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 Preview Voice
               </div>
@@ -421,9 +421,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </div>
 
-<!-- Hidden audio for voice previews; src is set dynamically -->
-<audio id="voice-preview-audio" preload="none" playsinline></audio>
-
 <script>
 (function () {
   const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
@@ -452,8 +449,101 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   // Voice card wiring
   const voiceGrid = document.getElementById('voice-grid');
   const voiceHidden = document.getElementById('voice_style');
-  const previewAudio = document.getElementById('voice-preview-audio');
+
+  // ---- Voice preview via the browser SpeechSynthesis API ----
+  const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  const SS_SUPPORTED = !!synth && (typeof window.SpeechSynthesisUtterance === 'function');
+
+  // Per-style sample text + delivery. Rate < 1 = slower, pitch < 1 = lower.
+  const VOICE_PREVIEWS = {
+    warm_female:         { gender: 'female', rate: 0.9,  pitch: 1.1, text: "Hi, thanks for calling. I'd be happy to help you today." },
+    professional_female: { gender: 'female', rate: 1.0,  pitch: 1.0, text: "Thank you for calling. How may I assist you today?" },
+    calm_male:           { gender: 'male',   rate: 0.9,  pitch: 1.0, text: "Thanks for calling. Tell me how I can help." },
+    deep_male:           { gender: 'male',   rate: 0.95, pitch: 0.7, text: "Thank you for calling. How may I direct your call today?" },
+  };
+
+  const PLAY_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  const STOP_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+
   let currentlyPlayingPreview = null;
+  let currentUtterance = null;
+  let speakTimer = null;
+
+  // The Web Speech API exposes no reliable gender flag, so we infer it from
+  // voice names (with a fallback to language/locality ranking).
+  let voicesCache = [];
+  function refreshVoices() {
+    if (!SS_SUPPORTED) return;
+    const v = synth.getVoices();
+    if (v && v.length) voicesCache = v;
+  }
+  refreshVoices();
+  if (SS_SUPPORTED && typeof synth.addEventListener === 'function') {
+    synth.addEventListener('voiceschanged', refreshVoices);
+  }
+
+  const FEMALE_NAMES = ['samantha','victoria','karen','moira','tessa','fiona','veena','susan','zira','hazel','heather','catherine','allison','ava','nora','serena','linda','sandy','shelley','kathy','princess','google uk english female'];
+  const MALE_NAMES   = ['alex','daniel','fred','tom','aaron','arthur','oliver','david','mark','george','james','rishi','gordon','reed','rocko','bruce','junior','ralph','google uk english male'];
+
+  function classifyVoice(rawName) {
+    const n = (rawName || '').toLowerCase();
+    let f = 0, m = 0;
+    if (n.includes('female') || n.includes('woman')) f += 3;
+    if (n.includes('male') && !n.includes('female')) m += 3;   // 'male' is inside 'female' — guard it
+    if (n.includes('man') && !n.includes('woman')) m += 1;
+    if (FEMALE_NAMES.some(x => n.includes(x))) f += 3;
+    if (MALE_NAMES.some(x => n.includes(x))) m += 3;
+    return { f, m };
+  }
+
+  function rankVoices(gender) {
+    refreshVoices();
+    return voicesCache
+      .map(v => {
+        const { f, m } = classifyVoice(v.name);
+        const isEn = /^en/i.test(v.lang || '');
+        let score = (gender === 'female') ? (f - m) : (m - f);
+        if (isEn) score += 1.5;
+        if (v.localService) score += 0.5;
+        return { v, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map(x => x.v);
+  }
+
+  // Give the two same-gender styles distinct voices when the device has them;
+  // otherwise they share a voice and are differentiated by rate/pitch.
+  function resolveVoice(style) {
+    const females = rankVoices('female');
+    const males = rankVoices('male');
+    const map = {
+      warm_female: females[0],
+      professional_female: females[1] || females[0],
+      calm_male: males[0],
+      deep_male: males[1] || males[0],
+    };
+    return map[style] || null;
+  }
+
+  // Normalise each preview button: drop the legacy "disabled" (mp3) state,
+  // give the label its own span so we can swap its text, and flag unsupported browsers.
+  const previewButtons = [...voiceGrid.querySelectorAll('.voice-card-preview')];
+  previewButtons.forEach(btn => {
+    btn.classList.remove('disabled');
+    btn.removeAttribute('data-src');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = PLAY_ICON + '<span class="vp-label">Preview Voice</span>';
+    if (!SS_SUPPORTED) btn.classList.add('disabled');
+  });
+
+  function setPreviewPlaying(btn, playing) {
+    btn.classList.toggle('playing', playing);
+    btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    const icon = btn.querySelector('svg');
+    if (icon) icon.outerHTML = playing ? STOP_ICON : PLAY_ICON;
+    const label = btn.querySelector('.vp-label');
+    if (label) label.textContent = playing ? 'Playing…' : 'Preview Voice';
+  }
 
   function selectVoiceCard(value) {
     [...voiceGrid.querySelectorAll('.voice-card')].forEach(c => {
@@ -478,52 +568,81 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   });
 
   function stopAllPreviews() {
-    try { previewAudio.pause(); previewAudio.currentTime = 0; } catch (_) {}
+    if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
+    // Always cancel any queued/active speech before starting something new.
+    if (SS_SUPPORTED) { try { synth.cancel(); } catch (_) {} }
     if (currentlyPlayingPreview) {
-      currentlyPlayingPreview.classList.remove('playing');
-      const svg = currentlyPlayingPreview.querySelector('svg');
-      if (svg) svg.outerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      setPreviewPlaying(currentlyPlayingPreview, false);
       currentlyPlayingPreview = null;
     }
+    currentUtterance = null;
   }
 
   function handlePreviewClick(btn) {
-    // If button is "disabled" (no audio file yet), show a quick message
-    if (btn.classList.contains('disabled')) {
-      showAlert('info', 'Voice samples coming soon. You can still pick the style and we\'ll apply it during setup.');
+    if (!SS_SUPPORTED) {
+      showAlert('info', 'Voice preview isn\'t supported in this browser. You can still pick a style and we\'ll apply it during setup.');
       return;
     }
 
-    // If this button is already playing, stop
+    const cfg = VOICE_PREVIEWS[btn.dataset.preview];
+    if (!cfg) return;
+
+    // Clicking the one that's already playing just stops it.
     if (currentlyPlayingPreview === btn) {
       stopAllPreviews();
       return;
     }
 
+    // Stop whatever is currently playing, then start this one.
     stopAllPreviews();
 
-    const src = btn.dataset.src;
-    if (!src) return;
-    try {
-      previewAudio.src = src;
-      previewAudio.currentTime = 0;
-      const p = previewAudio.play();
-      if (p && typeof p.then === 'function') {
-        p.then(() => {
-          btn.classList.add('playing');
-          const svg = btn.querySelector('svg');
-          if (svg) svg.outerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-          currentlyPlayingPreview = btn;
-        }).catch(() => {
-          showAlert('info', 'Couldn\'t play that preview right now. Try again in a moment.');
-        });
+    const u = new SpeechSynthesisUtterance(cfg.text);
+    u.rate = cfg.rate;
+    u.pitch = cfg.pitch;
+    u.volume = 1;
+    const voice = resolveVoice(btn.dataset.preview);
+    if (voice) { u.voice = voice; u.lang = voice.lang; }
+    else { u.lang = 'en-US'; }
+
+    u.onend = () => { if (currentlyPlayingPreview === btn) stopAllPreviews(); };
+    u.onerror = (ev) => {
+      const err = ev && ev.error;
+      // cancel()/new selection fire 'canceled'/'interrupted' — those are expected, not failures.
+      if (currentlyPlayingPreview === btn) stopAllPreviews();
+      if (err && err !== 'canceled' && err !== 'interrupted') {
+        showAlert('info', 'Couldn\'t play that preview right now. Try again in a moment.');
       }
-    } catch (err) {
-      console.warn('preview play error', err);
-    }
+    };
+
+    currentlyPlayingPreview = btn;
+    currentUtterance = u;
+    setPreviewPlaying(btn, true);
+
+    // Small defer: Chrome can drop a speak() that lands too soon after cancel().
+    speakTimer = setTimeout(() => {
+      speakTimer = null;
+      try {
+        synth.speak(u);
+      } catch (err) {
+        console.warn('preview speak error', err);
+        stopAllPreviews();
+        showAlert('info', 'Couldn\'t play that preview right now. Try again in a moment.');
+      }
+    }, 60);
   }
 
-  previewAudio.addEventListener('ended', stopAllPreviews);
+  // Keyboard support for the role="button" preview elements.
+  voiceGrid.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+    const previewBtn = e.target.closest('.voice-card-preview');
+    if (!previewBtn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handlePreviewClick(previewBtn);
+  });
+
+  // Stop speech if the user leaves/closes the tab mid-preview.
+  window.addEventListener('beforeunload', () => { if (SS_SUPPORTED) { try { synth.cancel(); } catch (_) {} } });
 
   // Restore voice style from localStorage (until DB hydration overrides it)
   try {
