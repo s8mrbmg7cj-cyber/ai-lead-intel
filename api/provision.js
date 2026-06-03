@@ -29,6 +29,12 @@ const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || '';
 const LOW_STOCK = 3; // alert when free numbers drop to this or below
 
+// Spoken to every caller at the very start of the call, and stated in the prompt.
+// This is the recording + "you're talking to an AI" disclosure. Edit the wording
+// freely. Recording-consent law varies by state (some require all parties consent),
+// so confirm the wording for the states you operate in before relying on it.
+const CALL_DISCLOSURE = "Just so you know, you're speaking with our AI virtual assistant, and this call may be recorded for quality and follow-up.";
+
 const VOICE_MAP = {
   warm_female:         { provider: 'openai', voiceId: 'shimmer' },
   professional_female: { provider: 'openai', voiceId: 'nova' },
@@ -84,7 +90,23 @@ async function notify(text) {
   try { await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: text }); } catch (_) {}
 }
 
+// The system prompt sent to Vapi. Prefer the detailed prompt that onboarding
+// already built and stored in `ai_prompt` (it has the pricing ranges, the
+// what-to-collect list, emergency handling, and the hard rules). Only fall back
+// to a basic prompt if `ai_prompt` is somehow empty. Either way, the call
+// disclosure is appended so the AI handles it consistently.
 function buildSystemPrompt(c) {
+  let prompt = (c.ai_prompt && c.ai_prompt.trim())
+    ? c.ai_prompt.trim()
+    : buildBasicPrompt(c);
+  prompt += '\n\n# DISCLOSURE\n'
+    + 'If the caller asks, confirm that you are an AI virtual assistant and that the call may be recorded. '
+    + 'Never claim or imply that you are a human.';
+  return prompt;
+}
+
+// Fallback only — used when a client row has no stored ai_prompt.
+function buildBasicPrompt(c) {
   const L = [];
   L.push(`You are the AI receptionist for ${c.business_name || 'this business'}, a ${c.business_type || 'local service'} company.`);
   if (c.ai_personality) L.push(`Your tone is ${c.ai_personality}.`);
@@ -151,9 +173,10 @@ export default async function handler(req, res) {
     const model = CLAUDE_MODEL
       ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
       : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
+    const greeting = client.caller_greeting || 'Thanks for calling. How can I help you today?';
     const assistantPayload = {
       name: `${client.business_name || client.client_slug} receptionist`,
-      firstMessage: client.caller_greeting || 'Thanks for calling. How can I help you today?',
+      firstMessage: `${CALL_DISCLOSURE} ${greeting}`,
       model,
       voice,
     };
