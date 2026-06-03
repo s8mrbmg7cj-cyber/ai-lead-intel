@@ -91,6 +91,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .status-banner-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
 .status-banner-sub { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.ai-number-card { display:flex; align-items:center; justify-content:space-between; gap:14px; background: linear-gradient(135deg, var(--brand-tint), transparent 70%), var(--surface); border:1px solid var(--brand-line); border-radius:14px; padding:18px 20px; margin-bottom:20px; flex-wrap:wrap; }
+.ai-number-left { min-width:0; }
+.ai-number-label { font-family:'Geist Mono',monospace; font-size:10px; color:var(--brand); letter-spacing:0.14em; text-transform:uppercase; font-weight:700; margin-bottom:6px; }
+.ai-number-value { font-family:'Geist Mono',monospace; font-size:24px; font-weight:600; color:var(--text); letter-spacing:0.02em; }
+.ai-number-status { font-size:11.5px; color:var(--text-dim); margin-top:5px; }
+.ai-copy-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-radius:10px; font-size:13px; font-weight:600; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); }
+.ai-copy-btn.copied { background:linear-gradient(135deg,var(--green),#4ade80); }
 .stat { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; position: relative; overflow: hidden; transition: all 0.2s; min-width: 0; }
 .stat:hover { border-color: var(--border-2); }
 .stat-label { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
@@ -274,10 +281,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
   </div>
   <div id="billing-section"></div>
+  <div class="ai-number-card" id="ai-number-card" style="display:none;">
+    <div class="ai-number-left">
+      <div class="ai-number-label">Your AI receptionist number</div>
+      <div class="ai-number-value" id="ai-number-value">—</div>
+      <div class="ai-number-status" id="ai-number-status"></div>
+    </div>
+    <button class="ai-copy-btn" id="ai-copy-btn" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <span id="ai-copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Calls Today</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub">Since midnight</div></div>
+    <div class="stat"><div class="stat-label">This Week</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">Last 7 days</div></div>
+    <div class="stat"><div class="stat-label">This Month</div><div class="stat-value" id="stat-month">0</div><div class="stat-sub">Last 30 days</div></div>
+  </div>
   <div class="stats-row">
     <div class="stat"><div class="stat-label">Calls Answered</div><div class="stat-value" id="stat-calls">0</div><div class="stat-sub" id="stat-calls-sub">All time</div></div>
     <div class="stat"><div class="stat-label">Missed Calls Recovered</div><div class="stat-value" id="stat-recovered">0</div><div class="stat-sub" id="stat-recovered-sub">Captured by AI</div></div>
-    <div class="stat"><div class="stat-label">Avg Response Time</div><div class="stat-value" id="stat-answer">—</div><div class="stat-sub">Time to pickup</div></div>
+    <div class="stat"><div class="stat-label">Avg Call Length</div><div class="stat-value" id="stat-answer">—</div><div class="stat-sub">Per call</div></div>
   </div>
   <div class="dash-grid">
     <div class="panel">
@@ -529,6 +552,41 @@ function renderDashboard(client, calls) {
   document.getElementById('info-payment').textContent = paymentLabel;
 
   const callsArr = calls || [];
+
+  // AI number card (twilio_number is the assigned AI line).
+  const aiNum = client.twilio_number || '';
+  const card = document.getElementById('ai-number-card');
+  if (card && aiNum) {
+    document.getElementById('ai-number-value').textContent = formatPhone(aiNum);
+    const st = document.getElementById('ai-number-status');
+    if (st) st.textContent = 'Active · forward your business line here';
+    const copyBtn = document.getElementById('ai-copy-btn');
+    if (copyBtn) {
+      copyBtn.dataset.raw = aiNum;
+      copyBtn.addEventListener('click', function () {
+        navigator.clipboard.writeText(this.dataset.raw).then(() => {
+          this.classList.add('copied');
+          document.getElementById('ai-copy-label').textContent = 'Copied!';
+          setTimeout(() => { this.classList.remove('copied'); document.getElementById('ai-copy-label').textContent = 'Copy'; }, 1800);
+        }).catch(() => {});
+      });
+    }
+    card.style.display = 'flex';
+  }
+
+  // Time-window counts.
+  const now = Date.now();
+  const since = (days) => now - days * 86400000;
+  const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
+  const ts = (c) => new Date(c.created_at).getTime();
+  const today = callsArr.filter(c => ts(c) >= startOfToday.getTime()).length;
+  const week = callsArr.filter(c => ts(c) >= since(7)).length;
+  const month = callsArr.filter(c => ts(c) >= since(30)).length;
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setText('stat-today', today);
+  setText('stat-week', week);
+  setText('stat-month', month);
+
   // Missed calls recovered: a captured call that came in while the human line
   // didn't pick up. We treat any answered AI call with a real outcome as recovered,
   // and also honor explicit flags if present.
@@ -542,18 +600,13 @@ function renderDashboard(client, calls) {
   document.getElementById('stat-calls-sub').textContent = callsArr.length === 0 ? 'No calls yet' : 'All time';
   document.getElementById('stat-recovered-sub').textContent = recoveredCalls.length === 0 ? 'None yet' : 'Captured by AI';
 
-  // Avg call length (from duration_seconds), shown in the response-time card.
+  // Avg call length (from duration_seconds).
   const withDuration = callsArr.filter(c => Number(c.duration_seconds) > 0);
   const answerEl = document.getElementById('stat-answer');
   if (answerEl) {
-    if (withDuration.length > 0) {
-      const avg = withDuration.reduce((sum, c) => sum + Number(c.duration_seconds), 0) / withDuration.length;
-      answerEl.textContent = formatDuration(avg);
-      const sub = answerEl.parentElement && answerEl.parentElement.querySelector('.stat-sub');
-      if (sub) sub.textContent = 'Avg call length';
-    } else {
-      answerEl.textContent = '—';
-    }
+    answerEl.textContent = withDuration.length > 0
+      ? formatDuration(withDuration.reduce((s, c) => s + Number(c.duration_seconds), 0) / withDuration.length)
+      : '—';
   }
 
   renderCalls(callsArr);
