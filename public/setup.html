@@ -160,6 +160,62 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .voice-card-preview.disabled:hover { background: var(--surface-3); border-color: var(--border-2); color: var(--text-soft); }
 @media (max-width: 600px) { .voice-grid { grid-template-columns: 1fr; gap: 10px; } }
 
+/* ====== QUICK-SELECT PRESET CHIPS ====== */
+.preset-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset-chip {
+  padding: 9px 14px; border-radius: 99px; background: var(--surface-input);
+  border: 1px solid var(--border-2); color: var(--text-soft); font-size: 13px;
+  font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.16s;
+  display: inline-flex; align-items: center; gap: 8px; line-height: 1;
+}
+.preset-chip:hover { border-color: var(--border-3); background: var(--surface-3); color: var(--text); }
+.preset-chip.active {
+  border-color: var(--brand-line); color: var(--brand);
+  background: linear-gradient(180deg, rgba(255,106,0,0.14), rgba(255,106,0,0.05));
+  box-shadow: 0 0 0 1px var(--brand-line) inset;
+}
+.preset-chip::before {
+  content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border-3); transition: all 0.16s; background-position: center; background-repeat: no-repeat;
+}
+.preset-chip.active::before {
+  border-color: var(--brand); background-color: var(--brand);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+}
+.preset-add {
+  align-self: flex-start; margin-top: 10px; font-size: 12.5px; font-weight: 600;
+  color: var(--text-dim); font-family: inherit; cursor: pointer; padding: 4px 2px; transition: color 0.16s;
+}
+.preset-add:hover { color: var(--brand); }
+.preset-note { margin-top: 10px; min-height: 70px; }
+
+/* ====== AI RECEPTIONIST NUMBER CARD ====== */
+.ai-number-card {
+  background: linear-gradient(180deg, rgba(255,106,0,0.08), rgba(255,106,0,0.02)), var(--surface-input);
+  border: 1px solid var(--brand-line); border-radius: 12px; padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+}
+.ai-number-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ai-number-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
+.ai-number-value { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); font-variant-numeric: tabular-nums; }
+.ai-number-copy {
+  display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 9px;
+  background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-soft);
+  font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.16s; flex-shrink: 0;
+}
+.ai-number-copy:hover { border-color: var(--brand-line); color: var(--brand); }
+.ai-number-pending {
+  background: var(--surface-input); border: 1px dashed var(--border-3); border-radius: 12px;
+  padding: 16px 18px; color: var(--text-dim); font-size: 13px; line-height: 1.55;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.ai-number-pending .dot2 { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); margin-top: 5px; flex-shrink: 0; animation: pulse 1.6s ease-in-out infinite; }
+.ai-steps { list-style: none; counter-reset: s; margin-top: 14px; display: flex; flex-direction: column; gap: 9px; }
+.ai-steps li { counter-increment: s; position: relative; padding-left: 30px; font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.ai-steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; }
+.ai-steps li strong { color: var(--text-soft); font-weight: 600; }
+.ai-steps code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 5px; padding: 1px 6px; color: var(--text); }
+
 .section-divider { height: 1px; background: var(--border); margin: 4px 0; }
 .section-title-mini {
   font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em;
@@ -388,25 +444,59 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <textarea id="services_offered" name="services_offered" class="textarea" maxlength="1500" placeholder="Weekly lawn care ($40–$75 per visit), seasonal cleanup, sprinkler repair, mulch installation. Final quotes from owner only."></textarea>
         </div>
 
-        <!-- Forwarding Number -->
+        <div class="section-divider"></div>
+        <div class="section-title-mini">Phone setup</div>
+
+        <!-- AI receptionist number (provisioned + stored by the backend) -->
         <div class="field">
-          <label class="field-label" for="forwarding_number">Forwarding number (yours)</label>
-          <div class="field-help">The phone number where urgent calls should be forwarded to you.</div>
+          <label class="field-label">Your AI receptionist number</label>
+          <div class="field-help">This is the number your AI answers on. Point your business line here and every call gets picked up.</div>
+          <div id="ai-number-box"></div>
+        </div>
+
+        <!-- Owner's cell for live transfers -->
+        <div class="field">
+          <label class="field-label" for="forwarding_number">Your cell — for live transfers</label>
+          <div class="field-help">When the AI transfers an urgent call, this is the number it rings. Usually your mobile.</div>
           <input type="tel" id="forwarding_number" name="forwarding_number" class="input" maxlength="20" placeholder="(801) 555-0142" />
         </div>
 
-        <!-- Transfer Destination -->
+        <div class="section-divider"></div>
+
+        <!-- Transfer rules (quick-select) -->
         <div class="field">
-          <label class="field-label" for="transfer_destination">When should the AI transfer to you?</label>
-          <div class="field-help">Examples: hot leads, emergencies, callers who insist on speaking to a person.</div>
-          <textarea id="transfer_destination" name="transfer_destination" class="textarea" maxlength="500" placeholder="Transfer if it's an after-hours emergency, or if the caller specifically asks to speak to the owner."></textarea>
+          <label class="field-label">When should the AI transfer a call to you?</label>
+          <div class="field-help">Tap all that apply. Leave everything off and the AI handles calls on its own.</div>
+          <div class="preset-grid" id="transfer-grid">
+            <button type="button" class="preset-chip" data-label="Caller asks to speak to a person">Caller asks for a person</button>
+            <button type="button" class="preset-chip" data-label="After-hours emergency">After-hours emergency</button>
+            <button type="button" class="preset-chip" data-label="Hot lead ready to buy">Hot lead, ready to buy</button>
+            <button type="button" class="preset-chip" data-label="Pricing or quote question">Pricing / quote question</button>
+            <button type="button" class="preset-chip" data-label="Existing customer issue">Existing customer issue</button>
+            <button type="button" class="preset-chip" data-label="Scheduling or rescheduling">Scheduling</button>
+          </div>
+          <button type="button" class="preset-add" data-target="transfer_note">+ Add your own</button>
+          <textarea id="transfer_note" class="textarea preset-note hidden" maxlength="300" placeholder="Anything else that should get transferred to you…"></textarea>
+          <input type="hidden" id="transfer_destination" />
         </div>
 
-        <!-- Emergency Rules -->
+        <!-- Emergency rules (quick-select) -->
         <div class="field">
-          <label class="field-label" for="emergency_rules">Emergency or special handling rules</label>
-          <div class="field-help">Anything the AI should treat as urgent or escalate immediately.</div>
-          <textarea id="emergency_rules" name="emergency_rules" class="textarea" maxlength="800" placeholder="If a caller says the word 'flood', 'no heat in winter', or 'gas smell' — flag as hot lead and text me immediately."></textarea>
+          <label class="field-label">What counts as an emergency?</label>
+          <div class="field-help">Tap the situations the AI should flag as urgent and alert you about right away.</div>
+          <div class="preset-grid" id="emergency-grid">
+            <button type="button" class="preset-chip" data-label="Flood or major leak">Flood / major leak</button>
+            <button type="button" class="preset-chip" data-label="Burst or frozen pipe">Burst / frozen pipe</button>
+            <button type="button" class="preset-chip" data-label="No water">No water</button>
+            <button type="button" class="preset-chip" data-label="No heat in winter">No heat (winter)</button>
+            <button type="button" class="preset-chip" data-label="No air conditioning in heat">No A/C (heat wave)</button>
+            <button type="button" class="preset-chip" data-label="Gas smell">Gas smell</button>
+            <button type="button" class="preset-chip" data-label="Sewage backup">Sewage backup</button>
+            <button type="button" class="preset-chip" data-label="Electrical hazard">Electrical hazard</button>
+          </div>
+          <button type="button" class="preset-add" data-target="emergency_note">+ Add your own</button>
+          <textarea id="emergency_note" class="textarea preset-note hidden" maxlength="400" placeholder="Other words or situations to treat as urgent…"></textarea>
+          <input type="hidden" id="emergency_rules" />
         </div>
 
         <div class="btn-row">
@@ -644,6 +734,120 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   // Stop speech if the user leaves/closes the tab mid-preview.
   window.addEventListener('beforeunload', () => { if (SS_SUPPORTED) { try { synth.cancel(); } catch (_) {} } });
 
+  // ---- Quick-select presets (transfer rules + emergencies) ----
+  // Chips + an optional note are folded into the existing text columns
+  // (transfer_destination / emergency_rules), so the backend contract is unchanged.
+  const transferGrid = document.getElementById('transfer-grid');
+  const emergencyGrid = document.getElementById('emergency-grid');
+  const transferHidden = document.getElementById('transfer_destination');
+  const emergencyHidden = document.getElementById('emergency_rules');
+  const transferNote = document.getElementById('transfer_note');
+  const emergencyNote = document.getElementById('emergency_note');
+  const NOTE_SEP = ' — Note: ';
+
+  function syncPreset(grid, noteEl, hiddenEl) {
+    const labels = [...grid.querySelectorAll('.preset-chip.active')].map(c => c.dataset.label);
+    let val = labels.join('; ');
+    const note = (noteEl.value || '').trim();
+    if (note) val = val ? (val + NOTE_SEP + note) : note;
+    hiddenEl.value = val;
+  }
+
+  function wirePresetGrid(grid, noteEl, hiddenEl) {
+    grid.addEventListener('click', (e) => {
+      const chip = e.target.closest('.preset-chip');
+      if (!chip) return;
+      chip.classList.toggle('active');
+      chip.setAttribute('aria-pressed', chip.classList.contains('active') ? 'true' : 'false');
+      syncPreset(grid, noteEl, hiddenEl);
+    });
+    noteEl.addEventListener('input', () => syncPreset(grid, noteEl, hiddenEl));
+  }
+  wirePresetGrid(transferGrid, transferNote, transferHidden);
+  wirePresetGrid(emergencyGrid, emergencyNote, emergencyHidden);
+
+  // "+ Add your own" reveals the optional note box
+  [...document.querySelectorAll('.preset-add')].forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      target.classList.remove('hidden');
+      btn.classList.add('hidden');
+      target.focus();
+    });
+  });
+
+  function hydratePreset(grid, noteEl, hiddenEl, addBtnSelector, saved) {
+    if (!saved) return;
+    let main = saved, note = '';
+    const idx = saved.indexOf(NOTE_SEP);
+    if (idx !== -1) { main = saved.slice(0, idx); note = saved.slice(idx + NOTE_SEP.length); }
+    let matchedAny = false;
+    [...grid.querySelectorAll('.preset-chip')].forEach(chip => {
+      if (main.includes(chip.dataset.label)) { chip.classList.add('active'); chip.setAttribute('aria-pressed','true'); matchedAny = true; }
+    });
+    // Legacy free-text saves (no chip matched) drop into the note box so nothing is lost.
+    if (!matchedAny && main.trim()) { note = note ? (main.trim() + '. ' + note) : main.trim(); }
+    if (note) {
+      noteEl.value = note;
+      noteEl.classList.remove('hidden');
+      const addBtn = document.querySelector(addBtnSelector);
+      if (addBtn) addBtn.classList.add('hidden');
+    }
+    syncPreset(grid, noteEl, hiddenEl);
+  }
+
+  // ---- AI receptionist number display ----
+  // The number itself is provisioned + stored server-side (see notes to the dev).
+  // This just surfaces whatever the backend saved on the client row.
+  const aiNumberBox = document.getElementById('ai-number-box');
+
+  function formatPhone(raw) {
+    const d = ('' + raw).replace(/[^\d]/g, '');
+    if (d.length === 10) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
+    if (d.length === 11 && d[0] === '1') return '+1 (' + d.slice(1,4) + ') ' + d.slice(4,7) + '-' + d.slice(7);
+    return raw;
+  }
+
+  function renderAiNumber(client) {
+    const raw = client.twilio_number || client.ai_phone_number || client.vapi_phone_number
+      || client.phone_number || client.receptionist_number || client.ai_number || '';
+    if (raw) {
+      const pretty = formatPhone(raw);
+      aiNumberBox.innerHTML =
+        '<div class="ai-number-card">' +
+          '<div class="ai-number-main">' +
+            '<span class="ai-number-label">Your AI number</span>' +
+            '<span class="ai-number-value"></span>' +
+          '</div>' +
+          '<button type="button" class="ai-number-copy" id="ai-number-copy">' +
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+            '<span>Copy</span>' +
+          '</button>' +
+        '</div>' +
+        '<ol class="ai-steps">' +
+          '<li><strong>Forward your business line to this number.</strong> On most US carriers, dial <code>*72</code> then the number above; dial <code>*73</code> to turn forwarding off later. (Codes vary by carrier — your phone provider can confirm.)</li>' +
+          '<li><strong>Test it.</strong> Call your real business number from another phone — your AI should answer with the greeting you set above.</li>' +
+          '<li><strong>Urgent calls reach you.</strong> When a call matches your transfer rules, the AI rings the cell you entered above.</li>' +
+        '</ol>';
+      aiNumberBox.querySelector('.ai-number-value').textContent = pretty; // textContent avoids HTML injection
+      const copyBtn = document.getElementById('ai-number-copy');
+      if (copyBtn) copyBtn.addEventListener('click', () => {
+        const span = copyBtn.querySelector('span');
+        const done = () => { if (span) { span.textContent = 'Copied'; setTimeout(() => { span.textContent = 'Copy'; }, 1600); } };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText('' + raw).then(done).catch(done);
+        } else { done(); }
+      });
+    } else {
+      aiNumberBox.innerHTML =
+        '<div class="ai-number-pending">' +
+          '<span class="dot2"></span>' +
+          '<div>Your AI number is being set up. It usually appears within a few minutes of signing up — refresh this page shortly. If it\'s still not here within an hour, email <strong>hello@aileadintel.com</strong> and we\'ll sort it out.</div>' +
+        '</div>';
+    }
+  }
+
   // Restore voice style from localStorage (until DB hydration overrides it)
   try {
     const saved = localStorage.getItem('selectedVoiceStyle');
@@ -691,7 +895,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     if (slug) {
       const { data, error } = await sb
         .from('clients')
-        .select('id, client_slug, business_name, owner_user_id, plan, setup_complete, business_type, caller_greeting, ai_personality, voice_style, business_hours, service_area, services_offered, forwarding_number, transfer_destination, emergency_rules, ai_greeting')
+        .select('*')
         .eq('client_slug', slug)
         .maybeSingle();
       queryError = error;
@@ -700,7 +904,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       // No slug — find first client for this user
       const { data, error } = await sb
         .from('clients')
-        .select('id, client_slug, business_name, owner_user_id, plan, setup_complete, business_type, caller_greeting, ai_personality, voice_style, business_hours, service_area, services_offered, forwarding_number, transfer_destination, emergency_rules, ai_greeting')
+        .select('*')
         .eq('owner_user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -758,8 +962,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     document.getElementById('service_area').value = client.service_area || '';
     document.getElementById('services_offered').value = client.services_offered || '';
     document.getElementById('forwarding_number').value = client.forwarding_number || '';
-    document.getElementById('transfer_destination').value = client.transfer_destination || '';
-    document.getElementById('emergency_rules').value = client.emergency_rules || '';
+    hydratePreset(transferGrid, transferNote, transferHidden, '[data-target="transfer_note"]', client.transfer_destination || '');
+    hydratePreset(emergencyGrid, emergencyNote, emergencyHidden, '[data-target="emergency_note"]', client.emergency_rules || '');
+    renderAiNumber(client);
 
     // Topnav
     if (client.business_name) {
@@ -778,6 +983,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAlert();
+
+    // Make sure chip selections are written into the hidden fields before we read them.
+    syncPreset(transferGrid, transferNote, transferHidden);
+    syncPreset(emergencyGrid, emergencyNote, emergencyHidden);
 
     // Required: voice style & personality
     if (!personalityHidden.value) {
@@ -829,7 +1038,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       if (!resp.ok) {
         submitBtn.disabled = false;
         submitLabel.textContent = originalLabel;
-        showAlert('error', body?.error || 'Couldn\'t save your setup. Try again in a moment.');
+        console.error('save-setup failed', { status: resp.status, body });
+        let msg = (body && body.error) ? body.error : 'Couldn\'t save your setup.';
+        if (resp.status === 404) {
+          msg = 'Save service not reachable (404). The /api/save-setup endpoint may not be deployed yet — check your server logs.';
+        } else if (resp.status === 401 || resp.status === 403) {
+          msg = 'Not authorized to save (' + resp.status + '). Try signing out and back in.';
+        } else {
+          msg += ' (error ' + resp.status + ')';
+        }
+        showAlert('error', msg);
         return;
       }
 
