@@ -216,6 +216,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-steps li strong { color: var(--text-soft); font-weight: 600; }
 .ai-steps code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 5px; padding: 1px 6px; color: var(--text); }
 
+/* ====== PHONE SETUP CONFIRMATION CHECKBOX ====== */
+.confirm-row { margin-top: 8px; }
+.confirm-check { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px 16px; border-radius: 12px; background: var(--surface-input); border: 1px solid var(--border-2); transition: all 0.18s; }
+.confirm-check:hover { border-color: var(--border-3); }
+.confirm-check.checked { border-color: var(--brand-line); background: linear-gradient(180deg, rgba(255,106,0,0.10), rgba(255,106,0,0.03)); }
+.confirm-check input { position: absolute; opacity: 0; pointer-events: none; }
+.confirm-box { width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; margin-top: 1px; background: var(--surface-3); border: 1.5px solid var(--border-3); display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.18s; }
+.confirm-check.checked .confirm-box { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 0 3px rgba(255,106,0,0.18); }
+.confirm-text { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); font-weight: 500; }
+.confirm-text .confirm-sub { display: block; margin-top: 3px; font-size: 12px; color: var(--text-faint); font-weight: 400; }
+
 .section-divider { height: 1px; background: var(--border); margin: 4px 0; }
 .section-title-mini {
   font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em;
@@ -497,6 +508,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <button type="button" class="preset-add" data-target="emergency_note">+ Add your own</button>
           <textarea id="emergency_note" class="textarea preset-note hidden" maxlength="400" placeholder="Other words or situations to treat as urgent…"></textarea>
           <input type="hidden" id="emergency_rules" />
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Phone setup confirmation -->
+        <div class="field confirm-row">
+          <label class="confirm-check" id="phone-confirm-label" for="phone_confirm">
+            <input type="checkbox" id="phone_confirm" />
+            <span class="confirm-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span class="confirm-text">
+              I've completed the phone setup — my business line is forwarded to my AI number above (or I'm using the AI number directly).
+              <span class="confirm-sub">Calls won't reach your AI until this is done. You can re-check the steps under "Your AI receptionist number" above.</span>
+            </span>
+          </label>
         </div>
 
         <div class="btn-row">
@@ -809,9 +836,21 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     return raw;
   }
 
-  function renderAiNumber(client) {
-    const raw = client.twilio_number || client.ai_phone_number || client.vapi_phone_number
+  function numberFromClient(client) {
+    return client.twilio_number || client.ai_phone_number || client.vapi_phone_number
       || client.phone_number || client.receptionist_number || client.ai_number || '';
+  }
+
+  function setAiNumberProvisioning() {
+    aiNumberBox.innerHTML =
+      '<div class="ai-number-pending">' +
+        '<span class="dot2"></span>' +
+        '<div>Setting up your AI phone number… this takes a few seconds. You can keep filling out the form below.</div>' +
+      '</div>';
+  }
+
+  function renderAiNumber(client) {
+    const raw = numberFromClient(client);
     if (raw) {
       const pretty = formatPhone(raw);
       aiNumberBox.innerHTML =
@@ -826,9 +865,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           '</button>' +
         '</div>' +
         '<ol class="ai-steps">' +
-          '<li><strong>Forward your business line to this number.</strong> On most US carriers, dial <code>*72</code> then the number above; dial <code>*73</code> to turn forwarding off later. (Codes vary by carrier — your phone provider can confirm.)</li>' +
-          '<li><strong>Test it.</strong> Call your real business number from another phone — your AI should answer with the greeting you set above.</li>' +
-          '<li><strong>Urgent calls reach you.</strong> When a call matches your transfer rules, the AI rings the cell you entered above.</li>' +
+          '<li><strong>Pick how customers reach your AI.</strong> Either give out this AI number directly as your business number, <em>or</em> keep your current number and forward it here (steps below). Most people forward, so they keep the number customers already know.</li>' +
+          '<li><strong>Forward your existing business line here.</strong> From your business phone, dial <code>*72</code>, wait for the dial tone, then dial your AI number above and press call. You\'ll hear a confirmation tone. (On some carriers it\'s a setting in your phone\'s "Call forwarding" menu instead of <code>*72</code> — both work.)</li>' +
+          '<li><strong>Prefer only forwarding missed calls?</strong> Ask your carrier for <em>conditional</em> call forwarding (forward on no-answer / busy). That way you still answer in person when you can, and the AI catches the rest.</li>' +
+          '<li><strong>Test it before you rely on it.</strong> From a different phone, call the number your customers dial. Within a couple of rings the AI should answer with your greeting. If it goes to your old voicemail, the forward didn\'t take — redo step 2 or check your carrier\'s forwarding setting.</li>' +
+          '<li><strong>Turn forwarding off anytime</strong> by dialing <code>*73</code> from your business phone.</li>' +
+          '<li><strong>Urgent calls still reach you.</strong> When a call matches your transfer rules below, the AI rings the cell number you enter under "Your cell."</li>' +
         '</ol>';
       aiNumberBox.querySelector('.ai-number-value').textContent = pretty; // textContent avoids HTML injection
       const copyBtn = document.getElementById('ai-number-copy');
@@ -843,9 +885,45 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       aiNumberBox.innerHTML =
         '<div class="ai-number-pending">' +
           '<span class="dot2"></span>' +
-          '<div>Your AI number is being set up. It usually appears within a few minutes of signing up — refresh this page shortly. If it\'s still not here within an hour, email <strong>hello@aileadintel.com</strong> and we\'ll sort it out.</div>' +
+          '<div>We couldn\'t set up your AI number automatically just yet. Refresh this page in a minute to try again — if it\'s still not here, email <strong>hello@aileadintel.com</strong> and we\'ll provision it for you.</div>' +
         '</div>';
     }
+  }
+
+  // Auto-provision the AI number on load if the client doesn't have one yet,
+  // so the number + forwarding steps are ready by the time they need them.
+  async function ensureProvisioned(client) {
+    if (numberFromClient(client)) { renderAiNumber(client); return; }
+    setAiNumberProvisioning();
+    try {
+      const { data: s } = await sb.auth.getSession();
+      const token = s?.session?.access_token;
+      if (!token) { renderAiNumber({}); return; }
+      // Match the AI number's area code to the owner's cell when we can.
+      const cell = (client.forwarding_number || '').replace(/\D/g, '');
+      const areaCode = cell.length === 11 && cell[0] === '1' ? cell.slice(1, 4)
+        : cell.length === 10 ? cell.slice(0, 3) : '';
+      const resp = await fetch('/api/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ client_slug: client.client_slug, area_code: areaCode || undefined }),
+      });
+      const b = await resp.json().catch(() => ({}));
+      if (resp.ok && b.number) { renderAiNumber({ twilio_number: b.number }); }
+      else { console.warn('provision failed', resp.status, b); renderAiNumber({}); }
+    } catch (err) {
+      console.warn('provision error', err);
+      renderAiNumber({});
+    }
+  }
+
+  // Phone-setup confirmation checkbox styling toggle.
+  const phoneConfirm = document.getElementById('phone_confirm');
+  const phoneConfirmLabel = document.getElementById('phone-confirm-label');
+  if (phoneConfirm) {
+    phoneConfirm.addEventListener('change', () => {
+      phoneConfirmLabel.classList.toggle('checked', phoneConfirm.checked);
+    });
   }
 
   // Restore voice style from localStorage (until DB hydration overrides it)
@@ -964,7 +1042,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     document.getElementById('forwarding_number').value = client.forwarding_number || '';
     hydratePreset(transferGrid, transferNote, transferHidden, '[data-target="transfer_note"]', client.transfer_destination || '');
     hydratePreset(emergencyGrid, emergencyNote, emergencyHidden, '[data-target="emergency_note"]', client.emergency_rules || '');
-    renderAiNumber(client);
+    ensureProvisioned(client);
 
     // Topnav
     if (client.business_name) {
@@ -995,6 +1073,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     }
     if (!voiceHidden.value) {
       showAlert('error', 'Please pick a voice style.');
+      return;
+    }
+    if (phoneConfirm && !phoneConfirm.checked) {
+      showAlert('error', 'Please confirm you\'ve completed the phone setup — tick the box just above the Save button.');
+      phoneConfirmLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
