@@ -1,0 +1,188 @@
+// api/paypal-webhook.js
+// SOURCE OF TRUTH for payment status. PayPal calls this directly when a
+// subscription is activated/cancelled/etc — independent of whether the
+// customer ever returns to the site. Matches the client by the custom_id
+// (= client_slug) that createSubscriptionRedirect() stamps onto the
+// subscription, with the subscription id as a fallback.
+//
+// Required env vars:
+//   PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET  (same app as onboarding)
+//   PAYPAL_ENV          'live' | 'sandbox'  (defaults 'live')
+//   PAYPAL_WEBHOOK_ID   from the PayPal dashboard webhook you create
+//   SUPABASE_URL, SUPABASE_SERVICE_KEY
+//
+// If PAYPAL_WEBHOOK_ID is unset, signature verification is SKIPPED (with a
+// warning) so you can do an initial test — set it before real customers.
+
+export const config = { maxDuration: 30 };
+
+const PAYPAL_ENV = process.env.PAYPAL_ENV || 'live';
+const PAYPAL_BASE = PAYPAL_ENV === 'live'
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com';
+
+const PAID_EVENTS = new Set([
+  'BILLING.SUBSCRIPTION.ACTIVATED',
+  'PAYMENT.SALE.COMPLETED', // recurring renewal — keep them active
+]);
+const INACTIVE_EVENTS = new Set([
+  'BILLING.SUBSCRIPTION.CANCELLED',
+  'BILLING.SUBSCRIPTION.SUSPENDED',
+  'BILLING.SUBSCRIPTION.EXPIRED',
+  'PAYMENT.SALE.DENIED',
+]);
+
+async function getAccessToken() {
+  const id = process.env.PAYPAL_CLIENT_ID;
+  const secret = process.env.PAYPAL_CLIENT_SECRET;
+  if (!id || !secret) throw new Error('Missing PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET');
+  const auth = Buffer.from(`${id}:${secret}`).toString('base64');
+  const r = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials',
+  });
+  if (!r.ok) throw new Error(`PayPal token error ${r.status}: ${await r.text()}`);
+  const j = await r.json();
+  return j.access_token;
+}
+
+// Ask PayPal to confirm this event really came from PayPal.
+async function verifyWithPayPal(req, event, accessToken) {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  if (!webhookId) {
+    console.warn('[paypal-webhook] PAYPAL_WEBHOOK_ID not set — SKIPPING verification (set it before launch).');
+    return true;
+  }
+  const h = req.headers;
+  const body = {
+    auth_algo: h['paypal-auth-algo'],
+    cert_url: h['paypal-cert-url'],
+    transmission_id: h['paypal-transmission-id'],
+    transmission_sig: h['paypal-transmission-sig'],
+    transmission_time: h['paypal-transmission-time'],
+    webhook_id: webhookId,
+    webhook_event: event,
+  };
+  try {
+    const r = await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      console.error('[paypal-webhook] verify call failed:', r.status, await r.text());
+      return false;
+    }
+    const j = await r.json();
+    const ok = j.verification_status === 'SUCCESS';
+    if (!ok) console.error('[paypal-webhook] verification_status:', j.verification_status);
+    return ok;
+  } catch (e) {
+    console.error('[paypal-webhook] verify error:', e.message);
+    return false;
+  }
+}
+
+function sbHeaders() {
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+  return { apikey: key, Authorization: `Bearer ${key}` };
+}
+
+// Find the client this event belongs to: by custom_id (= client_slug) first,
+// then by the subscription id we stored in payment_external_id at onboarding.
+async function findClient(customId, subId) {
+  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+  const enc = encodeURIComponent;
+
+  if (customId) {
+    const r = await fetch(`${url}/rest/v1/clients?client_slug=eq.${enc(customId)}&select=*&limit=1`, { headers: sbHeaders() });
+    if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) return { client: rows[0], by: 'custom_id' }; }
+  }
+  if (subId) {
+    const r = await fetch(`${url}/rest/v1/clients?payment_external_id=eq.${enc(subId)}&select=*&limit=1`, { headers: sbHeaders() });
+    if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) return { client: rows[0], by: 'subscription_id' }; }
+  }
+  return { client: null, by: null };
+}
+
+async function patchClient(clientId, patch) {
+  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+  const r = await fetch(`${url}/rest/v1/clients?id=eq.${clientId}`, {
+    method: 'PATCH',
+    headers: { ...sbHeaders(), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify(patch),
+  });
+  if (!r.ok) console.error('[paypal-webhook] client patch failed:', r.status, await r.text().catch(() => ''));
+  else console.log('[paypal-webhook] client updated:', clientId, JSON.stringify(patch));
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Parse body (Vercel usually parses JSON already).
+  let event = req.body;
+  if (typeof event === 'string') { try { event = JSON.parse(event); } catch { event = null; } }
+  if (!event || !event.event_type) {
+    console.warn('[paypal-webhook] no event_type in body');
+    return res.status(200).json({ received: true }); // ack so PayPal doesn't retry-storm
+  }
+
+  const eventType = event.event_type;
+  console.log('[paypal-webhook] event:', eventType, 'id:', event.id);
+
+  try {
+    // Verify authenticity (skipped only if PAYPAL_WEBHOOK_ID unset, for testing).
+    let token = null;
+    try { token = await getAccessToken(); } catch (e) { console.error('[paypal-webhook]', e.message); }
+    if (token) {
+      const valid = await verifyWithPayPal(req, event, token);
+      if (!valid) {
+        console.error('[paypal-webhook] REJECTED — failed verification');
+        return res.status(200).json({ received: true, verified: false }); // ack, but do nothing
+      }
+    }
+
+    // Only act on events we care about.
+    if (!PAID_EVENTS.has(eventType) && !INACTIVE_EVENTS.has(eventType)) {
+      return res.status(200).json({ received: true, ignored: eventType });
+    }
+
+    const resource = event.resource || {};
+    const customId = resource.custom_id || resource.custom || null; // subscription events use custom_id
+    const subId = resource.id || resource.billing_agreement_id || null; // sale events use billing_agreement_id
+
+    const { client, by } = await findClient(customId, subId);
+    if (!client) {
+      console.error('[paypal-webhook] NO CLIENT MATCH — custom_id:', customId, 'subId:', subId);
+      return res.status(200).json({ received: true, matched: false });
+    }
+    console.log('[paypal-webhook] matched client', client.client_slug, 'by', by);
+
+    if (PAID_EVENTS.has(eventType)) {
+      const patch = {
+        payment_status: 'paid',
+        payment_pending: false,
+        status: 'active',
+        paid_at: new Date().toISOString(),
+      };
+      if (subId) patch.payment_external_id = subId; // record/refresh the subscription id
+      await patchClient(client.id, patch);
+    } else if (INACTIVE_EVENTS.has(eventType)) {
+      // Cancelled / suspended / expired / payment denied → mark inactive so the
+      // dashboard reflects it. (Releasing the phone number is a separate cleanup
+      // step we can add later.)
+      const isCancel = eventType === 'BILLING.SUBSCRIPTION.CANCELLED' || eventType === 'BILLING.SUBSCRIPTION.EXPIRED';
+      await patchClient(client.id, {
+        status: isCancel ? 'cancelled' : 'paused',
+        payment_status: eventType === 'PAYMENT.SALE.DENIED' ? 'failed' : 'cancelled',
+        payment_pending: false,
+      });
+    }
+
+    return res.status(200).json({ received: true, processed: eventType });
+  } catch (err) {
+    console.error('[paypal-webhook] ERROR:', err.message);
+    return res.status(200).json({ received: true, error: err.message }); // ack to avoid retry storm
+  }
+}
