@@ -1,17 +1,14 @@
 // api/onboarding-submit.js
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
-import { buildPaypalRedirect } from '../lib/paypal-redirect.js';
-
+import { createSubscriptionRedirect } from '../lib/paypal-redirect.js';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 const PLAN_PRICING = { starter: { amount: 97.00 }, pro: { amount: 297.00 } };
-
 const INDUSTRY_LABELS = { self_storage: "Self Storage", hvac: "HVAC", plumbing: "Plumbing", electrician: "Electrician", landscaping: "Landscaping / Lawn Care", auto_detailing: "Auto Detailing", auto_repair: "Auto Repair", salon: "Salon / Spa", pest_control: "Pest Control", cleaning: "Cleaning Services", roofing: "Roofing", locksmith: "Locksmith", real_estate: "Real Estate", dental: "Dental / Medical", other: "Other" };
 const PERSONALITY_LABELS = { warm: "Warm & Conversational — friendly, approachable, talks like a real person", professional: "Professional — polished, corporate, formal", direct: "Direct — efficient, to-the-point, no fluff" };
 const PRICING_LABELS = { yes_specific: "Give exact prices when asked", yes_ranges: "Give price ranges only — never exact figures", no_quote: "Never quote prices — say 'I'll have someone send you a quote'", no_transfer: "Never quote prices — transfer pricing questions to the owner" };
 const TOPIC_LABELS = { new_customer: "New customer / booking", payments: "Payments / billing", support: "Customer support", other: "Other" };
 const VALID_STATUSES = new Set(["pending", "active", "paused"]);
-
 const EMERGENCY_GUIDANCE = {
   plumbing: "If the caller mentions active flooding, a burst pipe, no water shut-off, or a gas leak, calmly say: 'This sounds urgent — please call 911 or your local emergency line right now. We'll follow up as soon as we receive your message.' Then capture their name and number.",
   hvac: "If the caller mentions no heat or AC in extreme weather, a gas smell, or carbon monoxide concerns, calmly say: 'Please contact 911 or your gas company right away if you smell gas. We'll be in touch as soon as we get your message.' Capture their name and number.",
@@ -29,9 +26,7 @@ const EMERGENCY_GUIDANCE = {
   landscaping: "If the caller mentions a downed power line, gas leak, or injury, direct them to 911 first. Capture info for follow-up.",
   other: "If the caller mentions any urgent or unsafe situation, direct them to contact emergency services right away. Capture their name and callback number for follow-up.",
 };
-
 function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
-
 function normalizeData(data) {
   return {
     business_name: data.business_name || data.business?.name || "",
@@ -60,11 +55,9 @@ function normalizeData(data) {
     raw_data: data,
   };
 }
-
 function slugifyBase(businessName) {
   return String(businessName || "client").toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 50) || "client";
 }
-
 async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
   try {
     const r = await fetch(`${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`, { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } });
@@ -73,7 +66,6 @@ async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
     return Array.isArray(rows) && rows.length > 0;
   } catch (_) { return false; }
 }
-
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
   let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
   if (!base) base = slugifyBase(data.business_name);
@@ -81,10 +73,8 @@ async function resolveSlug(data, supabaseUrl, supabaseKey) {
   if (!taken) return base;
   return `${base}-${Math.random().toString(36).slice(2, 6)}`;
 }
-
 function parseUrgentTransfer(value) { if (value === "yes") return true; if (value === "no") return false; return null; }
 function safeStatus(value) { if (typeof value === "string" && VALID_STATUSES.has(value.toLowerCase())) return value.toLowerCase(); return "pending"; }
-
 function generateAiConfig(data) {
   const businessName = data.business_name || "the business";
   const industryLabel = INDUSTRY_LABELS[data.industry] || data.industry || "service business";
@@ -100,14 +90,11 @@ function generateAiConfig(data) {
   const topicsList = Array.isArray(data.topics) ? data.topics.map(t => TOPIC_LABELS[t] || t).filter(Boolean) : [];
   const offerUrgent = data.offer_urgent_transfer === "yes";
   const emergencyGuidance = EMERGENCY_GUIDANCE[data.industry] || EMERGENCY_GUIDANCE.other;
-
   let ai_greeting;
   if (data.personality === "professional") ai_greeting = `Thank you for calling ${businessName}. How may I assist you?`;
   else if (data.personality === "direct") ai_greeting = `Thanks for calling ${businessName}. How can I help?`;
   else ai_greeting = `Thanks for calling ${businessName}. How can I help you today?`;
-
   const ai_personality = personalityLabel;
-
   const transferLines = [];
   transferLines.push(`Business hours: ${hours}.`);
   if (transferPrimary) transferLines.push(`Primary transfer: ${transferPrimary}.`);
@@ -119,18 +106,15 @@ function generateAiConfig(data) {
     transferLines.push(`Emergency handling: Follow the emergency guidance below. Do NOT transfer. Capture their info thoroughly and notify the owner.`);
   }
   const transfer_behavior = transferLines.join(" ");
-
   const servicesParts = [`${businessName} is a ${industryLabel.toLowerCase()} business.`];
   if (services) servicesParts.push(`Services: ${services}.`);
   if (serviceArea) servicesParts.push(`Service area: ${serviceArea}.`);
   const services_summary = servicesParts.join(" ");
-
   const faqParts = [`Pricing rule: ${pricingRuleLabel}.`];
   if (pricingExamples) faqParts.push(`Known prices:\n${pricingExamples}`);
   if (topicsList.length) faqParts.push(`Common reasons people call: ${topicsList.join(", ")}.`);
   if (notes) faqParts.push(`Notes from the owner: ${notes}`);
   const faq_summary = faqParts.join("\n\n");
-
   const promptLines = [];
   promptLines.push(`You are the AI receptionist for ${businessName}, a ${industryLabel.toLowerCase()} business.`);
   promptLines.push("");
@@ -172,10 +156,8 @@ function generateAiConfig(data) {
   promptLines.push(`- Stay in character as ${businessName}'s receptionist.`);
   promptLines.push(`- Keep responses short and natural — like a real person.`);
   promptLines.push(`- Confirm contact info before ending the call.`);
-
   return { ai_prompt: promptLines.join("\n"), ai_greeting, ai_personality, transfer_behavior, services_summary, faq_summary };
 }
-
 async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
   try {
     const res = await fetch(`${supabaseUrl}/rest/v1/client_onboarding`, {
@@ -197,14 +179,12 @@ async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
     return rows && rows[0] ? rows[0].id : null;
   } catch (e) { console.error("[onboarding] onboarding EXC:", e.message); return null; }
 }
-
 async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey) {
   const phoneNumber = data.business_phone || null;
   const pricing = PLAN_PRICING[data.plan] || PLAN_PRICING.starter;
   const urgentBool = parseUrgentTransfer(data.offer_urgent_transfer);
   const aiConfig = generateAiConfig(data);
   console.log("[onboarding] AI prompt generated:", aiConfig.ai_prompt.length, "chars");
-
   const adminNotes = [
     `Industry: ${data.industry || "—"}`, `Forward: ${data.transfer_primary || "—"}`,
     data.transfer_backup ? `Backup: ${data.transfer_backup}` : null,
@@ -215,10 +195,8 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     urgentBool !== null ? `Urgent transfer: ${urgentBool ? "Yes" : "No"}` : null,
     data.topics && data.topics.length ? `Topics: ${data.topics.join(", ")}` : null,
   ].filter(Boolean).join("\n");
-
   const writeHeaders = { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=representation" };
   const readHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
-
   let existingId = null;
   if (phoneNumber) {
     try {
@@ -226,7 +204,6 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
       if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) existingId = rows[0].id; }
     } catch (e) { console.warn("[onboarding] phone lookup:", e.message); }
   }
-
   const baseFields = {
     business_name: data.business_name, client_slug: finalSlug, notify_email: data.notify_email,
     plan: data.plan, status: safeStatus("pending"), notes: adminNotes,
@@ -239,7 +216,6 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     ai_personality: aiConfig.ai_personality, transfer_behavior: aiConfig.transfer_behavior,
     services_summary: aiConfig.services_summary, faq_summary: aiConfig.faq_summary,
   };
-
   if (existingId) {
     const r = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${existingId}`, { method: "PATCH", headers: writeHeaders, body: JSON.stringify(baseFields) });
     if (!r.ok) { const t = await r.text().catch(() => ""); throw new Error(`Update failed (${r.status}): ${t.slice(0,300)}`); }
@@ -247,7 +223,6 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     const row = rows[0]; if (!row) throw new Error("Update returned no row");
     return { row, existing: true };
   }
-
   const insertPayload = { ...baseFields, phone_number: phoneNumber, active: true, payment_required: true, payment_pending: true, payment_status: "unpaid" };
   const r = await fetch(`${supabaseUrl}/rest/v1/clients`, { method: "POST", headers: writeHeaders, body: JSON.stringify(insertPayload) });
   if (!r.ok) { const t = await r.text().catch(() => ""); throw new Error(`Insert failed (${r.status}): ${t.slice(0,300)}`); }
@@ -255,14 +230,12 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   const row = rows[0]; if (!row) throw new Error("Insert returned no row");
   return { row, existing: false };
 }
-
 async function safeNtfy(data) {
   try {
     const body = `New onboarding\nBusiness: ${data.business_name}\nIndustry: ${data.industry}\nPhone: ${data.business_phone}\nEmail: ${data.notify_email}\nPlan: ${data.plan}`;
     await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: "POST", headers: { Title: `New Onboarding (${data.plan}): ${data.business_name}`, Priority: "high", Tags: "rocket" }, body });
   } catch (e) { console.error("[onboarding] ntfy:", e.message); }
 }
-
 async function safeOwnerEmail(data) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
@@ -277,7 +250,6 @@ async function safeOwnerEmail(data) {
     });
   } catch (e) { console.error("[onboarding] owner email:", e.message); }
 }
-
 async function safeCustomerEmail(data, finalSlug) {
   try {
     const resendKey = process.env.RESEND_API_KEY;
@@ -295,44 +267,35 @@ async function safeCustomerEmail(data, finalSlug) {
     });
   } catch (e) { console.error("[onboarding] customer email:", e.message); }
 }
-
 async function runAllNotificationsSafely(data, finalSlug) {
   try { await Promise.allSettled([safeNtfy(data), safeOwnerEmail(data), safeCustomerEmail(data, finalSlug)]); }
   catch (e) { console.error("[onboarding] notif wrap:", e.message); }
 }
-
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).json({ ok: true });
   if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
-
   let ip = "unknown";
   try {
     ip = getClientIp(req);
     const limit = rateLimit(`onboarding:${ip}`, 5, 60 * 60);
     if (!limit.ok) { res.setHeader("Retry-After", String(limit.retryAfter)); return res.status(429).json({ success: false, error: "Too many submissions." }); }
   } catch (e) { console.error("[onboarding] rate-limit:", e.message); }
-
   let body = req.body || {};
   if (typeof body === "string") { try { body = JSON.parse(body); } catch (_) { body = {}; } }
   if (body.website_url || body.company_size_other || body._gotcha) return res.status(200).json({ success: true });
-
   try {
     const data = normalizeData(body);
     if (!data.business_name) return res.status(400).json({ success: false, error: "Missing business name" });
     if (!data.notify_email) return res.status(400).json({ success: false, error: "Missing notification email" });
-
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
     if (!supabaseUrl || !supabaseKey) return res.status(500).json({ success: false, error: "Server misconfigured" });
-
     const finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
     const onboardingId = await saveOnboardingToSupabase(data, supabaseUrl, supabaseKey);
-
     let clientResult;
     try { clientResult = await createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey); }
     catch (err) {
@@ -341,20 +304,33 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: "Could not save your submission." });
     }
     const clientRow = clientResult.row;
-
     try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
 
-    // Build PayPal redirect URL
-    const r = buildPaypalRedirect({
-  plan: clientRow.plan || data.plan,
-  clientSlug: clientRow.client_slug,
-});
-console.log('[onboarding] paypal:', JSON.stringify(r.log));
-if (!r.ok) {
-  console.error('[onboarding] paypal misconfig:', r.error);
-  return res.status(502).json({ error: 'PayPal checkout is not configured correctly: ' + r.error });
-}
-const paypalRedirect = r.redirect;
+    // ── Create the PayPal subscription via the REST API ──
+    // We control the return_url (embedding ?slug) and capture the subscription id,
+    // so onboarding-return.js can reliably identify the client after payment.
+    const sub = await createSubscriptionRedirect({
+      plan: clientRow.plan || data.plan,
+      clientSlug: clientRow.client_slug,
+      returnUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}`,
+      cancelUrl: `https://aileadintel.com/onboarding?canceled=1`,
+    });
+    if (!sub.ok) {
+      console.error("[onboarding] paypal create error:", sub.error);
+      return res.status(502).json({ success: false, error: "PayPal checkout error: " + sub.error });
+    }
+    console.log("[onboarding] paypal subscription created:", sub.subscriptionId);
+    // Store the subscription id on the client row (second reliable identifier).
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientRow.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=minimal" },
+        body: JSON.stringify({ payment_external_id: sub.subscriptionId }),
+      });
+    } catch (e) {
+      console.error("[onboarding] failed to store subscription id:", e.message);
+    }
+    const paypalRedirect = sub.redirect;   // the PayPal approval URL
 
     const responseBody = {
       success: true,
