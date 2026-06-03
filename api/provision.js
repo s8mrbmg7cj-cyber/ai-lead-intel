@@ -29,6 +29,12 @@ const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || '';
 const LOW_STOCK = 3; // alert when free numbers drop to this or below
 
+// Where Vapi should POST each finished call (the api/vapi/call-ended webhook).
+// Override with PUBLIC_BASE_URL if your production domain ever changes.
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || 'https://aileadintel.com';
+const CALL_WEBHOOK_URL = `${PUBLIC_BASE_URL}/api/vapi/call-ended`;
+const VAPI_WEBHOOK_SECRET = process.env.VAPI_WEBHOOK_SECRET || '';
+
 // Spoken to every caller at the very start of the call, and stated in the prompt.
 // This is the recording + "you're talking to an AI" disclosure. Edit the wording
 // freely. Recording-consent law varies by state (some require all parties consent),
@@ -179,6 +185,12 @@ export default async function handler(req, res) {
       firstMessage: `${CALL_DISCLOSURE} ${greeting}`,
       model,
       voice,
+      // Tell Vapi to POST the finished call to our webhook so it lands on the
+      // client's dashboard. Without this, calls happen but never get reported back.
+      server: VAPI_WEBHOOK_SECRET
+        ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
+        : { url: CALL_WEBHOOK_URL },
+      serverMessages: ['end-of-call-report'],
     };
 
     let assistantId = client.vapi_assistant_id;
