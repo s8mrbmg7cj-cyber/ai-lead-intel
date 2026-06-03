@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Phone Setup · AI Lead Intel</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#08080a; --surface:#111114; --surface-2:#16161b; --surface-3:#1c1c22; --surface-input:#0d0d10;
+  --border:rgba(255,255,255,0.06); --border-2:rgba(255,255,255,0.10); --border-3:rgba(255,255,255,0.14);
+  --text:#fafafa; --text-soft:#d4d4d8; --text-dim:#a1a1aa; --text-faint:#71717a; --text-muted:#52525b;
+  --brand:#ff6a00; --brand-2:#ff9a00; --brand-3:#ff8533; --brand-glow:rgba(255,106,0,0.32);
+  --brand-soft:rgba(255,106,0,0.10); --brand-tint:rgba(255,106,0,0.05); --brand-line:rgba(255,106,0,0.22);
+  --green:#34d399; --green-soft:rgba(52,211,153,0.10); --green-line:rgba(52,211,153,0.30);
+  --warn:#f59e0b; --warn-soft:rgba(245,158,11,0.10); --warn-line:rgba(245,158,11,0.28);
+}
+html,body{height:100%;}
+body{font-family:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;letter-spacing:-0.011em;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(255,106,0,0.10),transparent 60%);pointer-events:none;z-index:0;}
+a{color:var(--brand);text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+.topnav{position:relative;z-index:100;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(8,8,10,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.logo{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 0 18px var(--brand-glow),inset 0 1px 0 rgba(255,255,255,0.25);}
+.support-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:99px;font-size:12px;color:var(--text-dim);font-weight:500;}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:36px 24px 100px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:600;color:var(--brand);background:var(--brand-soft);border:1px solid var(--brand-line);padding:6px 13px;border-radius:99px;margin-bottom:16px;}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--brand);box-shadow:0 0 6px var(--brand-glow);}
+h1.title{font-size:clamp(26px,4vw,34px);font-weight:600;letter-spacing:-0.025em;line-height:1.15;margin-bottom:10px;}
+h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.lead{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:28px;}
+.card{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;}
+.card-eyebrow{font-family:'Geist Mono',monospace;font-size:10px;color:var(--brand);letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:10px;}
+.card h2{font-size:17px;font-weight:600;margin-bottom:10px;letter-spacing:-0.02em;}
+.card p{font-size:14px;color:var(--text-soft);line-height:1.65;margin-bottom:10px;}
+.card p:last-child{margin-bottom:0;}
+.how-row{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);}
+.how-row:last-child{border-bottom:none;}
+.how-num{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--brand);display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:12px;font-weight:700;}
+.how-text{font-size:14px;color:var(--text-soft);line-height:1.6;}
+.ai-number-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-input);border:1px solid var(--brand-line);border-radius:12px;padding:16px 18px;margin:6px 0 4px;flex-wrap:wrap;}
+.ai-number{font-family:'Geist Mono',monospace;font-size:22px;font-weight:600;color:var(--brand);letter-spacing:0.02em;}
+.copy-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:linear-gradient(135deg,var(--brand),var(--brand-3));color:#fff;border-radius:9px;font-size:13px;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,0.22);}
+.copy-btn.copied{background:linear-gradient(135deg,var(--green),#4ade80);}
+.carrier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0 4px;}
+.carrier-btn{padding:12px 10px;background:var(--surface-input);border:1px solid var(--border-2);border-radius:10px;font-size:13px;font-weight:500;color:var(--text-soft);text-align:center;transition:all 0.15s;}
+.carrier-btn:hover{border-color:var(--brand-line);color:var(--text);}
+.carrier-btn.active{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand);}
+.carrier-detail{display:none;margin-top:14px;padding:16px 18px;background:var(--surface-input);border:1px solid var(--border);border-radius:12px;}
+.carrier-detail.show{display:block;}
+.carrier-detail h3{font-size:14px;font-weight:600;margin-bottom:10px;}
+.code-line{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-soft);}
+.code-line:last-child{border-bottom:none;}
+.code{font-family:'Geist Mono',monospace;font-size:15px;font-weight:600;color:var(--brand);background:var(--brand-soft);border:1px solid var(--brand-line);border-radius:7px;padding:3px 9px;white-space:nowrap;}
+.note{font-size:12.5px;color:var(--text-faint);line-height:1.55;margin-top:10px;}
+.verify-warn{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);border:1px solid var(--warn-line);border-radius:10px;padding:12px 14px;margin-top:12px;}
+.verify-warn svg{color:var(--warn);flex-shrink:0;margin-top:1px;}
+.verify-warn span{font-size:12.5px;color:var(--text-soft);line-height:1.55;}
+.cond{display:flex;flex-direction:column;gap:10px;}
+.cond-item{padding:12px 14px;background:var(--surface-input);border:1px solid var(--border);border-radius:10px;}
+.cond-item .ct{font-size:13.5px;font-weight:600;margin-bottom:3px;}
+.cond-item .cd{font-size:12.5px;color:var(--text-dim);line-height:1.5;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-item:last-child{border-bottom:none;}
+.faq-q{width:100%;text-align:left;padding:14px 0;font-size:14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.faq-q svg{flex-shrink:0;color:var(--text-faint);transition:transform 0.2s;}
+.faq-q.open svg{transform:rotate(45deg);}
+.faq-a{display:none;padding:0 0 14px;font-size:13.5px;color:var(--text-dim);line-height:1.6;}
+.faq-a.show{display:block;}
+.confirm-row{margin-top:22px;}
+.confirm-check{display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:16px 18px;background:var(--surface-input);border:1px solid var(--border-2);border-radius:12px;transition:all 0.15s;}
+.confirm-check:hover{border-color:var(--brand-line);}
+.confirm-check input{position:absolute;opacity:0;}
+.confirm-box{flex-shrink:0;width:24px;height:24px;border-radius:7px;border:2px solid var(--border-3);display:flex;align-items:center;justify-content:center;color:transparent;transition:all 0.15s;}
+.confirm-check input:checked ~ .confirm-box{background:linear-gradient(135deg,var(--brand),var(--brand-2));border-color:transparent;color:#fff;}
+.confirm-text{font-size:13.5px;color:var(--text-soft);line-height:1.55;}
+.btn-row{margin-top:24px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 24px;border-radius:12px;font-size:15px;font-weight:600;transition:all 0.18s;}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-3));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),0 4px 14px var(--brand-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.spinner{width:34px;height:34px;border:3px solid var(--border-2);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:640px){.wrap{padding:24px 16px 100px;}.card{padding:18px 16px;}.ai-number{font-size:18px;}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
+  <a href="mailto:hello@aileadintel.com" class="support-pill">Support</a>
+</nav>
+
+<div id="loading"><div class="spinner"></div></div>
+
+<div class="wrap" id="main" style="display:none;">
+  <div class="eyebrow"><span class="dot"></span>Final step · Phone setup</div>
+  <h1 class="title">Forward your calls to your <span class="accent">AI receptionist.</span></h1>
+  <p class="lead">One last step. You'll point your existing business number at your AI number so the AI answers your calls. Takes about 2 minutes — no new equipment, no app.</p>
+
+  <!-- WHAT IS HAPPENING -->
+  <div class="card">
+    <div class="card-eyebrow">How this works</div>
+    <h2>You keep your number. Your AI answers it.</h2>
+    <p>You already have a business phone number. Your customers keep calling that same number — nothing changes for them. Behind the scenes, your phone forwards those calls to your AI receptionist, so the AI picks up. Customers never see or dial the AI number.</p>
+  </div>
+
+  <!-- YOUR AI NUMBER -->
+  <div class="card">
+    <div class="card-eyebrow">Your AI receptionist number</div>
+    <h2>This is the number you'll forward to.</h2>
+    <div class="ai-number-box">
+      <span class="ai-number" id="ai-number">—</span>
+      <button class="copy-btn" id="copy-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="copy-label">Copy</span>
+      </button>
+    </div>
+    <p class="note">Copy this number — you'll need it in the forwarding steps below.</p>
+  </div>
+
+  <!-- HOW TO FORWARD BY SETUP -->
+  <div class="card">
+    <div class="card-eyebrow">Set up forwarding</div>
+    <h2>Pick how your business line works.</h2>
+    <p>Choose your phone type or carrier below for exact steps.</p>
+    <div class="carrier-grid" id="carrier-grid"></div>
+    <div class="carrier-detail" id="carrier-detail"></div>
+    <div class="verify-warn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Carrier codes and menus can vary by plan and region. If a code below doesn't work on your line, search "<em>[your carrier] call forwarding</em>" or call your carrier — they'll set it up free in a minute.</span>
+    </div>
+  </div>
+
+  <!-- CONDITIONAL FORWARDING -->
+  <div class="card">
+    <div class="card-eyebrow">Optional · Forwarding styles</div>
+    <h2>Forward all calls, or only some.</h2>
+    <div class="cond">
+      <div class="cond-item"><div class="ct">Forward every call (recommended)</div><div class="cd">The AI answers all calls. Best if you want every call captured and never want to miss a lead.</div></div>
+      <div class="cond-item"><div class="ct">Forward only missed calls</div><div class="cd">Your phone rings first; if you don't pick up in a few rings, it goes to the AI. Good if you still answer calls yourself sometimes.</div></div>
+      <div class="cond-item"><div class="ct">Forward only when busy</div><div class="cd">Calls go to the AI only when you're already on another call. Good for solo operators.</div></div>
+      <div class="cond-item"><div class="ct">Forward after hours</div><div class="cd">Forward to the AI in the evenings/weekends, answer yourself during the day. (Set this on a schedule with your carrier, or just toggle forwarding on when you leave.)</div></div>
+    </div>
+    <p class="note">Most owners start with "forward every call" while testing, then switch to "missed calls only" once they trust it. The codes for conditional forwarding are in each carrier's section above.</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card">
+    <div class="card-eyebrow">Common questions</div>
+    <h2>FAQ</h2>
+    <div id="faq"></div>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-row">
+    <label class="confirm-check" for="confirm">
+      <input type="checkbox" id="confirm" />
+      <span class="confirm-box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="confirm-text">I've forwarded my business number to my AI number above (or I'm giving out the AI number directly). I understand calls won't reach my AI until this is done.</span>
+    </label>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="finish-btn" type="button" disabled>
+      <span id="finish-label">Confirm the box above to continue</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SUPABASE_URL='https://mbrhkeddgmywqqgdfdgx.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+  const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+  function getSlug(){
+    const p=new URLSearchParams(location.search).get('slug');
+    if(p) return p.toLowerCase().replace(/[^a-z0-9-]/g,'');
+    const m=location.pathname.match(/\/phone-setup\/([^/?#]+)/);
+    return m?m[1].toLowerCase().replace(/[^a-z0-9-]/g,''):'';
+  }
+  function fmt(num){
+    if(!num) return '—';
+    const d=String(num).replace(/\D/g,'');
+    if(d.length===11&&d[0]==='1') return `+1 (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+    if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+    return num;
+  }
+
+  // Carrier / phone-type forwarding instructions.
+  // NOTE: codes vary by plan/region — owners are told to verify.
+  const CARRIERS={
+    verizon:{label:'Verizon',steps:[
+      {t:'Turn ON (forward all calls)',c:'*72'},{t:'then dial your AI number, press call',c:''},
+      {t:'Turn OFF forwarding',c:'*73'},
+      {t:'Forward only when no answer / busy',c:'*71'}
+    ],note:'Dial the code, then the AI number with no spaces, then press call. You\'ll hear a confirmation tone.'},
+    att:{label:'AT&T',steps:[
+      {t:'Turn ON (forward all calls)',c:'**21*'},{t:'enter AI number, then #',c:''},
+      {t:'Turn OFF forwarding',c:'##21#'},
+      {t:'Forward when unanswered',c:'**61*'}
+    ],note:'On AT&T, dial **21*, the AI number, then # — e.g. **21*8542545551#.'},
+    tmobile:{label:'T-Mobile',steps:[
+      {t:'Turn ON (forward all calls)',c:'**21*'},{t:'enter AI number, then #',c:''},
+      {t:'Turn OFF forwarding',c:'##21#'},
+      {t:'Forward when busy / no answer',c:'**004*'}
+    ],note:'Dial **21*, the AI number, then # and press call.'},
+    googlevoice:{label:'Google Voice',steps:[
+      {t:'Open Google Voice → Settings',c:''},
+      {t:'Calls → Call forwarding → add a number',c:''},
+      {t:'Enter your AI number and save',c:''}
+    ],note:'Google Voice forwards from the web/app, not a dial code. Add the AI number as a forwarding destination.'},
+    openphone:{label:'OpenPhone',steps:[
+      {t:'Settings → your number → Call flow',c:''},
+      {t:'Set "Forward calls" to your AI number',c:''}
+    ],note:'OpenPhone is configured in-app under the number\'s call flow / forwarding settings.'},
+    ringcentral:{label:'RingCentral',steps:[
+      {t:'Admin → Phone System → your number',c:''},
+      {t:'Call Handling & Forwarding → add the AI number',c:''}
+    ],note:'Set the AI number as a forwarding destination in Call Handling.'},
+    dialpad:{label:'Dialpad',steps:[
+      {t:'Settings → Your Numbers → call routing',c:''},
+      {t:'Forward to an external number → AI number',c:''}
+    ],note:'Route calls to an external number (your AI number) in call routing settings.'},
+    landline:{label:'Landline',steps:[
+      {t:'Turn ON (forward all calls)',c:'*72'},{t:'then dial AI number',c:''},
+      {t:'Turn OFF',c:'*73'}
+    ],note:'Most landlines use *72 to enable and *73 to disable. If those don\'t work, call your phone company — they\'ll enable "call forwarding" on your line.'},
+    voip:{label:'VoIP / Other',steps:[
+      {t:'Find "call forwarding" in your provider\'s admin panel',c:''},
+      {t:'Set forwarding destination to your AI number',c:''}
+    ],note:'Nearly every VoIP system has a call-forwarding setting in its admin dashboard. Set the destination to your AI number.'}
+  };
+
+  const FAQ=[
+    {q:'What if my business phone is my personal cell?',a:'That\'s fine and common. Use the "forward only missed calls" option so your cell rings first and only unanswered calls go to the AI — or forward everything if you\'d rather the AI handle all calls. Your personal voicemail is replaced by the AI for forwarded calls.'},
+    {q:'What if I already have a receptionist?',a:'Many owners forward only after-hours or overflow calls to the AI, so the AI covers nights, weekends, and times the line is busy. Use conditional forwarding (no-answer or busy) instead of forwarding everything.'},
+    {q:'What if I only want the AI after hours?',a:'Turn forwarding on when you close and off when you open (the *72 / *73 codes), or set a schedule with your carrier if they support it. The AI then only answers outside your hours.'},
+    {q:'What if I want calls transferred to me?',a:'If you entered your cell on the previous step, the AI can transfer urgent or "speak to a person" calls straight to you. You don\'t need to do anything extra here.'},
+    {q:'What if I stop paying?',a:'Your subscription manages access. If it lapses, the AI stops answering — just turn off forwarding (*73 or your carrier\'s off code) and calls ring your own line again as normal.'},
+    {q:'What if I change phone providers?',a:'Your AI number stays the same. Just set up call forwarding again on the new provider, pointing to the same AI number. Email us if you need a hand.'}
+  ];
+
+  const grid=document.getElementById('carrier-grid');
+  const detail=document.getElementById('carrier-detail');
+  Object.keys(CARRIERS).forEach((key,i)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='carrier-btn'; b.textContent=CARRIERS[key].label; b.dataset.key=key;
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.carrier-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderCarrier(key);
+    });
+    grid.appendChild(b);
+  });
+  function renderCarrier(key){
+    const c=CARRIERS[key];
+    let html=`<h3>${c.label} — call forwarding</h3>`;
+    c.steps.forEach(s=>{
+      html+=`<div class="code-line"><span>${s.t}</span>${s.c?`<span class="code">${s.c}</span>`:''}</div>`;
+    });
+    html+=`<p class="note">${c.note}</p>`;
+    detail.innerHTML=html; detail.classList.add('show');
+  }
+
+  const faqEl=document.getElementById('faq');
+  FAQ.forEach(f=>{
+    const item=document.createElement('div'); item.className='faq-item';
+    item.innerHTML=`<button class="faq-q" type="button">${f.q}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button><div class="faq-a">${f.a}</div>`;
+    const q=item.querySelector('.faq-q'), a=item.querySelector('.faq-a');
+    q.addEventListener('click',()=>{q.classList.toggle('open');a.classList.toggle('show');});
+    faqEl.appendChild(item);
+  });
+
+  let SLUG='';
+  async function init(){
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session){ location.replace('/sign-in'); return; }
+    SLUG=getSlug();
+    let client=null;
+    if(SLUG){
+      const {data}=await sb.from('clients').select('*').eq('client_slug',SLUG).eq('owner_user_id',session.user.id).limit(1);
+      if(data&&data[0]) client=data[0];
+    }
+    if(!client){
+      const {data}=await sb.from('clients').select('*').eq('owner_user_id',session.user.id).limit(1);
+      if(data&&data[0]){ client=data[0]; SLUG=client.client_slug; }
+    }
+    if(!client){ location.replace('/dashboard'); return; }
+
+    const aiNum=client.twilio_number||'';
+    document.getElementById('ai-number').textContent=aiNum?fmt(aiNum):'Being assigned…';
+    document.getElementById('copy-btn').dataset.raw=aiNum;
+    if(CARRIERS.verizon){ document.querySelector('.carrier-btn').click(); } // open first by default
+
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
+  }
+
+  document.getElementById('copy-btn').addEventListener('click',function(){
+    const raw=this.dataset.raw||document.getElementById('ai-number').textContent;
+    navigator.clipboard.writeText(raw).then(()=>{
+      this.classList.add('copied'); document.getElementById('copy-label').textContent='Copied!';
+      setTimeout(()=>{this.classList.remove('copied');document.getElementById('copy-label').textContent='Copy';},1800);
+    }).catch(()=>{});
+  });
+
+  const confirm=document.getElementById('confirm'), finishBtn=document.getElementById('finish-btn'), finishLabel=document.getElementById('finish-label');
+  confirm.addEventListener('change',()=>{
+    finishBtn.disabled=!confirm.checked;
+    finishLabel.textContent=confirm.checked?'Go to my dashboard':'Confirm the box above to continue';
+  });
+  finishBtn.addEventListener('click',()=>{
+    location.href='/dashboard/'+encodeURIComponent(SLUG);
+  });
+
+  init().catch(e=>{console.error('[phone-setup]',e);document.getElementById('loading').innerHTML='<p style="text-align:center;color:#a1a1aa;margin-top:60px;">Something went wrong. <a href="/dashboard">Go to dashboard</a></p>';});
+})();
+</script>
+</body>
+</html>
