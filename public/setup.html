@@ -528,7 +528,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
         <div class="btn-row">
           <button type="submit" class="btn btn-primary" id="submit-btn">
-            <span id="submit-label">Save and go to dashboard</span>
+            <span id="submit-label">Save & continue to phone setup</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -1138,7 +1138,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       // Clear the localStorage preview hint (DB is source of truth now)
       try { localStorage.removeItem('selectedVoiceStyle'); } catch (_) {}
 
-      window.location.href = '/dashboard/' + encodeURIComponent(formEl.dataset.slug);
+      // Step 3: send them to the dedicated phone-setup page (forwarding guide),
+      // not straight to the dashboard.
+      window.location.href = '/phone-setup?slug=' + encodeURIComponent(formEl.dataset.slug);
     } catch (err) {
       console.error('save-setup error', err);
       submitBtn.disabled = false;
