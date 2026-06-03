@@ -271,6 +271,12 @@ async function runAllNotificationsSafely(data, finalSlug) {
   try { await Promise.allSettled([safeNtfy(data), safeOwnerEmail(data), safeCustomerEmail(data, finalSlug)]); }
   catch (e) { console.error("[onboarding] notif wrap:", e.message); }
 }
+async function safePaypalFailAlert(data, finalSlug, errorDetail) {
+  try {
+    const body = `Checkout FAILED for a new onboarding — fix ASAP.\nBusiness: ${data.business_name}\nPlan: ${data.plan}\nSlug: ${finalSlug}\nReason: ${errorDetail}`;
+    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: "POST", headers: { Title: `PayPal checkout FAILED: ${data.business_name}`, Priority: "urgent", Tags: "warning,money_with_wings" }, body });
+  } catch (e) { console.error("[onboarding] paypal fail alert:", e.message); }
+}
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -304,7 +310,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: "Could not save your submission." });
     }
     const clientRow = clientResult.row;
-    try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
 
     // ── Create the PayPal subscription via the REST API ──
     // We control the return_url (embedding ?slug) and capture the subscription id,
@@ -316,8 +321,13 @@ export default async function handler(req, res) {
       cancelUrl: `https://aileadintel.com/onboarding?canceled=1`,
     });
     if (!sub.ok) {
+      // Log the real reason and alert the owner; the customer only sees a soft message.
       console.error("[onboarding] paypal create error:", sub.error);
-      return res.status(502).json({ success: false, error: "PayPal checkout error: " + sub.error });
+      await safePaypalFailAlert(data, finalSlug, sub.error);
+      return res.status(502).json({
+        success: false,
+        error: "Checkout is temporarily unavailable. Please try again in a few minutes — if it keeps happening, email hello@aileadintel.com.",
+      });
     }
     console.log("[onboarding] paypal subscription created:", sub.subscriptionId);
     // Store the subscription id on the client row (second reliable identifier).
@@ -330,6 +340,11 @@ export default async function handler(req, res) {
     } catch (e) {
       console.error("[onboarding] failed to store subscription id:", e.message);
     }
+
+    // PayPal succeeded → now it's safe to notify the owner and send the customer
+    // their welcome email (so a failed checkout never sends a "you're all set" email).
+    try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
+
     const paypalRedirect = sub.redirect;   // the PayPal approval URL
 
     const responseBody = {
