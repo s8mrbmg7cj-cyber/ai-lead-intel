@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System Health — AI Lead Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#08080a; --surface:#111114; --surface-2:#16161b; --surface-3:#1c1c22;
+  --border:rgba(255,255,255,0.08); --border-2:rgba(255,255,255,0.12);
+  --text:#fafafa; --text-dim:#a1a1aa; --text-faint:#71717a;
+  --brand:#ff6a00; --brand-soft:rgba(255,106,0,0.10); --brand-line:rgba(255,106,0,0.25);
+  --green:#34d399; --green-soft:rgba(52,211,153,0.12); --green-line:rgba(52,211,153,0.3);
+  --amber:#fbbf24; --amber-soft:rgba(251,191,36,0.12); --amber-line:rgba(251,191,36,0.3);
+  --red:#ef4444; --red-soft:rgba(239,68,68,0.12); --red-line:rgba(239,68,68,0.3);
+}
+body { font-family:'Geist',-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; letter-spacing:-0.011em; -webkit-font-smoothing:antialiased; padding:40px 20px 80px; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,106,0,0.12), transparent 60%); pointer-events:none; z-index:0; }
+.wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; }
+.head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:8px; flex-wrap:wrap; }
+.logo { display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; }
+.logo-mark { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--brand),#ff9a00); box-shadow:0 0 18px rgba(255,106,0,0.32); }
+h1 { font-size:clamp(26px,4vw,34px); font-weight:600; letter-spacing:-0.03em; margin:24px 0 6px; }
+h1 .accent { font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; color:var(--brand); }
+.sub { color:var(--text-dim); font-size:14px; margin-bottom:24px; }
+.overall { display:inline-flex; align-items:center; gap:10px; padding:10px 18px; border-radius:99px; font-family:'Geist Mono',monospace; font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:28px; border:1px solid; }
+.overall .dot { width:9px; height:9px; border-radius:50%; }
+.overall.ok { background:var(--green-soft); border-color:var(--green-line); color:var(--green); }
+.overall.warn { background:var(--amber-soft); border-color:var(--amber-line); color:var(--amber); }
+.overall.fail { background:var(--red-soft); border-color:var(--red-line); color:var(--red); }
+.overall.ok .dot { background:var(--green); } .overall.warn .dot { background:var(--amber); } .overall.fail .dot { background:var(--red); box-shadow:0 0 8px var(--red); animation:pulse 1.4s infinite; }
+@keyframes pulse { 50% { opacity:0.4; } }
+.section-label { font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-faint); font-weight:600; margin:28px 0 12px; }
+.card { background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid var(--border-2); border-radius:14px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+.card .icn { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.card .icn.ok { background:var(--green-soft); color:var(--green); } .card .icn.warn { background:var(--amber-soft); color:var(--amber); } .card .icn.fail { background:var(--red-soft); color:var(--red); } .card .icn.skip { background:var(--surface-3); color:var(--text-faint); }
+.card .body { flex:1; min-width:0; }
+.card .name { font-size:14.5px; font-weight:600; text-transform:capitalize; }
+.card .detail { font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+.card .badge { font-family:'Geist Mono',monospace; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:4px 9px; border-radius:6px; flex-shrink:0; }
+.badge.ok { background:var(--green-soft); color:var(--green); } .badge.warn { background:var(--amber-soft); color:var(--amber); } .badge.fail { background:var(--red-soft); color:var(--red); } .badge.skip { background:var(--surface-3); color:var(--text-faint); }
+.env-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; }
+.env-pill { display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:9px; background:var(--surface); border:1px solid var(--border); font-family:'Geist Mono',monospace; font-size:11.5px; }
+.env-pill .ed { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.env-pill.ok .ed { background:var(--green); } .env-pill.fail .ed { background:var(--red); }
+.env-pill .en { color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.env-pill.fail .en { color:var(--red); }
+.bar { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.btn { font-family:inherit; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px; border:1px solid var(--border-2); background:var(--surface-2); color:var(--text); cursor:pointer; transition:all 0.16s; }
+.btn:hover { border-color:var(--brand-line); color:var(--brand); }
+.stamp { font-family:'Geist Mono',monospace; font-size:11px; color:var(--text-faint); }
+.loading,.errbox { text-align:center; color:var(--text-dim); padding:60px 20px; font-size:14px; }
+.errbox { color:var(--red); }
+.spinner { width:26px; height:26px; border:2px solid var(--border-2); border-top-color:var(--brand); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 14px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="logo"><div class="logo-mark"></div> AI Lead Intel</div>
+    <span class="section-label" style="margin:0;">System Health</span>
+  </div>
+  <h1>System <span class="accent">health.</span></h1>
+  <p class="sub">Live status of every service this app depends on. Red means a customer-facing feature is broken right now.</p>
+
+  <div class="bar">
+    <button class="btn" id="refresh">↻ Re-check</button>
+    <span class="stamp" id="stamp"></span>
+  </div>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>Running checks…</div>
+  </div>
+</div>
+
+<script>
+const ICONS = { ok:'✓', warn:'!', fail:'✕', skip:'–' };
+
+function card(name, c) {
+  const s = c.status;
+  return `<div class="card">
+    <div class="icn ${s}">${ICONS[s] || '?'}</div>
+    <div class="body">
+      <div class="name">${name.replace(/_/g,' ')}</div>
+      <div class="detail">${c.detail || ''}</div>
+    </div>
+    <span class="badge ${s}">${s}</span>
+  </div>`;
+}
+function envPill(e) {
+  return `<div class="env-pill ${e.status}"><span class="ed"></span><span class="en">${e.name}</span></div>`;
+}
+
+async function run() {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div>Running checks…</div>';
+  try {
+    const resp = await fetch('/api/health' + window.location.search);
+    if (resp.status === 401) { content.innerHTML = '<div class="errbox">Unauthorized. Add ?key=YOUR_HEALTH_KEY to the URL.</div>'; return; }
+    const d = await resp.json();
+
+    let html = '';
+    html += `<div class="overall ${d.overall}"><span class="dot"></span>${
+      d.overall === 'ok' ? 'All systems operational' : d.overall === 'warn' ? 'Operational — needs attention' : 'Problems detected'
+    }</div>`;
+
+    html += '<div class="section-label">Service connections</div>';
+    for (const [name, c] of Object.entries(d.checks)) html += card(name, c);
+
+    html += '<div class="section-label">Required keys</div><div class="env-grid">';
+    for (const e of d.env.required) html += envPill(e);
+    html += '</div>';
+
+    html += '<div class="section-label">Optional keys</div><div class="env-grid">';
+    for (const e of d.env.optional) html += envPill(e);
+    html += '</div>';
+
+    content.innerHTML = html;
+    document.getElementById('stamp').textContent = 'Checked ' + new Date(d.checked_at).toLocaleString();
+  } catch (e) {
+    content.innerHTML = '<div class="errbox">Could not reach /api/health — is it deployed?</div>';
+  }
+}
+document.getElementById('refresh').addEventListener('click', run);
+run();
+</script>
+</body>
+</html>
