@@ -90,7 +90,25 @@ export default async function handler(req, res) {
       return;
     }
 
-    res.status(200).json({ ok: true, client_slug: clientSlug });
+    // Kick off provisioning (best-effort). The save already succeeded above, so a
+    // provisioning failure won't fail the save — it just gets logged and reported.
+    let provision = null;
+    try {
+      const base = process.env.SITE_URL
+        || (req.headers.host ? `https://${req.headers.host}` : 'https://aileadintel.com');
+      const pr = await fetch(`${base}/api/provision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ client_slug: clientSlug }),
+      });
+      provision = await pr.json().catch(() => ({}));
+      if (!pr.ok) console.error('save-setup: provision failed', pr.status, provision);
+    } catch (e) {
+      console.error('save-setup: provision call threw', e);
+      provision = { error: String(e && e.message || e) };
+    }
+
+    res.status(200).json({ ok: true, client_slug: clientSlug, provision });
   } catch (err) {
     console.error('save-setup error', err);
     res.status(500).json({ error: err?.message || 'Unexpected server error' });
