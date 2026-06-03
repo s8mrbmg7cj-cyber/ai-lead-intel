@@ -358,7 +358,7 @@ function showState(which) {
 }
 function isClientReady(client) {
   if (!client) return false;
-  const liveStatuses = ['active', 'live', 'enabled'];
+  const liveStatuses = ['active', 'live', 'enabled', 'ready'];
   const status = (client.status || '').toLowerCase();
   if (client.active === true && liveStatuses.includes(status)) return true;
   return false;
@@ -378,6 +378,13 @@ function formatTimeAgo(iso) {
   if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
   return `${Math.floor(diff/86400)}d ago`;
+}
+function formatDuration(sec) {
+  const s = Math.max(0, Math.round(Number(sec) || 0));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}m ${r}s`;
 }
 function escapeHtml(str) {
   if (!str && str !== 0) return '';
@@ -407,13 +414,14 @@ function renderCalls(calls) {
   calls.forEach(call => {
     const item = document.createElement('div');
     item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface-input);border:1px solid var(--border);border-radius:11px;min-width:0;';
+    const durationLabel = call.duration_seconds ? ` · ${formatDuration(call.duration_seconds)}` : '';
     item.innerHTML = `
       <div style="width:32px;height:32px;border-radius:9px;background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
       </div>
       <div style="flex:1;min-width:0;overflow:hidden;">
-        <div style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(formatPhone(call.caller_number))}</div>
-        <div style="font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(call.summary || call.transcript_snippet || 'Call captured')}</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(formatPhone(call.caller_number))}${escapeHtml(durationLabel)}</div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(call.summary || call.outcome || 'Call captured')}</div>
       </div>
       <div style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-faint);flex-shrink:0;">${formatTimeAgo(call.created_at)}</div>
     `;
@@ -519,12 +527,36 @@ function renderDashboard(client, calls) {
   else if (client.payment_pending === true) paymentLabel = 'Payment pending';
   else if (client.payment_status === 'unpaid') paymentLabel = 'Unpaid';
   document.getElementById('info-payment').textContent = paymentLabel;
-  const recoveredCalls = (calls || []).filter(c => c.lead_captured === true || c.missed === true);
-  document.getElementById('stat-calls').textContent = (calls || []).length;
+
+  const callsArr = calls || [];
+  // Missed calls recovered: a captured call that came in while the human line
+  // didn't pick up. We treat any answered AI call with a real outcome as recovered,
+  // and also honor explicit flags if present.
+  const recoveredCalls = callsArr.filter(c =>
+    c.lead_captured === true ||
+    c.missed === true ||
+    (c.outcome && !['Short call', 'General inquiry'].includes(c.outcome))
+  );
+  document.getElementById('stat-calls').textContent = callsArr.length;
   document.getElementById('stat-recovered').textContent = recoveredCalls.length;
-  document.getElementById('stat-calls-sub').textContent = (calls || []).length === 0 ? 'No calls yet' : 'All time';
+  document.getElementById('stat-calls-sub').textContent = callsArr.length === 0 ? 'No calls yet' : 'All time';
   document.getElementById('stat-recovered-sub').textContent = recoveredCalls.length === 0 ? 'None yet' : 'Captured by AI';
-  renderCalls(calls);
+
+  // Avg call length (from duration_seconds), shown in the response-time card.
+  const withDuration = callsArr.filter(c => Number(c.duration_seconds) > 0);
+  const answerEl = document.getElementById('stat-answer');
+  if (answerEl) {
+    if (withDuration.length > 0) {
+      const avg = withDuration.reduce((sum, c) => sum + Number(c.duration_seconds), 0) / withDuration.length;
+      answerEl.textContent = formatDuration(avg);
+      const sub = answerEl.parentElement && answerEl.parentElement.querySelector('.stat-sub');
+      if (sub) sub.textContent = 'Avg call length';
+    } else {
+      answerEl.textContent = '—';
+    }
+  }
+
+  renderCalls(callsArr);
   renderAiConfig(client);
   renderBilling(client);
   showState('dash');
@@ -605,12 +637,16 @@ async function init() {
     return;
   }
 
-  const { data: calls } = await supabase
+  // Load this client's calls. The webhook (api/vapi/call-ended) stores the
+  // client's UUID in `client_uuid`, so we match on that — NOT the legacy
+  // `client_id` column, which holds stale/non-UUID values.
+  const { data: calls, error: callsError } = await supabase
     .from('calls')
     .select('*')
-    .eq('client_id', client.id)
+    .eq('client_uuid', client.id)
     .order('created_at', { ascending: false })
     .limit(20);
+  if (callsError) console.error('[dashboard] calls fetch error:', callsError);
 
   renderDashboard(client, calls || []);
 }
