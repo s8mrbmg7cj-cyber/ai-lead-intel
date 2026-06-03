@@ -837,8 +837,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   }
 
   function numberFromClient(client) {
-    return client.twilio_number || client.ai_phone_number || client.vapi_phone_number
-      || client.phone_number || client.receptionist_number || client.ai_number || '';
+    // ONLY the provisioned AI/pool number — never fall back to phone_number,
+    // which is the customer's own forwarding line (that was the 385 bug).
+    return client.twilio_number || '';
   }
 
   function setAiNumberProvisioning() {
@@ -1036,7 +1037,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     if (client.voice_style) {
       selectVoiceCard(client.voice_style);
     }
-    document.getElementById('business_hours').value = client.business_hours || '';
+    document.getElementById('business_hours').value = client.business_hours || 'Mon–Fri 8am–6pm';
     document.getElementById('service_area').value = client.service_area || '';
     document.getElementById('services_offered').value = client.services_offered || '';
     document.getElementById('forwarding_number').value = client.forwarding_number || '';
