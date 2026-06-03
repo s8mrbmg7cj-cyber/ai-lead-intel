@@ -125,6 +125,53 @@ function buildBasicPrompt(c) {
   return L.join('\n');
 }
 
+// Digits-only E.164-ish normaliser for the owner's transfer cell.
+function toE164(raw) {
+  const d = String(raw || '').replace(/\D/g, '');
+  if (!d) return '';
+  if (d.length === 10) return `+1${d}`;
+  if (d.length === 11 && d[0] === '1') return `+${d}`;
+  if (String(raw).trim().startsWith('+')) return `+${d}`;
+  return `+${d}`;
+}
+
+// The complete Vapi assistant config for a client. Building this in one place
+// means create and update always produce an identical, fully-wired assistant:
+// model, voice, greeting, the call-report webhook, and (if a cell is set) the
+// ability to actually transfer urgent calls to the owner.
+function buildAssistantPayload(client) {
+  const voice = VOICE_MAP[client.voice_style] || VOICE_MAP.professional_female;
+  const sysPrompt = { role: 'system', content: buildSystemPrompt(client) };
+  const model = CLAUDE_MODEL
+    ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
+    : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
+  const greeting = client.caller_greeting || 'Thanks for calling. How can I help you today?';
+
+  const payload = {
+    name: `${client.business_name || client.client_slug} receptionist`,
+    firstMessage: `${CALL_DISCLOSURE} ${greeting}`,
+    model,
+    voice,
+    // Report the finished call to our webhook so it lands on the dashboard.
+    server: VAPI_WEBHOOK_SECRET
+      ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
+      : { url: CALL_WEBHOOK_URL },
+    serverMessages: ['end-of-call-report'],
+    // Be polite if a call runs long, and end cleanly.
+    endCallMessage: 'Thanks for calling. Have a great day!',
+    endCallFunctionEnabled: true,
+  };
+
+  // Live transfer: only wire it if the owner gave a cell number. This makes the
+  // "transfer to a human" behavior in the prompt actually do something.
+  const cell = toE164(client.forwarding_number);
+  if (cell && cell.length >= 11) {
+    payload.forwardingPhoneNumber = cell;
+  }
+
+  return payload;
+}
+
 // Release a claimed number back to the pool (used if provisioning fails mid-way).
 async function releaseNumber(token, phoneNumber) {
   try {
@@ -167,41 +214,33 @@ export default async function handler(req, res) {
     const client = Array.isArray(loadRows) ? loadRows[0] : null;
     if (!client) { res.status(403).json({ error: 'No matching client for this account' }); return; }
 
-    // Idempotent: already has a number → return it, claim nothing new.
-    if (client.vapi_phone_number_id && client.twilio_number) {
-      res.status(200).json({ ok: true, already: true, number: client.twilio_number });
-      return;
-    }
-
-    // 1) Create or update the assistant, and persist its ID immediately so a retry reuses it.
-    const voice = VOICE_MAP[client.voice_style] || VOICE_MAP.professional_female;
-    const sysPrompt = { role: 'system', content: buildSystemPrompt(client) };
-    const model = CLAUDE_MODEL
-      ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
-      : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
-    const greeting = client.caller_greeting || 'Thanks for calling. How can I help you today?';
-    const assistantPayload = {
-      name: `${client.business_name || client.client_slug} receptionist`,
-      firstMessage: `${CALL_DISCLOSURE} ${greeting}`,
-      model,
-      voice,
-      // Tell Vapi to POST the finished call to our webhook so it lands on the
-      // client's dashboard. Without this, calls happen but never get reported back.
-      server: VAPI_WEBHOOK_SECRET
-        ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
-        : { url: CALL_WEBHOOK_URL },
-      serverMessages: ['end-of-call-report'],
-    };
+    // 1) Build the full assistant config and create OR update it.
+    //    IMPORTANT: we do this for EVERY provision call, even when the client
+    //    already has a number — that's how existing assistants get the webhook
+    //    URL, prompt, voice, and transfer settings refreshed. (The old code
+    //    returned early here, which is why existing clients never got the
+    //    server URL attached.)
+    const assistantPayload = buildAssistantPayload(client);
 
     let assistantId = client.vapi_assistant_id;
     if (assistantId) {
+      console.log('[provision] refreshing existing assistant', assistantId);
       await vapi(`/assistant/${assistantId}`, 'PATCH', assistantPayload);
     } else {
+      console.log('[provision] creating new assistant for', clientSlug);
       const assistant = await vapi('/assistant', 'POST', assistantPayload);
       assistantId = assistant.id;
       await fetch(`${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&owner_user_id=eq.${enc(userId)}`, {
         method: 'PATCH', headers: sbHeaders(token), body: JSON.stringify({ vapi_assistant_id: assistantId }),
       });
+    }
+
+    // Idempotent on the NUMBER only: if the client already has a number, the
+    // assistant has now been refreshed above, so we're done — don't claim another.
+    if (client.vapi_phone_number_id && client.twilio_number) {
+      console.log('[provision] client already has a number; assistant refreshed, skipping claim.');
+      res.status(200).json({ ok: true, already: true, number: client.twilio_number, assistantId, refreshed: true });
+      return;
     }
 
     // 2) Atomically claim one free number from the pool.
