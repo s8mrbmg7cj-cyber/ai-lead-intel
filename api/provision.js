@@ -184,6 +184,7 @@ async function releaseNumber(token, phoneNumber) {
 }
 
 export default async function handler(req, res) {
+  console.log('[provision] ===== VERSION 2026-06-03-refresh-first ===== method:', req.method);
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   let claimedNumber = null;
