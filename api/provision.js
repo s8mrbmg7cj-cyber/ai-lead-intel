@@ -168,6 +168,7 @@ export default async function handler(req, res) {
         vapi_assistant_id: assistantId,
         vapi_phone_number_id: phone.id,
         twilio_number: phone.number,
+        ai_setup_status: 'ready', // fires your existing webhook → setup email + flips dashboard live
       }),
     });
     if (!saveResp.ok) {
