@@ -20,6 +20,8 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY;
 const VAPI_BASE = 'https://api.vapi.ai';
+// If set, the assistant's brain runs on Anthropic/Claude; otherwise falls back to GPT-4o.
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || '';
 
 // Map your setup form's voice_style values to a real Vapi voice.
 // 'openai' voices work out of the box; swap to '11labs' + a voiceId for more natural audio.
@@ -130,10 +132,14 @@ export default async function handler(req, res) {
 
     // 1) Create or update the assistant.
     const voice = VOICE_MAP[client.voice_style] || VOICE_MAP.professional_female;
+    const sysPrompt = { role: 'system', content: buildSystemPrompt(client) };
+    const model = CLAUDE_MODEL
+      ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
+      : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
     const assistantPayload = {
       name: `${client.business_name || client.client_slug} receptionist`,
       firstMessage: client.caller_greeting || 'Thanks for calling. How can I help you today?',
-      model: { provider: 'openai', model: 'gpt-4o', messages: [{ role: 'system', content: buildSystemPrompt(client) }] },
+      model,
       voice,
     };
     let assistantId = client.vapi_assistant_id;
