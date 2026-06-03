@@ -10,9 +10,9 @@
 //   SUPABASE_ANON_KEY            (optional — defaults below)
 //   SUPABASE_SERVICE_ROLE_KEY    (RECOMMENDED — lets the save bypass RLS so it always works)
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const ALLOWED_FIELDS = [
   'business_type', 'caller_greeting', 'ai_personality', 'voice_style',
