@@ -456,14 +456,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
         </div>
 
         <div class="section-divider"></div>
-        <div class="section-title-mini">Phone setup</div>
-
-        <!-- AI receptionist number (provisioned + stored by the backend) -->
-        <div class="field">
-          <label class="field-label">Your AI receptionist number</label>
-          <div class="field-help">This is the number your AI answers on. Point your business line here and every call gets picked up.</div>
-          <div id="ai-number-box"></div>
-        </div>
+        <div class="section-title-mini">Call handling</div>
 
         <!-- Owner's cell for live transfers -->
         <div class="field">
@@ -511,20 +504,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
         </div>
 
         <div class="section-divider"></div>
-
-        <!-- Phone setup confirmation -->
-        <div class="field confirm-row">
-          <label class="confirm-check" id="phone-confirm-label" for="phone_confirm">
-            <input type="checkbox" id="phone_confirm" />
-            <span class="confirm-box">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </span>
-            <span class="confirm-text">
-              I've completed the phone setup — my business line is forwarded to my AI number above (or I'm using the AI number directly).
-              <span class="confirm-sub">Calls won't reach your AI until this is done. You can re-check the steps under "Your AI receptionist number" above.</span>
-            </span>
-          </label>
-        </div>
 
         <div class="btn-row">
           <button type="submit" class="btn btn-primary" id="submit-btn">
@@ -824,107 +803,30 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     syncPreset(grid, noteEl, hiddenEl);
   }
 
-  // ---- AI receptionist number display ----
-  // The number itself is provisioned + stored server-side (see notes to the dev).
-  // This just surfaces whatever the backend saved on the client row.
-  const aiNumberBox = document.getElementById('ai-number-box');
-
-  function formatPhone(raw) {
-    const d = ('' + raw).replace(/[^\d]/g, '');
-    if (d.length === 10) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
-    if (d.length === 11 && d[0] === '1') return '+1 (' + d.slice(1,4) + ') ' + d.slice(4,7) + '-' + d.slice(7);
-    return raw;
-  }
-
+  // ---- Trigger provisioning on load ----
+  // The dedicated /phone-setup page shows the number + forwarding steps now,
+  // so here we just make sure the client gets provisioned (number claimed +
+  // assistant built) in the background. No number UI on this page anymore.
   function numberFromClient(client) {
-    // ONLY the provisioned AI/pool number — never fall back to phone_number,
-    // which is the customer's own forwarding line (that was the 385 bug).
     return client.twilio_number || '';
   }
-
-  function setAiNumberProvisioning() {
-    aiNumberBox.innerHTML =
-      '<div class="ai-number-pending">' +
-        '<span class="dot2"></span>' +
-        '<div>Setting up your AI phone number… this takes a few seconds. You can keep filling out the form below.</div>' +
-      '</div>';
-  }
-
-  function renderAiNumber(client) {
-    const raw = numberFromClient(client);
-    if (raw) {
-      const pretty = formatPhone(raw);
-      aiNumberBox.innerHTML =
-        '<div class="ai-number-card">' +
-          '<div class="ai-number-main">' +
-            '<span class="ai-number-label">Your AI number</span>' +
-            '<span class="ai-number-value"></span>' +
-          '</div>' +
-          '<button type="button" class="ai-number-copy" id="ai-number-copy">' +
-            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
-            '<span>Copy</span>' +
-          '</button>' +
-        '</div>' +
-        '<ol class="ai-steps">' +
-          '<li><strong>Pick how customers reach your AI.</strong> Either give out this AI number directly as your business number, <em>or</em> keep your current number and forward it here (steps below). Most people forward, so they keep the number customers already know.</li>' +
-          '<li><strong>Forward your existing business line here.</strong> From your business phone, dial <code>*72</code>, wait for the dial tone, then dial your AI number above and press call. You\'ll hear a confirmation tone. (On some carriers it\'s a setting in your phone\'s "Call forwarding" menu instead of <code>*72</code> — both work.)</li>' +
-          '<li><strong>Prefer only forwarding missed calls?</strong> Ask your carrier for <em>conditional</em> call forwarding (forward on no-answer / busy). That way you still answer in person when you can, and the AI catches the rest.</li>' +
-          '<li><strong>Test it before you rely on it.</strong> From a different phone, call the number your customers dial. Within a couple of rings the AI should answer with your greeting. If it goes to your old voicemail, the forward didn\'t take — redo step 2 or check your carrier\'s forwarding setting.</li>' +
-          '<li><strong>Turn forwarding off anytime</strong> by dialing <code>*73</code> from your business phone.</li>' +
-          '<li><strong>Urgent calls still reach you.</strong> When a call matches your transfer rules below, the AI rings the cell number you enter under "Your cell."</li>' +
-        '</ol>';
-      aiNumberBox.querySelector('.ai-number-value').textContent = pretty; // textContent avoids HTML injection
-      const copyBtn = document.getElementById('ai-number-copy');
-      if (copyBtn) copyBtn.addEventListener('click', () => {
-        const span = copyBtn.querySelector('span');
-        const done = () => { if (span) { span.textContent = 'Copied'; setTimeout(() => { span.textContent = 'Copy'; }, 1600); } };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText('' + raw).then(done).catch(done);
-        } else { done(); }
-      });
-    } else {
-      aiNumberBox.innerHTML =
-        '<div class="ai-number-pending">' +
-          '<span class="dot2"></span>' +
-          '<div>We couldn\'t set up your AI number automatically just yet. Refresh this page in a minute to try again — if it\'s still not here, email <strong>hello@aileadintel.com</strong> and we\'ll provision it for you.</div>' +
-        '</div>';
-    }
-  }
-
-  // Auto-provision the AI number on load if the client doesn't have one yet,
-  // so the number + forwarding steps are ready by the time they need them.
   async function ensureProvisioned(client) {
-    if (numberFromClient(client)) { renderAiNumber(client); return; }
-    setAiNumberProvisioning();
+    if (numberFromClient(client)) return;
     try {
       const { data: s } = await sb.auth.getSession();
       const token = s?.session?.access_token;
-      if (!token) { renderAiNumber({}); return; }
-      // Match the AI number's area code to the owner's cell when we can.
-      const cell = (client.forwarding_number || '').replace(/\D/g, '');
+      if (!token) return;
+      const cell = (client.forwarding_number || '').replace(/\\D/g, '');
       const areaCode = cell.length === 11 && cell[0] === '1' ? cell.slice(1, 4)
         : cell.length === 10 ? cell.slice(0, 3) : '';
-      const resp = await fetch('/api/provision', {
+      await fetch('/api/provision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
         body: JSON.stringify({ client_slug: client.client_slug, area_code: areaCode || undefined }),
       });
-      const b = await resp.json().catch(() => ({}));
-      if (resp.ok && b.number) { renderAiNumber({ twilio_number: b.number }); }
-      else { console.warn('provision failed', resp.status, b); renderAiNumber({}); }
     } catch (err) {
       console.warn('provision error', err);
-      renderAiNumber({});
     }
-  }
-
-  // Phone-setup confirmation checkbox styling toggle.
-  const phoneConfirm = document.getElementById('phone_confirm');
-  const phoneConfirmLabel = document.getElementById('phone-confirm-label');
-  if (phoneConfirm) {
-    phoneConfirm.addEventListener('change', () => {
-      phoneConfirmLabel.classList.toggle('checked', phoneConfirm.checked);
-    });
   }
 
   // Restore voice style from localStorage (until DB hydration overrides it)
@@ -1074,11 +976,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     }
     if (!voiceHidden.value) {
       showAlert('error', 'Please pick a voice style.');
-      return;
-    }
-    if (phoneConfirm && !phoneConfirm.checked) {
-      showAlert('error', 'Please confirm you\'ve completed the phone setup — tick the box just above the Save button.');
-      phoneConfirmLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
