@@ -145,11 +145,12 @@ function buildAssistantPayload(client) {
   const model = CLAUDE_MODEL
     ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
     : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
-  const greeting = client.caller_greeting || 'Thanks for calling. How can I help you today?';
+  const greeting = client.caller_greeting
+    || `Thanks for calling ${client.business_name || 'us'}. How can I help you today?`;
 
   const payload = {
     name: `${client.business_name || client.client_slug} receptionist`,
-    firstMessage: `${CALL_DISCLOSURE} ${greeting}`,
+    firstMessage: greeting,
     model,
     voice,
     // Report the finished call to our webhook so it lands on the dashboard.
