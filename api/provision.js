@@ -128,6 +128,19 @@ function buildSystemPrompt(c) {
     + '- No filler, no long intros, no over-explaining. Get to the point.\n'
     + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
     + '- If you need a detail, ask one quick question at a time.';
+  // How the assistant should handle "can I talk to a person?" — give out the
+  // business's callback number rather than attempting a live transfer.
+  const callback = String(c.forwarding_number || c.transfer_primary || c.business_phone || '').trim();
+  prompt += '\n\n# IF THEY WANT A PERSON\n';
+  if (callback) {
+    prompt += 'If the caller asks to be transferred, speak to a human, or reach someone at the business, '
+      + 'do NOT say you will transfer them. Instead, give them the direct number: ' + callback + '. '
+      + 'Say it naturally, e.g. "You can reach the team directly at ' + callback + '." '
+      + 'Then offer to take their name and number so someone can call them back.';
+  } else {
+    prompt += 'If the caller asks to be transferred or to speak to a human, let them know you\'ll take a '
+      + 'message and have someone call them back, then collect their name and number.';
+  }
   prompt += '\n\n# DISCLOSURE\n'
     + 'If the caller directly asks whether you are a person, tell them you are an AI assistant. '
     + 'Never claim or imply that you are a human.';
@@ -206,12 +219,9 @@ function buildAssistantPayload(client) {
     endCallFunctionEnabled: true,
   };
 
-  // Live transfer: only wire it if the owner gave a cell number. This makes the
-  // "transfer to a human" behavior in the prompt actually do something.
-  const cell = toE164(client.forwarding_number);
-  if (cell && cell.length >= 11) {
-    payload.forwardingPhoneNumber = cell;
-  }
+  // No live call transfer. Instead, the AI gives out the business's callback
+  // number when a caller asks for a person (see buildSystemPrompt). This avoids
+  // forwarding loops and is more reliable than a live transfer.
 
   return payload;
 }
