@@ -157,6 +157,26 @@ function buildAssistantPayload(client) {
       ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
       : { url: CALL_WEBHOOK_URL },
     serverMessages: ['end-of-call-report'],
+    // ── Latency: make the AI respond faster ──
+    // The default endpointing waits up to 1.5s after the caller stops talking
+    // before the AI even begins. These settings cut that down so replies feel
+    // snappy. Applies to every assistant built here.
+    startSpeakingPlan: {
+      // How long to wait after the caller stops before the AI speaks (default 0.4).
+      waitSeconds: 0.4,
+      // LiveKit = best natural end-of-turn detection for English calls.
+      smartEndpointingPlan: { provider: 'livekit' },
+      // Text-based fallback timings. onNoPunctuationSeconds (default 1.5) is the
+      // big one — it's the long pause you hear when a caller trails off.
+      transcriptionEndpointingPlan: {
+        onPunctuationSeconds: 0.1,
+        onNoPunctuationSeconds: 0.6,
+        onNumberSeconds: 0.4,
+      },
+    },
+    // Small head-start delays kept low so the AI starts forming its reply sooner.
+    responseDelaySeconds: 0.2,
+    llmRequestDelaySeconds: 0.1,
     // Be polite if a call runs long, and end cleanly.
     endCallMessage: 'Thanks for calling. Have a great day!',
     endCallFunctionEnabled: true,
@@ -184,7 +204,7 @@ async function releaseNumber(token, phoneNumber) {
 }
 
 export default async function handler(req, res) {
-  console.log('[provision] ===== VERSION 2026-06-03-refresh-first ===== method:', req.method);
+  console.log('[provision] ===== VERSION 2026-06-03-faster-endpointing ===== method:', req.method);
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   let claimedNumber = null;
