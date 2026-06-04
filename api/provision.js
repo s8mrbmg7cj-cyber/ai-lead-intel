@@ -41,12 +41,28 @@ const VAPI_WEBHOOK_SECRET = process.env.VAPI_WEBHOOK_SECRET || '';
 // so confirm the wording for the states you operate in before relying on it.
 const CALL_DISCLOSURE = "Just so you know, you're speaking with our AI virtual assistant, and this call may be recorded for quality and follow-up.";
 
+// Starter voices (OpenAI — solid, low-cost). Used for the $97 plan.
 const VOICE_MAP = {
   warm_female:         { provider: 'openai', voiceId: 'shimmer' },
   professional_female: { provider: 'openai', voiceId: 'nova' },
   calm_male:           { provider: 'openai', voiceId: 'echo' },
   deep_male:           { provider: 'openai', voiceId: 'onyx' },
 };
+// Pro voices (ElevenLabs — more natural). Used for the $297 plan.
+// NOTE: requires ElevenLabs to be connected in your Vapi account (provider key).
+// These are ElevenLabs stock voice IDs; same style/gender mapping as Starter.
+const PRO_VOICE_MAP = {
+  warm_female:         { provider: '11labs', voiceId: 'EXAVITQu4vr4xnSDxMaL' }, // Sarah — warm female
+  professional_female: { provider: '11labs', voiceId: '21m00Tcm4TlvDq8ikWAM' }, // Rachel — professional female
+  calm_male:           { provider: '11labs', voiceId: 'TxGEqnHWrfWFTfGW9XjX' }, // Josh — calm male
+  deep_male:           { provider: '11labs', voiceId: 'pNInz6obpgDQGcFmaJgB' }, // Adam — deep male
+};
+function pickVoice(client) {
+  const style = client.voice_style || 'professional_female';
+  const isPro = (client.plan || '').toLowerCase() === 'pro';
+  if (isPro) return PRO_VOICE_MAP[style] || PRO_VOICE_MAP.professional_female;
+  return VOICE_MAP[style] || VOICE_MAP.professional_female;
+}
 
 const enc = encodeURIComponent;
 
@@ -105,8 +121,15 @@ function buildSystemPrompt(c) {
   let prompt = (c.ai_prompt && c.ai_prompt.trim())
     ? c.ai_prompt.trim()
     : buildBasicPrompt(c);
+  // Make every assistant fast and natural on a phone call.
+  prompt += '\n\n# HOW TO SOUND\n'
+    + '- Talk like a real receptionist, not a chatbot. Be warm, confident, and natural.\n'
+    + '- Keep every reply short — one or two sentences. Answer first, then ask the next question.\n'
+    + '- No filler, no long intros, no over-explaining. Get to the point.\n'
+    + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
+    + '- If you need a detail, ask one quick question at a time.';
   prompt += '\n\n# DISCLOSURE\n'
-    + 'If the caller asks, confirm that you are an AI virtual assistant and that the call may be recorded. '
+    + 'If the caller directly asks whether you are a person, tell them you are an AI assistant. '
     + 'Never claim or imply that you are a human.';
   return prompt;
 }
@@ -140,7 +163,7 @@ function toE164(raw) {
 // model, voice, greeting, the call-report webhook, and (if a cell is set) the
 // ability to actually transfer urgent calls to the owner.
 function buildAssistantPayload(client) {
-  const voice = VOICE_MAP[client.voice_style] || VOICE_MAP.professional_female;
+  const voice = pickVoice(client);
   const sysPrompt = { role: 'system', content: buildSystemPrompt(client) };
   const model = CLAUDE_MODEL
     ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
