@@ -229,7 +229,7 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: [client.notify_email],
       subject: `${emoji} ${leadAnalysis.score} Lead - ${client.business_name}`,
       html,
