@@ -12,280 +12,88 @@
 <style>
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #08080a; --bg-2: #0c0c0f;
-  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22; --surface-input: #0d0d10;
-  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.14);
-  --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a;
-  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
-  --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
-  --brand-tint: rgba(255,106,0,0.05); --brand-line: rgba(255,106,0,0.22);
-  --green: #34d399; --green-soft: rgba(52,211,153,0.1); --green-line: rgba(52,211,153,0.25);
-  --hot: #ef4444; --hot-soft: rgba(239,68,68,0.1); --hot-line: rgba(239,68,68,0.25);
+  --bg:#08080a; --bg-2:#0c0c0f; --surface:#111114; --surface-2:#16161b; --surface-3:#1c1c22; --surface-input:#0d0d10;
+  --border:rgba(255,255,255,0.06); --border-2:rgba(255,255,255,0.10); --border-3:rgba(255,255,255,0.14);
+  --text:#fafafa; --text-soft:#d4d4d8; --text-dim:#a1a1aa; --text-faint:#71717a;
+  --brand:#ff6a00; --brand-2:#ff9a00; --brand-3:#ff8533;
+  --brand-glow:rgba(255,106,0,0.32); --brand-soft:rgba(255,106,0,0.10); --brand-tint:rgba(255,106,0,0.05); --brand-line:rgba(255,106,0,0.22);
+  --green:#34d399; --green-soft:rgba(52,211,153,0.1); --green-line:rgba(52,211,153,0.25);
+  --hot:#ef4444; --hot-soft:rgba(239,68,68,0.1); --hot-line:rgba(239,68,68,0.25);
 }
-html { scroll-behavior: smooth; }
-html, body { height: 100%; }
-body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; overflow-x: hidden; -webkit-font-smoothing: antialiased; line-height: 1.55; }
-body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,106,0,0.14), transparent 60%), radial-gradient(ellipse 60% 35% at 100% 0%, rgba(255,154,0,0.07), transparent 55%); pointer-events: none; z-index: 0; }
-body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none; z-index: 0; mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%); -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%); }
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-
-.topnav { position: sticky; top: 0; z-index: 100; background: rgba(8,8,10,0.72); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
-.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
-.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); position: relative; overflow: hidden; }
-.logo-mark::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.22)); }
-.nav-right { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; }
-
-.wrap { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
-.setup-head { text-align: center; margin-bottom: 36px; }
-.setup-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 7px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 20px; }
-.setup-eyebrow .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); animation: pulse 1.6s ease-in-out infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
-.setup-title { font-size: clamp(28px, 4vw, 38px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 12px; }
-.setup-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.setup-sub { font-size: 15.5px; color: var(--text-dim); line-height: 1.6; max-width: 540px; margin: 0 auto; }
-
-.card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 18px; padding: 28px; position: relative; overflow: hidden; }
-.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
-
-.field-group { display: flex; flex-direction: column; gap: 24px; }
-.field { display: flex; flex-direction: column; gap: 8px; }
-.field-label { font-size: 13.5px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
-.field-label .req { color: var(--brand); margin-left: 3px; }
-.field-help { font-size: 12.5px; color: var(--text-faint); line-height: 1.5; margin-top: -2px; }
-
-.input, .textarea, .select {
-  width: 100%; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 10px;
-  padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--text); line-height: 1.5;
-  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
-  -webkit-appearance: none; appearance: none;
-}
-.input:focus, .textarea:focus, .select:focus {
-  outline: none; border-color: var(--brand-line); background: var(--bg-2);
-  box-shadow: 0 0 0 3px rgba(255,106,0,0.08);
-}
-.input::placeholder, .textarea::placeholder { color: var(--text-faint); }
-.textarea { resize: vertical; min-height: 92px; }
-.select {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
-}
-
-/* Personality selector (3 chips) */
-.personality-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.personality-chip {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
-  padding: 12px 14px; border-radius: 10px; background: var(--surface-input);
-  border: 1px solid var(--border-2); cursor: pointer; transition: all 0.18s; text-align: left;
-}
-.personality-chip:hover { border-color: var(--border-3); background: var(--surface-3); }
-.personality-chip.active { border-color: var(--brand-line); background: linear-gradient(180deg, rgba(255,106,0,0.12), rgba(255,106,0,0.04)); box-shadow: 0 0 0 1px var(--brand-line) inset, 0 4px 14px rgba(255,106,0,0.1); }
-.personality-chip-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.personality-chip.active .personality-chip-name { color: var(--brand); }
-.personality-chip-desc { font-size: 11px; color: var(--text-faint); }
-@media (max-width: 560px) { .personality-grid { grid-template-columns: 1fr; } }
-
-/* ====== VOICE STYLE SECTION ====== */
-.voice-section { margin-top: 4px; }
-.voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.voice-card {
-  position: relative; padding: 18px 18px 16px; border-radius: 14px;
-  background: linear-gradient(180deg, var(--surface-input) 0%, var(--surface-2) 100%);
-  border: 1px solid var(--border-2); cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1); text-align: left;
-  display: flex; flex-direction: column; gap: 10px; overflow: hidden;
-  font-family: inherit; color: inherit;
-}
-.voice-card::before {
-  content: ''; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
-  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(255,106,0,0.08), transparent 60%);
-  opacity: 0; transition: opacity 0.3s;
-}
-.voice-card:hover { transform: translateY(-2px); border-color: var(--border-3); }
-.voice-card:hover::before { opacity: 1; }
-.voice-card.active {
-  border-color: var(--brand-line);
-  background: linear-gradient(180deg, rgba(255,106,0,0.10) 0%, rgba(255,106,0,0.03) 100%), var(--surface-2);
-  box-shadow: 0 0 0 1px var(--brand-line) inset, 0 10px 28px rgba(255,106,0,0.14);
-}
-.voice-card.active::before { opacity: 1; }
-.voice-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.voice-card-icon-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.voice-card-icon {
-  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
-  background: var(--surface-3); border: 1px solid var(--border-2);
-  display: flex; align-items: center; justify-content: center; color: var(--text-dim);
-  transition: all 0.25s;
-}
-.voice-card.active .voice-card-icon {
-  background: linear-gradient(135deg, var(--brand), var(--brand-2));
-  border-color: var(--brand);
-  color: #fff; box-shadow: 0 6px 16px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-.voice-card-name {
-  font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.01em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.voice-card.active .voice-card-name { color: var(--text); }
-.voice-card-tag {
-  font-family: 'Geist Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--brand); background: var(--brand-soft);
-  border: 1px solid var(--brand-line); padding: 3px 8px; border-radius: 99px;
-  font-weight: 700; flex-shrink: 0; line-height: 1;
-}
-.voice-card-check {
-  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
-  background: var(--surface-3); border: 1px solid var(--border-2);
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.22s; color: transparent;
-}
-.voice-card.active .voice-card-check {
-  background: var(--brand); border-color: var(--brand); color: #fff;
-  box-shadow: 0 0 0 3px rgba(255,106,0,0.18);
-}
-.voice-card-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
-.voice-card-preview {
-  display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
-  padding: 7px 12px; border-radius: 8px; background: var(--surface-3);
-  border: 1px solid var(--border-2); color: var(--text-soft);
-  font-size: 11.5px; font-weight: 600; letter-spacing: -0.005em;
-  transition: all 0.18s; cursor: pointer; font-family: inherit; margin-top: 2px;
-}
-.voice-card-preview:hover { background: var(--surface); border-color: var(--brand-line); color: var(--brand); }
-.voice-card-preview:active { transform: scale(0.97); }
-.voice-card-preview svg { transition: transform 0.18s; flex-shrink: 0; }
-.voice-card-preview:hover svg { transform: scale(1.1); }
-.voice-card-preview.playing { background: var(--brand-soft); border-color: var(--brand-line); color: var(--brand); }
-.voice-card-preview.disabled { opacity: 0.55; cursor: not-allowed; }
-.voice-card-preview.disabled:hover { background: var(--surface-3); border-color: var(--border-2); color: var(--text-soft); }
-@media (max-width: 600px) { .voice-grid { grid-template-columns: 1fr; gap: 10px; } }
-
-/* ====== QUICK-SELECT PRESET CHIPS ====== */
-.preset-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.preset-chip {
-  padding: 9px 14px; border-radius: 99px; background: var(--surface-input);
-  border: 1px solid var(--border-2); color: var(--text-soft); font-size: 13px;
-  font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.16s;
-  display: inline-flex; align-items: center; gap: 8px; line-height: 1;
-}
-.preset-chip:hover { border-color: var(--border-3); background: var(--surface-3); color: var(--text); }
-.preset-chip.active {
-  border-color: var(--brand-line); color: var(--brand);
-  background: linear-gradient(180deg, rgba(255,106,0,0.14), rgba(255,106,0,0.05));
-  box-shadow: 0 0 0 1px var(--brand-line) inset;
-}
-.preset-chip::before {
-  content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
-  border: 1.5px solid var(--border-3); transition: all 0.16s; background-position: center; background-repeat: no-repeat;
-}
-.preset-chip.active::before {
-  border-color: var(--brand); background-color: var(--brand);
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-}
-.preset-add {
-  align-self: flex-start; margin-top: 10px; font-size: 12.5px; font-weight: 600;
-  color: var(--text-dim); font-family: inherit; cursor: pointer; padding: 4px 2px; transition: color 0.16s;
-}
-.preset-add:hover { color: var(--brand); }
-.preset-note { margin-top: 10px; min-height: 70px; }
-
-/* ====== AI RECEPTIONIST NUMBER CARD ====== */
-.ai-number-card {
-  background: linear-gradient(180deg, rgba(255,106,0,0.08), rgba(255,106,0,0.02)), var(--surface-input);
-  border: 1px solid var(--brand-line); border-radius: 12px; padding: 16px 18px;
-  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
-}
-.ai-number-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ai-number-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
-.ai-number-value { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); font-variant-numeric: tabular-nums; }
-.ai-number-copy {
-  display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 9px;
-  background: var(--surface-3); border: 1px solid var(--border-2); color: var(--text-soft);
-  font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.16s; flex-shrink: 0;
-}
-.ai-number-copy:hover { border-color: var(--brand-line); color: var(--brand); }
-.ai-number-pending {
-  background: var(--surface-input); border: 1px dashed var(--border-3); border-radius: 12px;
-  padding: 16px 18px; color: var(--text-dim); font-size: 13px; line-height: 1.55;
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.ai-number-pending .dot2 { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); margin-top: 5px; flex-shrink: 0; animation: pulse 1.6s ease-in-out infinite; }
-.ai-steps { list-style: none; counter-reset: s; margin-top: 14px; display: flex; flex-direction: column; gap: 9px; }
-.ai-steps li { counter-increment: s; position: relative; padding-left: 30px; font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-.ai-steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; }
-.ai-steps li strong { color: var(--text-soft); font-weight: 600; }
-.ai-steps code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 5px; padding: 1px 6px; color: var(--text); }
-
-/* ====== PHONE SETUP CONFIRMATION CHECKBOX ====== */
-.confirm-row { margin-top: 8px; }
-.confirm-check { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px 16px; border-radius: 12px; background: var(--surface-input); border: 1px solid var(--border-2); transition: all 0.18s; }
-.confirm-check:hover { border-color: var(--border-3); }
-.confirm-check.checked { border-color: var(--brand-line); background: linear-gradient(180deg, rgba(255,106,0,0.10), rgba(255,106,0,0.03)); }
-.confirm-check input { position: absolute; opacity: 0; pointer-events: none; }
-.confirm-box { width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; margin-top: 1px; background: var(--surface-3); border: 1.5px solid var(--border-3); display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.18s; }
-.confirm-check.checked .confirm-box { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 0 3px rgba(255,106,0,0.18); }
-.confirm-text { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); font-weight: 500; }
-.confirm-text .confirm-sub { display: block; margin-top: 3px; font-size: 12px; color: var(--text-faint); font-weight: 400; }
-
-.section-divider { height: 1px; background: var(--border); margin: 4px 0; }
-.section-title-mini {
-  font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: -4px;
-}
-
-.btn-row { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: 11px; font-size: 14px; font-weight: 600; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); border: 1px solid transparent; cursor: pointer; min-height: 48px; }
-.btn-primary { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-3) 100%); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 2px rgba(255,106,0,0.3), 0 6px 20px var(--brand-glow); flex: 1; position: relative; overflow: hidden; }
-.btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transition: left 0.6s; }
-.btn-primary:hover::before { left: 100%; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 14px 36px var(--brand-glow); }
-.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-.btn-secondary { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
-.btn-secondary:hover { background: var(--surface-3); border-color: var(--border-3); }
-
-.alert { padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5; display: flex; align-items: flex-start; gap: 10px; }
-.alert.error { background: var(--hot-soft); border: 1px solid var(--hot-line); color: var(--hot); }
-.alert.success { background: var(--green-soft); border: 1px solid var(--green-line); color: var(--green); }
-.alert.info { background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); }
-.alert svg { flex-shrink: 0; margin-top: 1px; }
-
-.loading-screen { min-height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: var(--text-dim); font-size: 14px; }
-.spinner { width: 28px; height: 28px; border: 2px solid var(--border-2); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.hidden { display: none !important; }
-
-@media (max-width: 600px) {
-  .wrap { padding: 32px 18px 64px; }
-  .card { padding: 20px; border-radius: 14px; }
-  .field-group { gap: 20px; }
-}
+html { scroll-behavior: smooth; } html, body { height: 100%; }
+body { font-family:'Geist',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; letter-spacing:-0.011em; overflow-x:hidden; -webkit-font-smoothing:antialiased; line-height:1.55; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,106,0,0.14), transparent 60%); pointer-events:none; z-index:0; }
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+.topnav { position:sticky; top:0; z-index:100; background:rgba(8,8,10,0.72); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; justify-content:space-between; align-items:center; }
+.logo { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; letter-spacing:-0.02em; }
+.logo-mark { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--brand),var(--brand-2)); box-shadow:0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+.nav-right { font-family:'Geist Mono',monospace; font-size:11px; color:var(--text-faint); letter-spacing:0.08em; text-transform:uppercase; }
+.wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:48px 24px 80px; }
+.setup-head { text-align:center; margin-bottom:32px; }
+.setup-eyebrow { display:inline-flex; align-items:center; gap:8px; font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--brand); background:var(--brand-soft); border:1px solid var(--brand-line); padding:7px 14px; border-radius:99px; font-weight:600; margin-bottom:18px; }
+.setup-eyebrow .dot { width:5px; height:5px; border-radius:50%; background:var(--brand); box-shadow:0 0 6px var(--brand-glow); animation:pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.45;transform:scale(0.7);} }
+.setup-title { font-size:clamp(26px,4vw,36px); font-weight:600; letter-spacing:-0.03em; line-height:1.1; margin-bottom:12px; }
+.setup-title .accent { font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; background:linear-gradient(135deg,var(--brand),var(--brand-2)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.setup-sub { font-size:15px; color:var(--text-dim); line-height:1.6; max-width:520px; margin:0 auto; }
+.card { background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%); border:1px solid var(--border-2); border-radius:18px; padding:28px; position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,106,0,0.4),transparent); }
+.field-group { display:flex; flex-direction:column; gap:26px; }
+.field { display:flex; flex-direction:column; gap:8px; }
+.field-label { font-size:13.5px; font-weight:600; color:var(--text); }
+.field-label .req { color:var(--brand); margin-left:3px; }
+.field-help { font-size:12.5px; color:var(--text-faint); line-height:1.5; margin-top:-2px; }
+.input { width:100%; background:var(--surface-input); border:1px solid var(--border-2); border-radius:10px; padding:13px 14px; font-family:inherit; font-size:14px; color:var(--text); line-height:1.5; transition:border-color 0.18s, box-shadow 0.18s; }
+.input:focus { outline:none; border-color:var(--brand-line); background:var(--bg-2); box-shadow:0 0 0 3px rgba(255,106,0,0.08); }
+.input::placeholder { color:var(--text-faint); }
+.voice-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.voice-card { position:relative; padding:18px; border-radius:14px; background:linear-gradient(180deg,var(--surface-input) 0%,var(--surface-2) 100%); border:1px solid var(--border-2); cursor:pointer; transition:all 0.2s; text-align:left; display:flex; flex-direction:column; gap:10px; font-family:inherit; color:inherit; }
+.voice-card:hover { border-color:var(--border-3); transform:translateY(-2px); }
+.voice-card.active { border-color:var(--brand-line); background:linear-gradient(180deg,rgba(255,106,0,0.10) 0%,rgba(255,106,0,0.03) 100%),var(--surface-2); box-shadow:0 0 0 1px var(--brand-line) inset, 0 10px 28px rgba(255,106,0,0.14); }
+.voice-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.voice-card-icon-wrap { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+.voice-card-icon { width:36px; height:36px; border-radius:10px; flex-shrink:0; background:var(--surface-3); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; color:var(--text-dim); transition:all 0.25s; }
+.voice-card.active .voice-card-icon { background:linear-gradient(135deg,var(--brand),var(--brand-2)); border-color:var(--brand); color:#fff; }
+.voice-card-name { font-size:14px; font-weight:600; color:var(--text); }
+.voice-card-tag { font-family:'Geist Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brand); background:var(--brand-soft); border:1px solid var(--brand-line); padding:3px 8px; border-radius:99px; font-weight:700; flex-shrink:0; }
+.voice-card-check { width:22px; height:22px; border-radius:50%; flex-shrink:0; background:var(--surface-3); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; transition:all 0.22s; color:transparent; }
+.voice-card.active .voice-card-check { background:var(--brand); border-color:var(--brand); color:#fff; box-shadow:0 0 0 3px rgba(255,106,0,0.18); }
+.voice-card-desc { font-size:12.5px; color:var(--text-dim); line-height:1.5; }
+.voice-card-preview { display:inline-flex; align-items:center; gap:7px; align-self:flex-start; padding:7px 12px; border-radius:8px; background:var(--surface-3); border:1px solid var(--border-2); color:var(--text-soft); font-size:11.5px; font-weight:600; transition:all 0.18s; cursor:pointer; font-family:inherit; }
+.voice-card-preview:hover { background:var(--surface); border-color:var(--brand-line); color:var(--brand); }
+.voice-card-preview.playing { background:var(--brand-soft); border-color:var(--brand-line); color:var(--brand); }
+.voice-card-preview.disabled { opacity:0.55; cursor:not-allowed; }
+@media (max-width:600px) { .voice-grid { grid-template-columns:1fr; gap:10px; } }
+.btn-row { margin-top:8px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px 24px; border-radius:12px; font-size:15px; font-weight:600; transition:all 0.2s; border:1px solid transparent; cursor:pointer; min-height:50px; }
+.btn-primary { background:linear-gradient(135deg,var(--brand) 0%,var(--brand-3) 100%); color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), 0 6px 20px var(--brand-glow); }
+.btn-primary:hover { transform:translateY(-1px); }
+.btn-primary:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+.alert { padding:12px 14px; border-radius:10px; font-size:13px; line-height:1.5; display:flex; align-items:flex-start; gap:10px; margin-bottom:18px; }
+.alert.error { background:var(--hot-soft); border:1px solid var(--hot-line); color:var(--hot); }
+.alert.info { background:var(--brand-soft); border:1px solid var(--brand-line); color:var(--brand); }
+.loading-screen { min-height:60vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--text-dim); font-size:14px; }
+.spinner { width:28px; height:28px; border:2px solid var(--border-2); border-top-color:var(--brand); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.hidden { display:none !important; }
+.section-divider { height:1px; background:var(--border); margin:2px 0; }
+@media (max-width:600px) { .wrap { padding:32px 18px 64px; } .card { padding:20px; } }
 </style>
 </head>
 <body>
-
 <nav class="topnav">
-  <a href="/" class="logo">
-    <div class="logo-mark"></div>
-    <span>AI Lead Intel</span>
-  </a>
+  <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
   <div class="nav-right" id="topnav-slug">Setup</div>
 </nav>
-
 <div class="wrap">
+  <div id="loading" class="loading-screen"><div class="spinner"></div><div>Loading your setup…</div></div>
 
-  <!-- Loading state -->
-  <div id="loading" class="loading-screen">
-    <div class="spinner"></div>
-    <div>Loading your setup…</div>
-  </div>
-
-  <!-- Setup form -->
   <div id="setup-content" class="hidden">
     <div class="setup-head">
       <div class="setup-eyebrow"><span class="dot"></span>Pro setup</div>
-      <h1 class="setup-title">Let's tune your <span class="accent">AI receptionist.</span></h1>
-      <p class="setup-sub">Tell us how you want your AI to sound and what it needs to know. You can update these anytime from your dashboard.</p>
+      <h1 class="setup-title">Last step — <span class="accent">your AI's voice.</span></h1>
+      <p class="setup-sub">We already have your business details. Just confirm the greeting and pick a voice — then you're ready to forward your calls.</p>
     </div>
 
     <div id="alert-area"></div>
@@ -293,221 +101,72 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <form id="setup-form" class="card" autocomplete="off">
       <div class="field-group">
 
-        <!-- Business Type -->
-        <div class="field">
-          <label class="field-label" for="business_type">Business type<span class="req">*</span></label>
-          <select id="business_type" name="business_type" class="select" required>
-            <option value="">Select your industry</option>
-            <option value="landscaping">Landscaping / Lawn care</option>
-            <option value="hvac">HVAC / Heating & Air</option>
-            <option value="plumbing">Plumbing</option>
-            <option value="self_storage">Self storage</option>
-            <option value="roofing">Roofing</option>
-            <option value="cleaning">Cleaning</option>
-            <option value="electrical">Electrical</option>
-            <option value="pest_control">Pest control</option>
-            <option value="auto_repair">Auto repair</option>
-            <option value="general_contractor">General contractor</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <!-- Caller Greeting -->
+        <!-- Greeting (pre-filled, editable) -->
         <div class="field">
           <label class="field-label" for="caller_greeting">Greeting the AI uses when answering<span class="req">*</span></label>
-          <div class="field-help">First thing the caller hears. Use a natural, business-specific greeting.</div>
-          <input type="text" id="caller_greeting" name="caller_greeting" class="input" required maxlength="300" placeholder="Thanks for calling Apex Heating & Air, this is Riley — how can I help?" />
-        </div>
-
-        <!-- AI Personality -->
-        <div class="field">
-          <label class="field-label">AI personality<span class="req">*</span></label>
-          <div class="field-help">How the AI carries the conversation.</div>
-          <div class="personality-grid" id="personality-grid">
-            <button type="button" class="personality-chip" data-value="warm">
-              <span class="personality-chip-name">Warm</span>
-              <span class="personality-chip-desc">Friendly, conversational</span>
-            </button>
-            <button type="button" class="personality-chip" data-value="professional">
-              <span class="personality-chip-name">Professional</span>
-              <span class="personality-chip-desc">Polished, polite</span>
-            </button>
-            <button type="button" class="personality-chip" data-value="direct">
-              <span class="personality-chip-name">Direct</span>
-              <span class="personality-chip-desc">Concise, no fluff</span>
-            </button>
-          </div>
-          <input type="hidden" id="ai_personality" name="ai_personality" required />
+          <div class="field-help">First thing the caller hears. We've filled this in for you — edit it if you'd like.</div>
+          <input type="text" id="caller_greeting" name="caller_greeting" class="input" required maxlength="300" placeholder="Thanks for calling — how can I help you today?" />
         </div>
 
         <div class="section-divider"></div>
 
-        <!-- =============== VOICE STYLE SECTION =============== -->
-        <div class="field voice-section">
-          <div class="section-title-mini">Voice style</div>
+        <!-- Voice style -->
+        <div class="field">
           <label class="field-label">What voice style fits your business best?<span class="req">*</span></label>
-          <div class="field-help">Choose the personality and tone your customers will hear when they call.</div>
-
+          <div class="field-help">This is the voice your customers will hear when they call.</div>
           <div class="voice-grid" id="voice-grid">
-
             <button type="button" class="voice-card" data-value="warm_female">
               <div class="voice-card-head">
                 <div class="voice-card-icon-wrap">
-                  <div class="voice-card-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-                  </div>
+                  <div class="voice-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
                   <div class="voice-card-name">Warm Female</div>
                 </div>
                 <div class="voice-card-tag">Most Popular</div>
-                <div class="voice-card-check">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
+                <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Friendly, conversational, and welcoming.</div>
-              <div class="voice-card-preview" data-preview="warm_female" role="button" tabindex="0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Preview Voice
-              </div>
+              <div class="voice-card-preview" data-preview="warm_female" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
-
             <button type="button" class="voice-card" data-value="professional_female">
               <div class="voice-card-head">
                 <div class="voice-card-icon-wrap">
-                  <div class="voice-card-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-                  </div>
+                  <div class="voice-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
                   <div class="voice-card-name">Professional Female</div>
                 </div>
-                <div class="voice-card-check">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
+                <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Clear, polished, and professional.</div>
-              <div class="voice-card-preview" data-preview="professional_female" role="button" tabindex="0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Preview Voice
-              </div>
+              <div class="voice-card-preview" data-preview="professional_female" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
-
             <button type="button" class="voice-card" data-value="calm_male">
               <div class="voice-card-head">
                 <div class="voice-card-icon-wrap">
-                  <div class="voice-card-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-                  </div>
+                  <div class="voice-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
                   <div class="voice-card-name">Calm Male</div>
                 </div>
-                <div class="voice-card-check">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
+                <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Relaxed, patient, and trustworthy.</div>
-              <div class="voice-card-preview" data-preview="calm_male" role="button" tabindex="0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Preview Voice
-              </div>
+              <div class="voice-card-preview" data-preview="calm_male" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
-
             <button type="button" class="voice-card" data-value="deep_male">
               <div class="voice-card-head">
                 <div class="voice-card-icon-wrap">
-                  <div class="voice-card-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>
-                  </div>
+                  <div class="voice-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg></div>
                   <div class="voice-card-name">Deep Professional Male</div>
                 </div>
-                <div class="voice-card-check">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
+                <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Confident, premium, and authoritative.</div>
-              <div class="voice-card-preview" data-preview="deep_male" role="button" tabindex="0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Preview Voice
-              </div>
+              <div class="voice-card-preview" data-preview="deep_male" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
-
           </div>
           <input type="hidden" id="voice_style" name="voice_style" required />
         </div>
-        <!-- =============== END VOICE STYLE SECTION =============== -->
-
-        <div class="section-divider"></div>
-
-        <!-- Business Hours -->
-        <div class="field">
-          <label class="field-label" for="business_hours">Business hours</label>
-          <div class="field-help">When you're typically working. The AI will use this to set caller expectations.</div>
-          <textarea id="business_hours" name="business_hours" class="textarea" maxlength="300" placeholder="Mon–Fri 8am–6pm, Sat 9am–2pm, Closed Sunday"></textarea>
-        </div>
-
-        <!-- Service Area -->
-        <div class="field">
-          <label class="field-label" for="service_area">Service area</label>
-          <div class="field-help">Cities, neighborhoods, or radius you cover.</div>
-          <textarea id="service_area" name="service_area" class="textarea" maxlength="300" placeholder="Salt Lake County, Davis County, and within 30 miles of downtown SLC"></textarea>
-        </div>
-
-        <!-- Services Offered -->
-        <div class="field">
-          <label class="field-label" for="services_offered">Services you offer</label>
-          <div class="field-help">List the services and any pricing the AI is allowed to quote (or leave blank if quotes always come from you).</div>
-          <textarea id="services_offered" name="services_offered" class="textarea" maxlength="1500" placeholder="Weekly lawn care ($40–$75 per visit), seasonal cleanup, sprinkler repair, mulch installation. Final quotes from owner only."></textarea>
-        </div>
-
-        <div class="section-divider"></div>
-        <div class="section-title-mini">Call handling</div>
-
-        <!-- Owner's cell for live transfers -->
-        <div class="field">
-          <label class="field-label" for="forwarding_number">Your cell — for live transfers</label>
-          <div class="field-help">When the AI transfers an urgent call, this is the number it rings. Usually your mobile.</div>
-          <input type="tel" id="forwarding_number" name="forwarding_number" class="input" maxlength="20" placeholder="(801) 555-0142" />
-        </div>
-
-        <div class="section-divider"></div>
-
-        <!-- Transfer rules (quick-select) -->
-        <div class="field">
-          <label class="field-label">When should the AI transfer a call to you?</label>
-          <div class="field-help">Tap all that apply. Leave everything off and the AI handles calls on its own.</div>
-          <div class="preset-grid" id="transfer-grid">
-            <button type="button" class="preset-chip" data-label="Caller asks to speak to a person">Caller asks for a person</button>
-            <button type="button" class="preset-chip" data-label="After-hours emergency">After-hours emergency</button>
-            <button type="button" class="preset-chip" data-label="Hot lead ready to buy">Hot lead, ready to buy</button>
-            <button type="button" class="preset-chip" data-label="Pricing or quote question">Pricing / quote question</button>
-            <button type="button" class="preset-chip" data-label="Existing customer issue">Existing customer issue</button>
-            <button type="button" class="preset-chip" data-label="Scheduling or rescheduling">Scheduling</button>
-          </div>
-          <button type="button" class="preset-add" data-target="transfer_note">+ Add your own</button>
-          <textarea id="transfer_note" class="textarea preset-note hidden" maxlength="300" placeholder="Anything else that should get transferred to you…"></textarea>
-          <input type="hidden" id="transfer_destination" />
-        </div>
-
-        <!-- Emergency rules (quick-select) -->
-        <div class="field">
-          <label class="field-label">What counts as an emergency?</label>
-          <div class="field-help">Tap the situations the AI should flag as urgent and alert you about right away.</div>
-          <div class="preset-grid" id="emergency-grid">
-            <button type="button" class="preset-chip" data-label="Flood or major leak">Flood / major leak</button>
-            <button type="button" class="preset-chip" data-label="Burst or frozen pipe">Burst / frozen pipe</button>
-            <button type="button" class="preset-chip" data-label="No water">No water</button>
-            <button type="button" class="preset-chip" data-label="No heat in winter">No heat (winter)</button>
-            <button type="button" class="preset-chip" data-label="No air conditioning in heat">No A/C (heat wave)</button>
-            <button type="button" class="preset-chip" data-label="Gas smell">Gas smell</button>
-            <button type="button" class="preset-chip" data-label="Sewage backup">Sewage backup</button>
-            <button type="button" class="preset-chip" data-label="Electrical hazard">Electrical hazard</button>
-          </div>
-          <button type="button" class="preset-add" data-target="emergency_note">+ Add your own</button>
-          <textarea id="emergency_note" class="textarea preset-note hidden" maxlength="400" placeholder="Other words or situations to treat as urgent…"></textarea>
-          <input type="hidden" id="emergency_rules" />
-        </div>
-
-        <div class="section-divider"></div>
 
         <div class="btn-row">
           <button type="submit" class="btn btn-primary" id="submit-btn">
-            <span id="submit-label">Save & continue to phone setup</span>
+            <span id="submit-label">Save &amp; continue to phone setup</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -530,531 +189,176 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   const submitBtn = document.getElementById('submit-btn');
   const submitLabel = document.getElementById('submit-label');
   const topnavSlug = document.getElementById('topnav-slug');
-
-  // Personality chip wiring
-  const personalityGrid = document.getElementById('personality-grid');
-  const personalityHidden = document.getElementById('ai_personality');
-  personalityGrid.addEventListener('click', (e) => {
-    const chip = e.target.closest('.personality-chip');
-    if (!chip) return;
-    [...personalityGrid.children].forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    personalityHidden.value = chip.dataset.value;
-  });
-
-  // Voice card wiring
+  const greetingEl = document.getElementById('caller_greeting');
   const voiceGrid = document.getElementById('voice-grid');
   const voiceHidden = document.getElementById('voice_style');
-
-  // ---- Voice preview via the browser SpeechSynthesis API ----
-  const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
-  const SS_SUPPORTED = !!synth && (typeof window.SpeechSynthesisUtterance === 'function');
-
-  // Per-style sample text + delivery. Rate < 1 = slower, pitch < 1 = lower.
-  const VOICE_PREVIEWS = {
-    warm_female:         { gender: 'female', rate: 0.9,  pitch: 1.1, text: "Hi, thanks for calling. I'd be happy to help you today." },
-    professional_female: { gender: 'female', rate: 1.0,  pitch: 1.0, text: "Thank you for calling. How may I assist you today?" },
-    calm_male:           { gender: 'male',   rate: 0.9,  pitch: 1.0, text: "Thanks for calling. Tell me how I can help." },
-    deep_male:           { gender: 'male',   rate: 0.95, pitch: 0.7, text: "Thank you for calling. How may I direct your call today?" },
-  };
-
-  const PLAY_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-  const STOP_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-
-  let currentlyPlayingPreview = null;
-  let currentUtterance = null;
-  let speakTimer = null;
-
-  // The Web Speech API exposes no reliable gender flag, so we infer it from
-  // voice names (with a fallback to language/locality ranking).
-  let voicesCache = [];
-  function refreshVoices() {
-    if (!SS_SUPPORTED) return;
-    const v = synth.getVoices();
-    if (v && v.length) voicesCache = v;
-  }
-  refreshVoices();
-  if (SS_SUPPORTED && typeof synth.addEventListener === 'function') {
-    synth.addEventListener('voiceschanged', refreshVoices);
-  }
-
-  const FEMALE_NAMES = ['samantha','victoria','karen','moira','tessa','fiona','veena','susan','zira','hazel','heather','catherine','allison','ava','nora','serena','linda','sandy','shelley','kathy','princess','google uk english female'];
-  const MALE_NAMES   = ['alex','daniel','fred','tom','aaron','arthur','oliver','david','mark','george','james','rishi','gordon','reed','rocko','bruce','junior','ralph','google uk english male'];
-
-  function classifyVoice(rawName) {
-    const n = (rawName || '').toLowerCase();
-    let f = 0, m = 0;
-    if (n.includes('female') || n.includes('woman')) f += 3;
-    if (n.includes('male') && !n.includes('female')) m += 3;   // 'male' is inside 'female' — guard it
-    if (n.includes('man') && !n.includes('woman')) m += 1;
-    if (FEMALE_NAMES.some(x => n.includes(x))) f += 3;
-    if (MALE_NAMES.some(x => n.includes(x))) m += 3;
-    return { f, m };
-  }
-
-  function rankVoices(gender) {
-    refreshVoices();
-    return voicesCache
-      .map(v => {
-        const { f, m } = classifyVoice(v.name);
-        const isEn = /^en/i.test(v.lang || '');
-        let score = (gender === 'female') ? (f - m) : (m - f);
-        if (isEn) score += 1.5;
-        if (v.localService) score += 0.5;
-        return { v, score };
-      })
-      .sort((a, b) => b.score - a.score)
-      .map(x => x.v);
-  }
-
-  // Give the two same-gender styles distinct voices when the device has them;
-  // otherwise they share a voice and are differentiated by rate/pitch.
-  function resolveVoice(style) {
-    const females = rankVoices('female');
-    const males = rankVoices('male');
-    const map = {
-      warm_female: females[0],
-      professional_female: females[1] || females[0],
-      calm_male: males[0],
-      deep_male: males[1] || males[0],
-    };
-    return map[style] || null;
-  }
-
-  // Normalise each preview button: drop the legacy "disabled" (mp3) state,
-  // give the label its own span so we can swap its text, and flag unsupported browsers.
-  const previewButtons = [...voiceGrid.querySelectorAll('.voice-card-preview')];
-  previewButtons.forEach(btn => {
-    btn.classList.remove('disabled');
-    btn.removeAttribute('data-src');
-    btn.setAttribute('aria-pressed', 'false');
-    btn.innerHTML = PLAY_ICON + '<span class="vp-label">Preview Voice</span>';
-    if (!SS_SUPPORTED) btn.classList.add('disabled');
-  });
-
-  function setPreviewPlaying(btn, playing) {
-    btn.classList.toggle('playing', playing);
-    btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-    const icon = btn.querySelector('svg');
-    if (icon) icon.outerHTML = playing ? STOP_ICON : PLAY_ICON;
-    const label = btn.querySelector('.vp-label');
-    if (label) label.textContent = playing ? 'Playing…' : 'Preview Voice';
-  }
-
-  function selectVoiceCard(value) {
-    [...voiceGrid.querySelectorAll('.voice-card')].forEach(c => {
-      c.classList.toggle('active', c.dataset.value === value);
-    });
-    voiceHidden.value = value;
-    try { localStorage.setItem('selectedVoiceStyle', value); } catch (_) {}
-  }
-
-  voiceGrid.addEventListener('click', (e) => {
-    // Preview button takes precedence — don't activate the card
-    const previewBtn = e.target.closest('.voice-card-preview');
-    if (previewBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      handlePreviewClick(previewBtn);
-      return;
-    }
-    const card = e.target.closest('.voice-card');
-    if (!card) return;
-    selectVoiceCard(card.dataset.value);
-  });
-
-  function stopAllPreviews() {
-    if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
-    // Always cancel any queued/active speech before starting something new.
-    if (SS_SUPPORTED) { try { synth.cancel(); } catch (_) {} }
-    if (currentlyPlayingPreview) {
-      setPreviewPlaying(currentlyPlayingPreview, false);
-      currentlyPlayingPreview = null;
-    }
-    currentUtterance = null;
-  }
-
-  function handlePreviewClick(btn) {
-    if (!SS_SUPPORTED) {
-      showAlert('info', 'Voice preview isn\'t supported in this browser. You can still pick a style and we\'ll apply it during setup.');
-      return;
-    }
-
-    const cfg = VOICE_PREVIEWS[btn.dataset.preview];
-    if (!cfg) return;
-
-    // Clicking the one that's already playing just stops it.
-    if (currentlyPlayingPreview === btn) {
-      stopAllPreviews();
-      return;
-    }
-
-    // Stop whatever is currently playing, then start this one.
-    stopAllPreviews();
-
-    const u = new SpeechSynthesisUtterance(cfg.text);
-    u.rate = cfg.rate;
-    u.pitch = cfg.pitch;
-    u.volume = 1;
-    const voice = resolveVoice(btn.dataset.preview);
-    if (voice) { u.voice = voice; u.lang = voice.lang; }
-    else { u.lang = 'en-US'; }
-
-    u.onend = () => { if (currentlyPlayingPreview === btn) stopAllPreviews(); };
-    u.onerror = (ev) => {
-      const err = ev && ev.error;
-      // cancel()/new selection fire 'canceled'/'interrupted' — those are expected, not failures.
-      if (currentlyPlayingPreview === btn) stopAllPreviews();
-      if (err && err !== 'canceled' && err !== 'interrupted') {
-        showAlert('info', 'Couldn\'t play that preview right now. Try again in a moment.');
-      }
-    };
-
-    currentlyPlayingPreview = btn;
-    currentUtterance = u;
-    setPreviewPlaying(btn, true);
-
-    // Small defer: Chrome can drop a speak() that lands too soon after cancel().
-    speakTimer = setTimeout(() => {
-      speakTimer = null;
-      try {
-        synth.speak(u);
-      } catch (err) {
-        console.warn('preview speak error', err);
-        stopAllPreviews();
-        showAlert('info', 'Couldn\'t play that preview right now. Try again in a moment.');
-      }
-    }, 60);
-  }
-
-  // Keyboard support for the role="button" preview elements.
-  voiceGrid.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
-    const previewBtn = e.target.closest('.voice-card-preview');
-    if (!previewBtn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    handlePreviewClick(previewBtn);
-  });
-
-  // Stop speech if the user leaves/closes the tab mid-preview.
-  window.addEventListener('beforeunload', () => { if (SS_SUPPORTED) { try { synth.cancel(); } catch (_) {} } });
-
-  // ---- Quick-select presets (transfer rules + emergencies) ----
-  // Chips + an optional note are folded into the existing text columns
-  // (transfer_destination / emergency_rules), so the backend contract is unchanged.
-  const transferGrid = document.getElementById('transfer-grid');
-  const emergencyGrid = document.getElementById('emergency-grid');
-  const transferHidden = document.getElementById('transfer_destination');
-  const emergencyHidden = document.getElementById('emergency_rules');
-  const transferNote = document.getElementById('transfer_note');
-  const emergencyNote = document.getElementById('emergency_note');
-  const NOTE_SEP = ' — Note: ';
-
-  function syncPreset(grid, noteEl, hiddenEl) {
-    const labels = [...grid.querySelectorAll('.preset-chip.active')].map(c => c.dataset.label);
-    let val = labels.join('; ');
-    const note = (noteEl.value || '').trim();
-    if (note) val = val ? (val + NOTE_SEP + note) : note;
-    hiddenEl.value = val;
-  }
-
-  function wirePresetGrid(grid, noteEl, hiddenEl) {
-    grid.addEventListener('click', (e) => {
-      const chip = e.target.closest('.preset-chip');
-      if (!chip) return;
-      chip.classList.toggle('active');
-      chip.setAttribute('aria-pressed', chip.classList.contains('active') ? 'true' : 'false');
-      syncPreset(grid, noteEl, hiddenEl);
-    });
-    noteEl.addEventListener('input', () => syncPreset(grid, noteEl, hiddenEl));
-  }
-  wirePresetGrid(transferGrid, transferNote, transferHidden);
-  wirePresetGrid(emergencyGrid, emergencyNote, emergencyHidden);
-
-  // "+ Add your own" reveals the optional note box
-  [...document.querySelectorAll('.preset-add')].forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = document.getElementById(btn.dataset.target);
-      if (!target) return;
-      target.classList.remove('hidden');
-      btn.classList.add('hidden');
-      target.focus();
-    });
-  });
-
-  function hydratePreset(grid, noteEl, hiddenEl, addBtnSelector, saved) {
-    if (!saved) return;
-    let main = saved, note = '';
-    const idx = saved.indexOf(NOTE_SEP);
-    if (idx !== -1) { main = saved.slice(0, idx); note = saved.slice(idx + NOTE_SEP.length); }
-    let matchedAny = false;
-    [...grid.querySelectorAll('.preset-chip')].forEach(chip => {
-      if (main.includes(chip.dataset.label)) { chip.classList.add('active'); chip.setAttribute('aria-pressed','true'); matchedAny = true; }
-    });
-    // Legacy free-text saves (no chip matched) drop into the note box so nothing is lost.
-    if (!matchedAny && main.trim()) { note = note ? (main.trim() + '. ' + note) : main.trim(); }
-    if (note) {
-      noteEl.value = note;
-      noteEl.classList.remove('hidden');
-      const addBtn = document.querySelector(addBtnSelector);
-      if (addBtn) addBtn.classList.add('hidden');
-    }
-    syncPreset(grid, noteEl, hiddenEl);
-  }
-
-  // ---- Trigger provisioning on load ----
-  // The dedicated /phone-setup page shows the number + forwarding steps now,
-  // so here we just make sure the client gets provisioned (number claimed +
-  // assistant built) in the background. No number UI on this page anymore.
-  function numberFromClient(client) {
-    return client.twilio_number || '';
-  }
-  async function ensureProvisioned(client) {
-    if (numberFromClient(client)) return;
-    try {
-      const { data: s } = await sb.auth.getSession();
-      const token = s?.session?.access_token;
-      if (!token) return;
-      const cell = (client.forwarding_number || '').replace(/\\D/g, '');
-      const areaCode = cell.length === 11 && cell[0] === '1' ? cell.slice(1, 4)
-        : cell.length === 10 ? cell.slice(0, 3) : '';
-      await fetch('/api/provision', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ client_slug: client.client_slug, area_code: areaCode || undefined }),
-      });
-    } catch (err) {
-      console.warn('provision error', err);
-    }
-  }
-
-  // Restore voice style from localStorage (until DB hydration overrides it)
-  try {
-    const saved = localStorage.getItem('selectedVoiceStyle');
-    if (saved) selectVoiceCard(saved);
-  } catch (_) {}
-
-  function showAlert(type, message) {
-    const icons = {
-      error: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
-      success: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
-      info: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
-    };
-    alertArea.innerHTML = '<div class="alert ' + type + '">' + (icons[type] || '') + '<div>' + message + '</div></div>';
-    alertArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-  function clearAlert() { alertArea.innerHTML = ''; }
 
   function getSlugFromURL() {
     const params = new URLSearchParams(window.location.search);
     let slug = params.get('slug');
-    if (!slug) {
-      const m = window.location.pathname.match(/\/setup\/([^/?#]+)/);
-      if (m) slug = m[1];
-    }
-    return slug;
+    if (!slug) { const m = window.location.pathname.match(/\/setup\/([^/?#]+)/); if (m) slug = m[1]; }
+    return slug ? slug.toLowerCase().replace(/[^a-z0-9-]/g, '') : '';
+  }
+  function showAlert(type, msg) {
+    alertArea.innerHTML = '<div class="alert ' + type + '"><div>' + msg + '</div></div>';
+    alertArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function clearAlert() { alertArea.innerHTML = ''; }
+
+  // ---- Voice selection ----
+  function selectVoiceCard(value) {
+    [...voiceGrid.querySelectorAll('.voice-card')].forEach(c => c.classList.toggle('active', c.dataset.value === value));
+    voiceHidden.value = value;
+  }
+
+  // ---- Voice preview (browser SpeechSynthesis) ----
+  const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  const SS = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
+  const PREVIEWS = {
+    warm_female:         { rate:0.9,  pitch:1.1, text:"Hi, thanks for calling. I'd be happy to help you today." },
+    professional_female: { rate:1.0,  pitch:1.0, text:"Thank you for calling. How may I assist you today?" },
+    calm_male:           { rate:0.9,  pitch:1.0, text:"Thanks for calling. Tell me how I can help." },
+    deep_male:           { rate:0.95, pitch:0.7, text:"Thank you for calling. How may I direct your call today?" },
+  };
+  let playing = null;
+  function stopPreview() { if (SS) { try { synth.cancel(); } catch(_){} } if (playing) { playing.classList.remove('playing'); playing = null; } }
+  function handlePreview(btn) {
+    if (!SS) { showAlert('info', "Voice preview isn't supported in this browser, but you can still pick a style."); return; }
+    if (playing === btn) { stopPreview(); return; }
+    stopPreview();
+    const cfg = PREVIEWS[btn.dataset.preview]; if (!cfg) return;
+    const u = new SpeechSynthesisUtterance(cfg.text); u.rate = cfg.rate; u.pitch = cfg.pitch; u.lang = 'en-US';
+    u.onend = () => { if (playing === btn) stopPreview(); };
+    playing = btn; btn.classList.add('playing');
+    setTimeout(() => { try { synth.speak(u); } catch(_) { stopPreview(); } }, 60);
+  }
+  voiceGrid.addEventListener('click', (e) => {
+    const p = e.target.closest('.voice-card-preview');
+    if (p) { e.preventDefault(); e.stopPropagation(); handlePreview(p); return; }
+    const card = e.target.closest('.voice-card');
+    if (card) selectVoiceCard(card.dataset.value);
+  });
+  window.addEventListener('beforeunload', () => { if (SS) { try { synth.cancel(); } catch(_){} } });
+
+  // ---- Trigger provisioning in the background (save-setup also provisions) ----
+  async function ensureProvisioned(client) {
+    if (client.twilio_number) return;
+    try {
+      const { data: s } = await sb.auth.getSession();
+      const token = s?.session?.access_token; if (!token) return;
+      await fetch('/api/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ client_slug: client.client_slug }),
+      });
+    } catch (err) { console.warn('provision error', err); }
   }
 
   async function bootstrap() {
     const slug = getSlugFromURL();
-
-    // Must have session
     const { data: sessionData } = await sb.auth.getSession();
     const session = sessionData?.session;
     if (!session) {
-      // Send to sign-in, remember where to come back
       const dest = slug ? '/setup?slug=' + encodeURIComponent(slug) : '/setup';
       window.location.replace('/sign-in?redirect=' + encodeURIComponent(dest));
       return;
     }
     const user = session.user;
 
-    // Load the client row
     let client = null;
-    let queryError = null;
     if (slug) {
-      const { data, error } = await sb
-        .from('clients')
-        .select('*')
-        .eq('client_slug', slug)
-        .maybeSingle();
-      queryError = error;
-      client = data;
-    } else {
-      // No slug — find first client for this user
-      const { data, error } = await sb
-        .from('clients')
-        .select('*')
-        .eq('owner_user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      queryError = error;
+      const { data } = await sb.from('clients').select('*').eq('client_slug', slug).maybeSingle();
       client = data;
     }
-
-    if (queryError) {
-      console.error('client lookup error', queryError);
-      loadingEl.classList.add('hidden');
-      contentEl.classList.remove('hidden');
-      showAlert('error', 'We couldn\'t load your setup. Refresh and try again, or email hello@aileadintel.com.');
-      return;
+    if (!client) {
+      const { data } = await sb.from('clients').select('*').eq('owner_user_id', user.id).order('created_at', { ascending:false }).limit(1).maybeSingle();
+      client = data;
     }
 
     if (!client) {
-      loadingEl.classList.add('hidden');
-      contentEl.classList.remove('hidden');
-      showAlert('error', 'No client account found for this login. Email hello@aileadintel.com if you think this is wrong.');
+      loadingEl.classList.add('hidden'); contentEl.classList.remove('hidden');
+      showAlert('error', 'No client account found for this login. Email hello@aileadintel.com if this looks wrong.');
       return;
     }
-
-    // Authorization guard
     if (client.owner_user_id !== user.id) {
-      loadingEl.classList.add('hidden');
-      contentEl.classList.remove('hidden');
+      loadingEl.classList.add('hidden'); contentEl.classList.remove('hidden');
       showAlert('error', 'This setup belongs to a different account. Sign out and sign in with the right one.');
       return;
     }
-
-    // Starter users do not see setup
     if (client.plan && client.plan.toLowerCase() === 'starter') {
-      window.location.replace('/confirmation?slug=' + encodeURIComponent(client.client_slug));
-      return;
+      window.location.replace('/confirmation?slug=' + encodeURIComponent(client.client_slug)); return;
     }
-
-    // Pro user, already complete -> dashboard
     if (client.setup_complete === true) {
-      window.location.replace('/dashboard/' + encodeURIComponent(client.client_slug));
-      return;
+      window.location.replace('/dashboard/' + encodeURIComponent(client.client_slug)); return;
     }
 
-    // Pre-fill form
-    document.getElementById('business_type').value = client.business_type || '';
-    document.getElementById('caller_greeting').value = client.caller_greeting || client.ai_greeting || '';
-    if (client.ai_personality && ['warm', 'professional', 'direct'].includes(client.ai_personality)) {
-      const chip = personalityGrid.querySelector('[data-value="' + client.ai_personality + '"]');
-      if (chip) chip.click();
-    }
-    if (client.voice_style) {
-      selectVoiceCard(client.voice_style);
-    }
-    document.getElementById('business_hours').value = client.business_hours || 'Mon–Fri 8am–6pm';
-    document.getElementById('service_area').value = client.service_area || '';
-    document.getElementById('services_offered').value = client.services_offered || '';
-    document.getElementById('forwarding_number').value = client.forwarding_number || '';
-    hydratePreset(transferGrid, transferNote, transferHidden, '[data-target="transfer_note"]', client.transfer_destination || '');
-    hydratePreset(emergencyGrid, emergencyNote, emergencyHidden, '[data-target="emergency_note"]', client.emergency_rules || '');
+    // Pre-fill greeting (default to a business-specific greeting), and voice.
+    const defaultGreeting = 'Thanks for calling ' + (client.business_name || 'us') + '. How can I help you today?';
+    greetingEl.value = client.caller_greeting || client.ai_greeting || defaultGreeting;
+    if (client.voice_style) selectVoiceCard(client.voice_style);
+    else selectVoiceCard('warm_female');
+
+    topnavSlug.textContent = client.business_name || client.client_slug;
+    formEl.dataset.slug = client.client_slug || slug;
+
     ensureProvisioned(client);
 
-    // Topnav
-    if (client.business_name) {
-      topnavSlug.textContent = client.business_name;
-    } else {
-      topnavSlug.textContent = client.client_slug;
-    }
-
-    // Stash slug on the form for submit
-    formEl.dataset.slug = client.client_slug;
-
-    loadingEl.classList.add('hidden');
-    contentEl.classList.remove('hidden');
+    loadingEl.classList.add('hidden'); contentEl.classList.remove('hidden');
   }
 
   formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAlert();
 
-    // Make sure chip selections are written into the hidden fields before we read them.
-    syncPreset(transferGrid, transferNote, transferHidden);
-    syncPreset(emergencyGrid, emergencyNote, emergencyHidden);
+    if (!voiceHidden.value) { showAlert('error', 'Please pick a voice style.'); return; }
+    if (!greetingEl.value.trim()) { showAlert('error', 'Please enter a greeting.'); return; }
 
-    // Required: voice style & personality
-    if (!personalityHidden.value) {
-      showAlert('error', 'Please pick an AI personality.');
-      return;
-    }
-    if (!voiceHidden.value) {
-      showAlert('error', 'Please pick a voice style.');
-      return;
-    }
+    // Robust slug: prefer the one stashed on load, fall back to the URL.
+    const clientSlug = formEl.dataset.slug || getSlugFromURL();
+    if (!clientSlug) { showAlert('error', 'Could not determine your account. Reload the page from your setup link.'); return; }
 
     submitBtn.disabled = true;
-    const originalLabel = submitLabel.textContent;
+    const original = submitLabel.textContent;
     submitLabel.textContent = 'Saving…';
 
     const { data: sessionData } = await sb.auth.getSession();
     const token = sessionData?.session?.access_token;
-    if (!token) {
-      submitBtn.disabled = false;
-      submitLabel.textContent = originalLabel;
-      showAlert('error', 'Your session expired. Please sign in again.');
-      return;
-    }
+    if (!token) { submitBtn.disabled = false; submitLabel.textContent = original; showAlert('error', 'Your session expired. Please sign in again.'); return; }
 
     const payload = {
-      client_slug: formEl.dataset.slug,
-      business_type: document.getElementById('business_type').value || null,
-      caller_greeting: document.getElementById('caller_greeting').value || null,
-      ai_personality: personalityHidden.value || null,
+      client_slug: clientSlug,
+      caller_greeting: greetingEl.value.trim() || null,
       voice_style: voiceHidden.value || null,
-      business_hours: document.getElementById('business_hours').value || null,
-      service_area: document.getElementById('service_area').value || null,
-      services_offered: document.getElementById('services_offered').value || null,
-      forwarding_number: document.getElementById('forwarding_number').value || null,
-      transfer_destination: document.getElementById('transfer_destination').value || null,
-      emergency_rules: document.getElementById('emergency_rules').value || null,
     };
 
     try {
       const resp = await fetch('/api/save-setup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token,
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
         body: JSON.stringify(payload),
       });
       const body = await resp.json().catch(() => ({}));
       if (!resp.ok) {
-        submitBtn.disabled = false;
-        submitLabel.textContent = originalLabel;
-        console.error('save-setup failed', { status: resp.status, body });
-        let msg = (body && body.error) ? body.error : 'Couldn\'t save your setup.';
-        if (resp.status === 404) {
-          msg = 'Save service not reachable (404). The /api/save-setup endpoint may not be deployed yet — check your server logs.';
-        } else if (resp.status === 401 || resp.status === 403) {
-          msg = 'Not authorized to save (' + resp.status + '). Try signing out and back in.';
-        } else {
-          msg += ' (error ' + resp.status + ')';
-        }
+        submitBtn.disabled = false; submitLabel.textContent = original;
+        let msg = (body && body.error) ? body.error : "Couldn't save your setup.";
+        msg += ' (error ' + resp.status + ')';
         showAlert('error', msg);
         return;
       }
-
-      // Clear the localStorage preview hint (DB is source of truth now)
-      try { localStorage.removeItem('selectedVoiceStyle'); } catch (_) {}
-
-      // Step 3: send them to the dedicated phone-setup page (forwarding guide),
-      // not straight to the dashboard.
-      window.location.href = '/phone-setup?slug=' + encodeURIComponent(formEl.dataset.slug);
+      window.location.href = '/phone-setup?slug=' + encodeURIComponent(clientSlug);
     } catch (err) {
       console.error('save-setup error', err);
-      submitBtn.disabled = false;
-      submitLabel.textContent = originalLabel;
+      submitBtn.disabled = false; submitLabel.textContent = original;
       showAlert('error', 'Network error. Check your connection and try again.');
     }
   });
 
   bootstrap().catch(err => {
     console.error('bootstrap error', err);
-    loadingEl.classList.add('hidden');
-    contentEl.classList.remove('hidden');
+    loadingEl.classList.add('hidden'); contentEl.classList.remove('hidden');
     showAlert('error', 'Something went wrong loading your setup. Refresh the page.');
   });
-
 })();
 </script>
-
 </body>
 </html>
