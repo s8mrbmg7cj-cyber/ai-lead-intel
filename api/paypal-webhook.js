@@ -164,6 +164,7 @@ export default async function handler(req, res) {
         payment_status: 'paid',
         payment_pending: false,
         status: 'active',
+        active: true,
         paid_at: new Date().toISOString(),
       };
       if (subId) patch.payment_external_id = subId; // record/refresh the subscription id
@@ -175,6 +176,7 @@ export default async function handler(req, res) {
         status: isCancel ? 'cancelled' : 'paused',
         payment_status: eventType === 'PAYMENT.SALE.DENIED' ? 'failed' : 'cancelled',
         payment_pending: false,
+        active: false,
       });
       // On a HARD cancel (cancelled/expired), release the phone number back to
       // the pool and clean up Vapi so the number can be reused by a new client
