@@ -559,7 +559,15 @@ function renderDashboard(client, calls) {
   if (card && aiNum) {
     document.getElementById('ai-number-value').textContent = formatPhone(aiNum);
     const st = document.getElementById('ai-number-status');
-    if (st) st.textContent = 'Active · forward your business line here';
+    if (st) {
+      if (client.phone_setup_method === 'dedicated') {
+        st.textContent = 'Active · this is your business number — use it everywhere';
+      } else if (client.phone_setup_method === 'forward') {
+        st.textContent = 'Active · forward your business line to this number';
+      } else {
+        st.textContent = 'Active · your AI receptionist number';
+      }
+    }
     const copyBtn = document.getElementById('ai-copy-btn');
     if (copyBtn) {
       copyBtn.dataset.raw = aiNum;
