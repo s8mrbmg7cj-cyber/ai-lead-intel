@@ -128,15 +128,14 @@ function buildSystemPrompt(c) {
     + '- No filler, no long intros, no over-explaining. Get to the point.\n'
     + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
     + '- If you need a detail, ask one quick question at a time.';
-  // How the assistant should handle "can I talk to a person?" — give out the
-  // business's callback number rather than attempting a live transfer.
+  // How the assistant should handle "can I talk to a person?" — transfer the
+  // caller live to the business's number.
   const callback = String(c.forwarding_number || c.transfer_primary || c.business_phone || '').trim();
   prompt += '\n\n# IF THEY WANT A PERSON\n';
   if (callback) {
-    prompt += 'If the caller asks to be transferred, speak to a human, or reach someone at the business, '
-      + 'do NOT say you will transfer them. Instead, give them the direct number: ' + callback + '. '
-      + 'Say it naturally, e.g. "You can reach the team directly at ' + callback + '." '
-      + 'Then offer to take their name and number so someone can call them back.';
+    prompt += 'If the caller asks to be transferred, to speak to a human, or to reach someone at the business, '
+      + 'briefly let them know you\'ll connect them (e.g. "Sure, one moment while I connect you.") and transfer the call. '
+      + 'If the transfer does not go through, give them the direct number instead: ' + callback + ', and offer to take a message.';
   } else {
     prompt += 'If the caller asks to be transferred or to speak to a human, let them know you\'ll take a '
       + 'message and have someone call them back, then collect their name and number.';
@@ -183,10 +182,13 @@ function buildAssistantPayload(client) {
     : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
   const greeting = client.caller_greeting
     || `Thanks for calling ${client.business_name || 'us'}. How can I help you today?`;
+  // Every call opens with the business greeting + a brief recording disclosure.
+  const businessName = client.business_name || 'us';
+  const firstMessage = `Thanks for calling ${businessName}. Please note this call may be recorded for quality and training purposes. How can I help you today?`;
 
   const payload = {
     name: `${client.business_name || client.client_slug} receptionist`,
-    firstMessage: greeting,
+    firstMessage: firstMessage,
     model,
     voice,
     // Report the finished call to our webhook so it lands on the dashboard.
@@ -219,9 +221,13 @@ function buildAssistantPayload(client) {
     endCallFunctionEnabled: true,
   };
 
-  // No live call transfer. Instead, the AI gives out the business's callback
-  // number when a caller asks for a person (see buildSystemPrompt). This avoids
-  // forwarding loops and is more reliable than a live transfer.
+  // Live transfer: connect the caller to the business's transfer number when
+  // they ask for a person. Uses the number the client gave at onboarding.
+  // (For a real client this is a separate human line, so there is no loop.)
+  const transferTo = toE164(client.forwarding_number || client.transfer_primary || client.business_phone);
+  if (transferTo && transferTo.length >= 11) {
+    payload.forwardingPhoneNumber = transferTo;
+  }
 
   return payload;
 }
