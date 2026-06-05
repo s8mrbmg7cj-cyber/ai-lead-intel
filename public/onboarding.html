@@ -329,7 +329,7 @@
             <div class="field"><div class="float-wrap"><input type="tel" class="float-input phone-input" id="transfer_primary" placeholder=" " inputmode="numeric" maxlength="14" required /><label class="float-label" for="transfer_primary">Primary transfer number</label></div></div>
             <div class="field"><div class="float-wrap"><input type="tel" class="float-input phone-input" id="transfer_backup" placeholder=" " inputmode="numeric" maxlength="14" /><label class="float-label" for="transfer_backup">Backup transfer <span class="opt">— optional</span></label></div></div>
           </div>
-          <div class="field"><div class="float-wrap"><input type="email" class="float-input" id="notify_email" placeholder=" " autocomplete="email" required /><label class="float-label" for="notify_email">Notification email</label></div><div class="field-hint">Where call summaries and lead alerts will be sent.</div></div>
+          <div class="field"><div class="float-wrap"><input type="email" class="float-input" id="notify_email" placeholder=" " autocomplete="email" required /><label class="float-label" for="notify_email">Notification email</label></div><div class="field-hint">We email a summary of every call to this inbox the moment the caller hangs up.</div></div>
           <div class="field"><div class="float-wrap"><input type="text" class="float-input" id="transfer_hours" placeholder=" " required /><label class="float-label" for="transfer_hours">Business hours · transfer hours</label></div><div class="field-hint">e.g. Mon–Fri 9am–6pm</div></div>
           <div class="field urgent-transfer-field" id="urgent-transfer-field" style="display:none;">
             <div class="float-wrap">
@@ -365,21 +365,10 @@
             <label class="radio-card" data-value="direct"><input type="radio" name="personality" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Direct</div><div class="radio-desc">Efficient and to-the-point. Best for high-volume or repeat customers.</div><div class="radio-sample">"Thanks for calling. How can I help?"</div></div></label>
           </div>
         </div>
-        <div class="subsection" id="reports-subsection" style="display:none;">
-          <div class="subsection-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Lead Reports
-          </div>
-          <p style="font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:14px;margin-top:-6px;">Get a clean summary of every lead, missed call, and booking — delivered to your inbox on a schedule you choose.</p>
-          <div class="radio-inline" id="report-frequency-stack">
-            <label class="radio-card compact" data-value="weekly"><input type="radio" name="report_frequency" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Weekly</div><div class="radio-desc">Every Monday morning</div></div></label>
-            <label class="radio-card compact" data-value="monthly"><input type="radio" name="report_frequency" /><div class="radio-dot"></div><div class="radio-content"><div class="radio-label">Monthly</div><div class="radio-desc">First of each month</div></div></label>
-          </div>
-        </div>
         <div class="subsection" style="margin-bottom: 0;">
           <div class="subsection-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Pricing &amp; Notes</div>
           <div class="field"><div class="float-wrap"><select class="float-select" id="pricing_rule"><option value=""></option><option value="yes_specific">Yes — give exact prices when asked</option><option value="yes_ranges">Yes — give price ranges only</option><option value="no_quote">No — say "I'll have someone send you a quote"</option><option value="no_transfer">No — transfer pricing questions to me</option></select><label class="float-label" for="pricing_rule">Should the AI give pricing on calls?</label></div><div class="field-hint">If you don't set this, the AI may improvise prices.</div></div>
-          <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="pricing_examples" placeholder=" "></textarea><label class="float-label" for="pricing_examples">Common prices the AI should know <span class="opt">— optional</span></label></div><div class="field-hint">One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"</div></div>
+          <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="pricing_examples" placeholder=" "></textarea><label class="float-label" for="pricing_examples">Common prices the AI should know <span class="opt">— optional</span></label></div><div class="field-hint" id="pricing-examples-hint">One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"</div></div>
           <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="notes" placeholder=" "></textarea><label class="float-label" for="notes">Anything else we should know? <span class="opt">— optional</span></label></div><div class="field-hint">Special hours, common questions, things the AI should never say.</div></div>
           <div class="legal-note">By submitting, you agree to our <a href="/privacy" target="_blank">Privacy Policy</a><span class="sep">·</span><a href="/terms" target="_blank">Terms</a>. You authorize a recurring subscription that begins billing after your 7-day free trial. Cancel anytime through PayPal.</div>
         </div>
@@ -451,6 +440,34 @@
       other: "If this is an urgent or unsafe situation, please contact emergency services right away. We'll follow up as soon as possible.",
     };
     const EMERGENCY_FALLBACK = "If this is an urgent situation, please contact emergency services right away — we'll follow up with you after.";
+
+    const PRICING_EXAMPLES = {
+      self_storage: '10×10 unit: $129/mo · 5×5 unit: $49/mo · Climate-controlled 10×15: $189/mo',
+      hvac: 'Diagnostic fee: $89 · AC tune-up: $129 · Capacitor replacement: $250',
+      plumbing: 'Service call: $99 · Drain cleaning: $175 · Water heater install: $1,400',
+      electrician: 'Service call: $95 · Outlet install: $150 · Panel upgrade: $1,800',
+      landscaping: 'Weekly mowing: $45/visit · Spring cleanup: $250 · Sod install: $1.50/sq ft',
+      auto_detailing: 'Wash & wax: $75 · Full interior detail: $180 · Ceramic coating: $600',
+      auto_repair: 'Diagnostic fee: $120 · Oil change: $65 · Brake pads (per axle): $250',
+      salon: "Women's haircut: $55 · Color & highlights: $145 · Blowout: $40",
+      pest_control: 'Initial treatment: $150 · Quarterly service: $90 · Termite inspection: $125',
+      cleaning: 'Standard clean (2BR): $130 · Deep clean: $250 · Move-out clean: $300',
+      roofing: 'Inspection: free · Minor leak repair: $350 · Full replacement: from $8,500',
+      locksmith: 'Lockout service: $85 · Rekey (per lock): $25 · New deadbolt install: $120',
+      real_estate: 'Listing commission: 2.5% · Buyer consult: free · Rental placement: 1 month rent',
+      dental: 'New patient exam: $89 · Cleaning: $120 · Whitening: $350',
+      other: 'Service call: $89 · Standard package: $129/mo',
+    };
+    const PRICING_FALLBACK = 'One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"';
+
+    function updatePricingHint() {
+      const hintEl = document.getElementById('pricing-examples-hint');
+      if (!hintEl) return;
+      const industryEl = document.getElementById('industry');
+      const industry = industryEl ? industryEl.value : (formData.industry || '');
+      const next = PRICING_EXAMPLES[industry] ? ('One per line. e.g. ' + PRICING_EXAMPLES[industry]) : PRICING_FALLBACK;
+      if (hintEl.textContent !== next) hintEl.textContent = next;
+    }
 
     function safeRedirectToSuccess(slug, plan, businessName, freq, reportEmail) {
       const params = new URLSearchParams({ plan: plan || 'starter', slug: slug || '', business: businessName || '' });
@@ -710,12 +727,7 @@
         formData.pricing_rule = pricingRule;
         formData.pricing_examples = getVal('pricing_examples');
         formData.notes = getVal('notes');
-        if (IS_STARTER) {
-          const freqCard = document.querySelector('#report-frequency-stack .radio-card.selected');
-          formData.report_frequency = freqCard ? freqCard.dataset.value : 'monthly';
-        } else {
-          formData.report_frequency = '';
-        }
+        formData.report_frequency = '';
       }
       autoSave();
       return true;
@@ -749,7 +761,7 @@
       const empty = (v) => !v || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && v.length === 0);
       const emptyTag = '<span class="review-row-value empty">Not provided</span>';
       const renderValue = (v) => empty(v) ? emptyTag : `<span class="review-row-value">${escapeHtml(v)}</span>`;
-      const reportsSection = IS_STARTER ? `<div class="review-section"><div class="review-section-head"><div class="review-section-title"><span class="review-icon-wrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Lead Reports</div><button class="review-edit" type="button" data-edit="2">Edit</button></div><div class="review-data"><div class="review-row full"><div class="review-row-label">Frequency</div>${renderValue(reportFreqLabels[formData.report_frequency] || formData.report_frequency)}</div></div></div>` : '';
+      const reportsSection = '';
       const urgentSection = URGENT_INDUSTRIES.has(formData.industry) ? `<div class="review-row full"><div class="review-row-label">Live transfer for urgent calls</div>${renderValue(urgentTransferLabels[formData.offer_urgent_transfer] || '')}</div>` : '';
       reviewEl.innerHTML = `
         <div class="review-section">
@@ -819,7 +831,7 @@
 
     const industryEl = document.getElementById('industry');
     if (industryEl) {
-      industryEl.addEventListener('change', () => { toggleUrgentTransferField(); updateEmergencyPreview(); });
+      industryEl.addEventListener('change', () => { toggleUrgentTransferField(); updateEmergencyPreview(); updatePricingHint(); });
     }
     toggleUrgentTransferField();
     updateEmergencyPreview();
@@ -953,6 +965,7 @@
     updateProgress();
     updateAIPreview();
     updateEmergencyPreview();
+    updatePricingHint();
     refreshAllFloatStates();
     console.log('[onboarding] initialized');
   </script>
