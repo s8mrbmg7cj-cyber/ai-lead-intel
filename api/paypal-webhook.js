@@ -185,6 +185,8 @@ export default async function handler(req, res) {
       if (isCancel) {
         await releaseNumberAndCleanup(client);
       }
+      // Notify the owner (push + email) that a subscription went inactive.
+      await sendCancelAlert(client, eventType);
     }
 
     return res.status(200).json({ received: true, processed: eventType });
@@ -243,4 +245,57 @@ async function releaseNumberAndCleanup(client) {
     vapi_assistant_id: null,
     setup_complete: false,
   });
+}
+
+// ── Notify the owner when a subscription goes inactive ──
+// Fires a push via ntfy (NTFY_TOPIC) and an email via Resend (RESEND_API_KEY
+// + NOTIFY_EMAIL). Both are best-effort — failures are logged, never thrown,
+// so a notification problem can't break webhook processing.
+async function sendCancelAlert(client, eventType) {
+  const biz = client.business_name || client.client_slug || 'A client';
+  const labelMap = {
+    'BILLING.SUBSCRIPTION.CANCELLED': 'cancelled their subscription',
+    'BILLING.SUBSCRIPTION.EXPIRED': 'subscription expired',
+    'BILLING.SUBSCRIPTION.SUSPENDED': 'subscription was suspended',
+    'PAYMENT.SALE.DENIED': 'had a payment fail',
+  };
+  const what = labelMap[eventType] || 'went inactive';
+  const title =
+    (eventType === 'BILLING.SUBSCRIPTION.CANCELLED' || eventType === 'BILLING.SUBSCRIPTION.EXPIRED')
+      ? 'Client cancelled'
+      : (eventType === 'PAYMENT.SALE.DENIED' ? 'Payment failed' : 'Client paused');
+  const numberNote = client.twilio_number ? ` Their number ${client.twilio_number} was freed.` : '';
+  const msg = `${biz} ${what}.${numberNote}`;
+
+  // Push via ntfy (Title header kept plain ASCII; emoji goes in Tags).
+  const topic = process.env.NTFY_TOPIC;
+  if (topic) {
+    try {
+      await fetch(`https://ntfy.sh/${topic}`, {
+        method: 'POST',
+        headers: { Title: title, Priority: 'high', Tags: 'warning' },
+        body: msg,
+      });
+    } catch (e) { console.error('[paypal-webhook] ntfy cancel alert failed:', e.message); }
+  }
+
+  // Email via Resend.
+  const resendKey = process.env.RESEND_API_KEY;
+  const to = process.env.NOTIFY_EMAIL;
+  if (resendKey && to) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'AI Lead Intel <hello@aileadintel.com>',
+          to: [to],
+          subject: `${title} — ${biz}`,
+          text: `${msg}\n\nEvent: ${eventType}\nClient: ${client.client_slug || ''}`,
+        }),
+      });
+    } catch (e) { console.error('[paypal-webhook] cancel email failed:', e.message); }
+  }
+
+  console.log('[paypal-webhook] cancel alert sent:', title, '-', biz);
 }
