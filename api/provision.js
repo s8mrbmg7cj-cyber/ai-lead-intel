@@ -185,6 +185,7 @@ function buildAssistantPayload(client) {
   // client can edit or remove that, so we use their greeting exactly as saved.
   const businessName = client.business_name || 'us';
   const firstMessage = client.caller_greeting
+    || client.ai_greeting
     || `Thanks for calling ${businessName}. Please note this call may be recorded for quality and training purposes. How can I help you today?`;
 
   const payload = {
@@ -251,13 +252,29 @@ export default async function handler(req, res) {
   try {
     if (!VAPI_PRIVATE_KEY) { res.status(500).json({ error: 'Server is missing VAPI_PRIVATE_KEY' }); return; }
 
+    // Two ways in:
+    //  1) A logged-in user's Bearer token (the Pro /setup flow) — scoped to
+    //     clients that user owns.
+    //  2) An internal server-to-server call carrying x-internal-secret (the
+    //     Starter auto-provision flow from onboarding-return / paypal-webhook).
+    //     Looks the client up by slug alone and needs the service key.
+    const internalSecret = process.env.SUPABASE_WEBHOOK_SECRET || '';
+    const isInternal = !!internalSecret && req.headers['x-internal-secret'] === internalSecret;
+
     const authHeader = req.headers.authorization || '';
     token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    if (!token) { res.status(401).json({ error: 'Missing authentication token' }); return; }
 
-    const user = await getUser(token);
-    if (!user || !user.id) { res.status(401).json({ error: 'Invalid or expired session' }); return; }
-    const userId = user.id;
+    let userId = null;
+    if (!isInternal) {
+      if (!token) { res.status(401).json({ error: 'Missing authentication token' }); return; }
+      const user = await getUser(token);
+      if (!user || !user.id) { res.status(401).json({ error: 'Invalid or expired session' }); return; }
+      userId = user.id;
+    } else if (!SUPABASE_SERVICE_ROLE_KEY) {
+      res.status(500).json({ error: 'Internal provisioning requires SUPABASE_SERVICE_KEY' });
+      return;
+    }
+    const ownerFilter = isInternal ? '' : `&owner_user_id=eq.${enc(userId)}`;
 
     const body = await readJsonBody(req);
     const clientSlug = body.client_slug;
@@ -265,7 +282,7 @@ export default async function handler(req, res) {
 
     // Load the client row.
     const loadResp = await fetch(
-      `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&owner_user_id=eq.${enc(userId)}&select=*`,
+      `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}${ownerFilter}&select=*`,
       { headers: sbHeaders(token) }
     );
     const loadRows = await loadResp.json().catch(() => []);
@@ -289,7 +306,7 @@ export default async function handler(req, res) {
       console.log('[provision] creating new assistant for', clientSlug);
       const assistant = await vapi('/assistant', 'POST', assistantPayload);
       assistantId = assistant.id;
-      await fetch(`${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&owner_user_id=eq.${enc(userId)}`, {
+      await fetch(`${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}${ownerFilter}`, {
         method: 'PATCH', headers: sbHeaders(token), body: JSON.stringify({ vapi_assistant_id: assistantId }),
       });
     }
@@ -338,7 +355,7 @@ export default async function handler(req, res) {
     }
 
     // 4) Save to the client + mark ready (fires your webhook → email + dashboard live).
-    const saveResp = await fetch(`${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&owner_user_id=eq.${enc(userId)}`, {
+    const saveResp = await fetch(`${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}${ownerFilter}`, {
       method: 'PATCH', headers: sbHeaders(token, { Prefer: 'return=representation' }),
       body: JSON.stringify({
         vapi_assistant_id: assistantId,
