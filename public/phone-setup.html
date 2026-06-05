@@ -85,6 +85,22 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
 .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-3));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),0 4px 14px var(--brand-glow);}
 .btn-primary:hover{transform:translateY(-1px);}
 .btn-primary:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px;}
+@media(max-width:640px){.choice-grid{grid-template-columns:1fr;}}
+.choice-card{text-align:left;padding:22px;border-radius:16px;background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border-2);transition:all 0.18s;display:flex;flex-direction:column;gap:10px;}
+.choice-card:hover{border-color:var(--brand-line);transform:translateY(-2px);}
+.choice-icon{width:42px;height:42px;border-radius:11px;background:var(--brand-soft);border:1px solid var(--brand-line);display:flex;align-items:center;justify-content:center;color:var(--brand);}
+.choice-card h3{font-size:16px;font-weight:600;}
+.choice-card p{font-size:13px;color:var(--text-dim);line-height:1.55;}
+.choice-pick{margin-top:auto;display:inline-flex;align-items:center;gap:7px;color:var(--brand);font-size:13px;font-weight:600;}
+.check-list{display:flex;flex-direction:column;gap:2px;}
+.check-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-ic{flex-shrink:0;width:24px;height:24px;border-radius:7px;background:var(--green-soft);border:1px solid var(--green-line);color:var(--green);display:flex;align-items:center;justify-content:center;}
+.check-tx{font-size:14px;color:var(--text-soft);line-height:1.5;}
+.check-tx b{color:var(--text);font-weight:600;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);margin-bottom:16px;cursor:pointer;}
+.back-link:hover{color:var(--text);}
 .spinner{width:34px;height:34px;border:3px solid var(--border-2);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto;}
 @keyframes spin{to{transform:rotate(360deg);}}
 @media(max-width:640px){.wrap{padding:24px 16px 100px;}.card{padding:18px 16px;}.ai-number{font-size:18px;}}
@@ -98,77 +114,134 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
 
 <div id="loading"><div class="spinner"></div></div>
 
-<div class="wrap" id="main" style="display:none;">
+<!-- ============ CHOICE SCREEN ============ -->
+<div class="wrap" id="choice-screen" style="display:none;">
   <div class="eyebrow"><span class="dot"></span>Final step · Phone setup</div>
-  <h1 class="title">Forward your calls to your <span class="accent">AI receptionist.</span></h1>
-  <p class="lead">One last step. You'll point your existing business number at your AI number so the AI answers your calls. Takes about 2 minutes — no new equipment, no app.</p>
+  <h1 class="title">How do you want customers to <span class="accent">reach your AI?</span></h1>
+  <p class="lead">Two ways to set this up. Pick whichever fits your business — you can change it later.</p>
 
-  <!-- WHAT IS HAPPENING -->
-  <div class="card">
-    <div class="card-eyebrow">How this works</div>
-    <h2>You keep your number. Your AI answers it.</h2>
-    <p>You already have a business phone number. Your customers keep calling that same number — nothing changes for them. Behind the scenes, your phone forwards those calls to your AI receptionist, so the AI picks up. Customers never see or dial the AI number.</p>
+  <div class="choice-grid">
+    <button class="choice-card" type="button" id="pick-forward">
+      <div class="choice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.74-1.27a2 2 0 0 1 2.11-.45c.74.34 1.53.57 2.34.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <h3>Keep my current number</h3>
+      <p>I already have a business number. I'll forward it to my AI number so the AI answers my existing line.</p>
+      <span class="choice-pick">Choose this <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+    </button>
+
+    <button class="choice-card" type="button" id="pick-dedicated">
+      <div class="choice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+      <h3>Use the AI number as my business number</h3>
+      <p>I don't have a number, or I want a fresh one. I'll use the AI number everywhere — no forwarding needed.</p>
+      <span class="choice-pick">Choose this <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+    </button>
   </div>
+</div>
 
-  <!-- YOUR AI NUMBER -->
+<!-- ============ OPTION 1: FORWARD EXISTING NUMBER ============ -->
+<div class="wrap" id="forward-view" style="display:none;">
+  <span class="back-link" id="back-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back</span>
+  <div class="eyebrow"><span class="dot"></span>Keep your number</div>
+  <h1 class="title">Forward your calls to your <span class="accent">AI receptionist.</span></h1>
+  <p class="lead">Your customers keep calling your existing number — nothing changes for them. You just forward that line to your AI number so the AI picks up. Takes about 2 minutes, no new equipment.</p>
+
   <div class="card">
     <div class="card-eyebrow">Your AI receptionist number</div>
     <h2>This is the number you'll forward to.</h2>
     <div class="ai-number-box">
-      <span class="ai-number" id="ai-number">—</span>
-      <button class="copy-btn" id="copy-btn" type="button">
+      <span class="ai-number" id="ai-number-1">—</span>
+      <button class="copy-btn" data-copy type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="copy-label">Copy</span>
+        <span class="copy-label">Copy</span>
       </button>
     </div>
     <p class="note">Copy this number — you'll need it in the forwarding steps below.</p>
   </div>
 
-  <!-- HOW TO FORWARD BY SETUP -->
   <div class="card">
     <div class="card-eyebrow">Set up forwarding</div>
-    <h2>Pick how your business line works.</h2>
-    <p>Choose your phone type or carrier below for exact steps.</p>
+    <h2>Pick your phone type or carrier.</h2>
     <div class="carrier-grid" id="carrier-grid"></div>
     <div class="carrier-detail" id="carrier-detail"></div>
     <div class="verify-warn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span>Carrier codes and menus can vary by plan and region. If a code below doesn't work on your line, search "<em>[your carrier] call forwarding</em>" or call your carrier — they'll set it up free in a minute.</span>
+      <span>Carrier codes can vary by plan and region. If a code doesn't work, search "<em>[your carrier] call forwarding</em>" or call your carrier — they'll set it up free in a minute.</span>
     </div>
   </div>
 
-  <!-- CONDITIONAL FORWARDING -->
   <div class="card">
     <div class="card-eyebrow">Optional · Forwarding styles</div>
     <h2>Forward all calls, or only some.</h2>
     <div class="cond">
-      <div class="cond-item"><div class="ct">Forward every call (recommended)</div><div class="cd">The AI answers all calls. Best if you want every call captured and never want to miss a lead.</div></div>
-      <div class="cond-item"><div class="ct">Forward only missed calls</div><div class="cd">Your phone rings first; if you don't pick up in a few rings, it goes to the AI. Good if you still answer calls yourself sometimes.</div></div>
-      <div class="cond-item"><div class="ct">Forward only when busy</div><div class="cd">Calls go to the AI only when you're already on another call. Good for solo operators.</div></div>
-      <div class="cond-item"><div class="ct">Forward after hours</div><div class="cd">Forward to the AI in the evenings/weekends, answer yourself during the day. (Set this on a schedule with your carrier, or just toggle forwarding on when you leave.)</div></div>
+      <div class="cond-item"><div class="ct">Forward every call (recommended)</div><div class="cd">The AI answers all calls. Best if you never want to miss a lead.</div></div>
+      <div class="cond-item"><div class="ct">Forward only missed calls</div><div class="cd">Your phone rings first; unanswered calls go to the AI.</div></div>
+      <div class="cond-item"><div class="ct">Forward only when busy</div><div class="cd">Calls go to the AI only when you're already on another call.</div></div>
+      <div class="cond-item"><div class="ct">Forward after hours</div><div class="cd">Toggle forwarding on when you leave, off when you're open.</div></div>
     </div>
-    <p class="note">Most owners start with "forward every call" while testing, then switch to "missed calls only" once they trust it. The codes for conditional forwarding are in each carrier's section above.</p>
   </div>
 
-  <!-- FAQ -->
   <div class="card">
     <div class="card-eyebrow">Common questions</div>
     <h2>FAQ</h2>
     <div id="faq"></div>
   </div>
 
-  <!-- CONFIRM -->
   <div class="confirm-row">
-    <label class="confirm-check" for="confirm">
-      <input type="checkbox" id="confirm" />
+    <label class="confirm-check" for="confirm-1">
+      <input type="checkbox" id="confirm-1" />
       <span class="confirm-box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-      <span class="confirm-text">I've forwarded my business number to my AI number above (or I'm giving out the AI number directly). I understand calls won't reach my AI until this is done.</span>
+      <span class="confirm-text">I've forwarded my business number to my AI number above. I understand calls won't reach my AI until this is done.</span>
     </label>
   </div>
-
   <div class="btn-row">
-    <button class="btn btn-primary" id="finish-btn" type="button" disabled>
-      <span id="finish-label">Confirm the box above to continue</span>
+    <button class="btn btn-primary" id="finish-1" type="button" disabled>
+      <span id="finish-1-label">Confirm the box above to continue</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============ OPTION 2: DEDICATED AI NUMBER ============ -->
+<div class="wrap" id="dedicated-view" style="display:none;">
+  <span class="back-link" id="back-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back</span>
+  <div class="eyebrow"><span class="dot"></span>Your new business number</div>
+  <h1 class="title">You're all set — this is your <span class="accent">business number.</span></h1>
+  <p class="lead">No forwarding needed. Your AI answers this number 24/7. Use it anywhere you'd list a phone number, and every call is handled and captured automatically.</p>
+
+  <div class="card">
+    <div class="card-eyebrow">Your business number</div>
+    <div class="ai-number-box">
+      <span class="ai-number" id="ai-number-2">—</span>
+      <button class="copy-btn" data-copy type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="copy-label">Copy</span>
+      </button>
+    </div>
+    <p class="note">This number is yours. Calls to it are answered by your AI receptionist right away.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-eyebrow">Put your number to work</div>
+    <h2>Add it everywhere customers find you.</h2>
+    <div class="check-list">
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Your website</b> — header, contact page, and footer.</div></div>
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Google Business Profile</b> — so it shows on Google Search & Maps.</div></div>
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Business cards & invoices</b></div></div>
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Social media profiles</b> — Facebook, Instagram, etc.</div></div>
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Ads</b> — Google, Facebook, and any paid campaigns.</div></div>
+      <div class="check-row"><div class="check-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-tx"><b>Yard signs, trucks & flyers</b> — anywhere offline.</div></div>
+    </div>
+  </div>
+
+  <div class="confirm-row">
+    <label class="confirm-check" for="confirm-2">
+      <input type="checkbox" id="confirm-2" />
+      <span class="confirm-box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="confirm-text">Got it — I'll use this as my business number and start putting it on my website and listings.</span>
+    </label>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="finish-2" type="button" disabled>
+      <span id="finish-2-label">Confirm the box above to continue</span>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
   </div>
@@ -194,8 +267,6 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
     return num;
   }
 
-  // Carrier / phone-type forwarding instructions.
-  // NOTE: codes vary by plan/region — owners are told to verify.
   const CARRIERS={
     verizon:{label:'Verizon',steps:[
       {t:'Turn ON (forward all calls)',c:'*72'},{t:'then dial your AI number, press call',c:''},
@@ -232,44 +303,39 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
     landline:{label:'Landline',steps:[
       {t:'Turn ON (forward all calls)',c:'*72'},{t:'then dial AI number',c:''},
       {t:'Turn OFF',c:'*73'}
-    ],note:'Most landlines use *72 to enable and *73 to disable. If those don\'t work, call your phone company — they\'ll enable "call forwarding" on your line.'},
+    ],note:'Most landlines use *72 to enable and *73 to disable. If those don\'t work, call your phone company.'},
     voip:{label:'VoIP / Other',steps:[
       {t:'Find "call forwarding" in your provider\'s admin panel',c:''},
       {t:'Set forwarding destination to your AI number',c:''}
     ],note:'Nearly every VoIP system has a call-forwarding setting in its admin dashboard. Set the destination to your AI number.'}
   };
-
   const FAQ=[
-    {q:'What if my business phone is my personal cell?',a:'That\'s fine and common. Use the "forward only missed calls" option so your cell rings first and only unanswered calls go to the AI — or forward everything if you\'d rather the AI handle all calls. Your personal voicemail is replaced by the AI for forwarded calls.'},
-    {q:'What if I already have a receptionist?',a:'Many owners forward only after-hours or overflow calls to the AI, so the AI covers nights, weekends, and times the line is busy. Use conditional forwarding (no-answer or busy) instead of forwarding everything.'},
-    {q:'What if I only want the AI after hours?',a:'Turn forwarding on when you close and off when you open (the *72 / *73 codes), or set a schedule with your carrier if they support it. The AI then only answers outside your hours.'},
-    {q:'What if I want calls transferred to me?',a:'If you entered your cell on the previous step, the AI can transfer urgent or "speak to a person" calls straight to you. You don\'t need to do anything extra here.'},
-    {q:'What if I stop paying?',a:'Your subscription manages access. If it lapses, the AI stops answering — just turn off forwarding (*73 or your carrier\'s off code) and calls ring your own line again as normal.'},
-    {q:'What if I change phone providers?',a:'Your AI number stays the same. Just set up call forwarding again on the new provider, pointing to the same AI number. Email us if you need a hand.'}
+    {q:'What if my business phone is my personal cell?',a:'That\'s fine and common. Use "forward only missed calls" so your cell rings first and only unanswered calls go to the AI — or forward everything if you\'d rather the AI handle all calls.'},
+    {q:'What if I already have a receptionist?',a:'Many owners forward only after-hours or overflow calls to the AI, so it covers nights, weekends, and busy times. Use conditional forwarding instead of forwarding everything.'},
+    {q:'What if I only want the AI after hours?',a:'Turn forwarding on when you close and off when you open (the *72 / *73 codes), or set a schedule with your carrier.'},
+    {q:'What if I stop paying?',a:'Your subscription manages access. If it lapses, the AI stops answering — just turn off forwarding (*73 or your carrier\'s off code) and calls ring your own line again.'},
+    {q:'What if I change phone providers?',a:'Your AI number stays the same. Just set up call forwarding again on the new provider, pointing to the same AI number.'}
   ];
 
+  // build carrier UI
   const grid=document.getElementById('carrier-grid');
   const detail=document.getElementById('carrier-detail');
-  Object.keys(CARRIERS).forEach((key,i)=>{
+  Object.keys(CARRIERS).forEach((key)=>{
     const b=document.createElement('button');
     b.type='button'; b.className='carrier-btn'; b.textContent=CARRIERS[key].label; b.dataset.key=key;
     b.addEventListener('click',()=>{
       document.querySelectorAll('.carrier-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      renderCarrier(key);
+      b.classList.add('active'); renderCarrier(key);
     });
     grid.appendChild(b);
   });
   function renderCarrier(key){
     const c=CARRIERS[key];
     let html=`<h3>${c.label} — call forwarding</h3>`;
-    c.steps.forEach(s=>{
-      html+=`<div class="code-line"><span>${s.t}</span>${s.c?`<span class="code">${s.c}</span>`:''}</div>`;
-    });
+    c.steps.forEach(s=>{ html+=`<div class="code-line"><span>${s.t}</span>${s.c?`<span class="code">${s.c}</span>`:''}</div>`; });
     html+=`<p class="note">${c.note}</p>`;
     detail.innerHTML=html; detail.classList.add('show');
   }
-
   const faqEl=document.getElementById('faq');
   FAQ.forEach(f=>{
     const item=document.createElement('div'); item.className='faq-item';
@@ -279,47 +345,68 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
     faqEl.appendChild(item);
   });
 
-  let SLUG='';
+  // copy buttons
+  document.querySelectorAll('[data-copy]').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const raw=this.dataset.raw||''; if(!raw) return;
+      navigator.clipboard.writeText(raw).then(()=>{
+        this.classList.add('copied'); const lbl=this.querySelector('.copy-label'); if(lbl) lbl.textContent='Copied!';
+        setTimeout(()=>{this.classList.remove('copied'); if(lbl) lbl.textContent='Copy';},1800);
+      }).catch(()=>{});
+    });
+  });
+
+  let SLUG='', CLIENT=null;
+  const screens={ choice:document.getElementById('choice-screen'), forward:document.getElementById('forward-view'), dedicated:document.getElementById('dedicated-view') };
+  function show(name){ Object.values(screens).forEach(s=>s.style.display='none'); screens[name].style.display='block'; window.scrollTo(0,0); }
+
+  async function saveMethod(method){
+    try { await sb.from('clients').update({ phone_setup_method: method }).eq('client_slug', SLUG); }
+    catch(e){ console.warn('save method failed', e); }
+  }
+
+  // choice buttons
+  document.getElementById('pick-forward').addEventListener('click',()=>{ saveMethod('forward'); show('forward'); if(!document.querySelector('.carrier-btn.active')) document.querySelector('.carrier-btn').click(); });
+  document.getElementById('pick-dedicated').addEventListener('click',()=>{ saveMethod('dedicated'); show('dedicated'); });
+  document.getElementById('back-1').addEventListener('click',()=>show('choice'));
+  document.getElementById('back-2').addEventListener('click',()=>show('choice'));
+
+  // confirm + finish for both options
+  function wireFinish(checkId,btnId,labelId){
+    const chk=document.getElementById(checkId), btn=document.getElementById(btnId), lbl=document.getElementById(labelId);
+    chk.addEventListener('change',()=>{ btn.disabled=!chk.checked; lbl.textContent=chk.checked?'Go to my dashboard':'Confirm the box above to continue'; });
+    btn.addEventListener('click',()=>{ location.href='/dashboard/'+encodeURIComponent(SLUG); });
+  }
+  wireFinish('confirm-1','finish-1','finish-1-label');
+  wireFinish('confirm-2','finish-2','finish-2-label');
+
   async function init(){
     const {data:{session}}=await sb.auth.getSession();
     if(!session){ location.replace('/sign-in'); return; }
     SLUG=getSlug();
-    let client=null;
     if(SLUG){
       const {data}=await sb.from('clients').select('*').eq('client_slug',SLUG).eq('owner_user_id',session.user.id).limit(1);
-      if(data&&data[0]) client=data[0];
+      if(data&&data[0]) CLIENT=data[0];
     }
-    if(!client){
+    if(!CLIENT){
       const {data}=await sb.from('clients').select('*').eq('owner_user_id',session.user.id).limit(1);
-      if(data&&data[0]){ client=data[0]; SLUG=client.client_slug; }
+      if(data&&data[0]){ CLIENT=data[0]; SLUG=CLIENT.client_slug; }
     }
-    if(!client){ location.replace('/dashboard'); return; }
+    if(!CLIENT){ location.replace('/dashboard'); return; }
 
-    const aiNum=client.twilio_number||'';
-    document.getElementById('ai-number').textContent=aiNum?fmt(aiNum):'Being assigned…';
-    document.getElementById('copy-btn').dataset.raw=aiNum;
-    if(CARRIERS.verizon){ document.querySelector('.carrier-btn').click(); } // open first by default
+    const aiNum=CLIENT.twilio_number||'';
+    const disp=aiNum?fmt(aiNum):'Being assigned…';
+    document.getElementById('ai-number-1').textContent=disp;
+    document.getElementById('ai-number-2').textContent=disp;
+    document.querySelectorAll('[data-copy]').forEach(b=>b.dataset.raw=aiNum);
 
     document.getElementById('loading').style.display='none';
-    document.getElementById('main').style.display='block';
+
+    // If they already picked before, jump straight to that view.
+    if(CLIENT.phone_setup_method==='forward'){ show('forward'); document.querySelector('.carrier-btn').click(); }
+    else if(CLIENT.phone_setup_method==='dedicated'){ show('dedicated'); }
+    else { show('choice'); }
   }
-
-  document.getElementById('copy-btn').addEventListener('click',function(){
-    const raw=this.dataset.raw||document.getElementById('ai-number').textContent;
-    navigator.clipboard.writeText(raw).then(()=>{
-      this.classList.add('copied'); document.getElementById('copy-label').textContent='Copied!';
-      setTimeout(()=>{this.classList.remove('copied');document.getElementById('copy-label').textContent='Copy';},1800);
-    }).catch(()=>{});
-  });
-
-  const confirm=document.getElementById('confirm'), finishBtn=document.getElementById('finish-btn'), finishLabel=document.getElementById('finish-label');
-  confirm.addEventListener('change',()=>{
-    finishBtn.disabled=!confirm.checked;
-    finishLabel.textContent=confirm.checked?'Go to my dashboard':'Confirm the box above to continue';
-  });
-  finishBtn.addEventListener('click',()=>{
-    location.href='/dashboard/'+encodeURIComponent(SLUG);
-  });
 
   init().catch(e=>{console.error('[phone-setup]',e);document.getElementById('loading').innerHTML='<p style="text-align:center;color:#a1a1aa;margin-top:60px;">Something went wrong. <a href="/dashboard">Go to dashboard</a></p>';});
 })();
