@@ -680,9 +680,10 @@ async function init() {
     return;
   }
 
-  // Starter customers do not get dashboard access (Option A)
+  // Starter customers do not get the leads dashboard — send them to their
+  // account page (billing, subscription, self-service cancel).
   if ((client.plan || '').toLowerCase() === 'starter') {
-    window.location.assign('/confirmation');
+    window.location.assign('/account');
     return;
   }
 
