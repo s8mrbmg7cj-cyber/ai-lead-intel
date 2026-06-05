@@ -3,6 +3,15 @@
 // Looks up client, marks paid, sends the setup email (Pro), then redirects:
 //   - Pro     → /create-password
 //   - Starter → /confirmation  (no password, no dashboard, no setup email)
+//
+// STARTER AUTO-PROVISION: Starter never visits /setup, so this handler also
+// provisions the Starter client (number + AI assistant) on a confident paid
+// match, then emails them their new number with forwarding instructions.
+// A one-time lock column (provision_requested_at) + provision's own
+// idempotency guarantee a client is only ever provisioned once, even though
+// paypal-webhook.js carries the same hook as a backup.
+export const config = { maxDuration: 30 };
+
 export default async function handler(req, res) {
   console.log("[paypal-return] hit:", { query: req.query });
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -118,6 +127,17 @@ export default async function handler(req, res) {
     } else {
       console.log("[paypal-return] setup email NOT triggered:", { confidentMatch, plan: planLower, hasSlug: !!client?.client_slug });
     }
+
+    // ── STARTER AUTO-PROVISION ──
+    // Starter never visits /setup, so provision the number + AI right here on
+    // a confident paid match, then email the customer their number.
+    if (client && client.client_slug && confidentMatch && planLower === "starter") {
+      try {
+        await autoProvisionStarter(client, supabaseUrl, headers, baseUrl);
+      } catch (e) {
+        console.error("[paypal-return] auto-provision error:", e.message);
+      }
+    }
   }
   // Build redirect params (kept for both flows)
   const params = new URLSearchParams();
@@ -141,4 +161,137 @@ export default async function handler(req, res) {
   console.log("[paypal-return] plan:", plan, "→ 302:", redirectUrl);
   res.writeHead(302, { Location: redirectUrl });
   res.end();
+}
+
+// ── Starter auto-provision ──
+// 1) Take a one-time lock (provision_requested_at) so only ONE of
+//    onboarding-return / paypal-webhook ever provisions this client.
+// 2) Call /api/provision server-to-server with x-internal-secret.
+// 3) On success: email the customer their AI's number + forwarding steps.
+//    On failure: urgently alert the owner so they can fix it by hand.
+async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl) {
+  const secret = process.env.SUPABASE_WEBHOOK_SECRET || "";
+  if (!secret) {
+    console.error("[paypal-return] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision");
+    return;
+  }
+  if (client.twilio_number && client.vapi_phone_number_id) {
+    console.log("[paypal-return] already provisioned:", client.client_slug);
+    return;
+  }
+
+  // One-time lock: this PATCH only matches while provision_requested_at IS NULL,
+  // so exactly one caller can win it.
+  try {
+    const r = await fetch(
+      `${supabaseUrl}/rest/v1/clients?id=eq.${client.id}&provision_requested_at=is.null`,
+      {
+        method: "PATCH",
+        headers: { ...sbAuthHeaders, "Content-Type": "application/json", Prefer: "return=representation" },
+        body: JSON.stringify({ provision_requested_at: new Date().toISOString() }),
+      }
+    );
+    const rows = await r.json().catch(() => []);
+    if (!r.ok || !Array.isArray(rows) || rows.length === 0) {
+      console.log("[paypal-return] provision lock not acquired (already started elsewhere) —", client.client_slug);
+      return;
+    }
+  } catch (e) {
+    console.error("[paypal-return] provision lock error:", e.message);
+    return;
+  }
+
+  let result = null;
+  try {
+    const pr = await fetch(`${baseUrl}/api/provision`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-internal-secret": secret },
+      body: JSON.stringify({ client_slug: client.client_slug }),
+    });
+    result = await pr.json().catch(() => ({}));
+    if (!pr.ok) console.error("[paypal-return] provision failed:", pr.status, JSON.stringify(result).slice(0, 300));
+  } catch (e) {
+    console.error("[paypal-return] provision call threw:", e.message);
+  }
+
+  const number = result && result.number;
+  if (number) {
+    console.log("[paypal-return] ✅ starter provisioned:", client.client_slug, number);
+    await sendStarterLiveEmail(client, number);
+  } else {
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but auto-provisioning FAILED` +
+      ` (${(result && result.error) || "unknown error"}). Set them up manually ASAP.`
+    );
+  }
+}
+
+// Email the Starter customer their live AI number + how to forward to it.
+async function sendStarterLiveEmail(client, number) {
+  const key = process.env.RESEND_API_KEY;
+  const to = client.notify_email;
+  if (!key || !to) {
+    console.warn("[paypal-return] starter live email skipped (missing RESEND_API_KEY or notify_email)");
+    return;
+  }
+  const pretty = String(number).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, "($1) $2-$3");
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "AI Lead Intel <hello@aileadintel.com>",
+        to: [to],
+        subject: `Your AI receptionist is live — your number is ${pretty}`,
+        text: [
+          `Great news — your AI receptionist for ${client.business_name || "your business"} is set up and answering calls right now.`,
+          ``,
+          `Your AI's phone number: ${pretty}`,
+          ``,
+          `Try it: call the number above and talk to your AI. You'll get a summary email at this address the moment the call ends.`,
+          ``,
+          `To connect your existing business number, forward it to ${pretty}:`,
+          `- Most carriers: dial *72, then ${pretty}, and press call. (Dial *73 to turn forwarding off later.)`,
+          `- Or simply use ${pretty} as your business line on Google, your website, and your cards.`,
+          ``,
+          `Questions or want a hand? Just reply to this email.`,
+          ``,
+          `— AI Lead Intel`,
+        ].join("\n"),
+      }),
+    });
+    console.log("[paypal-return] ✅ starter live email sent to", to);
+  } catch (e) {
+    console.error("[paypal-return] starter live email failed:", e.message);
+  }
+}
+
+// Urgent owner alert (push + email) when a paid Starter could not be provisioned.
+async function alertOwnerStarterProblem(message) {
+  const topic = process.env.NTFY_TOPIC;
+  if (topic) {
+    try {
+      await fetch(`https://ntfy.sh/${topic}`, {
+        method: "POST",
+        headers: { Title: "Starter provisioning problem", Priority: "urgent", Tags: "rotating_light" },
+        body: message,
+      });
+    } catch (e) { console.error("[paypal-return] ntfy alert failed:", e.message); }
+  }
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.NOTIFY_EMAIL;
+  if (key && to) {
+    try {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "AI Lead Intel <hello@aileadintel.com>",
+          to: [to],
+          subject: "URGENT: Starter provisioning failed",
+          text: message,
+        }),
+      });
+    } catch (e) { console.error("[paypal-return] alert email failed:", e.message); }
+  }
 }
