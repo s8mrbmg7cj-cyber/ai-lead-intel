@@ -3,6 +3,8 @@
   "rewrites": [
     { "source": "/dashboard", "destination": "/sign-in.html" },
     { "source": "/dashboard/", "destination": "/sign-in.html" },
+    { "source": "/account", "destination": "/account.html" },
+    { "source": "/account/", "destination": "/account.html" },
     { "source": "/sign-in", "destination": "/sign-in.html" },
     { "source": "/signin", "destination": "/sign-in.html" },
     { "source": "/login", "destination": "/sign-in.html" },
