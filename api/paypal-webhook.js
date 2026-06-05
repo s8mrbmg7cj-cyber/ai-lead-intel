@@ -169,15 +169,20 @@ export default async function handler(req, res) {
       if (subId) patch.payment_external_id = subId; // record/refresh the subscription id
       await patchClient(client.id, patch);
     } else if (INACTIVE_EVENTS.has(eventType)) {
-      // Cancelled / suspended / expired / payment denied → mark inactive so the
-      // dashboard reflects it. (Releasing the phone number is a separate cleanup
-      // step we can add later.)
+      // Cancelled / suspended / expired / payment denied → mark inactive.
       const isCancel = eventType === 'BILLING.SUBSCRIPTION.CANCELLED' || eventType === 'BILLING.SUBSCRIPTION.EXPIRED';
       await patchClient(client.id, {
         status: isCancel ? 'cancelled' : 'paused',
         payment_status: eventType === 'PAYMENT.SALE.DENIED' ? 'failed' : 'cancelled',
         payment_pending: false,
       });
+      // On a HARD cancel (cancelled/expired), release the phone number back to
+      // the pool and clean up Vapi so the number can be reused by a new client
+      // and we don't orphan assistants. (Suspended/denied are left intact in
+      // case the client resumes.)
+      if (isCancel) {
+        await releaseNumberAndCleanup(client);
+      }
     }
 
     return res.status(200).json({ received: true, processed: eventType });
@@ -185,4 +190,55 @@ export default async function handler(req, res) {
     console.error('[paypal-webhook] ERROR:', err.message);
     return res.status(200).json({ received: true, error: err.message }); // ack to avoid retry storm
   }
+}
+
+// ── Release a cancelled client's number + clean up Vapi ──
+// 1) delete the Vapi phone-number import (so it can be re-imported later)
+// 2) delete the Vapi assistant (avoid orphans)
+// 3) free the number in phone_pool (client_id = null)
+// 4) clear the client's number fields
+async function releaseNumberAndCleanup(client) {
+  const VAPI_BASE = 'https://api.vapi.ai';
+  const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY;
+  const url = process.env.SUPABASE_URL;
+
+  // 1 + 2: Vapi cleanup (best-effort; don't block on failures)
+  if (VAPI_PRIVATE_KEY) {
+    const vapiDel = async (path) => {
+      try {
+        const r = await fetch(`${VAPI_BASE}${path}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${VAPI_PRIVATE_KEY}` },
+        });
+        if (!r.ok && r.status !== 404) {
+          console.error('[paypal-webhook] vapi delete failed', path, r.status, await r.text().catch(() => ''));
+        } else {
+          console.log('[paypal-webhook] vapi deleted', path);
+        }
+      } catch (e) { console.error('[paypal-webhook] vapi delete error', path, e.message); }
+    };
+    if (client.vapi_phone_number_id) await vapiDel(`/phone-number/${client.vapi_phone_number_id}`);
+    if (client.vapi_assistant_id)    await vapiDel(`/assistant/${client.vapi_assistant_id}`);
+  }
+
+  // 3: free the number in the pool
+  if (client.twilio_number) {
+    try {
+      const r = await fetch(`${url}/rest/v1/phone_pool?phone_number=eq.${encodeURIComponent(client.twilio_number)}`, {
+        method: 'PATCH',
+        headers: { ...sbHeaders(), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ client_id: null, assigned_at: null }),
+      });
+      if (!r.ok) console.error('[paypal-webhook] pool release failed:', r.status, await r.text().catch(() => ''));
+      else console.log('[paypal-webhook] number released to pool:', client.twilio_number);
+    } catch (e) { console.error('[paypal-webhook] pool release error:', e.message); }
+  }
+
+  // 4: clear the client's number fields
+  await patchClient(client.id, {
+    twilio_number: null,
+    vapi_phone_number_id: null,
+    vapi_assistant_id: null,
+    setup_complete: false,
+  });
 }
