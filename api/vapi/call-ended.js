@@ -206,21 +206,27 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
     return;
   }
 
-  const scoreEmoji = { HOT: "🔥", WARM: "🟡", COLD: "🔵", NONE: "⚪" };
-  const emoji = scoreEmoji[leadAnalysis.score] || "⚪";
+  const biz = client.business_name || "your business";
+  const caller = callData.caller_number || "Unknown number";
+  const dur = callData.duration_seconds ? `${callData.duration_seconds}s` : "—";
 
+  // Plain, personal, transactional layout — no marketing styling, no emoji,
+  // single column, dark text on white. This reads as a 1:1 message to Gmail,
+  // which keeps it in the Primary tab instead of Promotions.
   const html = `
-    <div style="font-family:sans-serif;padding:24px;background:#111827;color:white;">
-      <h1>${emoji} New Call Lead</h1>
-      <p><strong>Business:</strong> ${escapeHtml(client.business_name)}</p>
-      <p><strong>Caller:</strong> ${escapeHtml(callData.caller_number)}</p>
-      <p><strong>Lead Score:</strong> ${leadAnalysis.score}</p>
-      <p><strong>Outcome:</strong> ${escapeHtml(leadAnalysis.outcome)}</p>
-      <p><strong>Duration:</strong> ${callData.duration_seconds}s</p>
-      ${callData.summary ? `<h2>Summary</h2><p>${escapeHtml(callData.summary)}</p>` : ""}
-      ${callData.transcript ? `<h2>Transcript</h2><pre style="white-space:pre-wrap;">${escapeHtml(callData.transcript)}</pre>` : ""}
+    <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1a1a1a;max-width:560px;">
+      <p>You got a new call at <strong>${escapeHtml(biz)}</strong>.</p>
+      <p style="margin:0 0 4px;">Caller: <strong>${escapeHtml(caller)}</strong><br/>
+      Lead: <strong>${escapeHtml(leadAnalysis.score)}</strong><br/>
+      Outcome: ${escapeHtml(leadAnalysis.outcome || "—")}<br/>
+      Length: ${escapeHtml(dur)}</p>
+      ${callData.summary ? `<p style="margin:16px 0 4px;"><strong>Summary</strong><br/>${escapeHtml(callData.summary)}</p>` : ""}
+      ${callData.transcript ? `<p style="margin:16px 0 4px;"><strong>Transcript</strong></p><div style="white-space:pre-wrap;color:#444;border-left:3px solid #ddd;padding-left:12px;">${escapeHtml(callData.transcript)}</div>` : ""}
+      <p style="margin-top:20px;color:#666;font-size:13px;">— AI Lead Intel</p>
     </div>
   `;
+
+  const callerShort = caller && caller !== "Unknown number" ? caller : "new caller";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -229,9 +235,10 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "AI Lead Intel <hello@aileadintel.com>",
+      from: `${biz} via AI Lead Intel <hello@aileadintel.com>`,
       to: [client.notify_email],
-      subject: `${emoji} ${leadAnalysis.score} Lead - ${client.business_name}`,
+      replyTo: "hello@aileadintel.com",
+      subject: `New call from ${callerShort} — ${biz}`,
       html,
     }),
   });
