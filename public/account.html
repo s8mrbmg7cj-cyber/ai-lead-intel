@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Your account — AI Lead Intel</title>
+<meta name="description" content="Manage your AI Lead Intel subscription." />
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08080a; --bg-2: #0c0c0f;
+  --surface: #111114; --surface-2: #16161b; --surface-3: #1c1c22;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10);
+  --text: #fafafa; --text-soft: #d4d4d8; --text-dim: #a1a1aa; --text-faint: #71717a;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-3: #ff8533;
+  --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.10);
+  --brand-line: rgba(255,106,0,0.22); --brand-tint: rgba(255,106,0,0.05);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.1); --green-line: rgba(52,211,153,0.3);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.08); --red-line: rgba(248,113,113,0.3);
+}
+html, body { height: 100%; }
+body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; line-height: 1.55; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,106,0,0.12), transparent 60%); pointer-events: none; z-index: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+.topnav { position: sticky; top: 0; z-index: 100; background: rgba(8,8,10,0.72); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.signout { font-size: 13px; color: var(--text-dim); font-weight: 500; padding: 7px 14px; border: 1px solid var(--border-2); border-radius: 9px; transition: all 0.15s; }
+.signout:hover { color: var(--text); border-color: var(--border-2); background: var(--surface-3); }
+.wrap { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 22px 90px; }
+.page-eyebrow { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); font-weight: 600; margin-bottom: 10px; }
+h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 600; letter-spacing: -0.03em; margin-bottom: 8px; }
+h1 .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 14.5px; color: var(--text-dim); margin-bottom: 30px; }
+.loading { text-align: center; color: var(--text-faint); font-size: 14px; padding: 60px 0; }
+.spinner { width: 22px; height: 22px; border: 2.5px solid rgba(255,255,255,0.12); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.acct-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+.acct-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent); }
+.acct-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.acct-name { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; }
+.acct-slug { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; padding: 5px 11px; border-radius: 99px; }
+.badge .b-dot { width: 5px; height: 5px; border-radius: 50%; }
+.badge.active { color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); }
+.badge.active .b-dot { background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+.badge.cancelled { color: var(--red); background: var(--red-soft); border: 1px solid var(--red-line); }
+.badge.cancelled .b-dot { background: var(--red); }
+.badge.other { color: var(--text-dim); background: rgba(255,255,255,0.04); border: 1px solid var(--border-2); }
+.badge.other .b-dot { background: var(--text-faint); }
+.acct-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.acct-cell { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; }
+.acct-cell-label { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 4px; }
+.acct-cell-value { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+.acct-cell-value.mono { font-family: 'Geist Mono', monospace; font-size: 13.5px; }
+.acct-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 600; border: 1px solid transparent; transition: all 0.18s; }
+.btn-cancel { color: var(--red); border-color: var(--red-line); background: transparent; }
+.btn-cancel:hover { background: var(--red-soft); }
+.btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-dash { color: var(--text); border-color: var(--border-2); background: var(--surface-3); }
+.btn-dash:hover { border-color: var(--brand-line); }
+.cancel-note { font-size: 12px; color: var(--text-faint); margin-top: 12px; line-height: 1.5; }
+.confirm-box { margin-top: 14px; background: var(--red-soft); border: 1px solid var(--red-line); border-radius: 12px; padding: 16px; display: none; }
+.confirm-box.open { display: block; }
+.confirm-text { font-size: 13.5px; color: var(--text-soft); margin-bottom: 12px; line-height: 1.55; }
+.confirm-text strong { color: var(--text); }
+.confirm-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-confirm { background: var(--red); color: #fff; }
+.btn-confirm:hover { background: #ef5350; }
+.btn-keep { color: var(--text-dim); border-color: var(--border-2); }
+.btn-keep:hover { color: var(--text); background: var(--surface-3); }
+.result { margin-top: 12px; font-size: 13px; padding: 11px 13px; border-radius: 10px; display: none; }
+.result.ok { display: block; background: var(--green-soft); border: 1px solid var(--green-line); color: var(--green); }
+.result.err { display: block; background: var(--red-soft); border: 1px solid var(--red-line); color: var(--red); }
+.empty { text-align: center; color: var(--text-dim); padding: 50px 18px; background: var(--surface); border: 1px solid var(--border-2); border-radius: 16px; font-size: 14px; }
+.empty a { color: var(--brand-2); font-weight: 600; }
+.support { text-align: center; font-size: 13px; color: var(--text-faint); margin-top: 26px; }
+.support a { color: var(--brand-2); }
+@media (max-width: 540px) {
+  .acct-grid { grid-template-columns: 1fr; }
+  .btn { width: 100%; }
+  .acct-actions, .confirm-actions { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
+  <div class="nav-right">
+    <button class="signout" id="signout-btn" style="display:none;">Sign out</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-eyebrow">Your account</div>
+  <h1>Billing &amp; <span class="accent">subscription</span></h1>
+  <p class="page-sub">Your plan, your AI's number, and full control — including cancelling anytime, no phone calls or emails needed.</p>
+
+  <div class="loading" id="loading"><div class="spinner"></div>Loading your account…</div>
+  <div id="accounts"></div>
+
+  <div class="support">Need help with anything? Email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>.</div>
+</div>
+
+<script>
+'use strict';
+const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const PLAN_LABELS = { starter: 'Starter — $97/mo', pro: 'AI Front Desk Pro — $297/mo' };
+
+function esc(s) { if (s === null || s === undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function prettyNumber(n) {
+  if (!n) return '';
+  const m = String(n).match(/^\+1(\d{3})(\d{3})(\d{4})$/);
+  return m ? `(${m[1]}) ${m[2]}-${m[3]}` : String(n);
+}
+function prettyDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
+  catch (_) { return '—'; }
+}
+function statusInfo(client) {
+  const s = (client.status || '').toLowerCase();
+  if (s === 'cancelled') return { cls: 'cancelled', label: 'Cancelled' };
+  if (s === 'active' && client.active) return { cls: 'active', label: 'Active' };
+  if (s === 'paused') return { cls: 'other', label: 'Paused' };
+  return { cls: 'other', label: s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Pending' };
+}
+
+function renderAccounts(clients) {
+  const root = document.getElementById('accounts');
+  if (!clients.length) {
+    root.innerHTML = `<div class="empty">No subscriptions found for this login.<br><br><a href="/#pricing">See plans →</a></div>`;
+    return;
+  }
+  root.innerHTML = clients.map((c, i) => {
+    const st = statusInfo(c);
+    const isCancelled = st.cls === 'cancelled';
+    const plan = (c.plan || 'starter').toLowerCase();
+    return `
+    <div class="acct-card" data-slug="${esc(c.client_slug)}" data-idx="${i}">
+      <div class="acct-head">
+        <div>
+          <div class="acct-name">${esc(c.business_name || c.client_slug)}</div>
+          <div class="acct-slug">${esc(c.client_slug)}</div>
+        </div>
+        <span class="badge ${st.cls}"><span class="b-dot"></span>${st.label}</span>
+      </div>
+      <div class="acct-grid">
+        <div class="acct-cell"><div class="acct-cell-label">Plan</div><div class="acct-cell-value">${esc(PLAN_LABELS[plan] || plan)}</div></div>
+        <div class="acct-cell"><div class="acct-cell-label">Started</div><div class="acct-cell-value">${prettyDate(c.paid_at || c.created_at)}</div></div>
+        <div class="acct-cell"><div class="acct-cell-label">Your AI's number</div><div class="acct-cell-value mono">${isCancelled ? '—' : (prettyNumber(c.twilio_number) || 'Being assigned…')}</div></div>
+        <div class="acct-cell"><div class="acct-cell-label">Billing</div><div class="acct-cell-value">${isCancelled ? 'Stopped' : 'Via PayPal · 7-day free trial, then monthly'}</div></div>
+      </div>
+      <div class="acct-actions">
+        ${plan === 'pro' && !isCancelled ? `<a class="btn btn-dash" href="/dashboard/${encodeURIComponent(c.client_slug)}">Open dashboard</a>` : ''}
+        ${!isCancelled ? `<button class="btn btn-cancel" data-action="ask">Cancel subscription</button>` : ''}
+      </div>
+      ${!isCancelled ? `
+      <div class="confirm-box" data-role="confirm">
+        <div class="confirm-text"><strong>Cancel ${esc(c.business_name || 'this subscription')}?</strong> Your AI receptionist stops answering immediately, your number is released, and you will not be billed again. This can't be undone.</div>
+        <div class="confirm-actions">
+          <button class="btn btn-confirm" data-action="confirm">Yes, cancel my subscription</button>
+          <button class="btn btn-keep" data-action="keep">Keep my subscription</button>
+        </div>
+      </div>
+      <div class="result" data-role="result"></div>
+      <div class="cancel-note">Cancelling stops all future billing instantly. You can also manage payments anytime in your <a href="https://www.paypal.com/myaccount/autopay/" target="_blank" rel="noopener" style="color:var(--brand-2);">PayPal autopay settings</a>.</div>
+      ` : `<div class="cancel-note">This subscription is cancelled — you will not be billed. Changed your mind? <a href="/#pricing" style="color:var(--brand-2);">Start a new plan</a>.</div>`}
+    </div>`;
+  }).join('');
+
+  root.querySelectorAll('.acct-card').forEach(card => {
+    const confirmBox = card.querySelector('[data-role="confirm"]');
+    const resultBox = card.querySelector('[data-role="result"]');
+    const askBtn = card.querySelector('[data-action="ask"]');
+    const keepBtn = card.querySelector('[data-action="keep"]');
+    const confirmBtn = card.querySelector('[data-action="confirm"]');
+    if (askBtn) askBtn.addEventListener('click', () => { confirmBox.classList.add('open'); });
+    if (keepBtn) keepBtn.addEventListener('click', () => { confirmBox.classList.remove('open'); });
+    if (confirmBtn) confirmBtn.addEventListener('click', async () => {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Cancelling…';
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.assign('/sign-in'); return; }
+        const r = await fetch('/api/cancel-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ client_slug: card.dataset.slug }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.ok) {
+          resultBox.className = 'result ok';
+          resultBox.textContent = 'Your subscription is cancelled. You will not be billed again.';
+          confirmBox.classList.remove('open');
+          if (askBtn) askBtn.style.display = 'none';
+          const badge = card.querySelector('.badge');
+          if (badge) { badge.className = 'badge cancelled'; badge.innerHTML = '<span class="b-dot"></span>Cancelled'; }
+        } else {
+          resultBox.className = 'result err';
+          resultBox.textContent = (j && j.error) || 'Could not cancel. Please try again or email hello@aileadintel.com.';
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Yes, cancel my subscription';
+        }
+      } catch (e) {
+        resultBox.className = 'result err';
+        resultBox.textContent = 'Network error. Please try again.';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Yes, cancel my subscription';
+      }
+    });
+  });
+}
+
+async function init() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.assign('/sign-in'); return; }
+
+  const signoutBtn = document.getElementById('signout-btn');
+  signoutBtn.style.display = 'inline-flex';
+  signoutBtn.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.assign('/sign-in');
+  });
+
+  const { data: rows, error } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('owner_user_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  document.getElementById('loading').style.display = 'none';
+  if (error) {
+    document.getElementById('accounts').innerHTML = `<div class="empty">Couldn't load your account. Refresh to try again, or email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>.</div>`;
+    console.error('[account] load error:', error);
+    return;
+  }
+  renderAccounts(rows || []);
+}
+init();
+</script>
+
+</body>
+</html>
