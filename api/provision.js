@@ -128,17 +128,17 @@ function buildSystemPrompt(c) {
     + '- No filler, no long intros, no over-explaining. Get to the point.\n'
     + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
     + '- If you need a detail, ask one quick question at a time.';
-  // How the assistant should handle "can I talk to a person?" — transfer the
-  // caller live to the business's number.
+  // How the assistant handles "can I talk to a person?" — capture their info
+  // and promise a callback. Only if they specifically ask for a number to call
+  // does it read out the business number. Never attempt a live transfer.
   const callback = String(c.forwarding_number || c.transfer_primary || c.business_phone || '').trim();
-  prompt += '\n\n# IF THEY WANT A PERSON\n';
+  prompt += '\n\n# IF THEY WANT A PERSON\n'
+    + 'Do NOT say you are transferring them and do NOT attempt a live transfer. '
+    + 'Instead, collect their name, phone number, and what they need, then say something like '
+    + '"Got it — I\'ll pass this along and someone will get back to you shortly."';
   if (callback) {
-    prompt += 'If the caller asks to be transferred, to speak to a human, or to reach someone at the business, '
-      + 'briefly let them know you\'ll connect them (e.g. "Sure, one moment while I connect you.") and transfer the call. '
-      + 'If the transfer does not go through, give them the direct number instead: ' + callback + ', and offer to take a message.';
-  } else {
-    prompt += 'If the caller asks to be transferred or to speak to a human, let them know you\'ll take a '
-      + 'message and have someone call them back, then collect their name and number.';
+    prompt += ' If the caller specifically asks for a number they can call to reach a person, '
+      + 'give them this number: ' + callback + ' — just say it, do not try to connect them.';
   }
   prompt += '\n\n# DISCLOSURE\n'
     + 'If the caller directly asks whether you are a person, tell them you are an AI assistant. '
@@ -180,11 +180,12 @@ function buildAssistantPayload(client) {
   const model = CLAUDE_MODEL
     ? { provider: 'anthropic', model: CLAUDE_MODEL, messages: [sysPrompt] }
     : { provider: 'openai', model: 'gpt-4o', messages: [sysPrompt] };
-  const greeting = client.caller_greeting
-    || `Thanks for calling ${client.business_name || 'us'}. How can I help you today?`;
-  // Every call opens with the business greeting + a brief recording disclosure.
+  // The first message is whatever the client set as their greeting. The setup
+  // page pre-fills it with a recording-disclosure version by default, but the
+  // client can edit or remove that, so we use their greeting exactly as saved.
   const businessName = client.business_name || 'us';
-  const firstMessage = `Thanks for calling ${businessName}. Please note this call may be recorded for quality and training purposes. How can I help you today?`;
+  const firstMessage = client.caller_greeting
+    || `Thanks for calling ${businessName}. Please note this call may be recorded for quality and training purposes. How can I help you today?`;
 
   const payload = {
     name: `${client.business_name || client.client_slug} receptionist`,
@@ -221,13 +222,10 @@ function buildAssistantPayload(client) {
     endCallFunctionEnabled: true,
   };
 
-  // Live transfer: connect the caller to the business's transfer number when
-  // they ask for a person. Uses the number the client gave at onboarding.
-  // (For a real client this is a separate human line, so there is no loop.)
-  const transferTo = toE164(client.forwarding_number || client.transfer_primary || client.business_phone);
-  if (transferTo && transferTo.length >= 11) {
-    payload.forwardingPhoneNumber = transferTo;
-  }
+  // No live transfer. The AI captures the caller's info and tells them someone
+  // will get back to them; if they specifically ask for a number, it reads out
+  // the business's number (see buildSystemPrompt). Live transfer was removed
+  // because it doesn't connect reliably.
 
   return payload;
 }
