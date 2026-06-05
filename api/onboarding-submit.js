@@ -318,7 +318,7 @@ export default async function handler(req, res) {
       plan: clientRow.plan || data.plan,
       clientSlug: clientRow.client_slug,
       returnUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}`,
-      cancelUrl: `https://aileadintel.com/onboarding?canceled=1`,
+      cancelUrl: `https://aileadintel.com/onboarding.html?canceled=1`,
     });
     if (!sub.ok) {
       // Log the real reason and alert the owner; the customer only sees a soft message.
