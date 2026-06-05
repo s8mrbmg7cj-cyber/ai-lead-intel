@@ -169,6 +169,14 @@ export default async function handler(req, res) {
       };
       if (subId) patch.payment_external_id = subId; // record/refresh the subscription id
       await patchClient(client.id, patch);
+      // Starter never visits /setup, so make sure a paid Starter gets
+      // provisioned even if they closed the browser and never returned to the
+      // site. The provision lock + idempotency make this safe alongside the
+      // identical hook in onboarding-return.js.
+      if ((client.plan || '').toLowerCase() === 'starter') {
+        try { await autoProvisionStarter(client); }
+        catch (e) { console.error('[paypal-webhook] auto-provision error:', e.message); }
+      }
     } else if (INACTIVE_EVENTS.has(eventType)) {
       // Cancelled / suspended / expired / payment denied → mark inactive.
       const isCancel = eventType === 'BILLING.SUBSCRIPTION.CANCELLED' || eventType === 'BILLING.SUBSCRIPTION.EXPIRED';
@@ -298,4 +306,131 @@ async function sendCancelAlert(client, eventType) {
   }
 
   console.log('[paypal-webhook] cancel alert sent:', title, '-', biz);
+}
+
+// ── Starter auto-provision (backup path) ──
+// Mirrors onboarding-return.js. A one-time lock (provision_requested_at)
+// guarantees only one of the two ever provisions a given client.
+async function autoProvisionStarter(client) {
+  const secret = process.env.SUPABASE_WEBHOOK_SECRET || '';
+  if (!secret) {
+    console.error('[paypal-webhook] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision');
+    return;
+  }
+  if (client.twilio_number && client.vapi_phone_number_id) {
+    console.log('[paypal-webhook] already provisioned:', client.client_slug);
+    return;
+  }
+  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+
+  // One-time lock: only matches while provision_requested_at IS NULL.
+  try {
+    const r = await fetch(`${url}/rest/v1/clients?id=eq.${client.id}&provision_requested_at=is.null`, {
+      method: 'PATCH',
+      headers: { ...sbHeaders(), 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify({ provision_requested_at: new Date().toISOString() }),
+    });
+    const rows = await r.json().catch(() => []);
+    if (!r.ok || !Array.isArray(rows) || rows.length === 0) {
+      console.log('[paypal-webhook] provision lock not acquired (already started elsewhere) —', client.client_slug);
+      return;
+    }
+  } catch (e) {
+    console.error('[paypal-webhook] provision lock error:', e.message);
+    return;
+  }
+
+  let result = null;
+  try {
+    const pr = await fetch('https://aileadintel.com/api/provision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-internal-secret': secret },
+      body: JSON.stringify({ client_slug: client.client_slug }),
+    });
+    result = await pr.json().catch(() => ({}));
+    if (!pr.ok) console.error('[paypal-webhook] provision failed:', pr.status, JSON.stringify(result).slice(0, 300));
+  } catch (e) {
+    console.error('[paypal-webhook] provision call threw:', e.message);
+  }
+
+  const number = result && result.number;
+  if (number) {
+    console.log('[paypal-webhook] ✅ starter provisioned:', client.client_slug, number);
+    await sendStarterLiveEmail(client, number);
+  } else {
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but auto-provisioning FAILED` +
+      ` (${(result && result.error) || 'unknown error'}). Set them up manually ASAP.`
+    );
+  }
+}
+
+// Email the Starter customer their live AI number + how to forward to it.
+async function sendStarterLiveEmail(client, number) {
+  const key = process.env.RESEND_API_KEY;
+  const to = client.notify_email;
+  if (!key || !to) {
+    console.warn('[paypal-webhook] starter live email skipped (missing RESEND_API_KEY or notify_email)');
+    return;
+  }
+  const pretty = String(number).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, '($1) $2-$3');
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'AI Lead Intel <hello@aileadintel.com>',
+        to: [to],
+        subject: `Your AI receptionist is live — your number is ${pretty}`,
+        text: [
+          `Great news — your AI receptionist for ${client.business_name || 'your business'} is set up and answering calls right now.`,
+          ``,
+          `Your AI's phone number: ${pretty}`,
+          ``,
+          `Try it: call the number above and talk to your AI. You'll get a summary email at this address the moment the call ends.`,
+          ``,
+          `To connect your existing business number, forward it to ${pretty}:`,
+          `- Most carriers: dial *72, then ${pretty}, and press call. (Dial *73 to turn forwarding off later.)`,
+          `- Or simply use ${pretty} as your business line on Google, your website, and your cards.`,
+          ``,
+          `Questions or want a hand? Just reply to this email.`,
+          ``,
+          `— AI Lead Intel`,
+        ].join('\n'),
+      }),
+    });
+    console.log('[paypal-webhook] ✅ starter live email sent to', to);
+  } catch (e) {
+    console.error('[paypal-webhook] starter live email failed:', e.message);
+  }
+}
+
+// Urgent owner alert (push + email) when a paid Starter could not be provisioned.
+async function alertOwnerStarterProblem(message) {
+  const topic = process.env.NTFY_TOPIC;
+  if (topic) {
+    try {
+      await fetch(`https://ntfy.sh/${topic}`, {
+        method: 'POST',
+        headers: { Title: 'Starter provisioning problem', Priority: 'urgent', Tags: 'rotating_light' },
+        body: message,
+      });
+    } catch (e) { console.error('[paypal-webhook] ntfy alert failed:', e.message); }
+  }
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.NOTIFY_EMAIL;
+  if (key && to) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'AI Lead Intel <hello@aileadintel.com>',
+          to: [to],
+          subject: 'URGENT: Starter provisioning failed',
+          text: message,
+        }),
+      });
+    } catch (e) { console.error('[paypal-webhook] alert email failed:', e.message); }
+  }
 }
