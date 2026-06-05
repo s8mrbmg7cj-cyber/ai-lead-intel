@@ -193,8 +193,12 @@ export default async function handler(req, res) {
       if (isCancel) {
         await releaseNumberAndCleanup(client);
       }
-      // Notify the owner (push + email) that a subscription went inactive.
-      await sendCancelAlert(client, eventType);
+      // Notify the owner (push + email) that a subscription went inactive —
+      // unless this client was already marked cancelled (e.g. they cancelled
+      // from the account page, which already sent the alert).
+      if ((client.status || '').toLowerCase() !== 'cancelled') {
+        await sendCancelAlert(client, eventType);
+      }
     }
 
     return res.status(200).json({ received: true, processed: eventType });
