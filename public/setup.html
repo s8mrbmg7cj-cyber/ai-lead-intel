@@ -125,7 +125,6 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
                 <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Friendly, conversational, and welcoming.</div>
-              <div class="voice-card-preview" data-preview="warm_female" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
             <button type="button" class="voice-card" data-value="professional_female">
               <div class="voice-card-head">
@@ -136,7 +135,6 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
                 <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Clear, polished, and professional.</div>
-              <div class="voice-card-preview" data-preview="professional_female" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
             <button type="button" class="voice-card" data-value="calm_male">
               <div class="voice-card-head">
@@ -147,7 +145,6 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
                 <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Relaxed, patient, and trustworthy.</div>
-              <div class="voice-card-preview" data-preview="calm_male" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
             <button type="button" class="voice-card" data-value="deep_male">
               <div class="voice-card-head">
@@ -158,7 +155,6 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
                 <div class="voice-card-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
               </div>
               <div class="voice-card-desc">Confident, premium, and authoritative.</div>
-              <div class="voice-card-preview" data-preview="deep_male" role="button" tabindex="0"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Preview Voice</div>
             </button>
           </div>
           <input type="hidden" id="voice_style" name="voice_style" required />
@@ -211,34 +207,10 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
     voiceHidden.value = value;
   }
 
-  // ---- Voice preview (browser SpeechSynthesis) ----
-  const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
-  const SS = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
-  const PREVIEWS = {
-    warm_female:         { rate:0.9,  pitch:1.1, text:"Hi, thanks for calling. I'd be happy to help you today." },
-    professional_female: { rate:1.0,  pitch:1.0, text:"Thank you for calling. How may I assist you today?" },
-    calm_male:           { rate:0.9,  pitch:1.0, text:"Thanks for calling. Tell me how I can help." },
-    deep_male:           { rate:0.95, pitch:0.7, text:"Thank you for calling. How may I direct your call today?" },
-  };
-  let playing = null;
-  function stopPreview() { if (SS) { try { synth.cancel(); } catch(_){} } if (playing) { playing.classList.remove('playing'); playing = null; } }
-  function handlePreview(btn) {
-    if (!SS) { showAlert('info', "Voice preview isn't supported in this browser, but you can still pick a style."); return; }
-    if (playing === btn) { stopPreview(); return; }
-    stopPreview();
-    const cfg = PREVIEWS[btn.dataset.preview]; if (!cfg) return;
-    const u = new SpeechSynthesisUtterance(cfg.text); u.rate = cfg.rate; u.pitch = cfg.pitch; u.lang = 'en-US';
-    u.onend = () => { if (playing === btn) stopPreview(); };
-    playing = btn; btn.classList.add('playing');
-    setTimeout(() => { try { synth.speak(u); } catch(_) { stopPreview(); } }, 60);
-  }
   voiceGrid.addEventListener('click', (e) => {
-    const p = e.target.closest('.voice-card-preview');
-    if (p) { e.preventDefault(); e.stopPropagation(); handlePreview(p); return; }
     const card = e.target.closest('.voice-card');
     if (card) selectVoiceCard(card.dataset.value);
   });
-  window.addEventListener('beforeunload', () => { if (SS) { try { synth.cancel(); } catch(_){} } });
 
   // ---- Trigger provisioning in the background (save-setup also provisions) ----
   async function ensureProvisioned(client) {
@@ -293,7 +265,7 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
     }
 
     // Pre-fill greeting (default to a business-specific greeting), and voice.
-    const defaultGreeting = 'Thanks for calling ' + (client.business_name || 'us') + '. How can I help you today?';
+    const defaultGreeting = 'Thanks for calling ' + (client.business_name || 'us') + '. Please note this call may be recorded for quality and training purposes. How can I help you today?';
     greetingEl.value = client.caller_greeting || client.ai_greeting || defaultGreeting;
     if (client.voice_style) selectVoiceCard(client.voice_style);
     else selectVoiceCard('warm_female');
