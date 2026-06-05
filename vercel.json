@@ -9,6 +9,8 @@
     { "source": "/payment-success", "destination": "/payment-success.html" },
     { "source": "/create-password", "destination": "/create-password.html" },
     { "source": "/setup", "destination": "/setup.html" },
+    { "source": "/onboarding", "destination": "/onboarding.html" },
+    { "source": "/onboarding/", "destination": "/onboarding.html" },
     { "source": "/phone-setup", "destination": "/phone-setup.html" },
     { "source": "/phone-setup/", "destination": "/phone-setup.html" },
     { "source": "/go-live", "destination": "/go-live/index.html" },
