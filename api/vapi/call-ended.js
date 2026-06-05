@@ -78,6 +78,15 @@ export default async function handler(req, res) {
 
     console.log("CLIENT FOUND:", client.business_name);
 
+    // Don't process calls for cancelled/inactive clients — no dashboard entry,
+    // no email. (A cancelled client's assistant should already be removed, but
+    // this is a safety net so a lingering call can't be logged or emailed.)
+    const clientStatus = (client.status || '').toLowerCase();
+    if (clientStatus === 'cancelled' || clientStatus === 'paused' || client.active === false) {
+      console.log("CLIENT INACTIVE — skipping log/email:", client.business_name, clientStatus);
+      return res.status(200).json({ received: true, skipped: "client_inactive" });
+    }
+
     const transcript = message.transcript || formatTranscript(message.messages);
 
     const callData = {
