@@ -29,7 +29,7 @@ function sbHeaders(extra) {
 
 // Look up the client row by slug first, then fall back to notify_email.
 async function findClient({ clientSlug, email }) {
-  const select = 'id,business_name,notify_email,owner_user_id,client_slug';
+  const select = 'id,business_name,notify_email,owner_user_id,client_slug,plan';
   if (clientSlug) {
     const r = await fetch(
       `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&select=${enc(select)}&limit=1`,
@@ -174,6 +174,7 @@ export default async function handler(req, res) {
       success: true,
       client_slug: client.client_slug,
       business_name: client.business_name || '',
+      plan: (client.plan || '').toLowerCase(),
     });
   } catch (err) {
     console.error('[auth-link-user] UNHANDLED:', err.message);
