@@ -39,7 +39,7 @@ const VAPI_WEBHOOK_SECRET = process.env.VAPI_WEBHOOK_SECRET || '';
 // This is the recording + "you're talking to an AI" disclosure. Edit the wording
 // freely. Recording-consent law varies by state (some require all parties consent),
 // so confirm the wording for the states you operate in before relying on it.
-const CALL_DISCLOSURE = "Just so you know, you're speaking with our AI virtual assistant, and this call may be recorded for quality and follow-up.";
+const CALL_DISCLOSURE = "Just so you know, you're speaking with our AI virtual assistant, and this call may be transcribed for quality and follow-up.";
 
 // Starter voices (OpenAI — solid, low-cost). Used for the $97 plan.
 const VOICE_MAP = {
@@ -186,13 +186,18 @@ function buildAssistantPayload(client) {
   const businessName = client.business_name || 'us';
   const firstMessage = client.caller_greeting
     || client.ai_greeting
-    || `Thanks for calling ${businessName}. Please note this call may be recorded for quality and training purposes. How can I help you today?`;
+    || `Thanks for calling ${businessName}. How can I help you today?`;
 
   const payload = {
     name: `${client.business_name || client.client_slug} receptionist`,
     firstMessage: firstMessage,
     model,
     voice,
+    // No audio recordings — the product runs on transcripts + summaries only.
+    // (Transcription is unaffected; this just stops Vapi storing call audio,
+    // which we never use and which raises recording-consent questions in
+    // all-party-consent states.)
+    artifactPlan: { recordingEnabled: false, videoRecordingEnabled: false },
     // Report the finished call to our webhook so it lands on the dashboard.
     server: VAPI_WEBHOOK_SECRET
       ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
