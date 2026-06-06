@@ -319,6 +319,9 @@ async function autoProvisionStarter(client) {
   const secret = process.env.SUPABASE_WEBHOOK_SECRET || '';
   if (!secret) {
     console.error('[paypal-webhook] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision');
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but auto-provision could not run — the SUPABASE_WEBHOOK_SECRET environment variable is missing in Vercel. Add it, then set this client up manually.`
+    );
     return;
   }
   if (client.twilio_number && client.vapi_phone_number_id) {
@@ -335,12 +338,25 @@ async function autoProvisionStarter(client) {
       body: JSON.stringify({ provision_requested_at: new Date().toISOString() }),
     });
     const rows = await r.json().catch(() => []);
-    if (!r.ok || !Array.isArray(rows) || rows.length === 0) {
+    if (!r.ok) {
+      const detail = JSON.stringify(rows).slice(0, 250);
+      console.error('[paypal-webhook] provision lock PATCH failed:', r.status, detail);
+      await alertOwnerStarterProblem(
+        `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock failed (${r.status}: ${detail}). ` +
+        `If this mentions provision_requested_at, run this in Supabase: alter table clients add column if not exists provision_requested_at timestamptz; ` +
+        `Then set this client up manually.`
+      );
+      return;
+    }
+    if (!Array.isArray(rows) || rows.length === 0) {
       console.log('[paypal-webhook] provision lock not acquired (already started elsewhere) —', client.client_slug);
       return;
     }
   } catch (e) {
     console.error('[paypal-webhook] provision lock error:', e.message);
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock threw an error (${e.message}). Set them up manually.`
+    );
     return;
   }
 
@@ -378,6 +394,7 @@ async function sendStarterLiveEmail(client, number) {
     return;
   }
   const pretty = String(number).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, '($1) $2-$3');
+  const digits = String(number).replace(/[^\d]/g, '').replace(/^1/, '');
   try {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -393,9 +410,14 @@ async function sendStarterLiveEmail(client, number) {
           ``,
           `Try it: call the number above and talk to your AI. You'll get a summary email at this address the moment the call ends.`,
           ``,
-          `To connect your existing business number, forward it to ${pretty}:`,
-          `- Most carriers: dial *72, then ${pretty}, and press call. (Dial *73 to turn forwarding off later.)`,
-          `- Or simply use ${pretty} as your business line on Google, your website, and your cards.`,
+          `To connect your existing business number, forward it to your AI. Dial the code for your carrier from your business phone, then press call:`,
+          `- Verizon, US Cellular & most landlines: dial *72${digits}   (to turn off later: *73)`,
+          `- AT&T: dial *21*${digits}#   (to turn off later: #21#)`,
+          `- T-Mobile, Metro, Mint: dial **21*${digits}#   (to turn off later: ##21#)`,
+          `- Internet/VoIP phone systems (Spectrum, Xfinity, RingCentral, etc.): turn on call forwarding in your provider's app or settings instead.`,
+          `After dialing, call your business number from another phone — your AI should pick up.`,
+          ``,
+          `Or skip forwarding entirely and use ${pretty} as your business line on Google, your website, and your cards.`,
           ``,
           `Manage or cancel your subscription anytime at: https://aileadintel.com/account`,
           `(First time? Create your login here: https://aileadintel.com/create-password?plan=starter&slug=${client.client_slug || ''}&email=${encodeURIComponent(to)})`,
