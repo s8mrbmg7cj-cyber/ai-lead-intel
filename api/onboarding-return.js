@@ -150,13 +150,10 @@ export default async function handler(req, res) {
   if (client?.report_email) params.set("report_email", client.report_email);
   if (subscriptionId) params.set("paypal_sub", subscriptionId);
   params.set("paid", subscriptionId ? "1" : "0");
-  // PLAN-BASED ROUTING
-  let redirectPath;
-  if (plan === "pro") {
-    redirectPath = "/create-password";
-  } else {
-    redirectPath = "/confirmation";
-  }
+  // PLAN-BASED ROUTING — both plans now create a login (so /account and the
+  // self-service cancel button work for everyone). create-password reads the
+  // ?plan param and routes Starter on to /confirmation, Pro to /setup.
+  const redirectPath = "/create-password";
   const redirectUrl = `${baseUrl}${redirectPath}?${params.toString()}`;
   console.log("[paypal-return] plan:", plan, "→ 302:", redirectUrl);
   res.writeHead(302, { Location: redirectUrl });
@@ -253,6 +250,9 @@ async function sendStarterLiveEmail(client, number) {
           `To connect your existing business number, forward it to ${pretty}:`,
           `- Most carriers: dial *72, then ${pretty}, and press call. (Dial *73 to turn forwarding off later.)`,
           `- Or simply use ${pretty} as your business line on Google, your website, and your cards.`,
+          ``,
+          `Manage or cancel your subscription anytime at: https://aileadintel.com/account`,
+          `(First time? Create your login here: https://aileadintel.com/create-password?plan=starter&slug=${client.client_slug || ""}&email=${encodeURIComponent(to)})`,
           ``,
           `Questions or want a hand? Just reply to this email.`,
           ``,
