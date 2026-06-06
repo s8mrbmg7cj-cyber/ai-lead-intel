@@ -407,7 +407,10 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
     if(!CLIENT){ location.replace('/dashboard'); return; }
 
     const aiNum=CLIENT.twilio_number||'';
-    const disp=aiNum?fmt(aiNum):'Being assigned…';
+    const disp=aiNum?fmt(aiNum):'Being assigned — updates automatically…';
+    // Starter is provisioned automatically seconds after payment; if the
+    // number isn't on the row yet, refresh until it appears.
+    if(!aiNum){ setTimeout(()=>location.reload(), 6000); }
     document.getElementById('ai-number-1').textContent=disp;
     document.getElementById('ai-number-2').textContent=disp;
     document.querySelectorAll('[data-copy]').forEach(b=>b.dataset.raw=aiNum);
