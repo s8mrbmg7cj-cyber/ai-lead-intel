@@ -243,7 +243,7 @@ async function releaseNumberAndCleanup(client) {
       const r = await fetch(`${url}/rest/v1/phone_pool?phone_number=eq.${encodeURIComponent(client.twilio_number)}`, {
         method: 'PATCH',
         headers: { ...sbHeaders(), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ client_id: null, assigned_at: null }),
+        body: JSON.stringify({ client_id: null, assigned_at: null, vapi_phone_number_id: null }),
       });
       if (!r.ok) console.error('[paypal-webhook] pool release failed:', r.status, await r.text().catch(() => ''));
       else console.log('[paypal-webhook] number released to pool:', client.twilio_number);
