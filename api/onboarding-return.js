@@ -232,6 +232,7 @@ async function sendStarterLiveEmail(client, number) {
     return;
   }
   const pretty = String(number).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, "($1) $2-$3");
+  const digits = String(number).replace(/[^\d]/g, "").replace(/^1/, "");
   try {
     await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -247,9 +248,14 @@ async function sendStarterLiveEmail(client, number) {
           ``,
           `Try it: call the number above and talk to your AI. You'll get a summary email at this address the moment the call ends.`,
           ``,
-          `To connect your existing business number, forward it to ${pretty}:`,
-          `- Most carriers: dial *72, then ${pretty}, and press call. (Dial *73 to turn forwarding off later.)`,
-          `- Or simply use ${pretty} as your business line on Google, your website, and your cards.`,
+          `To connect your existing business number, forward it to your AI. Dial the code for your carrier from your business phone, then press call:`,
+          `- Verizon, US Cellular & most landlines: dial *72${digits}   (to turn off later: *73)`,
+          `- AT&T: dial *21*${digits}#   (to turn off later: #21#)`,
+          `- T-Mobile, Metro, Mint: dial **21*${digits}#   (to turn off later: ##21#)`,
+          `- Internet/VoIP phone systems (Spectrum, Xfinity, RingCentral, etc.): turn on call forwarding in your provider's app or settings instead.`,
+          `After dialing, call your business number from another phone — your AI should pick up.`,
+          ``,
+          `Or skip forwarding entirely and use ${pretty} as your business line on Google, your website, and your cards.`,
           ``,
           `Manage or cancel your subscription anytime at: https://aileadintel.com/account`,
           `(First time? Create your login here: https://aileadintel.com/create-password?plan=starter&slug=${client.client_slug || ""}&email=${encodeURIComponent(to)})`,
