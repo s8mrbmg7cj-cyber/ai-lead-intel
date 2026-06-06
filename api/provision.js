@@ -359,8 +359,15 @@ export default async function handler(req, res) {
     // 3) Attach the assistant to that number (import from Twilio first if needed).
     let vapiPhoneId = claimed.vapi_phone_number_id;
     if (vapiPhoneId) {
-      await vapi(`/phone-number/${vapiPhoneId}`, 'PATCH', { assistantId });
-    } else {
+      try {
+        await vapi(`/phone-number/${vapiPhoneId}`, 'PATCH', { assistantId });
+      } catch (e) {
+        // Stale ID — the Vapi import was deleted by a past cancel. Re-import fresh.
+        console.warn('[provision] stale vapi phone id, re-importing:', e.message);
+        vapiPhoneId = null;
+      }
+    }
+    if (!vapiPhoneId) {
       if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
         throw new Error(`Number ${claimedNumber} is not in Vapi and Twilio credentials are missing to import it.`);
       }
