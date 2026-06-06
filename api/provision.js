@@ -316,12 +316,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // Idempotent on the NUMBER only: if the client already has a number, the
-    // assistant has now been refreshed above, so we're done — don't claim another.
+    // Idempotent on the NUMBER only — but VERIFY against the pool first. A
+    // client row can carry a leftover number from old tests; the pool is the
+    // source of truth. If the pool doesn't credit them with this number, drop
+    // it and claim properly below.
     if (client.vapi_phone_number_id && client.twilio_number) {
-      console.log('[provision] client already has a number; assistant refreshed, skipping claim.');
-      res.status(200).json({ ok: true, already: true, number: client.twilio_number, assistantId, refreshed: true });
-      return;
+      const vr = await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${enc(client.twilio_number)}&select=client_id&limit=1`, { headers: sbHeaders(token) });
+      const vrows = await vr.json().catch(() => []);
+      const poolOwner = Array.isArray(vrows) && vrows[0] ? vrows[0].client_id : null;
+      if (poolOwner === client.id) {
+        console.log('[provision] client already has a number; assistant refreshed, skipping claim.');
+        res.status(200).json({ ok: true, already: true, number: client.twilio_number, assistantId, refreshed: true });
+        return;
+      }
+      console.warn('[provision] client row claims', client.twilio_number, 'but pool owner is', poolOwner, '— reclaiming properly.');
+      client.twilio_number = null;
+      client.vapi_phone_number_id = null;
     }
 
     // 2) Get this client a number. REUSE the one already on their row if any
@@ -332,13 +342,22 @@ export default async function handler(req, res) {
     if (client.twilio_number) {
       const reuseResp = await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${enc(client.twilio_number)}&select=*&limit=1`, { headers: sbHeaders(token) });
       const reuseRows = await reuseResp.json().catch(() => []);
-      if (reuseResp.ok && Array.isArray(reuseRows) && reuseRows[0]) {
-        claimed = reuseRows[0];
-        await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?id=eq.${enc(claimed.id)}`, {
-          method: 'PATCH', headers: sbHeaders(token),
-          body: JSON.stringify({ client_id: client.id, assigned_at: new Date().toISOString() }),
-        });
-        console.log('[provision] reusing existing number', claimed.phone_number);
+      const row = (reuseResp.ok && Array.isArray(reuseRows)) ? reuseRows[0] : null;
+      // Reuse ONLY if the pool says this number is free or already theirs —
+      // never take a number that belongs to another client.
+      if (row && (!row.client_id || row.client_id === client.id)) {
+        const lockResp = await fetch(
+          `${SUPABASE_URL}/rest/v1/phone_pool?id=eq.${enc(row.id)}&or=(client_id.is.null,client_id.eq.${enc(client.id)})`,
+          {
+            method: 'PATCH', headers: sbHeaders(token, { Prefer: 'return=representation' }),
+            body: JSON.stringify({ client_id: client.id, assigned_at: new Date().toISOString() }),
+          }
+        );
+        const lockRows = await lockResp.json().catch(() => []);
+        if (lockResp.ok && Array.isArray(lockRows) && lockRows[0]) {
+          claimed = lockRows[0];
+          console.log('[provision] reusing existing number', claimed.phone_number);
+        }
       }
     }
     if (!claimed) {
