@@ -517,6 +517,7 @@ function renderBilling(client) {
         <div class="billing-item"><div class="billing-item-label">Payment Status</div><div class="billing-item-value">${escapeHtml(paymentDisplay)}</div></div>
         <div class="billing-item"><div class="billing-item-label">Next Billing</div><div class="billing-item-value">${escapeHtml(nextBillingDisplay)}</div></div>
         <div class="billing-item"><div class="billing-item-label">Account Status</div><div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div></div>
+        <div class="billing-item"><div class="billing-item-label">Every Call Emailed To</div><div class="billing-item-value">${escapeHtml(client.notify_email || '—')}</div><div class="billing-item-value dim">Full summary + lead details after every call</div></div>
       </div>
       <div class="billing-manage-text">Cancel anytime right here with the button below — or manage your payment method and billing history through <strong>PayPal</strong>.</div>
       <div class="billing-actions">
