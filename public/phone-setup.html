@@ -392,6 +392,37 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
   wireFinish('confirm-1','finish-1','finish-1-label');
   wireFinish('confirm-2','finish-2','finish-2-label');
 
+  // Claim a number for this account by calling the provision API as the
+  // signed-in owner. Idempotent server-side. Caps at 3 attempts per session
+  // so an empty pool doesn't loop forever (the owner is alerted server-side).
+  async function tryProvision(){
+    let tries=0;
+    try{ tries=parseInt(sessionStorage.getItem('prov_tries')||'0',10)||0; }catch(_){}
+    if(tries>=3){
+      const msg='Taking longer than expected — we\u2019re on it. You\u2019ll get an email with your number shortly.';
+      const a=document.getElementById('ai-number-1'); if(a) a.textContent=msg;
+      const b=document.getElementById('ai-number-2'); if(b) b.textContent=msg;
+      return;
+    }
+    try{ sessionStorage.setItem('prov_tries',String(tries+1)); }catch(_){}
+    try{
+      const {data:{session}}=await sb.auth.getSession();
+      if(!session) return;
+      const r=await fetch('/api/provision',{
+        method:'POST',
+        headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
+        body:JSON.stringify({client_slug:SLUG}),
+      });
+      const j=await r.json().catch(()=>({}));
+      if(r.ok&&j.number){ try{ sessionStorage.removeItem('prov_tries'); }catch(_){} location.reload(); return; }
+      console.error('[phone-setup] provision failed:',r.status,j);
+      setTimeout(()=>location.reload(),8000);
+    }catch(e){
+      console.error('[phone-setup] provision error:',e);
+      setTimeout(()=>location.reload(),8000);
+    }
+  }
+
   async function init(){
     const {data:{session}}=await sb.auth.getSession();
     if(!session){ location.replace('/sign-in'); return; }
@@ -408,9 +439,10 @@ h1.title .accent{font-family:'Instrument Serif',serif;font-style:italic;font-wei
 
     const aiNum=CLIENT.twilio_number||'';
     const disp=aiNum?fmt(aiNum):'Being assigned — updates automatically…';
-    // Starter is provisioned automatically seconds after payment; if the
-    // number isn't on the row yet, refresh until it appears.
-    if(!aiNum){ setTimeout(()=>location.reload(), 6000); }
+    // No number on the account yet → this page claims one itself by calling
+    // the provision API as the signed-in owner (idempotent), then reloads.
+    if(!aiNum){ tryProvision(); }
+    else { try{ sessionStorage.removeItem('prov_tries'); }catch(_){} }
     document.getElementById('ai-number-1').textContent=disp;
     document.getElementById('ai-number-2').textContent=disp;
     document.querySelectorAll('[data-copy]').forEach(b=>b.dataset.raw=aiNum);
