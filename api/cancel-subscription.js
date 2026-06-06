@@ -71,7 +71,31 @@ export default async function handler(req, res) {
       { headers: sbHeaders() }
     );
     const rows = await loadResp.json().catch(() => []);
-    const client = Array.isArray(rows) ? rows[0] : null;
+    let client = Array.isArray(rows) ? rows[0] : null;
+
+    // Fallback: the ownership link can be stale (e.g. the original login was
+    // deleted and recreated). If the signed-in email matches the account's
+    // notification email, accept them and repair the link.
+    if (!client) {
+      const r2 = await fetch(
+        `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}&select=*&limit=1`,
+        { headers: sbHeaders() }
+      );
+      const rows2 = await r2.json().catch(() => []);
+      const cand = Array.isArray(rows2) ? rows2[0] : null;
+      const userEmail = String(user.email || '').toLowerCase();
+      if (cand && userEmail && String(cand.notify_email || '').toLowerCase() === userEmail) {
+        client = cand;
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}`, {
+            method: 'PATCH',
+            headers: sbHeaders({ Prefer: 'return=minimal' }),
+            body: JSON.stringify({ owner_user_id: user.id }),
+          });
+          console.log('[cancel-subscription] repaired stale owner link for', client.client_slug);
+        } catch (_) {}
+      }
+    }
     if (!client) return res.status(403).json({ error: 'No matching subscription for this account' });
 
     if ((client.status || '').toLowerCase() === 'cancelled') {
