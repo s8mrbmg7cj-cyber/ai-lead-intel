@@ -162,6 +162,7 @@ function renderAccounts(clients) {
         <div class="acct-cell"><div class="acct-cell-label">Started</div><div class="acct-cell-value">${prettyDate(c.paid_at || c.created_at)}</div></div>
         <div class="acct-cell"><div class="acct-cell-label">Your AI's number</div><div class="acct-cell-value mono">${isCancelled ? '—' : (prettyNumber(c.twilio_number) || 'Being assigned…')}</div></div>
         <div class="acct-cell"><div class="acct-cell-label">Billing</div><div class="acct-cell-value">${isCancelled ? 'Stopped' : 'Via PayPal · 7-day free trial, then monthly'}</div></div>
+        <div class="acct-cell" style="grid-column: 1 / -1;"><div class="acct-cell-label">Every call emailed to</div><div class="acct-cell-value">${esc(c.notify_email || '—')}</div></div>
       </div>
       <div class="acct-actions">
         ${plan === 'pro' && !isCancelled ? `<a class="btn btn-dash" href="/dashboard/${encodeURIComponent(c.client_slug)}">Open dashboard</a>` : ''}
