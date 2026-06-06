@@ -37,9 +37,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .user-pill-email { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .logout-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .logout-btn:hover { background: var(--hot-soft); color: var(--hot); border-color: var(--hot-line); }
+.nav-billing-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; transition: all 0.15s; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.nav-billing-btn:hover { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-line); }
 .support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; white-space: nowrap; flex-shrink: 0; }
 .support-pill svg { color: var(--brand); }
-@media (max-width: 720px) { .topnav { padding: 12px 14px; } .user-pill { display: none; } .support-pill span { display: none; } .logout-btn span { display: none; } }
+@media (max-width: 720px) { .topnav { padding: 12px 14px; } .user-pill { display: none; } .support-pill span { display: none; } .logout-btn span { display: none; } .nav-billing-btn span { display: none; } }
 .state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
 .state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
 .state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
@@ -207,6 +209,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="user-pill-email" id="user-pill-email"></span>
     </div>
+    <a href="/account" class="nav-billing-btn" id="billing-btn" style="display:none;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Billing</span>
+    </a>
     <button class="logout-btn" id="logout-btn" type="button" style="display:none;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       <span>Sign out</span>
@@ -634,6 +640,8 @@ async function init() {
   const userPill = document.getElementById('user-pill');
   const userEmail = document.getElementById('user-pill-email');
   const logoutBtn = document.getElementById('logout-btn');
+  const billingBtn = document.getElementById('billing-btn');
+  if (billingBtn) billingBtn.style.display = 'inline-flex';
   if (userPill && userEmail) {
     userEmail.textContent = session.user.email || '';
     userPill.style.display = 'inline-flex';
