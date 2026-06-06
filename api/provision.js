@@ -209,20 +209,20 @@ function buildAssistantPayload(client) {
     // snappy. Applies to every assistant built here.
     startSpeakingPlan: {
       // How long to wait after the caller stops before the AI speaks (default 0.4).
-      waitSeconds: 0.4,
+      waitSeconds: 0.3,
       // LiveKit = best natural end-of-turn detection for English calls.
       smartEndpointingPlan: { provider: 'livekit' },
       // Text-based fallback timings. onNoPunctuationSeconds (default 1.5) is the
       // big one — it's the long pause you hear when a caller trails off.
       transcriptionEndpointingPlan: {
         onPunctuationSeconds: 0.1,
-        onNoPunctuationSeconds: 0.6,
+        onNoPunctuationSeconds: 0.5,
         onNumberSeconds: 0.4,
       },
     },
-    // Small head-start delays kept low so the AI starts forming its reply sooner.
-    responseDelaySeconds: 0.2,
-    llmRequestDelaySeconds: 0.1,
+    // No head-start delays — the AI starts forming its reply immediately.
+    responseDelaySeconds: 0,
+    llmRequestDelaySeconds: 0,
     // Be polite if a call runs long, and end cleanly.
     endCallMessage: 'Thanks for calling. Have a great day!',
     endCallFunctionEnabled: true,
