@@ -423,6 +423,10 @@ export default async function handler(req, res) {
         vapi_phone_number_id: vapiPhoneId,
         twilio_number: claimedNumber,
         ai_setup_status: 'ready',
+        // The AI is live as of this moment — reflect that on the account so
+        // dashboards open straight into the active state, no manual flipping.
+        status: 'active',
+        active: true,
       }),
     });
     if (!saveResp.ok) {
