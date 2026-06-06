@@ -170,6 +170,9 @@ async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl)
   const secret = process.env.SUPABASE_WEBHOOK_SECRET || "";
   if (!secret) {
     console.error("[paypal-return] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision");
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but auto-provision could not run — the SUPABASE_WEBHOOK_SECRET environment variable is missing in Vercel. Add it, then set this client up manually.`
+    );
     return;
   }
   if (client.twilio_number && client.vapi_phone_number_id) {
@@ -189,12 +192,25 @@ async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl)
       }
     );
     const rows = await r.json().catch(() => []);
-    if (!r.ok || !Array.isArray(rows) || rows.length === 0) {
+    if (!r.ok) {
+      const detail = JSON.stringify(rows).slice(0, 250);
+      console.error("[paypal-return] provision lock PATCH failed:", r.status, detail);
+      await alertOwnerStarterProblem(
+        `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock failed (${r.status}: ${detail}). ` +
+        `If this mentions provision_requested_at, run this in Supabase: alter table clients add column if not exists provision_requested_at timestamptz; ` +
+        `Then set this client up manually.`
+      );
+      return;
+    }
+    if (!Array.isArray(rows) || rows.length === 0) {
       console.log("[paypal-return] provision lock not acquired (already started elsewhere) —", client.client_slug);
       return;
     }
   } catch (e) {
     console.error("[paypal-return] provision lock error:", e.message);
+    await alertOwnerStarterProblem(
+      `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock threw an error (${e.message}). Set them up manually.`
+    );
     return;
   }
 
