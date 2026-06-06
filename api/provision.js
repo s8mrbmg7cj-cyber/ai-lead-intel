@@ -371,13 +371,25 @@ export default async function handler(req, res) {
       if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
         throw new Error(`Number ${claimedNumber} is not in Vapi and Twilio credentials are missing to import it.`);
       }
-      const imported = await vapi('/phone-number', 'POST', {
-        provider: 'twilio',
-        number: claimedNumber,
-        twilioAccountSid: TWILIO_ACCOUNT_SID,
-        twilioAuthToken: TWILIO_AUTH_TOKEN,
-        assistantId,
-      });
+      let imported;
+      try {
+        imported = await vapi('/phone-number', 'POST', {
+          provider: 'twilio',
+          number: claimedNumber,
+          twilioAccountSid: TWILIO_ACCOUNT_SID,
+          twilioAuthToken: TWILIO_AUTH_TOKEN,
+          assistantId,
+        });
+      } catch (e) {
+        // The number may already be imported in Vapi without us knowing its id
+        // (e.g. the pool record was wiped). Look it up by number and reuse it.
+        console.warn('[provision] import failed, looking up existing Vapi import:', e.message);
+        const all = await vapi('/phone-number', 'GET');
+        const found = Array.isArray(all) ? all.find(p => p && p.number === claimedNumber) : null;
+        if (!found) throw e;
+        imported = found;
+        await vapi(`/phone-number/${found.id}`, 'PATCH', { assistantId });
+      }
       vapiPhoneId = imported.id;
       await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${enc(claimedNumber)}`, {
         method: 'PATCH', headers: sbHeaders(token), body: JSON.stringify({ vapi_phone_number_id: vapiPhoneId }),
