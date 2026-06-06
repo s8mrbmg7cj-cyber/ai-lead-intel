@@ -324,17 +324,35 @@ export default async function handler(req, res) {
       return;
     }
 
-    // 2) Atomically claim one free number from the pool.
-    const claimResp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/claim_phone_number`, {
-      method: 'POST', headers: sbHeaders(token), body: JSON.stringify({ p_client_id: client.id }),
-    });
-    const claimRows = await claimResp.json().catch(() => []);
-    if (!claimResp.ok) { res.status(500).json({ error: (claimRows && claimRows.message) || 'Claim failed' }); return; }
-    const claimed = Array.isArray(claimRows) ? claimRows[0] : claimRows;
-    if (!claimed || !claimed.phone_number) {
-      await notify('AI Lead Intel: phone number pool is EMPTY — a client could not be provisioned. Buy more numbers.');
-      res.status(409).json({ error: 'No phone numbers available in the pool. Add more numbers.' });
-      return;
+    // 2) Get this client a number. REUSE the one already on their row if any
+    //    (covers a half-finished earlier provision), otherwise atomically
+    //    claim a free one from the pool. This guarantees one client can never
+    //    end up holding two pool numbers.
+    let claimed = null;
+    if (client.twilio_number) {
+      const reuseResp = await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${enc(client.twilio_number)}&select=*&limit=1`, { headers: sbHeaders(token) });
+      const reuseRows = await reuseResp.json().catch(() => []);
+      if (reuseResp.ok && Array.isArray(reuseRows) && reuseRows[0]) {
+        claimed = reuseRows[0];
+        await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?id=eq.${enc(claimed.id)}`, {
+          method: 'PATCH', headers: sbHeaders(token),
+          body: JSON.stringify({ client_id: client.id, assigned_at: new Date().toISOString() }),
+        });
+        console.log('[provision] reusing existing number', claimed.phone_number);
+      }
+    }
+    if (!claimed) {
+      const claimResp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/claim_phone_number`, {
+        method: 'POST', headers: sbHeaders(token), body: JSON.stringify({ p_client_id: client.id }),
+      });
+      const claimRows = await claimResp.json().catch(() => []);
+      if (!claimResp.ok) { res.status(500).json({ error: (claimRows && claimRows.message) || 'Claim failed' }); return; }
+      claimed = Array.isArray(claimRows) ? claimRows[0] : claimRows;
+      if (!claimed || !claimed.phone_number) {
+        await notify('AI Lead Intel: phone number pool is EMPTY — a client could not be provisioned. Buy more numbers.');
+        res.status(409).json({ error: 'No phone numbers available in the pool. Add more numbers.' });
+        return;
+      }
     }
     claimedNumber = claimed.phone_number;
 
