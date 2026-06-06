@@ -127,7 +127,7 @@ export default async function handler(req, res) {
         await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${encodeURIComponent(client.twilio_number)}`, {
           method: 'PATCH',
           headers: sbHeaders({ Prefer: 'return=minimal' }),
-          body: JSON.stringify({ client_id: null, assigned_at: null }),
+          body: JSON.stringify({ client_id: null, assigned_at: null, vapi_phone_number_id: null }),
         });
       } catch (e) { console.error('[cancel-subscription] pool release error:', e.message); }
     }
