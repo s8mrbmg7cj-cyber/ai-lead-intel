@@ -227,8 +227,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <span class="user-pill-email" id="user-pill-email"></span>
     </div>
     <a href="/account" class="nav-billing-btn" id="billing-btn" style="display:none;">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      <span>Billing</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
     </a>
     <button class="logout-btn" id="logout-btn" type="button" style="display:none;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -404,8 +404,12 @@ function showState(which) {
 }
 function isClientReady(client) {
   if (!client) return false;
-  const liveStatuses = ['active', 'live', 'enabled', 'ready'];
   const status = (client.status || '').toLowerCase();
+  if (status === 'cancelled' || status === 'canceled' || status === 'suspended') return false;
+  // Reality check: a client with a live number + assistant IS active,
+  // regardless of whether the status flags were flipped.
+  if (client.twilio_number && client.vapi_assistant_id) return true;
+  const liveStatuses = ['active', 'live', 'enabled', 'ready'];
   if (client.active === true && liveStatuses.includes(status)) return true;
   return false;
 }
@@ -527,68 +531,19 @@ function renderBilling(client) {
         <div class="billing-item"><div class="billing-item-label">Account Status</div><div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div></div>
         <div class="billing-item"><div class="billing-item-label">Every Call Emailed To</div><div class="billing-item-value">${escapeHtml(client.notify_email || '—')}</div><div class="billing-item-value dim">Full summary + lead details after every call</div></div>
       </div>
-      <div class="billing-manage-text">Cancel anytime right here with the button below — or manage your payment method and billing history through <strong>PayPal</strong>.</div>
+      <div class="billing-manage-text">Update your payment method or view billing history through <strong>PayPal</strong>. To cancel or manage your subscription, open <strong>Settings</strong>.</div>
       <div class="billing-actions">
         <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-primary">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Manage Billing
         </a>
-        ${!isCancelled ? `<button type="button" class="billing-btn billing-btn-secondary" id="dash-cancel-ask">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-          Cancel Subscription
-        </button>` : ''}
+        <a href="/account" class="billing-btn billing-btn-secondary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Subscription Settings
+        </a>
       </div>
-      ${!isCancelled ? `
-      <div class="dash-confirm-box" id="dash-cancel-confirm">
-        <div class="dash-confirm-text"><strong>Cancel your subscription?</strong> Your AI receptionist stops answering immediately, your number is released, and you will not be billed again. This can't be undone.</div>
-        <div class="dash-confirm-actions">
-          <button type="button" class="billing-btn dash-btn-confirm" id="dash-cancel-yes">Yes, cancel my subscription</button>
-          <button type="button" class="billing-btn billing-btn-secondary" id="dash-cancel-keep">Keep my subscription</button>
-        </div>
-      </div>
-      <div class="dash-cancel-result" id="dash-cancel-result"></div>` : ''}
     </div>
   `;
-  // ── Real self-service cancel (same engine as /account) ──
-  const askBtn = document.getElementById('dash-cancel-ask');
-  const confirmBox = document.getElementById('dash-cancel-confirm');
-  const yesBtn = document.getElementById('dash-cancel-yes');
-  const keepBtn = document.getElementById('dash-cancel-keep');
-  const cancelResult = document.getElementById('dash-cancel-result');
-  if (askBtn && confirmBox) {
-    askBtn.addEventListener('click', () => confirmBox.classList.add('open'));
-    if (keepBtn) keepBtn.addEventListener('click', () => confirmBox.classList.remove('open'));
-    if (yesBtn) yesBtn.addEventListener('click', async () => {
-      yesBtn.disabled = true;
-      yesBtn.textContent = 'Cancelling…';
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { window.location.assign('/sign-in'); return; }
-        const r = await fetch('/api/cancel-subscription', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-          body: JSON.stringify({ client_slug: client.client_slug }),
-        });
-        const j = await r.json().catch(() => ({}));
-        if (r.ok && j.ok) {
-          client.status = 'cancelled';
-          client.payment_status = 'cancelled';
-          client.active = false;
-          renderBilling(client); // re-render: cancelled badge + inactive banner
-        } else {
-          cancelResult.className = 'dash-cancel-result err open';
-          cancelResult.textContent = (j && j.error) || 'Could not cancel. Please try again or email hello@aileadintel.com.';
-          yesBtn.disabled = false;
-          yesBtn.textContent = 'Yes, cancel my subscription';
-        }
-      } catch (e) {
-        cancelResult.className = 'dash-cancel-result err open';
-        cancelResult.textContent = 'Network error. Please try again.';
-        yesBtn.disabled = false;
-        yesBtn.textContent = 'Yes, cancel my subscription';
-      }
-    });
-  }
   const dashEl = document.getElementById('dash');
   if (dashEl) {
     if (!isActive || isCancelled) dashEl.classList.add('dashboard-disabled');
