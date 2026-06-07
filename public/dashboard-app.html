@@ -283,6 +283,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <a href="mailto:hello@aileadintel.com" class="btn btn-primary">Contact support</a>
   </div>
 </div>
+<div class="state-wrap" id="state-mismatch" style="display:none;">
+  <div class="state-icon not-found">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+  <div class="state-eyebrow not-found">Different account</div>
+  <h1 class="state-title">You're signed in as a <span class="accent">different account.</span></h1>
+  <p class="state-desc">This dashboard link belongs to another account. You're currently signed in as <strong id="mismatch-email"></strong>, which doesn't have access to it. Open your own dashboard below, or sign out and back in with the right email.</p>
+  <div class="state-actions">
+    <a href="#" class="btn btn-primary" id="mismatch-mine">Open my dashboard</a>
+    <a href="#" class="btn btn-secondary" id="mismatch-signout">Sign out &amp; switch account</a>
+  </div>
+</div>
 <div class="dash" id="dash">
   <div class="dash-head">
     <div class="dash-head-left">
@@ -395,7 +407,7 @@ function getSlugFromUrl() {
   return '';
 }
 function showState(which) {
-  ['state-loading', 'state-preparing', 'state-notfound'].forEach(id => {
+  ['state-loading', 'state-preparing', 'state-notfound', 'state-mismatch'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = (id === which) ? '' : 'none';
   });
@@ -695,13 +707,31 @@ async function init() {
       .eq('owner_user_id', session.user.id)
       .limit(1);
     if (error) console.error('[dashboard] owner fetch error:', error);
-    if (rows && rows[0]) {
-      client = rows[0];
-      if (slug && client.client_slug && slug !== client.client_slug) {
-        window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug));
-        return;
+    const own = rows && rows[0] ? rows[0] : null;
+    if (own && slug && own.client_slug && slug !== own.client_slug) {
+      // The URL points at a dashboard this login does NOT own (e.g. the
+      // browser got signed into a different account since this page was
+      // opened). NEVER silently swap to another account's data — say so.
+      const emailEl = document.getElementById('mismatch-email');
+      if (emailEl) emailEl.textContent = session.user.email || 'this account';
+      const mineBtn = document.getElementById('mismatch-mine');
+      if (mineBtn) {
+        const mine = (own.plan || '').toLowerCase() === 'starter'
+          ? '/account'
+          : '/dashboard/' + encodeURIComponent(own.client_slug);
+        mineBtn.setAttribute('href', mine);
+        if ((own.plan || '').toLowerCase() === 'starter') mineBtn.textContent = 'Open my account';
       }
+      const outBtn = document.getElementById('mismatch-signout');
+      if (outBtn) outBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await supabase.auth.signOut();
+        window.location.assign('/sign-in');
+      });
+      showState('state-mismatch');
+      return;
     }
+    if (own) client = own; // no slug in the URL → open their own dashboard
   }
 
   if (!client) {
