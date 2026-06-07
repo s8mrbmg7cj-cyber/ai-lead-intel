@@ -18,6 +18,10 @@
     { "source": "/go-live", "destination": "/go-live/index.html" },
     { "source": "/go-live/", "destination": "/go-live/index.html" },
     { "source": "/confirmation", "destination": "/confirmation.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/privacy/", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/terms/", "destination": "/terms.html" },
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
