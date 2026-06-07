@@ -216,26 +216,87 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
   }
 
   const biz = client.business_name || "your business";
-  const caller = callData.caller_number || "Unknown number";
-  const dur = callData.duration_seconds ? `${callData.duration_seconds}s` : "—";
 
-  // Plain, personal, transactional layout — no marketing styling, no emoji,
-  // single column, dark text on white. This reads as a 1:1 message to Gmail,
-  // which keeps it in the Primary tab instead of Promotions.
+  // ── Presentation-only mappings. The stored lead_score (HOT/WARM/COLD/NONE)
+  //    and all analysis logic are untouched — this just translates them for
+  //    display in the email.
+  const priorityMap = { HOT: "High", WARM: "Medium", COLD: "Low", NONE: "Low" };
+  const priority = priorityMap[leadAnalysis.score] || "Low";
+  const priorityColors = {
+    High: { bg: "#fff1e8", border: "#ff6a00", text: "#c2410c" },
+    Medium: { bg: "#fef9ec", border: "#f59e0b", text: "#92400e" },
+    Low: { bg: "#f4f4f5", border: "#d4d4d8", text: "#52525b" },
+  };
+  const pc = priorityColors[priority];
+
+  const service = prettyIndustry(client.industry);
+  const callerNumber = callData.caller_number || "Unknown number";
+  const phonePretty = prettyPhone(callerNumber);
+  const leadName = (callData.caller_name || "").trim() || phonePretty;
+  const duration = prettyDuration(callData.duration_seconds);
+  const outcome = leadAnalysis.outcome || "Call handled";
+  const emailFound = extractEmailFromTranscript(callData.transcript);
+
+  const action =
+    priority === "High"
+      ? "📞 Call back within 15 minutes — this caller showed strong buying intent."
+      : priority === "Medium"
+        ? "📞 Call back today while the inquiry is still fresh."
+        : "No urgent action needed — review when convenient.";
+
+  const row = (label, value) => `
+            <tr>
+              <td style="padding:7px 0;font-size:13px;color:#6b7280;width:150px;vertical-align:top;">${label}</td>
+              <td style="padding:7px 0;font-size:14px;color:#111827;font-weight:600;">${value}</td>
+            </tr>`;
+
   const html = `
-    <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1a1a1a;max-width:560px;">
-      <p>You got a new call at <strong>${escapeHtml(biz)}</strong>.</p>
-      <p style="margin:0 0 4px;">Caller: <strong>${escapeHtml(caller)}</strong><br/>
-      Lead: <strong>${escapeHtml(leadAnalysis.score)}</strong><br/>
-      Outcome: ${escapeHtml(leadAnalysis.outcome || "—")}<br/>
-      Length: ${escapeHtml(dur)}</p>
-      ${callData.summary ? `<p style="margin:16px 0 4px;"><strong>Summary</strong><br/>${escapeHtml(callData.summary)}</p>` : ""}
-      ${callData.transcript ? `<p style="margin:16px 0 4px;"><strong>Transcript</strong></p><div style="white-space:pre-wrap;color:#444;border-left:3px solid #ddd;padding-left:12px;">${escapeHtml(callData.transcript)}</div>` : ""}
-      <p style="margin-top:20px;color:#666;font-size:13px;">— AI Lead Intel</p>
+  <div style="background:#f6f7f9;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+    <div style="max-width:600px;margin:0 auto;">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;">
+        <div style="padding:20px 24px;border-bottom:1px solid #f0f0f2;">
+          <div style="font-size:18px;font-weight:700;color:#111827;">🚨 New Lead Captured</div>
+          <div style="font-size:13px;color:#6b7280;margin-top:2px;">${escapeHtml(biz)} · answered by your AI receptionist</div>
+        </div>
+        <div style="padding:20px 24px;">
+          <span style="display:inline-block;background:${pc.bg};border:1px solid ${pc.border};color:${pc.text};font-size:12px;font-weight:700;letter-spacing:0.04em;padding:5px 12px;border-radius:999px;">PRIORITY: ${priority.toUpperCase()}</span>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:14px;border-collapse:collapse;">
+            ${row("Service Requested", escapeHtml(service))}
+            ${row("Name", escapeHtml(leadName))}
+            ${row("Phone", `<a href="tel:${escapeHtml(callerNumber)}" style="color:#c2410c;text-decoration:none;">${escapeHtml(phonePretty)}</a>`)}
+            ${emailFound ? row("Email", escapeHtml(emailFound)) : ""}
+            ${row("Call Duration", escapeHtml(duration))}
+            ${row("Outcome", escapeHtml(outcome))}
+          </table>
+          <div style="margin-top:16px;background:#fff8f3;border:1px solid #ffd9bd;border-radius:10px;padding:12px 16px;font-size:14px;color:#111827;">
+            <strong>Recommended action:</strong> ${escapeHtml(action)}
+          </div>
+        </div>
+      </div>
+      ${callData.summary ? `
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;margin-top:14px;padding:20px 24px;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:8px;">Conversation Summary</div>
+        <div style="font-size:14px;line-height:1.65;color:#374151;">${escapeHtml(callData.summary)}</div>
+      </div>` : ""}
+      ${callData.transcript ? `
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;margin-top:14px;padding:20px 24px;">
+        <details>
+          <summary style="font-size:14px;font-weight:700;color:#111827;cursor:pointer;">Full Transcript</summary>
+          <div style="white-space:pre-wrap;font-size:13px;line-height:1.6;color:#4b5563;border-left:3px solid #e5e7eb;padding-left:12px;margin-top:12px;">${escapeHtml(callData.transcript)}</div>
+        </details>
+      </div>` : ""}
+      <div style="text-align:center;font-size:12px;color:#9ca3af;margin-top:18px;">AI Lead Intel · every call answered, every lead captured</div>
     </div>
-  `;
+  </div>`;
 
-  const callerShort = caller && caller !== "Unknown number" ? caller : "new caller";
+  // Subject mirrors the lead's importance — the 🔥 is reserved for genuine
+  // buying intent so it never cries wolf on spam or hang-ups.
+  const subject =
+    priority === "High"
+      ? `🔥 New ${service} Lead - ${leadName}`
+      : priority === "Medium"
+        ? `New ${service} Lead - ${leadName}`
+        : `Call handled - ${leadName} — ${biz}`;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -247,7 +308,7 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
       from: `${biz} via AI Lead Intel <hello@aileadintel.com>`,
       to: [client.notify_email],
       replyTo: "hello@aileadintel.com",
-      subject: `New call from ${callerShort} — ${biz}`,
+      subject,
       html,
     }),
   });
@@ -259,6 +320,33 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
   } else {
     console.log("CLIENT EMAIL SENT");
   }
+}
+
+// ── Email presentation helpers (display formatting only) ──
+
+function prettyIndustry(industry) {
+  const s = String(industry || "").replace(/[_-]+/g, " ").trim();
+  if (!s) return "Customer";
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function prettyPhone(num) {
+  const d = String(num || "").replace(/[^\d]/g, "").replace(/^1/, "");
+  if (d.length === 10) return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+  return String(num || "Unknown");
+}
+
+function prettyDuration(seconds) {
+  const s = Math.max(0, Math.round(seconds || 0));
+  if (!s) return "—";
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return m ? `${m}m ${r}s` : `${r}s`;
+}
+
+function extractEmailFromTranscript(transcript) {
+  const m = String(transcript || "").match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+  return m ? m[0] : null;
 }
 
 // ─────────────────────────────────────────────
@@ -273,7 +361,7 @@ async function sendPushNotification({ client, callData }) {
     await fetch(`https://ntfy.sh/${topic}`, {
       method: "POST",
       headers: {
-        Title: `🔥 HOT LEAD - ${client.business_name}`,
+        Title: `🔥 High-Priority Lead - ${client.business_name}`,
         Priority: "high",
         Tags: "fire,phone",
       },
