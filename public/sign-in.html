@@ -33,7 +33,6 @@ input { font-family: inherit; outline: none; }
 .logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
 .support-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 99px; font-size: 12px; color: var(--text-dim); font-weight: 500; }
 @media (max-width: 720px) { .topnav { padding: 12px 16px; } }
-
 .wrap { position: relative; z-index: 1; max-width: 460px; margin: 0 auto; padding: 64px 24px 80px; }
 .hero { text-align: center; margin-bottom: 28px; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 6px 14px; border-radius: 99px; font-weight: 600; margin-bottom: 18px; }
@@ -42,10 +41,8 @@ input { font-family: inherit; outline: none; }
 .hero-title { font-size: clamp(28px, 4vw, 36px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 12px; }
 .hero-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .hero-sub { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; max-width: 360px; margin: 0 auto; }
-
 .card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 18px; padding: 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.45); position: relative; overflow: hidden; }
 .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
-
 .field { margin-bottom: 14px; }
 .field:last-of-type { margin-bottom: 20px; }
 .float-wrap { position: relative; }
@@ -55,31 +52,25 @@ input { font-family: inherit; outline: none; }
 .float-label { position: absolute; left: 16px; top: 18px; font-size: 14px; color: var(--text-faint); pointer-events: none; transition: all 0.18s cubic-bezier(0.16,1,0.3,1); font-weight: 500; }
 .float-input:focus ~ .float-label, .float-input:not(:placeholder-shown) ~ .float-label, .float-input:-webkit-autofill ~ .float-label { top: 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
 .float-input:-webkit-autofill { -webkit-text-fill-color: var(--text) !important; -webkit-box-shadow: 0 0 0 1000px var(--surface-input) inset !important; caret-color: var(--text); }
-
 .forgot-row { display: flex; justify-content: flex-end; margin: -6px 0 16px; }
 .forgot-link { font-size: 12.5px; color: var(--text-dim); transition: color 0.15s; cursor: pointer; background: none; border: none; padding: 4px; font-family: inherit; }
 .forgot-link:hover { color: var(--brand); }
-
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 20px; border-radius: 11px; font-size: 14px; font-weight: 600; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); border: 1px solid transparent; cursor: pointer; min-height: 46px; }
 .btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 26px var(--brand-glow); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .form-msg { display: none; align-items: center; gap: 9px; padding: 11px 14px; border-radius: 11px; font-size: 13px; font-weight: 500; margin-bottom: 16px; line-height: 1.4; }
 .form-msg.visible { display: flex; }
 .form-msg svg { flex-shrink: 0; }
 .form-msg.error { background: var(--hot-soft); border: 1px solid var(--hot-line); color: var(--hot); }
 .form-msg.success { background: var(--green-soft); border: 1px solid var(--green-line); color: var(--green); }
 .form-msg.info { background: var(--brand-tint); border: 1px solid var(--brand-line); color: var(--brand); }
-
 .help-line { font-size: 12px; color: var(--text-faint); text-align: center; margin-top: 14px; line-height: 1.55; }
 .help-line a { color: var(--brand); font-weight: 500; }
-
 .bottom-link { text-align: center; margin-top: 22px; font-size: 13px; color: var(--text-faint); }
 .bottom-link a { color: var(--brand); font-weight: 500; }
-
 .forgot-card { display: none; }
 .forgot-card.visible { display: block; }
 .signin-card.hidden { display: none; }
@@ -90,77 +81,63 @@ input { font-family: inherit; outline: none; }
   <a href="/" class="logo"><div class="logo-mark"></div><span>AI Lead Intel</span></a>
   <a href="mailto:hello@aileadintel.com" class="support-pill">Support</a>
 </nav>
-
 <div class="wrap">
   <header class="hero">
     <div class="hero-eyebrow"><span class="dot"></span>Account access</div>
     <h1 class="hero-title">Sign in to your <span class="accent">dashboard</span></h1>
     <p class="hero-sub">Use the email and password you set up after payment.</p>
   </header>
-
   <!-- SIGN IN CARD -->
   <div class="card signin-card" id="signin-card">
     <div class="form-msg" id="signin-msg">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="signin-msg-text"></span>
     </div>
-
     <div class="field">
       <div class="float-wrap">
         <input type="email" id="signin-email" class="float-input" placeholder=" " autocomplete="email" />
         <label class="float-label" for="signin-email">Email</label>
       </div>
     </div>
-
     <div class="field">
       <div class="float-wrap">
         <input type="password" id="signin-password" class="float-input" placeholder=" " autocomplete="current-password" />
         <label class="float-label" for="signin-password">Password</label>
       </div>
     </div>
-
     <div class="forgot-row">
       <button class="forgot-link" type="button" id="show-forgot">Forgot password?</button>
     </div>
-
     <button class="btn btn-primary" id="signin-btn" type="button">
       <span id="signin-label">Sign in</span>
     </button>
-
     <div class="help-line">Just paid and need to set up? <a href="/create-password">Create your password</a></div>
   </div>
-
   <!-- FORGOT PASSWORD CARD -->
   <div class="card forgot-card" id="forgot-card">
     <div class="form-msg" id="forgot-msg">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="forgot-msg-text"></span>
     </div>
-
     <div class="field">
       <div class="float-wrap">
         <input type="email" id="forgot-email" class="float-input" placeholder=" " autocomplete="email" />
         <label class="float-label" for="forgot-email">Your email</label>
       </div>
     </div>
-
     <button class="btn btn-primary" id="forgot-btn" type="button">
       <span id="forgot-label">Send reset link</span>
     </button>
-
     <div class="help-line">We'll email you a link to set a new password.</div>
     <div class="bottom-link"><button class="forgot-link" type="button" id="back-to-signin" style="color:var(--brand);">← Back to sign in</button></div>
   </div>
-
   <div class="bottom-link"><a href="/">← Back to homepage</a></div>
 </div>
-
 <script>
 'use strict';
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 // Prefill email from URL params
 const urlParams = new URLSearchParams(window.location.search);
 const prefillEmail = (urlParams.get('email') || '').trim();
@@ -169,7 +146,6 @@ if (prefillEmail) document.getElementById('signin-email').value = prefillEmail;
 if (justCreated) {
   showMsg('signin-msg', 'info', 'Account created. Sign in with the password you just set.');
 }
-
 // If already signed in, route them appropriately
 (async function checkExistingSession() {
   const { data } = await supabase.auth.getSession();
@@ -178,7 +154,6 @@ if (justCreated) {
     await routeUserAfterSignIn();
   }
 })();
-
 function showMsg(id, type, text) {
   const el = document.getElementById(id);
   const txt = document.getElementById(id + '-text');
@@ -187,7 +162,6 @@ function showMsg(id, type, text) {
   txt.textContent = text;
 }
 function hideMsg(id) { document.getElementById(id).classList.remove('visible'); }
-
 async function lookupClientForCurrentUser() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return null;
@@ -202,7 +176,6 @@ async function lookupClientForCurrentUser() {
   }
   return rows && rows[0] ? rows[0] : null;
 }
-
 async function routeUserAfterSignIn() {
   const client = await lookupClientForCurrentUser();
   if (!client || !client.client_slug) {
@@ -210,13 +183,11 @@ async function routeUserAfterSignIn() {
     return;
   }
   const plan = (client.plan || '').toLowerCase();
-
-  // Option A — Starter users always go to /confirmation, no dashboard
+  // Starter users manage everything from their Settings/account page.
   if (plan === 'starter') {
-    window.location.assign('/confirmation');
+    window.location.assign('/account');
     return;
   }
-
   // Pro — gate on setup_complete
   if (client.setup_complete !== true) {
     window.location.assign('/setup');
@@ -224,26 +195,20 @@ async function routeUserAfterSignIn() {
   }
   window.location.assign('/dashboard/' + encodeURIComponent(client.client_slug));
 }
-
 // SIGN IN
 const signinBtn = document.getElementById('signin-btn');
 const signinLabel = document.getElementById('signin-label');
 let signinBusy = false;
-
 signinBtn.addEventListener('click', async () => {
   if (signinBusy) return;
   hideMsg('signin-msg');
-
   const email = document.getElementById('signin-email').value.trim().toLowerCase();
   const password = document.getElementById('signin-password').value;
-
   if (!email || !email.includes('@')) { showMsg('signin-msg', 'error', 'Please enter a valid email.'); return; }
   if (!password) { showMsg('signin-msg', 'error', 'Please enter your password.'); return; }
-
   signinBusy = true;
   signinBtn.disabled = true;
   signinLabel.innerHTML = '<span class="spinner"></span>';
-
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
@@ -258,7 +223,6 @@ signinBtn.addEventListener('click', async () => {
       signinLabel.textContent = 'Sign in';
       return;
     }
-
     showMsg('signin-msg', 'success', 'Signed in — opening your account…');
     setTimeout(routeUserAfterSignIn, 500);
   } catch (err) {
@@ -269,18 +233,15 @@ signinBtn.addEventListener('click', async () => {
     signinLabel.textContent = 'Sign in';
   }
 });
-
 // Submit on Enter
 document.querySelectorAll('#signin-card .float-input').forEach(input => {
   input.addEventListener('keydown', e => { if (e.key === 'Enter') signinBtn.click(); });
 });
-
 // FORGOT PASSWORD
 const showForgotBtn = document.getElementById('show-forgot');
 const backToSigninBtn = document.getElementById('back-to-signin');
 const signinCard = document.getElementById('signin-card');
 const forgotCard = document.getElementById('forgot-card');
-
 showForgotBtn.addEventListener('click', () => {
   signinCard.classList.add('hidden');
   forgotCard.classList.add('visible');
@@ -292,29 +253,24 @@ backToSigninBtn.addEventListener('click', () => {
   forgotCard.classList.remove('visible');
   signinCard.classList.remove('hidden');
 });
-
 const forgotBtn = document.getElementById('forgot-btn');
 const forgotLabel = document.getElementById('forgot-label');
 let forgotBusy = false;
-
 forgotBtn.addEventListener('click', async () => {
   if (forgotBusy) return;
   hideMsg('forgot-msg');
-
   const email = document.getElementById('forgot-email').value.trim().toLowerCase();
   if (!email || !email.includes('@')) { showMsg('forgot-msg', 'error', 'Please enter a valid email.'); return; }
-
   forgotBusy = true;
   forgotBtn.disabled = true;
   forgotLabel.innerHTML = '<span class="spinner"></span>';
-
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/sign-in?reset=1',
+    // Sends the reset email from hello@aileadintel.com (our own flow), not Supabase.
+    await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     });
-    if (error) {
-      console.error('[forgot] error:', error.message);
-    }
     // Always show success (don't leak which emails exist)
     showMsg('forgot-msg', 'success', 'If an account exists for that email, a reset link is on its way.');
     setTimeout(() => {
@@ -330,7 +286,6 @@ forgotBtn.addEventListener('click', async () => {
     forgotLabel.textContent = 'Send reset link';
   }
 });
-
 document.querySelectorAll('#forgot-card .float-input').forEach(input => {
   input.addEventListener('keydown', e => { if (e.key === 'Enter') forgotBtn.click(); });
 });
