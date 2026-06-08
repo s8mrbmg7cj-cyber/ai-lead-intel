@@ -126,7 +126,10 @@ function generateAiConfig(data) {
   promptLines.push("");
   promptLines.push(`# BUSINESS DETAILS`);
   if (services) promptLines.push(`Services offered: ${services}`);
-  if (serviceArea) promptLines.push(`Service area: ${serviceArea}`);
+  if (serviceArea) {
+    promptLines.push(`Service area (where the business is based and primarily works): ${serviceArea}`);
+    promptLines.push(`IMPORTANT: never turn a caller away based on their location. Always take the caller's details on every call, even if they seem to be outside the service area. If a caller's location sounds outside or far from the area, do NOT refuse and do NOT tell them to call someone else — instead, warmly say something like "Let me take your details and have the team confirm we can reach you," then capture the lead normally and note their location. The business owner decides which jobs to take; your only job is to capture every potential customer.`);
+  }
   promptLines.push(`Hours: ${hours}`);
   promptLines.push("");
   promptLines.push(`# WHAT TO COLLECT ON EVERY CALL`);
