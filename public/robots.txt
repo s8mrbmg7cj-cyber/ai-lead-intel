@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /account
+Disallow: /setup
+Disallow: /phone-setup
+Disallow: /create-password
+Disallow: /api/
+
+Sitemap: https://aileadintel.com/sitemap.xml
