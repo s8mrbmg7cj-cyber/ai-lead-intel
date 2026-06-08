@@ -126,7 +126,11 @@ export default async function handler(req, res) {
     // SEND CLIENT EMAIL
     // ─────────────────────────────────────────────
 
-    await sendClientEmail({ client, callData, leadAnalysis });
+    // Vapi's structured extraction (name, callback number, service, etc.) —
+    // kept separate from callData so the DB insert is unaffected.
+    const structured = (message.analysis && message.analysis.structuredData) || {};
+
+    await sendClientEmail({ client, callData, leadAnalysis, structured });
 
     // ─────────────────────────────────────────────
     // HOT LEAD ALERT
@@ -208,7 +212,7 @@ async function saveToSupabase(callData) {
 // EMAIL CLIENT
 // ─────────────────────────────────────────────
 
-async function sendClientEmail({ client, callData, leadAnalysis }) {
+async function sendClientEmail({ client, callData, leadAnalysis, structured = {} }) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
     console.log("NO RESEND KEY");
@@ -229,13 +233,18 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
   };
   const pc = priorityColors[priority];
 
-  const service = prettyIndustry(client.industry);
-  const callerNumber = callData.caller_number || "Unknown number";
-  const phonePretty = prettyPhone(callerNumber);
-  const leadName = (callData.caller_name || "").trim() || phonePretty;
+  // Prefer what the caller actually SAID (Vapi's structured extraction) over
+  // raw call metadata. The caller ID is only a last resort for the phone.
+  const callerId = callData.caller_number || "";
+  const callbackRaw = (structured.callback_number || "").trim();
+  const bestNumber = callbackRaw || callerId || "Unknown number";
+  const phonePretty = prettyPhone(bestNumber);
+  const leadName = (structured.caller_name || callData.caller_name || "").trim() || phonePretty;
+  const service = (structured.service_requested || "").trim() || prettyIndustry(client.industry);
+  const address = (structured.address || "").trim();
+  const emailFound = (structured.email || "").trim() || extractEmailFromTranscript(callData.transcript);
   const duration = prettyDuration(callData.duration_seconds);
   const outcome = leadAnalysis.outcome || "Call handled";
-  const emailFound = extractEmailFromTranscript(callData.transcript);
 
   const action =
     priority === "High"
@@ -263,8 +272,9 @@ async function sendClientEmail({ client, callData, leadAnalysis }) {
           <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:14px;border-collapse:collapse;">
             ${row("Service Requested", escapeHtml(service))}
             ${row("Name", escapeHtml(leadName))}
-            ${row("Phone", `<a href="tel:${escapeHtml(callerNumber)}" style="color:#c2410c;text-decoration:none;">${escapeHtml(phonePretty)}</a>`)}
+            ${row("Phone", `<a href="tel:${escapeHtml(bestNumber)}" style="color:#c2410c;text-decoration:none;">${escapeHtml(phonePretty)}</a>`)}
             ${emailFound ? row("Email", escapeHtml(emailFound)) : ""}
+            ${address ? row("Address", escapeHtml(address)) : ""}
             ${row("Call Duration", escapeHtml(duration))}
             ${row("Outcome", escapeHtml(outcome))}
           </table>
