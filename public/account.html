@@ -152,6 +152,10 @@ function renderAccounts(clients) {
     root.innerHTML = `<div class="empty">No subscriptions found for this login.<br><br><a href="/#pricing">See plans →</a></div>`;
     return;
   }
+  // Active subscriptions first, cancelled ones sink to the bottom — so
+  // managing or cancelling one never appears to jump to an old account.
+  const isDead = (c) => ['cancelled', 'canceled'].includes((c.status || '').toLowerCase());
+  clients = [...clients].sort((a, b) => (isDead(a) ? 1 : 0) - (isDead(b) ? 1 : 0));
   root.innerHTML = clients.map((c, i) => {
     const st = statusInfo(c);
     const isCancelled = st.cls === 'cancelled';
