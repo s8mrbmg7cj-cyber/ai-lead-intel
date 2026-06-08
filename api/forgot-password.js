@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         type: "recovery",
         email,
-        options: { redirect_to: `${SITE}/reset-password` },
+        redirect_to: `${SITE}/reset-password`,
       }),
     });
 
