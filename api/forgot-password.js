@@ -61,6 +61,9 @@ export default async function handler(req, res) {
     }
 
     // 2) Email the link ourselves, from hello@aileadintel.com.
+    const requestedAt = new Date().toLocaleString("en-US", {
+      timeZone: "America/Denver", dateStyle: "medium", timeStyle: "short",
+    });
     const html = `
     <div style="background:#f6f7f9;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
       <div style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:32px 28px;">
@@ -73,9 +76,21 @@ export default async function handler(req, res) {
         <div style="font-size:13px;line-height:1.6;color:#9ca3af;margin-top:24px;">
           If you didn't request this, you can safely ignore this email — your password won't change.
         </div>
-        <div style="font-size:12px;color:#c0c0c6;margin-top:22px;border-top:1px solid #f0f0f2;padding-top:16px;">AI Lead Intel · every call answered, every lead captured</div>
+        <div style="font-size:12px;color:#c0c0c6;margin-top:22px;border-top:1px solid #f0f0f2;padding-top:16px;">AI Lead Intel · every call answered, every lead captured · Requested ${requestedAt} MT</div>
       </div>
     </div>`;
+
+    const text = [
+      "Reset your AI Lead Intel password",
+      "",
+      "We got a request to reset the password for your account. Open the link below to choose a new password. It expires shortly and can only be used once.",
+      "",
+      actionLink,
+      "",
+      "If you didn't request this, you can ignore this email — your password won't change.",
+      "",
+      `Requested ${requestedAt} MT`,
+    ].join("\n");
 
     await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -89,6 +104,7 @@ export default async function handler(req, res) {
         replyTo: "hello@aileadintel.com",
         subject: "Reset your AI Lead Intel password",
         html,
+        text,
       }),
     });
 
