@@ -146,6 +146,16 @@ export default async function handler(req, res) {
       if (client.vapi_assistant_id) await vapiDel(`/assistant/${client.vapi_assistant_id}`);
     }
 
+    // Free ANY pool number still credited to this client — keyed on client_id,
+    // the pool's source of truth, so it works even if the client row's
+    // twilio_number was already cleared.
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?client_id=eq.${encodeURIComponent(client.id)}`, {
+        method: 'PATCH',
+        headers: sbHeaders({ Prefer: 'return=minimal' }),
+        body: JSON.stringify({ client_id: null, assigned_at: null, vapi_phone_number_id: null }),
+      });
+    } catch (e) { console.error('[cancel-subscription] pool release (by client_id) error:', e.message); }
     if (client.twilio_number) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?phone_number=eq.${encodeURIComponent(client.twilio_number)}`, {
@@ -153,7 +163,7 @@ export default async function handler(req, res) {
           headers: sbHeaders({ Prefer: 'return=minimal' }),
           body: JSON.stringify({ client_id: null, assigned_at: null, vapi_phone_number_id: null }),
         });
-      } catch (e) { console.error('[cancel-subscription] pool release error:', e.message); }
+      } catch (e) { console.error('[cancel-subscription] pool release (by number) error:', e.message); }
     }
 
     await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}`, {
@@ -171,13 +181,58 @@ export default async function handler(req, res) {
       }),
     });
 
-    // ── 4) Tell the owner ──
+    // ── 4) Tell the owner, and email the customer how to turn off forwarding ──
     await alertOwnerCancelled(client);
+    await sendCancelEmailToCustomer(client);
 
     return res.status(200).json({ ok: true, cancelled: true, paypal: paypalResult });
   } catch (err) {
     console.error('[cancel-subscription] ERROR:', err.message);
     return res.status(500).json({ error: 'Something went wrong. Please try again or email hello@aileadintel.com.' });
+  }
+}
+
+async function sendCancelEmailToCustomer(client) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  if (!RESEND_API_KEY || !client.notify_email) return;
+  const biz = client.business_name || "your business";
+  const html = `
+  <div style="background:#f6f7f9;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+    <div style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:32px 28px;">
+      <div style="width:34px;height:34px;border-radius:9px;background:#ff6a00;margin-bottom:20px;"></div>
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-bottom:10px;">Your subscription is cancelled</div>
+      <div style="font-size:14px;line-height:1.65;color:#4b5563;margin-bottom:18px;">
+        Your AI Lead Intel subscription for ${biz} has been cancelled and you won't be billed again. Your AI receptionist has stopped answering and its phone number has been released.
+      </div>
+      <div style="background:#fff8f3;border:1px solid #ffd9bd;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.6;color:#111827;margin-bottom:18px;">
+        <strong>Important — if you forwarded your business line to the AI:</strong> turn that forwarding OFF now, or calls to your business number will stop going through. Dial the code for your carrier from your business phone:
+        <div style="margin-top:10px;font-size:13.5px;color:#4b5563;">
+          • Verizon, US Cellular &amp; most landlines: <strong>*73</strong><br/>
+          • AT&amp;T: <strong>#21#</strong><br/>
+          • T-Mobile, Metro, Mint: <strong>##21#</strong><br/>
+          • Internet / VoIP phones: turn off call forwarding in your provider's app or settings
+        </div>
+      </div>
+      <div style="font-size:13.5px;line-height:1.6;color:#4b5563;">
+        Changed your mind? You're welcome back anytime at <a href="https://aileadintel.com" style="color:#c2410c;text-decoration:none;">aileadintel.com</a>. Questions? Just reply to this email.
+      </div>
+      <div style="font-size:12px;color:#c0c0c6;margin-top:22px;border-top:1px solid #f0f0f2;padding-top:16px;">AI Lead Intel</div>
+    </div>
+  </div>`;
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "AI Lead Intel <hello@aileadintel.com>",
+        to: [client.notify_email],
+        replyTo: "hello@aileadintel.com",
+        subject: "Your AI Lead Intel subscription is cancelled",
+        html,
+      }),
+    });
+  } catch (e) {
+    console.error("[cancel-subscription] customer email error:", e.message);
   }
 }
 
