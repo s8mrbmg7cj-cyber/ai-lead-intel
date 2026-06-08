@@ -314,6 +314,23 @@ export default async function handler(req, res) {
     const client = Array.isArray(loadRows) ? loadRows[0] : null;
     if (!client) { res.status(403).json({ error: 'No matching client for this account' }); return; }
 
+    // Payment gate: a signed-in user can only provision a number for an account
+    // that has actually paid. (The internal post-payment path is already trusted,
+    // so it skips this.) This stops anyone from pulling a number by visiting
+    // /phone-setup without completing checkout.
+    if (!isInternal) {
+      const status = (client.status || '').toLowerCase();
+      const payStatus = (client.payment_status || '').toLowerCase();
+      const paid =
+        client.active === true ||
+        ['active', 'live', 'ready', 'paid', 'enabled', 'trialing'].includes(status) ||
+        ['paid', 'active', 'trialing', 'completed'].includes(payStatus);
+      if (!paid) {
+        res.status(402).json({ error: 'This account does not have an active subscription yet.' });
+        return;
+      }
+    }
+
     // 1) Build the full assistant config and create OR update it.
     //    IMPORTANT: we do this for EVERY provision call, even when the client
     //    already has a number — that's how existing assistants get the webhook
