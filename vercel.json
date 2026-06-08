@@ -24,6 +24,8 @@
     { "source": "/terms/", "destination": "/terms.html" },
     { "source": "/reset-password", "destination": "/reset-password.html" },
     { "source": "/reset-password/", "destination": "/reset-password.html" },
+    { "source": "/forgot-password", "destination": "/forgot-password.html" },
+    { "source": "/forgot-password/", "destination": "/forgot-password.html" },
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
