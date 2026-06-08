@@ -151,7 +151,7 @@ function buildBasicPrompt(c) {
   const L = [];
   L.push(`You are the AI receptionist for ${c.business_name || 'this business'}, a ${c.business_type || 'local service'} company.`);
   if (c.ai_personality) L.push(`Your tone is ${c.ai_personality}.`);
-  if (c.service_area) L.push(`Service area: ${c.service_area}.`);
+  if (c.service_area) L.push(`Service area (where the business primarily works): ${c.service_area}. Never turn a caller away based on location — always take their details even if they seem outside this area, say the team will confirm they can help, and note the location. The owner decides which jobs to take.`);
   if (c.business_hours) L.push(`Business hours: ${c.business_hours}.`);
   if (c.services_offered) L.push(`Services and any pricing you may quote: ${c.services_offered}.`);
   if (c.transfer_destination) L.push(`Offer to transfer the caller to a human when: ${c.transfer_destination}.`);
@@ -203,6 +203,25 @@ function buildAssistantPayload(client) {
       ? { url: CALL_WEBHOOK_URL, secret: VAPI_WEBHOOK_SECRET }
       : { url: CALL_WEBHOOK_URL },
     serverMessages: ['end-of-call-report'],
+    // Ask Vapi to extract the key lead details from the conversation so the
+    // summary email shows what the caller SAID (their name, the callback
+    // number they gave) — not just raw caller-ID metadata.
+    analysisPlan: {
+      structuredDataPlan: {
+        enabled: true,
+        schema: {
+          type: 'object',
+          properties: {
+            caller_name: { type: 'string', description: "The caller's full name exactly as they said it. Empty string if they never gave a name." },
+            callback_number: { type: 'string', description: 'The best callback phone number the caller stated during the call (digits only, US 10-digit). Empty string if they did not give one.' },
+            email: { type: 'string', description: 'Email address the caller provided, or empty string.' },
+            service_requested: { type: 'string', description: 'The specific service or reason for the call in a few words, e.g. "Toilet installation".' },
+            address: { type: 'string', description: 'The service address or location the caller gave, or empty string.' },
+            urgency: { type: 'string', description: 'How urgent the request is: one of emergency, soon, flexible, or unknown.' },
+          },
+        },
+      },
+    },
     // ── Latency: make the AI respond faster ──
     // The default endpointing waits up to 1.5s after the caller stops talking
     // before the AI even begins. These settings cut that down so replies feel
