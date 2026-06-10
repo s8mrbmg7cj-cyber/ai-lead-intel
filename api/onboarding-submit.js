@@ -314,12 +314,36 @@ export default async function handler(req, res) {
     }
     const clientRow = clientResult.row;
 
+    // ── Trial-abuse guard ──────────────────────────────────────────────
+    // If this email has signed up before, they don't get the free trial again
+    // (they're routed to the no-trial plan). One exception: the owner's test
+    // email always gets the trial so testing isn't blocked.
+    const EXCEPTION_EMAILS = ['ay5570037@gmail.com'];
+    let noTrial = false;
+    try {
+      const em = (clientRow.notify_email || '').trim().toLowerCase();
+      if (em && !EXCEPTION_EMAILS.includes(em)) {
+        const priorRes = await fetch(
+          `${supabaseUrl}/rest/v1/clients?notify_email=ilike.${encodeURIComponent(em)}&id=neq.${clientRow.id}&select=id`,
+          { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+        );
+        const prior = await priorRes.json().catch(() => []);
+        if (Array.isArray(prior) && prior.length > 0) {
+          noTrial = true;
+          console.log(`[onboarding] repeat email ${em} — no free trial (${prior.length} prior account(s))`);
+        }
+      }
+    } catch (e) {
+      console.error('[onboarding] trial-history check failed (defaulting to trial):', e.message);
+    }
+
     // ── Create the PayPal subscription via the REST API ──
     // Stamps custom_id = client_slug onto the subscription so the webhook can
     // always match the payment to this client, and captures the subscription id.
     const sub = await createSubscriptionRedirect({
       plan: clientRow.plan || data.plan,
       clientSlug: clientRow.client_slug,
+      noTrial,
       returnUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}`,
       cancelUrl: `https://aileadintel.com/onboarding.html?canceled=1`,
     });
