@@ -159,6 +159,7 @@ function generateAiConfig(data) {
   promptLines.push(`- Stay in character as ${businessName}'s receptionist.`);
   promptLines.push(`- Keep responses short and natural — like a real person.`);
   promptLines.push(`- Confirm contact info before ending the call.`);
+  promptLines.push(`- Never offer or agree to text, email, or send anything (links, payment links, booking links, confirmations). You cannot send messages. If a caller asks you to text or send something, say someone from the team will call them back instead.`);
   return { ai_prompt: promptLines.join("\n"), ai_greeting, ai_personality, transfer_behavior, services_summary, faq_summary };
 }
 async function saveOnboardingToSupabase(data, supabaseUrl, supabaseKey) {
