@@ -397,6 +397,17 @@ export default async function handler(req, res) {
       }
     }
     if (!claimed) {
+      // SAFETY (prevents double-allocation): if this client already owns a pool
+      // number — e.g. a previous attempt claimed one but failed before writing it
+      // to the client row — REUSE that one instead of claiming a second number.
+      const ownedResp = await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?client_id=eq.${enc(client.id)}&select=*&limit=1`, { headers: sbHeaders(token) });
+      const ownedRows = await ownedResp.json().catch(() => []);
+      if (ownedResp.ok && Array.isArray(ownedRows) && ownedRows[0] && ownedRows[0].phone_number) {
+        claimed = ownedRows[0];
+        console.log('[provision] client already owns pool number', claimed.phone_number, '— reusing, not claiming another.');
+      }
+    }
+    if (!claimed) {
       const claimResp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/claim_phone_number`, {
         method: 'POST', headers: sbHeaders(token), body: JSON.stringify({ p_client_id: client.id }),
       });
@@ -410,6 +421,16 @@ export default async function handler(req, res) {
       }
     }
     claimedNumber = claimed.phone_number;
+
+    // INVARIANT: one client holds at most ONE pool number. If this client somehow
+    // has extra pool rows assigned (from a duplicate/interrupted attempt), release
+    // them back to the pool now — keep only the number we're actually using.
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/phone_pool?client_id=eq.${enc(client.id)}&phone_number=neq.${enc(claimedNumber)}`, {
+        method: 'PATCH', headers: sbHeaders(token),
+        body: JSON.stringify({ client_id: null, assigned_at: null, vapi_phone_number_id: null }),
+      });
+    } catch (e) { console.error('[provision] extra-number sweep failed:', e.message); }
 
     // 3) Attach the assistant to that number (import from Twilio first if needed).
     let vapiPhoneId = claimed.vapi_phone_number_id;
