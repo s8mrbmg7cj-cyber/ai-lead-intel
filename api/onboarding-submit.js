@@ -1,4 +1,5 @@
 // api/onboarding-submit.js
+import crypto from "crypto";
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
 import { createSubscriptionRedirect } from '../lib/paypal-redirect.js';
@@ -227,7 +228,12 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     const row = rows[0]; if (!row) throw new Error("Update returned no row");
     return { row, existing: true };
   }
-  const insertPayload = { ...baseFields, phone_number: phoneNumber, active: true, payment_required: true, payment_pending: true, payment_status: "unpaid" };
+  // Private per-client push channel: a long random suffix makes the ntfy topic
+  // effectively unguessable, so one client can't receive another's leads.
+  // Generated once, only on first insert — never rotated on re-submit, or a
+  // customer who already subscribed in the ntfy app would stop getting alerts.
+  const ntfyTopic = `ali-${finalSlug}-${crypto.randomBytes(6).toString("hex")}`;
+  const insertPayload = { ...baseFields, ntfy_topic: ntfyTopic, phone_number: phoneNumber, active: true, payment_required: true, payment_pending: true, payment_status: "unpaid" };
   const r = await fetch(`${supabaseUrl}/rest/v1/clients`, { method: "POST", headers: writeHeaders, body: JSON.stringify(insertPayload) });
   if (!r.ok) { const t = await r.text().catch(() => ""); throw new Error(`Insert failed (${r.status}): ${t.slice(0,300)}`); }
   const rows = await r.json().catch(() => []);

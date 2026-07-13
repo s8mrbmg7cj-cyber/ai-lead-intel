@@ -133,12 +133,12 @@ export default async function handler(req, res) {
     await sendClientEmail({ client, callData, leadAnalysis, structured });
 
     // ─────────────────────────────────────────────
-    // HOT LEAD ALERT
+    // PHONE PUSH ALERT (every captured lead)
     // ─────────────────────────────────────────────
+    // Buzz the owner's phone on every lead via their own private ntfy topic —
+    // email still fired above as the backup. HOT leads are marked urgent.
 
-    if (leadAnalysis.score === "HOT") {
-      await sendPushNotification({ client, callData });
-    }
+    await sendPushNotification({ client, callData, leadAnalysis, structured });
 
     return res.status(200).json({
       success: true,
@@ -363,21 +363,46 @@ function extractEmailFromTranscript(transcript) {
 // PUSH ALERTS
 // ─────────────────────────────────────────────
 
-async function sendPushNotification({ client, callData }) {
-  const topic = process.env.NTFY_TOPIC;
-  if (!topic) return;
+async function sendPushNotification({ client, callData, leadAnalysis = {}, structured = {} }) {
+  // Each client has their own private topic (set at onboarding). Fall back to
+  // the global env topic only for legacy rows created before ntfy_topic existed.
+  const topic = client.ntfy_topic || process.env.NTFY_TOPIC;
+  if (!topic) {
+    console.log("NO NTFY TOPIC for client:", client.business_name);
+    return;
+  }
+
+  const isHot = leadAnalysis.score === "HOT";
+  const bestNumber =
+    (structured.callback_number || "").trim() ||
+    callData.caller_number ||
+    "Unknown number";
+  const leadName =
+    (structured.caller_name || callData.caller_name || "").trim() ||
+    prettyPhone(bestNumber);
+  const service =
+    (structured.service_requested || "").trim() ||
+    prettyIndustry(client.industry);
+
+  const title = isHot
+    ? `🔥 Hot Lead — ${service}`
+    : `New Lead — ${service}`;
+  const body =
+    `${leadName}\n` +
+    `${prettyPhone(bestNumber)}\n` +
+    `${leadAnalysis.outcome || "Call handled"}`;
 
   try {
     await fetch(`https://ntfy.sh/${topic}`, {
       method: "POST",
       headers: {
-        Title: `🔥 High-Priority Lead - ${client.business_name}`,
-        Priority: "high",
-        Tags: "fire,phone",
+        Title: title,
+        Priority: isHot ? "urgent" : "default",
+        Tags: isHot ? "fire,phone" : "phone",
       },
-      body: `${client.business_name}\nCaller: ${callData.caller_number}`,
+      body,
     });
-    console.log("PUSH SENT");
+    console.log("PUSH SENT to", topic);
   } catch (err) {
     console.error("PUSH FAILED:", err);
   }
