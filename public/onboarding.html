@@ -268,7 +268,7 @@
     <header class="hero">
       <div class="hero-eyebrow"><span class="dot"></span>7-Day Free Trial · No charge today</div>
       <h1 class="hero-title">Start your <span class="accent">7-day free trial</span></h1>
-      <p class="hero-sub">Tell us about your business and we'll build your AI receptionist during your trial. <strong>You won't be charged until day 8</strong> — cancel anytime through PayPal.</p>
+      <p class="hero-sub">Tell us about your business and we'll build your AI receptionist during your trial. <strong>You won't be charged until day 8</strong> — cancel anytime from your account.</p>
     </header>
     <div class="plan-banner" id="plan-banner" style="display:none;">
       <div class="plan-banner-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -387,19 +387,19 @@
           <div class="field"><div class="float-wrap"><select class="float-select" id="pricing_rule"><option value=""></option><option value="yes_specific">Yes — give exact prices when asked</option><option value="yes_ranges">Yes — give price ranges only</option><option value="no_quote">No — say "I'll have someone send you a quote"</option><option value="no_transfer">No — transfer pricing questions to me</option></select><label class="float-label" for="pricing_rule">Should the AI give pricing on calls?</label></div><div class="field-hint">If you don't set this, the AI may improvise prices.</div></div>
           <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="pricing_examples" placeholder=" "></textarea><label class="float-label" for="pricing_examples">Common prices the AI should know <span class="opt">— optional</span></label></div><div class="field-hint" id="pricing-examples-hint">One per line. e.g. "Diagnostic fee: $89" or "10×10 unit: $129/mo"</div></div>
           <div class="field"><div class="float-wrap"><textarea class="float-textarea" id="notes" placeholder=" "></textarea><label class="float-label" for="notes">Anything else we should know? <span class="opt">— optional</span></label></div><div class="field-hint">Special hours, common questions, things the AI should never say.</div></div>
-          <div class="legal-note">By submitting, you agree to our <a href="/privacy" target="_blank">Privacy Policy</a><span class="sep">·</span><a href="/terms" target="_blank">Terms</a>. You authorize a recurring subscription that begins billing after your 7-day free trial. Cancel anytime through PayPal.</div>
+          <div class="legal-note">By submitting, you agree to our <a href="/privacy" target="_blank">Privacy Policy</a><span class="sep">·</span><a href="/terms" target="_blank">Terms</a>. You authorize a recurring subscription that begins billing after your 7-day free trial. Cancel anytime from your account.</div>
         </div>
       </section>
       <section class="section" data-section="3">
         <div class="section-head">
           <div class="section-eyebrow"><span class="step-dot"></span>Step 3 · Start Free Trial</div>
           <h2 class="section-title">Ready to start your <span class="accent">7-day free trial</span></h2>
-          <p class="section-sub">Submit and you'll be taken to PayPal to authorize your subscription. No charge today.</p>
+          <p class="section-sub">Submit and you'll be taken to our secure checkout to start your subscription. No charge today.</p>
         </div>
         <div class="activation-card">
           <div class="activation-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
           <div class="activation-title">Start your <span class="accent">free trial</span></div>
-          <div class="activation-sub">Submit below and authorize your subscription through PayPal. <strong>No charge for 7 days.</strong> Your AI receptionist is built and tested during your trial.</div>
+          <div class="activation-sub">Submit below and start your subscription through our secure checkout. <strong>No charge for 7 days.</strong> Your AI receptionist is built and tested during your trial.</div>
           <div class="trial-explainer">
             <div class="trial-explainer-row">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -759,7 +759,7 @@
       const nextLabel = document.getElementById('btn-next-label');
       const nextArrow = document.getElementById('btn-next-arrow');
       backBtn.disabled = section <= 1;
-      if (section === TOTAL) { nextLabel.textContent = 'Start Free Trial → PayPal'; nextBtn.classList.add('btn-launch'); }
+      if (section === TOTAL) { nextLabel.textContent = 'Start Free Trial'; nextBtn.classList.add('btn-launch'); }
       else { nextLabel.textContent = 'Continue'; nextBtn.classList.remove('btn-launch'); }
       if (nextArrow) nextArrow.style.display = 'block';
       currentSection = section;
@@ -899,7 +899,7 @@
       function reEnable() {
         isSubmitting = false;
         btn.disabled = false;
-        label.textContent = 'Start Free Trial → PayPal';
+        label.textContent = 'Start Free Trial';
         if (arrow) arrow.style.display = 'block';
       }
       function hardFail(userMsg, tech) {
@@ -957,12 +957,12 @@
 
       const canonicalSlug = result.client_slug || clientSlug;
       const canonicalPlan = result.plan || selectedPlan;
-      const paypalUrl = result.paypal_redirect;
+      const checkoutUrl = result.checkout_url || result.paypal_redirect;
 
-      if (typeof paypalUrl === 'string' && paypalUrl.startsWith('https://')) {
-        label.innerHTML = 'Redirecting to PayPal…';
+      if (typeof checkoutUrl === 'string' && checkoutUrl.startsWith('https://')) {
+        label.innerHTML = 'Redirecting to secure checkout…';
         await new Promise(r => setTimeout(r, 400));
-        window.location.assign(paypalUrl);
+        window.location.assign(checkoutUrl);
         return;
       }
 

@@ -2,7 +2,7 @@
 import crypto from "crypto";
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
-import { createSubscriptionRedirect } from '../lib/paypal-redirect.js';
+import { createCheckoutRedirect } from '../lib/stripe-checkout.js';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
 const PLAN_PRICING = { starter: { amount: 97.00 }, pro: { amount: 297.00 } };
 const INDUSTRY_LABELS = { self_storage: "Self Storage", hvac: "HVAC", plumbing: "Plumbing", electrician: "Electrician", landscaping: "Landscaping / Lawn Care", auto_detailing: "Auto Detailing", auto_repair: "Auto Repair", salon: "Salon / Spa", pest_control: "Pest Control", cleaning: "Cleaning Services", roofing: "Roofing", locksmith: "Locksmith", real_estate: "Real Estate", dental: "Dental / Medical", other: "Other" };
@@ -216,7 +216,7 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
     report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
     services_offered: data.services_offered, service_area: data.service_area,
-    offer_urgent_transfer: urgentBool, payment_amount: pricing.amount, payment_provider: "paypal",
+    offer_urgent_transfer: urgentBool, payment_amount: pricing.amount, payment_provider: "stripe",
     ai_prompt: aiConfig.ai_prompt, ai_greeting: aiConfig.ai_greeting,
     ai_personality: aiConfig.ai_personality, transfer_behavior: aiConfig.transfer_behavior,
     services_summary: aiConfig.services_summary, faq_summary: aiConfig.faq_summary,
@@ -281,11 +281,11 @@ async function runAllNotificationsSafely(data, finalSlug) {
   try { await Promise.allSettled([safeNtfy(data), safeOwnerEmail(data), safeCustomerEmail(data, finalSlug)]); }
   catch (e) { console.error("[onboarding] notif wrap:", e.message); }
 }
-async function safePaypalFailAlert(data, finalSlug, errorDetail) {
+async function safeCheckoutFailAlert(data, finalSlug, errorDetail) {
   try {
     const body = `Checkout FAILED for a new onboarding — fix ASAP.\nBusiness: ${data.business_name}\nPlan: ${data.plan}\nSlug: ${finalSlug}\nReason: ${errorDetail}`;
-    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: "POST", headers: { Title: `PayPal checkout FAILED: ${data.business_name}`, Priority: "urgent", Tags: "warning,money_with_wings" }, body });
-  } catch (e) { console.error("[onboarding] paypal fail alert:", e.message); }
+    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: "POST", headers: { Title: `Stripe checkout FAILED: ${data.business_name}`, Priority: "urgent", Tags: "warning,money_with_wings" }, body });
+  } catch (e) { console.error("[onboarding] checkout fail alert:", e.message); }
 }
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -366,42 +366,47 @@ export default async function handler(req, res) {
       console.error('[onboarding] trial-history check failed (defaulting to trial):', e.message);
     }
 
-    // ── Create the PayPal subscription via the REST API ──
-    // Stamps custom_id = client_slug onto the subscription so the webhook can
-    // always match the payment to this client, and captures the subscription id.
-    const sub = await createSubscriptionRedirect({
+    // ── Create the Stripe Checkout Session ──
+    // client_reference_id + metadata carry the client_slug so the webhook and
+    // the return handler can match the payment to this client with certainty.
+    // success_url embeds ?slug=<slug> and Stripe fills in the session id.
+    const sub = await createCheckoutRedirect({
       plan: clientRow.plan || data.plan,
       clientSlug: clientRow.client_slug,
+      customerEmail: clientRow.notify_email || data.notify_email || "",
       noTrial,
-      returnUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}`,
+      successUrl: `https://aileadintel.com/api/onboarding-return?slug=${encodeURIComponent(clientRow.client_slug)}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `https://aileadintel.com/onboarding.html?canceled=1`,
     });
     if (!sub.ok) {
       // Log the real reason and alert the owner; the customer only sees a soft message.
-      console.error("[onboarding] paypal create error:", sub.error);
-      await safePaypalFailAlert(data, finalSlug, sub.error);
+      console.error("[onboarding] stripe create error:", sub.error);
+      await safeCheckoutFailAlert(data, finalSlug, sub.error);
       return res.status(502).json({
         success: false,
         error: "Checkout is temporarily unavailable. Please try again in a few minutes — if it keeps happening, email hello@aileadintel.com.",
       });
     }
-    console.log("[onboarding] paypal subscription created:", sub.subscriptionId);
-    // Store the subscription id on the client row (fallback identifier for the webhook).
+    console.log("[onboarding] stripe checkout session created:", sub.sessionId);
+    // Store the Checkout Session id on the client row. The real subscription id
+    // isn't known until checkout completes; the webhook writes it then. Storing
+    // the session id gives the return handler a fallback lookup key.
     try {
       await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientRow.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=minimal" },
-        body: JSON.stringify({ payment_external_id: sub.subscriptionId }),
+        body: JSON.stringify({ payment_external_id: sub.sessionId }),
       });
     } catch (e) {
-      console.error("[onboarding] failed to store subscription id:", e.message);
+      console.error("[onboarding] failed to store checkout session id:", e.message);
     }
 
-    // PayPal succeeded → now it's safe to notify the owner and send the customer
-    // their welcome email (so a failed checkout never sends a "you're all set" email).
+    // Checkout session created → now it's safe to notify the owner and send the
+    // customer their welcome email (a failed checkout never sends a "you're all
+    // set" email).
     try { await runAllNotificationsSafely(data, finalSlug); } catch (e) { console.error("[onboarding] notif:", e.message); }
 
-    const paypalRedirect = sub.redirect;   // the PayPal approval URL
+    const checkoutUrl = sub.redirect;   // the Stripe hosted checkout URL
 
     const responseBody = {
       success: true,
@@ -411,9 +416,11 @@ export default async function handler(req, res) {
       business_name: clientRow.business_name || data.business_name || "",
       report_frequency: clientRow.report_frequency || null,
       report_email: clientRow.report_email || null,
-      paypal_redirect: paypalRedirect,
+      checkout_url: checkoutUrl,
+      // kept for backward-compat with any older frontend still reading this key
+      paypal_redirect: checkoutUrl,
     };
-    console.log("[onboarding] FINAL RESPONSE — paypal_redirect:", paypalRedirect ? paypalRedirect : "(EMPTY)");
+    console.log("[onboarding] FINAL RESPONSE — checkout_url:", checkoutUrl ? checkoutUrl : "(EMPTY)");
     return res.status(200).json(responseBody);
   } catch (error) {
     console.error("[onboarding] UNHANDLED:", error.message);

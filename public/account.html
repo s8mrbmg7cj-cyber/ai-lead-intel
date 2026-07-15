@@ -182,7 +182,7 @@ function renderAccounts(clients) {
         <div class="acct-cell"><div class="acct-cell-label">Plan</div><div class="acct-cell-value">${esc(PLAN_LABELS[plan] || plan)}</div></div>
         <div class="acct-cell"><div class="acct-cell-label">Started</div><div class="acct-cell-value">${prettyDate(c.paid_at || c.created_at)}</div></div>
         <div class="acct-cell"><div class="acct-cell-label">Your AI's number</div><div class="acct-cell-value mono">${isCancelled ? '—' : (prettyNumber(c.twilio_number) || 'Being assigned…')}</div></div>
-        <div class="acct-cell"><div class="acct-cell-label">Billing</div><div class="acct-cell-value">${isCancelled ? 'Stopped' : 'Via PayPal · 7-day free trial, then monthly'}</div></div>
+        <div class="acct-cell"><div class="acct-cell-label">Billing</div><div class="acct-cell-value">${isCancelled ? 'Stopped' : 'Via Stripe · 7-day free trial, then monthly'}</div></div>
         <div class="acct-cell" style="grid-column: 1 / -1;"><div class="acct-cell-label">Every call emailed to</div><div class="acct-cell-value">${esc(c.notify_email || '—')}</div></div>
       </div>
       <div class="acct-actions">
@@ -198,7 +198,7 @@ function renderAccounts(clients) {
         </div>
       </div>
       <div class="result" data-role="result"></div>
-      <div class="cancel-note">Cancelling stops all future billing instantly. You can also manage payments anytime in your <a href="https://www.paypal.com/myaccount/autopay/" target="_blank" rel="noopener" style="color:var(--brand-2);">PayPal autopay settings</a>.</div>
+      <div class="cancel-note">Cancelling stops all future billing instantly — no calls or emails needed. Questions about billing? Email <a href="mailto:hello@aileadintel.com" style="color:var(--brand-2);">hello@aileadintel.com</a>.</div>
       ` : `<div class="cancel-note">This subscription is cancelled — you will not be billed. Changed your mind? <a href="/#pricing" style="color:var(--brand-2);">Start a new plan</a>.</div>`}
     </div>`;
   }).join('');

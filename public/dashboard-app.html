@@ -404,7 +404,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 'use strict';
 const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
-const PAYPAL_MANAGE_URL = 'https://www.paypal.com/myaccount/autopay/';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function getSlugFromUrl() {
@@ -555,9 +554,9 @@ function renderBilling(client) {
         <div class="billing-item"><div class="billing-item-label">Account Status</div><div class="billing-item-value">${escapeHtml(accountStatusDisplay)}</div></div>
         <div class="billing-item"><div class="billing-item-label">Every Call Emailed To</div><div class="billing-item-value">${escapeHtml(client.notify_email || '—')}</div><div class="billing-item-value dim">Full summary + lead details after every call</div></div>
       </div>
-      <div class="billing-manage-text">Update your payment method or view billing history through <strong>PayPal</strong>. To cancel or manage your subscription, open <strong>Settings</strong>.</div>
+      <div class="billing-manage-text">To update your payment method or cancel your subscription, open your <strong>account settings</strong>.</div>
       <div class="billing-actions">
-        <a href="${PAYPAL_MANAGE_URL}" target="_blank" rel="noopener noreferrer" class="billing-btn billing-btn-primary">
+        <a href="/account" class="billing-btn billing-btn-primary">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Manage Billing
         </a>

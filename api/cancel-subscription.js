@@ -1,14 +1,14 @@
 // api/cancel-subscription.js
 // Lets a signed-in customer cancel their own subscription from /account.
 //  1) Verifies their Supabase session and that they own the client row.
-//  2) Cancels the PayPal subscription via the PayPal API.
+//  2) Cancels the Stripe subscription via the Stripe API.
 //  3) Marks the client cancelled, frees their number, deletes Vapi resources.
 //  4) Alerts the owner (push + email).
-// The PayPal CANCELLED webhook that follows is harmless — the webhook skips
-// its own alert when the client is already marked cancelled.
+// The Stripe customer.subscription.deleted webhook that follows is harmless —
+// the webhook skips its own alert when the client is already marked cancelled.
 //
-// Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, PAYPAL_CLIENT_ID,
-//      PAYPAL_CLIENT_SECRET, PAYPAL_ENV, VAPI_PRIVATE_KEY (optional),
+// Env: SUPABASE_URL, SUPABASE_SERVICE_KEY, STRIPE_SECRET_KEY,
+//      VAPI_PRIVATE_KEY (optional),
 //      NTFY_TOPIC / RESEND_API_KEY / NOTIFY_EMAIL (for the owner alert)
 
 export const config = { maxDuration: 30 };
@@ -16,8 +16,7 @@ export const config = { maxDuration: 30 };
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY || '';
-const PAYPAL_ENV = process.env.PAYPAL_ENV || 'live';
-const PAYPAL_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+const STRIPE_BASE = 'https://api.stripe.com/v1';
 
 function sbHeaders(extra) {
   return Object.assign(
@@ -32,21 +31,6 @@ async function getUser(token) {
   });
   if (!r.ok) return null;
   return r.json();
-}
-
-async function paypalToken() {
-  const id = process.env.PAYPAL_CLIENT_ID;
-  const secret = process.env.PAYPAL_CLIENT_SECRET;
-  if (!id || !secret) throw new Error('PayPal credentials missing');
-  const auth = Buffer.from(`${id}:${secret}`).toString('base64');
-  const r = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
-    method: 'POST',
-    headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'grant_type=client_credentials',
-  });
-  if (!r.ok) throw new Error(`PayPal token error ${r.status}`);
-  const j = await r.json();
-  return j.access_token;
 }
 
 export default async function handler(req, res) {
@@ -102,33 +86,51 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, already: true, message: 'Already cancelled.' });
     }
 
-    // ── 2) Cancel the PayPal subscription itself ──
-    let paypalResult = 'no_subscription_on_file';
-    if (client.payment_external_id) {
+    // ── 2) Cancel the Stripe subscription itself ──
+    const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+    let stripeResult = 'no_subscription_on_file';
+    const externalId = client.payment_external_id || '';
+    if (externalId && STRIPE_SECRET_KEY) {
       try {
-        const pt = await paypalToken();
-        const cr = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions/${encodeURIComponent(client.payment_external_id)}/cancel`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${pt}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: 'Customer requested cancellation from account page' }),
-        });
-        if (cr.status === 204) {
-          paypalResult = 'cancelled';
-        } else {
-          const t = await cr.text().catch(() => '');
-          // 422 usually means it's already cancelled/expired on PayPal's side.
-          if (cr.status === 422) paypalResult = 'already_inactive_on_paypal';
-          else {
-            console.error('[cancel-subscription] PayPal cancel failed:', cr.status, t.slice(0, 300));
-            return res.status(502).json({ error: 'PayPal could not cancel the subscription. Please try again or email hello@aileadintel.com.' });
+        // The stored id is the subscription id (sub_...) once checkout completed.
+        // If it's still the checkout session id (cs_...) — e.g. they cancel before
+        // the webhook landed — resolve the subscription from the session first.
+        let subId = externalId;
+        if (externalId.startsWith('cs_')) {
+          const sr = await fetch(`${STRIPE_BASE}/checkout/sessions/${encodeURIComponent(externalId)}`, {
+            headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+          });
+          if (sr.ok) {
+            const s = await sr.json().catch(() => ({}));
+            subId = typeof s.subscription === 'string' ? s.subscription : (s.subscription && s.subscription.id) || '';
+          } else {
+            subId = '';
           }
         }
+        if (subId && subId.startsWith('sub_')) {
+          const cr = await fetch(`${STRIPE_BASE}/subscriptions/${encodeURIComponent(subId)}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+          });
+          const body = await cr.json().catch(() => ({}));
+          if (cr.ok) {
+            stripeResult = 'cancelled';
+          } else if (body && body.error && body.error.code === 'resource_missing') {
+            // Already cancelled/deleted on Stripe's side — treat as success.
+            stripeResult = 'already_inactive_on_stripe';
+          } else {
+            console.error('[cancel-subscription] Stripe cancel failed:', cr.status, JSON.stringify(body).slice(0, 300));
+            return res.status(502).json({ error: 'Stripe could not cancel the subscription. Please try again or email hello@aileadintel.com.' });
+          }
+        } else {
+          stripeResult = 'no_subscription_on_file';
+        }
       } catch (e) {
-        console.error('[cancel-subscription] PayPal error:', e.message);
-        return res.status(502).json({ error: 'PayPal could not be reached. Please try again or email hello@aileadintel.com.' });
+        console.error('[cancel-subscription] Stripe error:', e.message);
+        return res.status(502).json({ error: 'Stripe could not be reached. Please try again or email hello@aileadintel.com.' });
       }
     }
-    console.log('[cancel-subscription]', clientSlug, 'paypal:', paypalResult);
+    console.log('[cancel-subscription]', clientSlug, 'stripe:', stripeResult);
 
     // ── 3) Local cleanup: mark cancelled, free number, remove Vapi resources ──
     const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY;
@@ -185,7 +187,7 @@ export default async function handler(req, res) {
     await alertOwnerCancelled(client);
     await sendCancelEmailToCustomer(client);
 
-    return res.status(200).json({ ok: true, cancelled: true, paypal: paypalResult });
+    return res.status(200).json({ ok: true, cancelled: true, stripe: stripeResult });
   } catch (err) {
     console.error('[cancel-subscription] ERROR:', err.message);
     return res.status(500).json({ error: 'Something went wrong. Please try again or email hello@aileadintel.com.' });

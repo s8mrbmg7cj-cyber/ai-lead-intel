@@ -1,25 +1,51 @@
 // api/onboarding-return.js
-// PayPal sends customers here after successful subscription.
+// Stripe sends customers here after a completed Checkout Session (success_url).
 // Looks up client, marks paid, sends the setup email (Pro), then redirects:
-//   - Pro     → /create-password
-//   - Starter → /confirmation  (no password, no dashboard, no setup email)
+//   - Pro     → /create-password → /setup
+//   - Starter → /create-password → /confirmation  (auto-provisioned here)
 //
 // STARTER AUTO-PROVISION: Starter never visits /setup, so this handler also
 // provisions the Starter client (number + AI assistant) on a confident paid
 // match, then emails them their new number with forwarding instructions.
 // A one-time lock column (provision_requested_at) + provision's own
 // idempotency guarantee a client is only ever provisioned once, even though
-// paypal-webhook.js carries the same hook as a backup.
+// stripe-webhook.js carries the same hook as a backup.
+//
+// The Stripe success_url embeds ?slug=<client_slug>&session_id=<id>. We match
+// on the slug (confident) and look the session up on Stripe to record the real
+// subscription id.
 export const config = { maxDuration: 30 };
 
+// Look up a completed Checkout Session on Stripe to get its real subscription
+// id. Best-effort — returns "" on any failure (the slug match still marks paid).
+async function fetchSubscriptionIdFromSession(sessionId) {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key || !sessionId) return "";
+  try {
+    const r = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+      headers: { Authorization: `Bearer ${key}` },
+    });
+    if (!r.ok) return "";
+    const s = await r.json().catch(() => ({}));
+    return typeof s.subscription === "string" ? s.subscription : (s.subscription && s.subscription.id) || "";
+  } catch (_) { return ""; }
+}
+
 export default async function handler(req, res) {
-  console.log("[paypal-return] hit:", { query: req.query });
+  console.log("[stripe-return] hit:", { query: req.query });
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
   const baseUrl = "https://aileadintel.com";
-  const subscriptionId = (req.query.subscription_id || req.query.ba_token || "").toString();
-  // We control the return_url when creating the subscription via the API, so we
-  // embed ?slug=<client_slug>. Also accept ?custom_id= for backward-compat.
+  // Stripe adds ?session_id=<cs_...>. Resolve it to the real subscription id so
+  // we store the same identifier the webhook will match on. Fall back to any
+  // legacy subscription_id param for safety.
+  const sessionId = (req.query.session_id || "").toString();
+  let subscriptionId = (req.query.subscription_id || "").toString();
+  if (!subscriptionId && sessionId) {
+    subscriptionId = await fetchSubscriptionIdFromSession(sessionId);
+  }
+  // We control the success_url, so we embed ?slug=<client_slug>.
+  // Also accept ?custom_id= for backward-compat.
   const customIdFromQuery = (req.query.slug || req.query.custom_id || "").toString();
   let client = null;
   let matchedBy = null;   // 'custom_id' | 'subscription_id' | 'fallback'
@@ -37,7 +63,7 @@ export default async function handler(req, res) {
           if (rows[0]) { client = rows[0]; matchedBy = "custom_id"; }
         }
       } catch (e) {
-        console.warn("[paypal-return] custom_id lookup:", e.message);
+        console.warn("[stripe-return] custom_id lookup:", e.message);
       }
     }
     // 2. Try subscription_id
@@ -52,7 +78,7 @@ export default async function handler(req, res) {
           if (rows[0]) { client = rows[0]; matchedBy = "subscription_id"; }
         }
       } catch (e) {
-        console.warn("[paypal-return] sub_id lookup:", e.message);
+        console.warn("[stripe-return] sub_id lookup:", e.message);
       }
     }
     // 3. Fallback — most recent unpaid (a GUESS — we won't email on this match)
@@ -67,19 +93,20 @@ export default async function handler(req, res) {
           if (rows[0]) { client = rows[0]; matchedBy = "fallback"; }
         }
       } catch (e) {
-        console.warn("[paypal-return] fallback lookup:", e.message);
+        console.warn("[stripe-return] fallback lookup:", e.message);
       }
     }
-    console.log("[paypal-return] client match:", { matchedBy, slug: client?.client_slug, plan: client?.plan });
+    console.log("[stripe-return] client match:", { matchedBy, slug: client?.client_slug, plan: client?.plan });
 
     // A confident match = we identified the client by the slug we embedded in
-    // the PayPal link (custom_id) or by the subscription id. NOT the "most
-    // recent unpaid" fallback guess.
+    // the Stripe success_url (custom_id) or by the subscription id. NOT the
+    // "most recent unpaid" fallback guess.
     const confidentMatch = matchedBy === "custom_id" || matchedBy === "subscription_id";
     const planLower = (client?.plan || "").toLowerCase();
 
-    // Mark client paid + active on a confident match — do NOT require
-    // subscription_id (PayPal hosted subscribe links often omit it on return).
+    // Mark client paid + active on a confident match — do NOT require a
+    // subscription id here (a free-trial Checkout returns before any charge, so
+    // the sub id may still be resolving; the webhook records/refreshes it).
     if (client && confidentMatch) {
       try {
         const patchBody = {
@@ -94,18 +121,18 @@ export default async function handler(req, res) {
           headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
           body: JSON.stringify(patchBody),
         });
-        console.log("[paypal-return] ✅ marked client paid:", client.client_slug, "(sub_id:", subscriptionId || "none", ")");
+        console.log("[stripe-return] ✅ marked client paid:", client.client_slug, "(sub_id:", subscriptionId || "none", ")");
       } catch (e) {
-        console.error("[paypal-return] update failed:", e.message);
+        console.error("[stripe-return] update failed:", e.message);
       }
     } else {
-      console.log("[paypal-return] NOT marking paid:", { confidentMatch, matchedBy });
+      console.log("[stripe-return] NOT marking paid:", { confidentMatch, matchedBy });
     }
 
     // ── SETUP EMAIL (Pro only) ──
     // Same confident-match rule. send-setup-email dedups on double-return.
     if (client && client.client_slug && confidentMatch && planLower === "pro") {
-      console.log("[paypal-return] → triggering setup email for", client.client_slug);
+      console.log("[stripe-return] → triggering setup email for", client.client_slug);
       try {
         const er = await fetch(`${baseUrl}/api/send-setup-email`, {
           method: "POST",
@@ -117,15 +144,15 @@ export default async function handler(req, res) {
         });
         const t = await er.text().catch(() => "");
         if (er.ok) {
-          console.log("[paypal-return] ✅ setup email triggered:", t.slice(0, 200));
+          console.log("[stripe-return] ✅ setup email triggered:", t.slice(0, 200));
         } else {
-          console.error("[paypal-return] ⚠️ setup email failed:", er.status, t.slice(0, 300));
+          console.error("[stripe-return] ⚠️ setup email failed:", er.status, t.slice(0, 300));
         }
       } catch (e) {
-        console.error("[paypal-return] ⚠️ setup email trigger error:", e.message);
+        console.error("[stripe-return] ⚠️ setup email trigger error:", e.message);
       }
     } else {
-      console.log("[paypal-return] setup email NOT triggered:", { confidentMatch, plan: planLower, hasSlug: !!client?.client_slug });
+      console.log("[stripe-return] setup email NOT triggered:", { confidentMatch, plan: planLower, hasSlug: !!client?.client_slug });
     }
 
     // ── STARTER AUTO-PROVISION ──
@@ -135,7 +162,7 @@ export default async function handler(req, res) {
       try {
         await autoProvisionStarter(client, supabaseUrl, headers, baseUrl);
       } catch (e) {
-        console.error("[paypal-return] auto-provision error:", e.message);
+        console.error("[stripe-return] auto-provision error:", e.message);
       }
     }
   }
@@ -148,14 +175,18 @@ export default async function handler(req, res) {
   if (client?.notify_email) params.set("email", client.notify_email);
   if (client?.report_frequency) params.set("freq", client.report_frequency);
   if (client?.report_email) params.set("report_email", client.report_email);
-  if (subscriptionId) params.set("paypal_sub", subscriptionId);
-  params.set("paid", subscriptionId ? "1" : "0");
+  if (subscriptionId) params.set("stripe_sub", subscriptionId);
+  // We reach this URL only after a completed Checkout, and a confident slug
+  // match already marked the client paid — so report paid on that, not on
+  // whether the (trial-delayed) subscription id resolved in time.
+  const confident = matchedBy === "custom_id" || matchedBy === "subscription_id";
+  params.set("paid", confident ? "1" : "0");
   // PLAN-BASED ROUTING — both plans now create a login (so /account and the
   // self-service cancel button work for everyone). create-password reads the
   // ?plan param and routes Starter on to /confirmation, Pro to /setup.
   const redirectPath = "/create-password";
   const redirectUrl = `${baseUrl}${redirectPath}?${params.toString()}`;
-  console.log("[paypal-return] plan:", plan, "→ 302:", redirectUrl);
+  console.log("[stripe-return] plan:", plan, "→ 302:", redirectUrl);
   res.writeHead(302, { Location: redirectUrl });
   res.end();
 }
@@ -169,14 +200,14 @@ export default async function handler(req, res) {
 async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl) {
   const secret = process.env.SUPABASE_WEBHOOK_SECRET || "";
   if (!secret) {
-    console.error("[paypal-return] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision");
+    console.error("[stripe-return] SUPABASE_WEBHOOK_SECRET missing — cannot auto-provision");
     await alertOwnerStarterProblem(
       `URGENT: Starter client ${client.business_name || client.client_slug} PAID but auto-provision could not run — the SUPABASE_WEBHOOK_SECRET environment variable is missing in Vercel. Add it, then set this client up manually.`
     );
     return;
   }
   if (client.twilio_number && client.vapi_phone_number_id) {
-    console.log("[paypal-return] already provisioned:", client.client_slug);
+    console.log("[stripe-return] already provisioned:", client.client_slug);
     return;
   }
 
@@ -194,7 +225,7 @@ async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl)
     const rows = await r.json().catch(() => []);
     if (!r.ok) {
       const detail = JSON.stringify(rows).slice(0, 250);
-      console.error("[paypal-return] provision lock PATCH failed:", r.status, detail);
+      console.error("[stripe-return] provision lock PATCH failed:", r.status, detail);
       await alertOwnerStarterProblem(
         `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock failed (${r.status}: ${detail}). ` +
         `If this mentions provision_requested_at, run this in Supabase: alter table clients add column if not exists provision_requested_at timestamptz; ` +
@@ -203,11 +234,11 @@ async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl)
       return;
     }
     if (!Array.isArray(rows) || rows.length === 0) {
-      console.log("[paypal-return] provision lock not acquired (already started elsewhere) —", client.client_slug);
+      console.log("[stripe-return] provision lock not acquired (already started elsewhere) —", client.client_slug);
       return;
     }
   } catch (e) {
-    console.error("[paypal-return] provision lock error:", e.message);
+    console.error("[stripe-return] provision lock error:", e.message);
     await alertOwnerStarterProblem(
       `URGENT: Starter client ${client.business_name || client.client_slug} PAID but the provision lock threw an error (${e.message}). Set them up manually.`
     );
@@ -222,14 +253,14 @@ async function autoProvisionStarter(client, supabaseUrl, sbAuthHeaders, baseUrl)
       body: JSON.stringify({ client_slug: client.client_slug }),
     });
     result = await pr.json().catch(() => ({}));
-    if (!pr.ok) console.error("[paypal-return] provision failed:", pr.status, JSON.stringify(result).slice(0, 300));
+    if (!pr.ok) console.error("[stripe-return] provision failed:", pr.status, JSON.stringify(result).slice(0, 300));
   } catch (e) {
-    console.error("[paypal-return] provision call threw:", e.message);
+    console.error("[stripe-return] provision call threw:", e.message);
   }
 
   const number = result && result.number;
   if (number) {
-    console.log("[paypal-return] ✅ starter provisioned:", client.client_slug, number);
+    console.log("[stripe-return] ✅ starter provisioned:", client.client_slug, number);
     await sendStarterLiveEmail(client, number);
   } else {
     await alertOwnerStarterProblem(
@@ -244,7 +275,7 @@ async function sendStarterLiveEmail(client, number) {
   const key = process.env.RESEND_API_KEY;
   const to = client.notify_email;
   if (!key || !to) {
-    console.warn("[paypal-return] starter live email skipped (missing RESEND_API_KEY or notify_email)");
+    console.warn("[stripe-return] starter live email skipped (missing RESEND_API_KEY or notify_email)");
     return;
   }
   const pretty = String(number).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, "($1) $2-$3");
@@ -282,9 +313,9 @@ async function sendStarterLiveEmail(client, number) {
         ].join("\n"),
       }),
     });
-    console.log("[paypal-return] ✅ starter live email sent to", to);
+    console.log("[stripe-return] ✅ starter live email sent to", to);
   } catch (e) {
-    console.error("[paypal-return] starter live email failed:", e.message);
+    console.error("[stripe-return] starter live email failed:", e.message);
   }
 }
 
@@ -298,7 +329,7 @@ async function alertOwnerStarterProblem(message) {
         headers: { Title: "Starter provisioning problem", Priority: "urgent", Tags: "rotating_light" },
         body: message,
       });
-    } catch (e) { console.error("[paypal-return] ntfy alert failed:", e.message); }
+    } catch (e) { console.error("[stripe-return] ntfy alert failed:", e.message); }
   }
   const key = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL;
@@ -314,6 +345,6 @@ async function alertOwnerStarterProblem(message) {
           text: message,
         }),
       });
-    } catch (e) { console.error("[paypal-return] alert email failed:", e.message); }
+    } catch (e) { console.error("[stripe-return] alert email failed:", e.message); }
   }
 }
