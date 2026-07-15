@@ -321,6 +321,28 @@ export default async function handler(req, res) {
     }
     const clientRow = clientResult.row;
 
+    // ── Instant SMS lead-alert number ──────────────────────────────────
+    // Store the owner's cell (their transfer number — "usually your cell") so
+    // the call webhook can text them the moment a lead comes in. Best-effort
+    // and isolated: if the alert_sms_number column doesn't exist yet, this PATCH
+    // fails harmlessly and onboarding still completes (email stays the backup).
+    try {
+      const cellDigits = String(data.transfer_primary || data.business_phone || "").replace(/\D/g, "");
+      let alertSms = "";
+      if (cellDigits.length === 10) alertSms = `+1${cellDigits}`;
+      else if (cellDigits.length === 11 && cellDigits[0] === "1") alertSms = `+${cellDigits}`;
+      if (alertSms) {
+        const r = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientRow.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=minimal" },
+          body: JSON.stringify({ alert_sms_number: alertSms }),
+        });
+        if (!r.ok) console.warn("[onboarding] alert_sms_number PATCH skipped:", r.status, (await r.text().catch(() => "")).slice(0, 160));
+      }
+    } catch (e) {
+      console.warn("[onboarding] alert_sms_number set failed (non-fatal):", e.message);
+    }
+
     // ── Trial-abuse guard ──────────────────────────────────────────────
     // If this email has signed up before, they don't get the free trial again
     // (they're routed to the no-trial plan). One exception: the owner's test

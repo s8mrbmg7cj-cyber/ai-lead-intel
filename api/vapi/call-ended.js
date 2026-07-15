@@ -140,6 +140,16 @@ export default async function handler(req, res) {
 
     await sendPushNotification({ client, callData, leadAnalysis, structured });
 
+    // ─────────────────────────────────────────────
+    // INSTANT SMS LEAD ALERT (owner's cell)
+    // ─────────────────────────────────────────────
+    // Text the owner the moment a lead comes in — name, number, and a short
+    // summary of what the caller wanted — sent FROM their own AI number so it
+    // reads like it's from their receptionist. Email above is the full backup.
+    // Best-effort: never blocks or fails the webhook.
+
+    await sendLeadTextAlert({ client, callData, leadAnalysis, structured });
+
     return res.status(200).json({
       success: true,
       client: client.business_name,
@@ -387,10 +397,18 @@ async function sendPushNotification({ client, callData, leadAnalysis = {}, struc
   const title = isHot
     ? `🔥 Hot Lead — ${service}`
     : `New Lead — ${service}`;
+
+  // Name + number lead the alert (so the owner can call back instantly); a
+  // summary of what the caller actually said follows underneath. ntfy caps very
+  // long bodies, so the summary is trimmed to stay readable on a lock screen.
+  // Falls back to the short outcome tag when no summary was produced.
+  const summaryText = (callData.summary || "").trim();
+  const shortSummary =
+    summaryText.length > 280 ? summaryText.slice(0, 277) + "…" : summaryText;
   const body =
     `${leadName}\n` +
-    `${prettyPhone(bestNumber)}\n` +
-    `${leadAnalysis.outcome || "Call handled"}`;
+    `${prettyPhone(bestNumber)}\n\n` +
+    (shortSummary || leadAnalysis.outcome || "Call handled");
 
   try {
     await fetch(`https://ntfy.sh/${topic}`, {
@@ -405,6 +423,85 @@ async function sendPushNotification({ client, callData, leadAnalysis = {}, struc
     console.log("PUSH SENT to", topic);
   } catch (err) {
     console.error("PUSH FAILED:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
+// SMS LEAD ALERT (Twilio)
+// ─────────────────────────────────────────────
+// Sends a short branded text to the owner's cell (alert_sms_number, set at
+// onboarding from their transfer/cell number). Sent FROM the client's own AI
+// number so it looks like it's from their receptionist. If the number or
+// Twilio creds are missing, it quietly no-ops — the email is the full backup.
+
+function toE164(raw) {
+  const d = String(raw || "").replace(/\D/g, "");
+  if (!d) return "";
+  if (d.length === 10) return `+1${d}`;
+  if (d.length === 11 && d[0] === "1") return `+${d}`;
+  if (String(raw).trim().startsWith("+")) return `+${d}`;
+  return "";
+}
+
+async function sendLeadTextAlert({ client, callData, leadAnalysis = {}, structured = {} }) {
+  const to = toE164(client.alert_sms_number || "");
+  if (!to) {
+    console.log("NO SMS ALERT NUMBER for client:", client.business_name);
+    return;
+  }
+
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const from = toE164(client.twilio_number || process.env.TWILIO_PHONE_NUMBER || "");
+  if (!sid || !token || !from) {
+    console.log("SMS alert skipped — Twilio creds or from-number missing");
+    return;
+  }
+
+  const isHot = leadAnalysis.score === "HOT";
+  const bestNumber =
+    (structured.callback_number || "").trim() ||
+    callData.caller_number ||
+    "Unknown number";
+  const leadName =
+    (structured.caller_name || callData.caller_name || "").trim() ||
+    prettyPhone(bestNumber);
+  const service =
+    (structured.service_requested || "").trim() ||
+    prettyIndustry(client.industry);
+  const biz = client.business_name || "your business";
+
+  const summaryText = (callData.summary || "").trim();
+  const shortSummary =
+    summaryText.length > 220 ? summaryText.slice(0, 217) + "…" : summaryText;
+
+  const lines = [
+    `${isHot ? "🔥 " : ""}New ${service} lead — ${biz}`,
+    `${leadName}`,
+    `${prettyPhone(bestNumber)}`,
+  ];
+  if (shortSummary) lines.push(`\n${shortSummary}`);
+  const body = lines.join("\n");
+
+  try {
+    const resp = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ To: to, From: from, Body: body }),
+      }
+    );
+    if (!resp.ok) {
+      console.error("SMS ALERT FAILED:", resp.status, await resp.text());
+    } else {
+      console.log("SMS ALERT SENT to owner");
+    }
+  } catch (err) {
+    console.error("SMS ALERT ERROR:", err.message);
   }
 }
 
