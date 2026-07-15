@@ -81,7 +81,7 @@ export default async function handler(req, res) {
   // ===== 1. FETCH CUSTOMER =====
   let customer = null;
   try {
-    const customerUrl = `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}&select=id,business_name,client_slug,notify_email,plan,setup_email_sent&limit=1`;
+    const customerUrl = `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}&select=id,business_name,client_slug,notify_email,plan,setup_email_sent,ntfy_topic&limit=1`;
     const r = await fetch(customerUrl, { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } });
     console.log(`[send-setup-email ${TRACE_ID}] Customer fetch status:`, r.status);
     if (!r.ok) {
@@ -126,6 +126,21 @@ export default async function handler(req, res) {
   const dashboardRow = dashboardUrl
     ? `<tr><td style="padding:6px 0;color:#6b7280;font-size:13px;">Dashboard</td><td style="padding:6px 0;text-align:right;"><a href="${dashboardUrl}" style="color:#ff6a00;font-size:13px;">${dashboardUrl}</a></td></tr>`
     : '';
+
+  // Optional "get alerts on your phone" block — only if this client has a push
+  // topic on file. Explains that leads arrive by email AND (if they want) as an
+  // instant phone push via the free ntfy app, and gives their private code.
+  const alertTopic = (customer.ntfy_topic || '').trim();
+  const alertsHtml = alertTopic ? `
+      <div style="margin-top:26px;padding:18px 20px;background:#fff7f0;border:1px solid #ffd9bd;border-radius:12px;">
+        <div style="font-size:14px;font-weight:600;color:#111827;margin:0 0 6px 0;">📲 Want alerts on your phone too?</div>
+        <p style="margin:0 0 12px 0;font-size:13px;color:#374151;line-height:1.55;">Every call is emailed to you automatically. If you'd also like an <strong>instant push notification</strong> the moment a lead comes in, install the free <strong>ntfy</strong> app and subscribe to your private alert code:</p>
+        <ol style="margin:0 0 12px 0;padding-left:18px;font-size:13px;color:#374151;line-height:1.7;">
+          <li>Install ntfy — <a href="https://apps.apple.com/app/ntfy/id1625396347" style="color:#ff6a00;">iPhone</a> or <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" style="color:#ff6a00;">Android</a></li>
+          <li>Open it, tap <strong>+</strong>, and subscribe to the code below</li>
+        </ol>
+        <div style="font-family:'Courier New',monospace;font-size:14px;font-weight:600;color:#111827;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;word-break:break-all;">${escapeHtml(alertTopic)}</div>
+      </div>` : '';
   const html = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;">
@@ -146,6 +161,7 @@ export default async function handler(req, res) {
         <tr><td style="padding:6px 0;color:#6b7280;font-size:13px;">Plan</td><td style="padding:6px 0;text-align:right;color:#111827;font-size:13px;font-weight:600;">${escapeHtml(planLabel)}</td></tr>
         ${dashboardRow}
       </table>
+      ${alertsHtml}
       <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;font-size:13px;color:#6b7280;line-height:1.5;">
         Need help? <a href="mailto:${SUPPORT_EMAIL}" style="color:#ff6a00;">${SUPPORT_EMAIL}</a>
         <div style="margin-top:8px;font-size:11px;color:#9ca3af;">Button not working? Copy this link: <a href="${createPasswordUrl}" style="color:#ff6a00;word-break:break-all;">${createPasswordUrl}</a></div>
@@ -163,7 +179,10 @@ ${createPasswordUrl}
 
 Business: ${businessName}
 Plan: ${planLabel}${dashboardUrl ? `\nDashboard: ${dashboardUrl}` : ''}
-
+${alertTopic ? `
+Want alerts on your phone too? Every call is emailed to you. For instant push notifications, install the free ntfy app (iPhone: https://apps.apple.com/app/ntfy/id1625396347 · Android: https://play.google.com/store/apps/details?id=io.heckel.ntfy), tap +, and subscribe to your private alert code:
+${alertTopic}
+` : ''}
 Need help? ${SUPPORT_EMAIL}`;
 
   // ===== 3. SEND VIA RESEND =====
