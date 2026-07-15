@@ -133,6 +133,30 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .stat-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); flex-shrink: 0; }
 .stat-value { font-family: 'Geist Mono', monospace; font-size: clamp(26px, 4vw, 34px); font-weight: 600; letter-spacing: -0.025em; line-height: 1; word-break: break-all; font-variant-numeric: tabular-nums; text-shadow: 0 0 24px var(--brand-tint); }
 .stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 9px; font-family: 'Geist Mono', monospace; letter-spacing: 0.04em; }
+.activity-panel { background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%); border: 1px solid var(--border-2); border-radius: 18px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 26px rgba(0,0,0,0.30); min-width: 0; }
+.activity-legend { display: flex; align-items: center; gap: 12px; }
+.activity-total { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--brand); font-weight: 600; letter-spacing: 0.04em; background: var(--brand-soft); border: 1px solid var(--brand-line); padding: 4px 11px; border-radius: 99px; white-space: nowrap; }
+.chart { display: flex; align-items: flex-end; gap: 6px; height: 168px; padding-top: 20px; }
+.chart-col { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 9px; min-width: 0; height: 100%; }
+.chart-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.chart-bar { width: 100%; max-width: 34px; border-radius: 6px 6px 3px 3px; background: var(--surface-3); position: relative; transition: height 0.6s cubic-bezier(0.2,0.8,0.2,1), filter 0.2s; min-height: 3px; }
+.chart-bar.has { background: linear-gradient(180deg, var(--brand-2), var(--brand)); box-shadow: 0 0 14px var(--brand-tint), inset 0 1px 0 rgba(255,255,255,0.25); }
+.chart-bar.today.has { background: linear-gradient(180deg, #ffc274, var(--brand)); }
+.chart-col:hover .chart-bar.has { filter: brightness(1.18); }
+.chart-count { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-soft); }
+.chart-x { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.02em; }
+.chart-x.today { color: var(--brand); font-weight: 700; }
+.chart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 168px; gap: 8px; color: var(--text-faint); }
+.chart-empty-title { font-size: 13px; font-weight: 600; color: var(--text-dim); }
+.chart-empty-desc { font-size: 12px; color: var(--text-faint); }
+.lead-quality { display: flex; gap: 26px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.lq-item { display: flex; align-items: center; gap: 9px; }
+.lq-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.lq-dot.hot { background: var(--hot); box-shadow: 0 0 8px var(--hot); }
+.lq-dot.warm { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+.lq-dot.other { background: var(--text-muted); }
+.lq-num { font-family: 'Geist Mono', monospace; font-size: 16px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.lq-label { font-size: 12px; color: var(--text-dim); }
 .dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-bottom: 20px; }
 .panel { background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%); border: 1px solid var(--border-2); border-radius: 18px; padding: 24px; min-width: 0; box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 26px rgba(0,0,0,0.30); }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
@@ -386,6 +410,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div class="stat"><div class="stat-label">Missed Calls Recovered</div><div class="stat-value" id="stat-recovered">0</div><div class="stat-sub" id="stat-recovered-sub">Captured by AI</div></div>
     <div class="stat"><div class="stat-label">Avg Call Length</div><div class="stat-value" id="stat-answer">—</div><div class="stat-sub">Per call</div></div>
   </div>
+  <div class="activity-panel">
+    <div class="panel-head">
+      <div class="panel-title">Call activity</div>
+      <div class="activity-legend">
+        <span class="activity-total" id="activity-total">0 calls</span>
+        <span class="panel-sub">Last 14 days</span>
+      </div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="lead-quality" id="lead-quality"></div>
+  </div>
   <div class="dash-grid">
     <div class="panel">
       <div class="panel-head"><div class="panel-title">Recent calls</div><div class="panel-sub">Last 20</div></div>
@@ -537,6 +572,53 @@ function renderCalls(calls) {
     `;
     list.appendChild(item);
   });
+}
+function renderActivityChart(calls) {
+  const chart = document.getElementById('chart');
+  const totalEl = document.getElementById('activity-total');
+  if (!chart) return;
+  const DAYS = 14;
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (DAYS - 1));
+  const startMs = start.getTime();
+  const buckets = [];
+  for (let i = 0; i < DAYS; i++) { const d = new Date(startMs + i * 86400000); buckets.push({ date: d, count: 0 }); }
+  (calls || []).forEach(c => {
+    const t = new Date(c.created_at).getTime();
+    if (isNaN(t)) return;
+    const idx = Math.floor((t - startMs) / 86400000);
+    if (idx >= 0 && idx < DAYS) buckets[idx].count++;
+  });
+  const total = buckets.reduce((s, b) => s + b.count, 0);
+  if (totalEl) totalEl.textContent = total === 1 ? '1 call' : total + ' calls';
+  if (total === 0) {
+    chart.innerHTML = '<div class="chart-empty"><div class="chart-empty-title">No calls yet</div><div class="chart-empty-desc">Your call activity will appear here as leads come in.</div></div>';
+    return;
+  }
+  const max = Math.max(1, ...buckets.map(b => b.count));
+  chart.innerHTML = buckets.map((b, i) => {
+    const isToday = i === DAYS - 1;
+    const h = b.count > 0 ? Math.max(8, Math.round((b.count / max) * 100)) : 2;
+    const label = b.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return '<div class="chart-col" title="' + b.count + ' call' + (b.count === 1 ? '' : 's') + ' \u00b7 ' + label + '">'
+      + '<div class="chart-bar-wrap"><div class="chart-bar' + (b.count > 0 ? ' has' : '') + (isToday ? ' today' : '') + '" style="height:' + h + '%;">'
+      + (b.count > 0 ? '<span class="chart-count">' + b.count + '</span>' : '') + '</div></div>'
+      + '<div class="chart-x' + (isToday ? ' today' : '') + '">' + b.date.getDate() + '</div></div>';
+  }).join('');
+}
+function renderLeadQuality(calls) {
+  const el = document.getElementById('lead-quality');
+  if (!el) return;
+  let hot = 0, warm = 0, other = 0;
+  (calls || []).forEach(c => {
+    const s = String(c.lead_score || '').toUpperCase();
+    if (s === 'HOT') hot++;
+    else if (s === 'WARM') warm++;
+    else other++;
+  });
+  el.innerHTML =
+    '<div class="lq-item"><span class="lq-dot hot"></span><span class="lq-num">' + hot + '</span><span class="lq-label">Hot leads</span></div>'
+    + '<div class="lq-item"><span class="lq-dot warm"></span><span class="lq-num">' + warm + '</span><span class="lq-label">Warm leads</span></div>'
+    + '<div class="lq-item"><span class="lq-dot other"></span><span class="lq-num">' + other + '</span><span class="lq-label">Other calls</span></div>';
 }
 function renderBilling(client) {
   const container = document.getElementById('billing-section');
@@ -729,6 +811,8 @@ function renderDashboard(client, calls) {
   }
 
   renderCalls(callsArr);
+  renderActivityChart(callsArr);
+  renderLeadQuality(callsArr);
   renderAiConfig(client);
   renderBilling(client);
   showState('dash');
