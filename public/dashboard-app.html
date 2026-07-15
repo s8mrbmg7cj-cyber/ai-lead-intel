@@ -109,6 +109,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-number-status { font-size:11.5px; color:var(--text-dim); margin-top:5px; }
 .ai-copy-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-radius:10px; font-size:13px; font-weight:600; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); }
 .ai-copy-btn.copied { background:linear-gradient(135deg,var(--green),#4ade80); }
+.alerts-card { background: linear-gradient(135deg, var(--brand-tint), transparent 70%), var(--surface); border:1px solid var(--brand-line); border-radius:14px; padding:20px 22px; margin-bottom:20px; }
+.alerts-head { display:flex; align-items:center; gap:13px; margin-bottom:14px; }
+.alerts-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 12px rgba(255,106,0,0.3); }
+.alerts-eyebrow { font-family:'Geist Mono',monospace; font-size:10px; color:var(--brand); letter-spacing:0.14em; text-transform:uppercase; font-weight:700; margin-bottom:3px; }
+.alerts-title { font-size:15px; font-weight:600; color:var(--text); }
+.alerts-desc { font-size:13px; color:var(--text-soft); line-height:1.6; margin-bottom:14px; }
+.alerts-steps { display:flex; flex-direction:column; gap:9px; margin-bottom:16px; }
+.alerts-step { display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-soft); line-height:1.5; }
+.alerts-step-num { flex-shrink:0; width:20px; height:20px; border-radius:50%; background:var(--brand-soft); border:1px solid var(--brand-line); color:var(--brand); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+.alerts-step a { color:var(--brand); font-weight:600; }
+.alerts-topic-label { font-family:'Geist Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase; font-weight:700; margin-bottom:7px; }
+.alerts-topic-box { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.alerts-topic { font-family:'Geist Mono',monospace; font-size:14px; color:var(--text); background:var(--surface-2); border:1px solid var(--border-2); border-radius:9px; padding:10px 14px; word-break:break-all; flex:1; min-width:180px; }
+.alerts-copy-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 16px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-radius:9px; font-size:12.5px; font-weight:600; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); cursor:pointer; }
+.alerts-copy-btn.copied { background:linear-gradient(135deg,var(--green),#4ade80); }
+.alerts-open-link { display:inline-block; margin-top:13px; font-size:12.5px; color:var(--brand); font-weight:600; }
 .stat { background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; min-width: 0; box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 6px 20px rgba(0,0,0,0.28); }
 .stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); opacity: 0; transition: opacity 0.2s; }
 .stat:hover { transform: translateY(-2px); border-color: var(--brand-line); box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 12px 30px rgba(0,0,0,0.38), 0 0 0 1px var(--brand-line); }
@@ -338,6 +354,27 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       <span id="ai-copy-label">Copy</span>
     </button>
+  </div>
+  <div class="alerts-card" id="alerts-card" style="display:none;">
+    <div class="alerts-head">
+      <div class="alerts-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div>
+        <div class="alerts-eyebrow">Phone Alerts</div>
+        <div class="alerts-title">Get buzzed on your phone for every lead</div>
+      </div>
+    </div>
+    <div class="alerts-desc">On top of the email, get an instant push notification the second a call comes in — with the caller's name, number, and what they wanted. Free, and it works on any phone.</div>
+    <div class="alerts-steps">
+      <div class="alerts-step"><span class="alerts-step-num">1</span><span>Install the free <strong>ntfy</strong> app — <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> &middot; <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a></span></div>
+      <div class="alerts-step"><span class="alerts-step-num">2</span><span>Open it, tap <strong>+</strong> to subscribe to a topic, and paste your alert code below</span></div>
+      <div class="alerts-step"><span class="alerts-step-num">3</span><span>Done — every captured lead now buzzes your phone instantly</span></div>
+    </div>
+    <div class="alerts-topic-label">Your private alert code</div>
+    <div class="alerts-topic-box">
+      <code class="alerts-topic" id="alerts-topic">—</code>
+      <button class="alerts-copy-btn" id="alerts-copy-btn" type="button">Copy</button>
+    </div>
+    <a class="alerts-open-link" id="alerts-open-link" href="#" target="_blank" rel="noopener">Or open &amp; test it in your browser first &rarr;</a>
   </div>
   <div class="stats-row">
     <div class="stat"><div class="stat-label">Calls Today</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub">Since midnight</div></div>
@@ -631,6 +668,29 @@ function renderDashboard(client, calls) {
       });
     }
     card.style.display = 'flex';
+  }
+
+  // Phone alerts (ntfy push) card — shows the owner their private topic so they
+  // can subscribe in the ntfy app. The push itself already fires automatically
+  // on every call (see api/vapi/call-ended.js); this just surfaces the code.
+  const alertTopic = client.ntfy_topic || '';
+  const alertsCard = document.getElementById('alerts-card');
+  if (alertsCard && alertTopic) {
+    const topicEl = document.getElementById('alerts-topic');
+    if (topicEl) topicEl.textContent = alertTopic;
+    const openLink = document.getElementById('alerts-open-link');
+    if (openLink) openLink.href = 'https://ntfy.sh/' + encodeURIComponent(alertTopic);
+    const acopy = document.getElementById('alerts-copy-btn');
+    if (acopy) {
+      acopy.addEventListener('click', function () {
+        navigator.clipboard.writeText(alertTopic).then(() => {
+          this.textContent = 'Copied!';
+          this.classList.add('copied');
+          setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 1800);
+        }).catch(() => {});
+      });
+    }
+    alertsCard.style.display = 'block';
   }
 
   // Time-window counts.
