@@ -14,10 +14,10 @@
    (Company name + phone are also set in the JS CONFIG block below)
    ============================================================ */
 :root {
-  --brand:        #1f9d57;   /* Bob Harvey Roofing royal blue */
-  --brand-dark:   #17864a;
-  --brand-light:  #4ec98a;
-  --brand-soft:   rgba(31,157,87,0.14);
+  --brand:        #2e3d5f;   /* Bob Harvey Roofing royal blue */
+  --brand-dark:   #222e47;
+  --brand-light:  #7b93c9;
+  --brand-soft:   rgba(46,61,95,0.14);
   --bg:           #0b0c0e;
   --surface:      #16171b;
   --surface-2:    #1d1f24;
@@ -35,7 +35,7 @@ html { scroll-behavior:smooth; }
 body {
   background:
     radial-gradient(ellipse 90% 55% at 50% -10%, var(--brand-soft), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(78,201,138,0.06), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(123,147,201,0.06), transparent 60%),
     var(--bg);
   color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
@@ -47,7 +47,7 @@ body {
 .brand-mark { width:42px; height:42px; border-radius:12px;
   background:linear-gradient(135deg, var(--brand-light), var(--brand-dark));
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  box-shadow:0 6px 18px rgba(31,157,87,0.35); }
+  box-shadow:0 6px 18px rgba(46,61,95,0.35); }
 .brand-mark svg { width:23px; height:23px; stroke:#fff; }
 .brand-name { font-weight:800; font-size:18px; letter-spacing:-0.01em; }
 .brand-sub { font-size:12px; color:var(--text-dim); font-weight:500; }
@@ -78,14 +78,14 @@ h1 .accent { color:var(--brand-light); }
   border:1px solid var(--border); border-radius:20px;
   padding:24px 22px; box-shadow:0 24px 60px rgba(0,0,0,0.45); position:relative; overflow:hidden; }
 .card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg, transparent, rgba(78,201,138,0.5), transparent); }
+  background:linear-gradient(90deg, transparent, rgba(123,147,201,0.5), transparent); }
 
 /* Progress */
 .progress { display:flex; gap:6px; margin-bottom:6px; }
 .progress-dot { flex:1; height:5px; border-radius:99px; background:var(--surface-3);
   transition:background 0.4s, box-shadow 0.4s; }
 .progress-dot.done { background:linear-gradient(90deg, var(--brand), var(--brand-light));
-  box-shadow:0 0 10px rgba(78,201,138,0.4); }
+  box-shadow:0 0 10px rgba(123,147,201,0.4); }
 .progress-label { font-family:'Geist Mono',monospace; font-size:10.5px; color:var(--text-dim);
   letter-spacing:0.08em; margin:9px 0 20px; text-align:right; }
 
@@ -104,7 +104,7 @@ h1 .accent { color:var(--brand-light); }
   align-items:center; gap:13px; color:var(--text); font-family:inherit; position:relative; }
 .opt:hover { border-color:var(--border-soft); background:var(--surface-3); transform:translateY(-1px); }
 .opt.selected { border-color:var(--brand); background:var(--brand-soft);
-  box-shadow:0 0 0 3px var(--brand-soft), 0 8px 20px rgba(31,157,87,0.18); }
+  box-shadow:0 0 0 3px var(--brand-soft), 0 8px 20px rgba(46,61,95,0.18); }
 .opt-emoji { font-size:23px; line-height:1; flex-shrink:0; }
 .opt-main { font-weight:600; font-size:15px; }
 .opt-sub { font-size:12.5px; color:var(--text-dim); margin-top:1px; }
@@ -129,9 +129,9 @@ h1 .accent { color:var(--brand-light); }
 /* Buttons */
 .btn { width:100%; background:linear-gradient(135deg, var(--brand-light), var(--brand)); color:#fff;
   border:none; border-radius:13px; padding:16px; font-family:inherit; font-size:15px; font-weight:700;
-  cursor:pointer; transition:all 0.16s; margin-top:8px; box-shadow:0 8px 22px rgba(31,157,87,0.32);
+  cursor:pointer; transition:all 0.16s; margin-top:8px; box-shadow:0 8px 22px rgba(46,61,95,0.32);
   display:flex; align-items:center; justify-content:center; gap:8px; }
-.btn:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 12px 28px rgba(31,157,87,0.42); }
+.btn:hover { filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 12px 28px rgba(46,61,95,0.42); }
 .btn:active { transform:translateY(0); }
 .btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
 .btn svg { width:17px; height:17px; }
@@ -181,7 +181,7 @@ h1 .accent { color:var(--brand-light); }
     </div>
     <div>
       <div class="brand-name" id="brandName">Bob Harvey Roofing</div>
-      <div class="brand-sub" id="brandSub">Here for all your roofing needs</div>
+      <div class="brand-sub" id="brandSub">Roofing Done Right</div>
     </div>
     <a class="brand-phone" id="brandPhone" href="#">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -201,7 +201,7 @@ h1 .accent { color:var(--brand-light); }
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
     </div>
-    <div class="proof-text"><b>Trusted local roofer</b> · Licensed &amp; insured · Free on-site quotes</div>
+    <div class="proof-text"><b>Family-owned since 1988</b> &middot; Licensed &amp; insured</div>
   </div>
 
   <div class="card">
@@ -309,7 +309,7 @@ h1 .accent { color:var(--brand-light); }
    ============================================================ */
 var CONFIG = {
   companyName: 'Bob Harvey Roofing',
-  companyTagline: 'Here for all your roofing needs',
+  companyTagline: 'Roofing Done Right',
   phone: '(801) 516-0538',           // the roofer's phone (or your demo line)
   leadTopic: 'roofquote-bobharvey-4d7e83', // ntfy.sh topic — every lead buzzes this phone
   leadWebhook: ''                    // optional: extra webhook URL to also receive leads
