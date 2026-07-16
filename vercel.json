@@ -28,6 +28,8 @@
     { "source": "/forgot-password/", "destination": "/forgot-password.html" },
     { "source": "/self-storage", "destination": "/self-storage.html" },
     { "source": "/self-storage/", "destination": "/self-storage.html" },
+    { "source": "/quote", "destination": "/quote/index.html" },
+    { "source": "/quote/", "destination": "/quote/index.html" },
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
