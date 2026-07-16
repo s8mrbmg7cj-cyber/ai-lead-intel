@@ -30,6 +30,8 @@
     { "source": "/self-storage/", "destination": "/self-storage.html" },
     { "source": "/quote", "destination": "/quote/index.html" },
     { "source": "/quote/", "destination": "/quote/index.html" },
+    { "source": "/quote/:slug", "destination": "/quote/:slug/index.html" },
+    { "source": "/quote/:slug/", "destination": "/quote/:slug/index.html" },
     { "source": "/dashboard/:slug", "destination": "/dashboard-app.html" },
     { "source": "/dashboard/:slug/", "destination": "/dashboard-app.html" }
   ],
