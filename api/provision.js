@@ -128,6 +128,10 @@ function buildSystemPrompt(c) {
     + '- No filler, no long intros, no over-explaining. Get to the point.\n'
     + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
     + '- If you need a detail, ask one quick question at a time.';
+  // Niche-specific intake playbook — makes the receptionist ask the questions a
+  // real dispatcher in THIS trade would ask, and flag the true emergencies.
+  const niche = buildNichePlaybook(c);
+  if (niche) prompt += niche;
   // How the assistant handles "can I talk to a person?" — capture their info
   // and promise a callback. Only if they specifically ask for a number to call
   // does it read out the business number. Never attempt a live transfer.
@@ -144,6 +148,60 @@ function buildSystemPrompt(c) {
     + 'If the caller directly asks whether you are a person, tell them you are an AI assistant. '
     + 'Never claim or imply that you are a human.';
   return prompt;
+}
+
+// Niche intake playbook. Detects the trade from the client's business_type /
+// services text and appends the specific triage questions and emergency flags a
+// real dispatcher in that trade uses. This is what makes each receptionist feel
+// purpose-built for the customer's industry instead of generic. Returns '' for
+// trades we don't have a playbook for, so the base prompt still stands alone.
+function buildNichePlaybook(c) {
+  const hay = `${c.business_type || ''} ${c.services_offered || ''} ${c.business_name || ''}`.toLowerCase();
+  const has = (...words) => words.some(w => hay.includes(w));
+
+  if (has('hvac', 'heating', 'cooling', 'air condition', ' ac ', 'furnace')) {
+    return '\n\n# HVAC INTAKE PLAYBOOK\n'
+      + 'For every service caller, work these in naturally (one question at a time):\n'
+      + '1. Is this about heating or cooling (or something else, like a new install or a quote)?\n'
+      + '2. What is the system doing — no heat, no cool air, strange noise, leak, no power, or just a tune-up?\n'
+      + '3. Is it their home or a business, and what is the property address?\n'
+      + '4. How long has it been going on?\n'
+      + '- Treat as an URGENT emergency to escalate right away: no heat when it is very cold, no cooling in extreme heat (especially with elderly, infants, or medical needs), a gas smell, or any burning smell. If they mention a GAS SMELL, tell them to leave the home and call their gas company or 911 first, then take their details.\n'
+      + '- Always ask if they already have a system they want serviced or are looking to replace/install a new one — those go to different follow-ups.';
+  }
+
+  if (has('roof', 'shingle', 'gutter')) {
+    return '\n\n# ROOFING INTAKE PLAYBOOK\n'
+      + 'For every caller, work these in naturally (one question at a time):\n'
+      + '1. Is this a repair, a full roof replacement, or a free quote/inspection?\n'
+      + '2. Is there an ACTIVE LEAK or water coming into the home right now?\n'
+      + '3. What type of roof is it (asphalt shingle, metal, tile, flat) if they know?\n'
+      + '4. What is the property address, and is it a home or a business?\n'
+      + '5. Was there recent storm, wind, or hail damage? (These are often insurance jobs — note it.)\n'
+      + '- Treat as URGENT to escalate right away: an active leak, water entering the home, or storm damage that left the roof open. Reassure them help is being arranged and capture the address fast.';
+  }
+
+  if (has('plumb', 'drain', 'sewer', 'water heater')) {
+    return '\n\n# PLUMBING INTAKE PLAYBOOK\n'
+      + 'For every caller, work these in naturally (one question at a time):\n'
+      + '1. What is happening — leak, clog/backup, no hot water, running/overflowing toilet, burst pipe, or a quote?\n'
+      + '2. Is water actively leaking or flooding right now? If YES, ask if they can shut off the water at the main valve.\n'
+      + '3. Is it their home or a business, and what is the property address?\n'
+      + '4. Which fixture or area (kitchen, bathroom, water heater, main line)?\n'
+      + '- Treat as URGENT to escalate right away: a burst pipe, active flooding, sewage backup, or no water to the whole property. Walk them to the shutoff valve first, then take their details.';
+  }
+
+  if (has('storage', 'self storage', 'self-storage')) {
+    return '\n\n# SELF-STORAGE INTAKE PLAYBOOK\n'
+      + 'Most callers want a unit or have a question about their existing one. Work these in naturally:\n'
+      + '1. Are they looking to rent a new unit, or is this about a unit they already have?\n'
+      + '2. If renting: what are they storing / roughly how much (a few boxes, a room, a house, a car/RV)? Use that to suggest a size.\n'
+      + '3. When do they need it, and how long do they expect to need it?\n'
+      + '4. If it is about an existing unit: get their name and unit number, and what they need (gate code, billing, access hours, move-out).\n'
+      + '- Capture name and phone every time so the team can follow up with availability and pricing.';
+  }
+
+  return '';
 }
 
 // Fallback only — used when a client row has no stored ai_prompt.
