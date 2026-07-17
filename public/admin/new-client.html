@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>AI Lead Intel — Set Up a New Client</title>
+<!-- Auth guard MUST be first script -->
+<script src="/admin/auth-guard.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #04050a; --surface: #0d0f17; --surface-2: #11141d; --surface-input: #0a0c13;
+  --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10); --border-3: rgba(255,255,255,0.16);
+  --text: #f5f7fa; --text-soft: #c8cdd6; --text-dim: #8a92a3; --text-faint: #5a6173;
+  --brand: #ff6a00; --brand-2: #ff9a00; --brand-glow: rgba(255,106,0,0.35); --brand-soft: rgba(255,106,0,0.10); --brand-line: rgba(255,106,0,0.26);
+  --green: #34d399; --green-soft: rgba(52,211,153,0.10); --green-line: rgba(52,211,153,0.30);
+  --red: #f87171; --red-soft: rgba(248,113,113,0.10); --red-line: rgba(248,113,113,0.30);
+}
+html, body { min-height: 100%; }
+body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; line-height: 1.55;
+  padding: 0 0 80px;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,106,0,0.08), transparent 60%);
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 14px; padding: 14px 22px;
+  background: rgba(8,10,16,0.8); backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%); border-bottom: 1px solid var(--border);
+}
+.topbar::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,106,0,0.45), transparent); }
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 0 18px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
+.brand-title { font-size: 13.5px; font-weight: 700; line-height: 1; }
+.brand-sub { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand); font-weight: 600; margin-top: 3px; }
+.tb-spacer { flex: 1; }
+.tb-link { font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); padding: 7px 11px; border: 1px solid var(--border-2); border-radius: 7px; }
+.tb-link:hover { color: var(--text); border-color: var(--border-3); }
+
+/* Layout */
+.wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 34px 22px 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 12px; }
+.eyebrow .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 6px var(--brand-glow); }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+.lead { color: var(--text-dim); font-size: 14.5px; max-width: 560px; margin-bottom: 26px; }
+
+/* Card + form */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.section-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin: 4px 0 16px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field.full { grid-column: 1 / -1; }
+label { font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+label .req { color: var(--brand); }
+label .hint { font-weight: 400; color: var(--text-faint); font-size: 11.5px; }
+input, select, textarea {
+  width: 100%; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 9px;
+  padding: 11px 13px; color: var(--text); font-family: inherit; font-size: 14px; transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea { resize: vertical; min-height: 74px; line-height: 1.5; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand-line); box-shadow: 0 0 0 3px var(--brand-soft); }
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
+select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a92a3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+
+/* Submit */
+.submit-row { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 14px 26px; border-radius: 11px; font-size: 15px; font-weight: 700;
+  color: #1a0e00; background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 6px 22px rgba(255,106,0,0.28); transition: transform 0.12s, box-shadow 0.12s, opacity 0.15s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(255,106,0,0.4); }
+.btn-primary:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
+.submit-note { font-size: 12.5px; color: var(--text-faint); }
+
+/* Result */
+.result { display: none; }
+.result.show { display: block; animation: rise 0.3s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.result-head { display: flex; align-items: center; gap: 11px; margin-bottom: 6px; }
+.result-badge { display: inline-flex; align-items: center; gap: 7px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); padding: 6px 11px; border-radius: 99px; }
+.result h2 { font-size: 20px; font-weight: 700; margin: 14px 0 4px; }
+.result .sub { color: var(--text-dim); font-size: 13.5px; margin-bottom: 20px; }
+.linkbox { display: flex; gap: 9px; margin-bottom: 18px; }
+.linkbox input { font-family: 'Geist Mono', monospace; font-size: 12.5px; color: var(--brand); }
+.copy-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 0 16px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text-soft); font-size: 13px; font-weight: 600; }
+.copy-btn:hover { border-color: var(--brand-line); color: var(--text); }
+.copy-btn.done { color: var(--green); border-color: var(--green-line); background: var(--green-soft); }
+.sms-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; margin-bottom: 9px; }
+.sms-box { background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 11px; padding: 15px 16px; font-size: 14px; color: var(--text-soft); line-height: 1.6; white-space: pre-wrap; margin-bottom: 12px; }
+.steps { list-style: none; counter-reset: s; margin: 20px 0 4px; padding: 16px 18px; background: rgba(255,106,0,0.04); border: 1px solid var(--brand-line); border-radius: 12px; }
+.steps li { counter-increment: s; position: relative; padding-left: 30px; font-size: 13.5px; color: var(--text-soft); margin-bottom: 9px; }
+.steps li:last-child { margin-bottom: 0; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--brand); color: #1a0e00; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.again-btn { margin-top: 18px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); padding: 10px 16px; border: 1px solid var(--border-2); border-radius: 8px; }
+.again-btn:hover { color: var(--text); border-color: var(--border-3); }
+
+.err { display: none; margin-top: 16px; padding: 13px 15px; border-radius: 10px; background: var(--red-soft); border: 1px solid var(--red-line); color: #ffb4b4; font-size: 13.5px; }
+.err.show { display: block; }
+
+@media (max-width: 620px) { .grid { grid-template-columns: 1fr; } .wrap { padding-top: 26px; } h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div>
+      <div class="brand-title">AI Lead Intel</div>
+      <div class="brand-sub">Set Up New Client</div>
+    </div>
+  </div>
+  <div class="tb-spacer"></div>
+  <a class="tb-link" href="/admin/command.html">← Command Center</a>
+</div>
+
+<div class="wrap">
+  <div id="formView">
+    <div class="eyebrow"><span class="pip"></span> Founder Tool</div>
+    <h1>Set up a client for them</h1>
+    <p class="lead">Fill in what you learned on the call. This builds their AI receptionist and gives you a payment link to text them. They pay with their own card — a 7-day free trial, no charge today. Once they pay, their phone number goes live automatically.</p>
+
+    <form id="clientForm">
+      <div class="card">
+        <div class="section-label">The Business</div>
+        <div class="grid">
+          <div class="field full">
+            <label>Business name <span class="req">*</span></label>
+            <input name="business_name" required placeholder="e.g. North Shore Heating & Air" />
+          </div>
+          <div class="field">
+            <label>Industry</label>
+            <select name="industry">
+              <option value="hvac">HVAC</option>
+              <option value="roofing">Roofing</option>
+              <option value="plumbing">Plumbing</option>
+              <option value="electrician">Electrician</option>
+              <option value="self_storage">Self Storage</option>
+              <option value="landscaping">Landscaping / Lawn Care</option>
+              <option value="pest_control">Pest Control</option>
+              <option value="cleaning">Cleaning Services</option>
+              <option value="auto_repair">Auto Repair</option>
+              <option value="auto_detailing">Auto Detailing</option>
+              <option value="locksmith">Locksmith</option>
+              <option value="salon">Salon / Spa</option>
+              <option value="real_estate">Real Estate</option>
+              <option value="dental">Dental / Medical</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Plan</label>
+            <select name="plan">
+              <option value="starter">Starter — $97/mo</option>
+              <option value="pro">Pro — $297/mo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Their business phone <span class="hint">(the number people call)</span></label>
+            <input name="business_phone" placeholder="(906) 555-0100" />
+          </div>
+          <div class="field">
+            <label>Their cell <span class="req">*</span> <span class="hint">(where leads get sent)</span></label>
+            <input name="transfer_primary" placeholder="(906) 555-0199" />
+          </div>
+          <div class="field full">
+            <label>Their email <span class="req">*</span> <span class="hint">(lead alerts + dashboard login)</span></label>
+            <input name="notify_email" type="email" required placeholder="owner@theirbusiness.com" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">How the AI Should Work</div>
+        <div class="grid">
+          <div class="field full">
+            <label>Services they offer</label>
+            <input name="services_offered" placeholder="e.g. AC repair, furnace install, maintenance plans" />
+          </div>
+          <div class="field">
+            <label>Service area</label>
+            <input name="service_area" placeholder="e.g. Marquette County, MI" />
+          </div>
+          <div class="field">
+            <label>Business hours</label>
+            <input name="transfer_hours" placeholder="e.g. Mon–Fri 8am–5pm" />
+          </div>
+          <div class="field">
+            <label>Voice / tone</label>
+            <select name="personality">
+              <option value="warm">Warm &amp; conversational</option>
+              <option value="professional">Professional &amp; polished</option>
+              <option value="direct">Direct &amp; to-the-point</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Pricing rule</label>
+            <select name="pricing_rule">
+              <option value="no_quote">Never quote — take a message</option>
+              <option value="no_transfer">Never quote — transfer to owner</option>
+              <option value="yes_ranges">Give price ranges only</option>
+              <option value="yes_specific">Give exact prices</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Known prices <span class="hint">(optional — only if it gives prices)</span></label>
+            <textarea name="pricing_examples" placeholder="e.g. Service call $89. Furnace tune-up $129."></textarea>
+          </div>
+          <div class="field">
+            <label>Transfer urgent calls live?</label>
+            <select name="offer_urgent_transfer">
+              <option value="no">No — always take a message</option>
+              <option value="yes">Yes — offer to connect them</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Notes for the AI <span class="hint">(anything special)</span></label>
+            <textarea name="notes" placeholder="e.g. We don't do new construction. Always mention the free estimate."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <span id="btnText">Build client &amp; get payment link</span>
+        </button>
+        <span class="submit-note">Nothing is charged. This just creates their link.</span>
+      </div>
+      <div class="err" id="errBox"></div>
+    </form>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result" id="resultView">
+    <div class="card">
+      <div class="result-head">
+        <span class="result-badge"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Client created</span>
+      </div>
+      <h2 id="resultTitle">Their AI receptionist is built.</h2>
+      <p class="sub">Send them this payment link. When they tap it and enter their card, their 7-day free trial starts and their phone line goes live automatically.</p>
+
+      <div class="sms-label">Payment link</div>
+      <div class="linkbox">
+        <input id="linkInput" readonly />
+        <button class="copy-btn" id="copyLink" type="button">Copy</button>
+      </div>
+
+      <div class="sms-label">Ready-to-send text message</div>
+      <div class="sms-box" id="smsText"></div>
+      <button class="copy-btn" id="copySms" type="button" style="padding:10px 16px;">Copy text message</button>
+
+      <ol class="steps">
+        <li>Text or email the link above to the owner.</li>
+        <li>They tap it, enter their card — <strong>$0 today</strong>, free for 7 days.</li>
+        <li>Their phone number and AI go live automatically the moment they finish.</li>
+        <li>You'll get an alert. Nothing else to do.</li>
+      </ol>
+
+      <button class="again-btn" id="againBtn" type="button">+ Set up another client</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var form = document.getElementById('clientForm');
+  var submitBtn = document.getElementById('submitBtn');
+  var btnText = document.getElementById('btnText');
+  var errBox = document.getElementById('errBox');
+  var formView = document.getElementById('formView');
+  var resultView = document.getElementById('resultView');
+
+  function showErr(msg) {
+    errBox.textContent = msg;
+    errBox.classList.add('show');
+  }
+  function clearErr() { errBox.classList.remove('show'); errBox.textContent = ''; }
+
+  function wireCopy(btn, getText) {
+    btn.addEventListener('click', function () {
+      var text = getText();
+      navigator.clipboard.writeText(text).then(function () {
+        var orig = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        btn.classList.add('done');
+        setTimeout(function () { btn.textContent = orig; btn.classList.remove('done'); }, 1800);
+      }).catch(function () {
+        showErr('Could not copy automatically — select the link and copy it manually.');
+      });
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearErr();
+
+    var fd = new FormData(form);
+    var payload = {};
+    fd.forEach(function (v, k) { payload[k] = typeof v === 'string' ? v.trim() : v; });
+
+    if (!payload.business_name) { showErr('Business name is required.'); return; }
+    if (!payload.notify_email) { showErr('Their email is required.'); return; }
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'Building…';
+
+    fetch('/api/onboarding-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    })
+    .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+    .then(function (res) {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Build client & get payment link';
+
+      var j = res.j || {};
+      var link = j.checkout_url || j.paypal_redirect || '';
+      if (!res.ok || !j.success || !link) {
+        showErr(j.error || 'Something went wrong creating the client. Try again in a minute.');
+        return;
+      }
+
+      var biz = j.business_name || payload.business_name || 'your business';
+      document.getElementById('resultTitle').textContent = biz + '\u2019s AI receptionist is built.';
+      document.getElementById('linkInput').value = link;
+
+      var sms =
+        'Hey \u2014 here\u2019s the AI receptionist for ' + biz + '. ' +
+        'It answers every call 24/7 so you never miss a job. ' +
+        'Tap to start your free 7-day trial (no charge today, cancel anytime):\n' + link;
+      document.getElementById('smsText').textContent = sms;
+
+      wireCopy(document.getElementById('copyLink'), function () { return link; });
+      wireCopy(document.getElementById('copySms'), function () { return sms; });
+
+      formView.style.display = 'none';
+      resultView.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(function (err) {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Build client & get payment link';
+      showErr('Network error: ' + (err && err.message ? err.message : 'could not reach the server.'));
+    });
+  });
+
+  document.getElementById('againBtn').addEventListener('click', function () {
+    form.reset();
+    clearErr();
+    resultView.classList.remove('show');
+    formView.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>
