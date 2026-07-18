@@ -123,6 +123,12 @@ export default async function handler(req, res) {
     await saveToSupabase(callData);
 
     // ─────────────────────────────────────────────
+    // USAGE CAP — margin protection (best-effort, never blocks)
+    // ─────────────────────────────────────────────
+
+    await checkUsageCap({ client, callData });
+
+    // ─────────────────────────────────────────────
     // SEND CLIENT EMAIL
     // ─────────────────────────────────────────────
 
@@ -216,6 +222,144 @@ async function saveToSupabase(callData) {
   }
 
   console.log("CALL SAVED");
+}
+
+// ─────────────────────────────────────────────
+// USAGE CAP — margin protection
+// ─────────────────────────────────────────────
+// Each plan includes a monthly allowance of calls + talk minutes. The AI NEVER
+// stops answering (we never want to drop a real customer's lead), but the
+// moment usage crosses the included amount we fire ONE alert to the owner so
+// they know they're in overage territory. Best-effort: any failure here is
+// swallowed so it can never break the webhook or block a lead.
+
+const USAGE_CAPS = {
+  starter: { minutes: 250, calls: 100 },
+  pro: { minutes: 600, calls: 240 },
+};
+
+async function checkUsageCap({ client, callData }) {
+  try {
+    const plan = client.plan === "pro" ? "pro" : "starter";
+    const cap = USAGE_CAPS[plan];
+    if (!cap) return;
+
+    // Start of the current calendar month, UTC.
+    const now = new Date();
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+
+    const url =
+      `${process.env.SUPABASE_URL}/rest/v1/calls` +
+      `?client_uuid=eq.${client.id}` +
+      `&created_at=gte.${monthStart}` +
+      `&select=duration_seconds`;
+
+    const resp = await fetch(url, {
+      headers: {
+        apikey: process.env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      },
+    });
+    const rows = await resp.json().catch(() => []);
+    if (!Array.isArray(rows)) return;
+
+    const totalCalls = rows.length;
+    const totalSec = rows.reduce((s, r) => s + (r.duration_seconds || 0), 0);
+    const capSec = cap.minutes * 60;
+
+    // Usage BEFORE this call (subtract the one we just saved) so we only alert
+    // on the single call that actually crosses the line — never repeatedly.
+    const thisSec = callData.duration_seconds || 0;
+    const prevSec = totalSec - thisSec;
+    const prevCalls = totalCalls - 1;
+
+    const crossedMinutes = prevSec < capSec && totalSec >= capSec;
+    const crossedCalls = prevCalls < cap.calls && totalCalls >= cap.calls;
+
+    if (!crossedMinutes && !crossedCalls) return;
+
+    const usedMin = Math.round(totalSec / 60);
+    const reason = crossedCalls
+      ? `${totalCalls} calls this month (plan includes ${cap.calls})`
+      : `${usedMin} talk minutes this month (plan includes ${cap.minutes})`;
+
+    await sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap });
+  } catch (err) {
+    console.error("USAGE CAP CHECK FAILED:", err);
+  }
+}
+
+async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap }) {
+  const biz = client.business_name || "your business";
+
+  // Push to the owner's private topic (same one used for lead alerts).
+  const topic = client.ntfy_topic || process.env.NTFY_TOPIC;
+  if (topic) {
+    try {
+      await fetch(`https://ntfy.sh/${topic}`, {
+        method: "POST",
+        headers: {
+          Title: `📊 ${biz} — monthly plan usage reached`,
+          Priority: "default",
+          Tags: "bar_chart",
+        },
+        body:
+          `You've reached your ${plan.toUpperCase()} plan's included usage: ${reason}.\n\n` +
+          `Your AI is still answering every call — no interruption. ` +
+          `Reply to upgrade if this is your new normal.`,
+      });
+    } catch (err) {
+      console.error("USAGE CAP PUSH FAILED:", err);
+    }
+  }
+
+  // Email backup to the business owner + internal notify list.
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    const to = [client.notify_email].filter(Boolean);
+    if (process.env.NOTIFY_EMAIL) {
+      process.env.NOTIFY_EMAIL.split(",").map((e) => e.trim()).filter(Boolean).forEach((e) => to.push(e));
+    }
+    if (to.length) {
+      try {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: `AI Lead Intel <hello@aileadintel.com>`,
+            to,
+            replyTo: "hello@aileadintel.com",
+            subject: `You've reached your ${plan.toUpperCase()} plan's monthly usage`,
+            html: `
+  <div style="background:#f6f7f9;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+    <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;">
+      <div style="font-size:18px;font-weight:700;color:#111827;">You've reached your plan's included usage</div>
+      <div style="font-size:14px;color:#374151;line-height:1.6;margin-top:10px;">
+        Hi ${escapeHtml(biz)} — heads up, you've reached the usage included in your
+        <strong>${plan.toUpperCase()}</strong> plan this month: <strong>${escapeHtml(reason)}</strong>.
+      </div>
+      <div style="font-size:14px;color:#374151;line-height:1.6;margin-top:12px;">
+        <strong>Nothing is turned off.</strong> Your AI receptionist is still answering every call —
+        we'd never let a real lead slip. This is just a friendly heads-up in case you'd like to move
+        up to a plan with more room.
+      </div>
+      <div style="font-size:13px;color:#6b7280;margin-top:16px;">
+        This month so far: ${totalCalls} calls · ~${usedMin} talk minutes
+        (plan includes ${cap.calls} calls / ${cap.minutes} minutes).
+      </div>
+      <div style="font-size:13px;color:#9ca3af;margin-top:18px;">Just reply to this email to upgrade or ask a question.</div>
+    </div>
+  </div>`,
+          }),
+        });
+      } catch (err) {
+        console.error("USAGE CAP EMAIL FAILED:", err);
+      }
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
