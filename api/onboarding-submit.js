@@ -267,7 +267,10 @@ async function safeCustomerEmail(data, finalSlug) {
     const resend = new Resend(resendKey);
     const businessName = data.business_name || "your business";
     const isPro = data.plan === "pro";
-    const dashboardBlock = isPro ? `<div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;"><div style="font-family:monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">★ Your Pro Dashboard</div><a href="https://aileadintel.com/dashboard/${finalSlug}" style="display:inline-block;font-family:monospace;font-size:13px;color:#ff6a00;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;text-decoration:none;">aileadintel.com/dashboard/${finalSlug}</a></div>` : "";
+    const dashUrl = isPro ? `https://aileadintel.com/dashboard/${finalSlug}` : `https://aileadintel.com/account`;
+    const dashText = isPro ? `aileadintel.com/dashboard/${finalSlug}` : `aileadintel.com/account`;
+    const dashLabel = isPro ? "★ Your Pro Dashboard" : "★ Your Dashboard";
+    const dashboardBlock = `<div style="background:linear-gradient(135deg,rgba(255,106,0,0.06),transparent);border:1px solid rgba(255,106,0,0.22);border-radius:12px;padding:18px 20px;margin:0 0 20px 0;"><div style="font-family:monospace;font-size:10px;color:#ff6a00;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">${dashLabel}</div><a href="${dashUrl}" style="display:inline-block;font-family:monospace;font-size:13px;color:#ff6a00;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;text-decoration:none;">${dashText}</a><div style="font-size:12px;color:#6b7280;margin-top:8px;">See your billing, your AI's number, and manage everything anytime. Sign in with the password you set after checkout.</div></div>`;
     await resend.emails.send({
       from: "AI Lead Intel <hello@aileadintel.com>",
       to: [data.notify_email],

@@ -77,6 +77,21 @@ h1 .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-we
 .btn-dash { color: var(--text); border-color: var(--border-2); background: var(--surface-3); }
 .btn-dash:hover { border-color: var(--brand-line); }
 .cancel-note { font-size: 12px; color: var(--text-faint); margin-top: 12px; line-height: 1.5; }
+.help-block { margin: 4px 0 18px; border-top: 1px solid var(--border); padding-top: 18px; }
+.help-head { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); font-weight: 700; margin-bottom: 14px; }
+.help-item { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 12px; padding: 15px 16px; margin-bottom: 10px; }
+.help-item-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+.help-item-body { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.help-item-body strong { color: var(--text-soft); font-weight: 600; }
+.help-item-body a { color: var(--brand-2); font-weight: 600; }
+.help-list { margin: 9px 0 4px; padding-left: 18px; }
+.help-list li { margin-bottom: 5px; }
+.help-item-body code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 6px; padding: 1px 6px; color: var(--text-soft); }
+.help-topic-box { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin: 11px 0 4px; }
+.help-topic { flex: 1; min-width: 170px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 9px; padding: 9px 13px; word-break: break-all; }
+.help-copy { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; padding: 9px 15px; font-size: 12.5px; }
+.help-copy.copied { background: linear-gradient(135deg, var(--green), #4ade80); }
+.help-link { display: inline-block; margin-top: 11px; font-size: 12.5px; color: var(--brand); font-weight: 600; }
 .confirm-box { margin-top: 14px; background: var(--red-soft); border: 1px solid var(--red-line); border-radius: 12px; padding: 16px; display: none; }
 .confirm-box.open { display: block; }
 .confirm-text { font-size: 13.5px; color: var(--text-soft); margin-bottom: 12px; line-height: 1.55; }
@@ -147,6 +162,60 @@ function prettyDate(d) {
   try { return new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
   catch (_) { return '—'; }
 }
+function starterHelpBlock(c) {
+  const num = prettyNumber(c.twilio_number);
+  const digits = String(c.twilio_number || '').replace(/[^\d]/g, '').replace(/^1/, '');
+  const topic = (c.ntfy_topic || '').trim();
+  const numLine = num
+    ? `<strong>${esc(num)}</strong>`
+    : `<strong>being assigned</strong> — you'll get an email the moment it's ready`;
+
+  const forwardBody = digits ? `
+    <div class="help-item-body">
+      Point your existing business number at your AI so it answers every call. From your business phone, dial the code for your carrier, then press call:
+      <ul class="help-list">
+        <li>Verizon, US Cellular &amp; most landlines: <code>*72${digits}</code> &nbsp;(turn off: <code>*73</code>)</li>
+        <li>AT&amp;T: <code>*21*${digits}#</code> &nbsp;(turn off: <code>#21#</code>)</li>
+        <li>T-Mobile, Metro, Mint: <code>**21*${digits}#</code> &nbsp;(turn off: <code>##21#</code>)</li>
+        <li>Internet / VoIP (Spectrum, Xfinity, RingCentral): turn on call forwarding in your provider's app.</li>
+      </ul>
+      Or skip forwarding and use <strong>${esc(num)}</strong> directly as your business line on Google, your website, and your cards.
+    </div>` : `
+    <div class="help-item-body">Once your AI number is assigned, this section will show the exact code to forward your existing business line to it.</div>`;
+
+  const pushBody = topic ? `
+    <div class="help-item-body">
+      On top of the email, get an instant push the second a call comes in — caller's name, number, and what they wanted. Free, works on any phone.
+      <ul class="help-list">
+        <li>Install the free <strong>ntfy</strong> app — <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> &middot; <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a></li>
+        <li>Open it, tap <strong>+</strong> to subscribe, and paste your private code below</li>
+      </ul>
+      <div class="help-topic-box">
+        <code class="help-topic" data-topic="${esc(topic)}">${esc(topic)}</code>
+        <button class="btn help-copy" data-copy="${esc(topic)}" type="button">Copy</button>
+      </div>
+      <a class="help-link" href="https://ntfy.sh/${encodeURIComponent(topic)}" target="_blank" rel="noopener">Or open &amp; test it in your browser first &rarr;</a>
+    </div>` : '';
+
+  return `
+    <div class="help-block">
+      <div class="help-head">Your setup &amp; details</div>
+      <div class="help-item">
+        <div class="help-item-title">Your AI receptionist's number</div>
+        <div class="help-item-body">Callers reach your AI at ${numLine}. It answers 24/7, captures the lead, and books or transfers based on your rules.</div>
+      </div>
+      <div class="help-item">
+        <div class="help-item-title">Forward your business calls to your AI</div>
+        ${forwardBody}
+      </div>
+      <div class="help-item">
+        <div class="help-item-title">Where your leads go</div>
+        <div class="help-item-body">Every call is emailed to <strong>${esc(c.notify_email || 'your email')}</strong> the moment it ends — with a summary of who called and what they wanted.</div>
+      </div>
+      ${pushBody ? `<div class="help-item"><div class="help-item-title">Get buzzed on your phone for every lead</div>${pushBody}</div>` : ''}
+    </div>`;
+}
+
 function statusInfo(client) {
   const s = (client.status || '').toLowerCase();
   if (s === 'cancelled') return { cls: 'cancelled', label: 'Cancelled' };
@@ -185,6 +254,7 @@ function renderAccounts(clients) {
         <div class="acct-cell"><div class="acct-cell-label">Billing</div><div class="acct-cell-value">${isCancelled ? 'Stopped' : 'Via Stripe · 7-day free trial, then monthly'}</div></div>
         <div class="acct-cell" style="grid-column: 1 / -1;"><div class="acct-cell-label">Every call emailed to</div><div class="acct-cell-value">${esc(c.notify_email || '—')}</div></div>
       </div>
+      ${plan === 'starter' && !isCancelled ? starterHelpBlock(c) : ''}
       <div class="acct-actions">
         ${plan === 'pro' && !isCancelled ? `<a class="btn btn-dash" href="/dashboard/${encodeURIComponent(c.client_slug)}">Open dashboard</a>` : ''}
         ${!isCancelled ? `<button class="btn btn-cancel" data-action="ask">Cancel subscription</button>` : ''}
@@ -209,6 +279,14 @@ function renderAccounts(clients) {
     const askBtn = card.querySelector('[data-action="ask"]');
     const keepBtn = card.querySelector('[data-action="keep"]');
     const confirmBtn = card.querySelector('[data-action="confirm"]');
+    const copyBtn = card.querySelector('.help-copy');
+    if (copyBtn) copyBtn.addEventListener('click', function () {
+      navigator.clipboard.writeText(this.dataset.copy).then(() => {
+        this.textContent = 'Copied!';
+        this.classList.add('copied');
+        setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('copied'); }, 1800);
+      }).catch(() => {});
+    });
     if (askBtn) askBtn.addEventListener('click', () => { confirmBox.classList.add('open'); });
     if (keepBtn) keepBtn.addEventListener('click', () => { confirmBox.classList.remove('open'); });
     if (confirmBtn) confirmBtn.addEventListener('click', async () => {
