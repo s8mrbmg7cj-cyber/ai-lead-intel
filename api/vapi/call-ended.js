@@ -296,17 +296,20 @@ async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, ca
   const topic = client.ntfy_topic || process.env.NTFY_TOPIC;
   if (topic) {
     try {
-      await fetch(`https://ntfy.sh/${topic}`, {
+      // JSON publish (title/tags in body) — headers can't carry the emoji/em dash.
+      await fetch("https://ntfy.sh", {
         method: "POST",
-        headers: {
-          Title: `📊 ${biz} — monthly plan usage reached`,
-          Priority: "default",
-          Tags: "bar_chart",
-        },
-        body:
-          `You've reached your ${plan.toUpperCase()} plan's included usage: ${reason}.\n\n` +
-          `Your AI is still answering every call — no interruption. ` +
-          `Reply to upgrade if this is your new normal.`,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic,
+          title: `📊 ${biz} — monthly plan usage reached`,
+          message:
+            `You've reached your ${plan.toUpperCase()} plan's included usage: ${reason}.\n\n` +
+            `Your AI is still answering every call — no interruption. ` +
+            `Reply to upgrade if this is your new normal.`,
+          priority: 3,
+          tags: ["bar_chart"],
+        }),
       });
     } catch (err) {
       console.error("USAGE CAP PUSH FAILED:", err);
@@ -554,17 +557,29 @@ async function sendPushNotification({ client, callData, leadAnalysis = {}, struc
     `${prettyPhone(bestNumber)}\n\n` +
     (shortSummary || leadAnalysis.outcome || "Call handled");
 
+  // IMPORTANT: publish via ntfy's JSON format (title/tags in the JSON body), not
+  // via HTTP headers. Node's fetch rejects any header value containing non-Latin1
+  // characters — and our titles use an em dash ("—") and emoji ("🔥"), which
+  // would make the request throw before it's ever sent. JSON body has no such
+  // limit, so the title and emoji come through fine.
   try {
-    await fetch(`https://ntfy.sh/${topic}`, {
+    const resp = await fetch("https://ntfy.sh", {
       method: "POST",
-      headers: {
-        Title: title,
-        Priority: isHot ? "urgent" : "default",
-        Tags: isHot ? "fire,phone" : "phone",
-      },
-      body,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic,
+        title,
+        message: body,
+        priority: isHot ? 5 : 3,
+        tags: isHot ? ["fire", "phone"] : ["phone"],
+      }),
     });
-    console.log("PUSH SENT to", topic);
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => "");
+      console.error(`PUSH FAILED (${resp.status}) to ${topic}: ${errText.slice(0, 200)}`);
+    } else {
+      console.log("PUSH SENT to", topic);
+    }
   } catch (err) {
     console.error("PUSH FAILED:", err);
   }
