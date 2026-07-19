@@ -60,8 +60,30 @@ const PRO_VOICE_MAP = {
 function pickVoice(client) {
   const style = client.voice_style || 'professional_female';
   const isPro = (client.plan || '').toLowerCase() === 'pro';
-  if (isPro) return PRO_VOICE_MAP[style] || PRO_VOICE_MAP.professional_female;
-  return VOICE_MAP[style] || VOICE_MAP.professional_female;
+  if (isPro) {
+    const v = PRO_VOICE_MAP[style] || PRO_VOICE_MAP.professional_female;
+    // Pro (ElevenLabs): tuned for a clear, natural, low-latency phone voice.
+    // turbo_v2_5 = fast + crisp; stability/similarity keep it consistent and
+    // human; speakerBoost sharpens clarity; streaming latency 3 keeps replies snappy.
+    return {
+      provider: '11labs',
+      voiceId: v.voiceId,
+      model: 'eleven_turbo_v2_5',
+      stability: 0.55,
+      similarityBoost: 0.8,
+      style: 0.0,
+      useSpeakerBoost: true,
+      optimizeStreamingLatency: 3,
+    };
+  }
+  // Starter (OpenAI): tts-1-hd is the higher-clarity model — noticeably cleaner
+  // on a phone line than the standard tts-1.
+  const v = VOICE_MAP[style] || VOICE_MAP.professional_female;
+  return {
+    provider: 'openai',
+    voiceId: v.voiceId,
+    model: 'tts-1-hd',
+  };
 }
 
 const enc = encodeURIComponent;
@@ -128,6 +150,13 @@ function buildSystemPrompt(c) {
     + '- No filler, no long intros, no over-explaining. Get to the point.\n'
     + '- Use contractions and a relaxed, human rhythm. Never read long lists out loud.\n'
     + '- If you need a detail, ask one quick question at a time.';
+  // Keep the call tight — aim to capture everything the owner needs in under 2 minutes.
+  prompt += '\n\n# PACE — KEEP IT UNDER 2 MINUTES\n'
+    + '- Move efficiently. Your goal is to get the caller\'s name, phone number, and reason for calling — plus the key intake details — in under 2 minutes.\n'
+    + '- Do NOT repeat the caller\'s answers back word-for-word. A quick "got it" or "perfect" is enough before the next question.\n'
+    + '- Ask only what you actually need. No small talk, no padding, no restating what they already told you.\n'
+    + '- Confirm the callback number ONCE (read it back a single time to make sure it\'s right), then wrap up.\n'
+    + '- As soon as you have their name, number, and what they need, thank them and end the call politely. Don\'t keep them on the line.';
   // Niche-specific intake playbook — makes the receptionist ask the questions a
   // real dispatcher in THIS trade would ask, and flag the true emergencies.
   const niche = buildNichePlaybook(c);
@@ -251,6 +280,10 @@ function buildAssistantPayload(client) {
     firstMessage: firstMessage,
     model,
     voice,
+    // Phone-tuned speech recognition. nova-2-phonecall is Deepgram's model built
+    // for phone audio — it hears callers clearly the first time, which means
+    // fewer "sorry, can you repeat that" moments and shorter calls.
+    transcriber: { provider: 'deepgram', model: 'nova-2-phonecall', language: 'en-US' },
     // No audio recordings — the product runs on transcripts + summaries only.
     // (Transcription is unaffected; this just stops Vapi storing call audio,
     // which we never use and which raises recording-consent questions in
