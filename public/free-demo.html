@@ -71,6 +71,23 @@
   .listen a { color: var(--text-soft); font-size: 14px; text-decoration: none; border-bottom: 1px dashed var(--border-3); padding-bottom: 2px; }
   .listen a strong { color: var(--brand-2); font-family: 'Geist Mono', monospace; }
 
+  /* ── FAQ ── */
+  .faq { margin-top: 30px; }
+  .faq h3 { font-size: 13px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; text-align: center; margin-bottom: 14px; }
+  details.q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0; margin-bottom: 9px; overflow: hidden; transition: border-color .15s; }
+  details.q[open] { border-color: var(--border-3); }
+  details.q summary { list-style: none; cursor: pointer; padding: 15px 16px; font-size: 14.5px; font-weight: 600; color: var(--text-soft); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q summary .plus { flex: none; color: var(--brand-2); font-size: 18px; font-weight: 400; transition: transform .18s; }
+  details.q[open] summary .plus { transform: rotate(45deg); }
+  details.q .a { padding: 0 16px 15px; font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── sticky mobile CTA ── */
+  .sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(20,20,28,0), var(--bg) 34%); display: none; }
+  .sticky-cta button { width: 100%; background: linear-gradient(180deg, var(--brand-2), var(--brand)); color: #180a00; border: none; border-radius: 12px; padding: 15px; font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 10px 30px -8px var(--brand-glow); }
+  .sticky-cta.hide { display: none !important; }
+  @media (max-width: 640px) { .sticky-cta { display: block; } .wrap { padding-bottom: 96px; } }
+
   /* success state */
   .success { display: none; text-align: center; padding: 8px 4px; }
   .success.show { display: block; }
@@ -143,6 +160,34 @@
       <div class="listen">
         <a href="tel:+19067622478">Prefer to hear it now? Call the live demo line <strong>(906) 762-2478</strong></a>
       </div>
+
+      <div class="faq">
+        <h3>Questions</h3>
+        <details class="q">
+          <summary>Is it actually free? <span class="plus">+</span></summary>
+          <div class="a">Yes. Building your demo and sending it to you costs nothing, and we never ask for a card. If you decide to turn it on for real, it's a flat monthly plan — but there's zero obligation to.</div>
+        </details>
+        <details class="q">
+          <summary>Will it sound like a robot? <span class="plus">+</span></summary>
+          <div class="a">Hear for yourself — that's the whole point. It uses a natural AI voice that greets callers as your business. You judge it before anyone else does.</div>
+        </details>
+        <details class="q">
+          <summary>Do I have to set anything up? <span class="plus">+</span></summary>
+          <div class="a">No. We build the demo for you. You just listen to it and decide. Nothing to install, no software to learn.</div>
+        </details>
+        <details class="q">
+          <summary>What does it actually do on a call? <span class="plus">+</span></summary>
+          <div class="a">It answers 24/7, greets the caller as your shop, captures their name, number and what they need, and texts the lead straight to you — so a missed call never turns into a lost job.</div>
+        </details>
+        <details class="q">
+          <summary>What's the catch? <span class="plus">+</span></summary>
+          <div class="a">Honestly, we're hoping you love the demo enough to turn it on. That's it. If it's not for you, keep the demo and we part as friends.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="sticky-cta" id="stickyCta">
+      <button type="button" id="stickyBtn">Build My Free Demo →</button>
     </div>
 
     <div class="success" id="successBox">
@@ -170,6 +215,13 @@
     const errMsg = document.getElementById('errMsg');
     const formWrap = document.querySelector('.form-wrap');
     const successBox = document.getElementById('successBox');
+    const stickyCta = document.getElementById('stickyCta');
+
+    // Sticky mobile CTA → jump to form and focus the first field
+    document.getElementById('stickyBtn').addEventListener('click', () => {
+      document.getElementById('business').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => document.getElementById('business').focus(), 400);
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -201,6 +253,7 @@
         if (!res.ok) throw new Error('bad status');
         formWrap.classList.add('hide');
         successBox.classList.add('show');
+        stickyCta.classList.add('hide');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
         btn.disabled = false;
