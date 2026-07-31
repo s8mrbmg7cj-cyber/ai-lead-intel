@@ -22,6 +22,8 @@
     { "source": "/privacy/", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/terms/", "destination": "/terms.html" },
+    { "source": "/sms-opt-in", "destination": "/sms-opt-in.html" },
+    { "source": "/sms-opt-in/", "destination": "/sms-opt-in.html" },
     { "source": "/reset-password", "destination": "/reset-password.html" },
     { "source": "/reset-password/", "destination": "/reset-password.html" },
     { "source": "/forgot-password", "destination": "/forgot-password.html" },
