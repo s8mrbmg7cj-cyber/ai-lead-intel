@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Get Text Updates from AI Lead Intel | SMS Sign-Up</title>
+<meta name="description" content="Opt in to receive SMS text updates and confirmations from AI Lead Intel about your service request. Consent-based, transactional messaging only." />
+<link rel="icon" href="/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #14141c; --surface: #1e1e28; --surface-2: #24242f; --surface-input: #191921;
+    --border: rgba(255,255,255,0.08); --border-2: rgba(255,255,255,0.13); --border-3: rgba(255,255,255,0.18);
+    --text: #fafafa; --text-soft: #e4e4e8; --text-dim: #b4b4bd; --text-faint: #85858f;
+    --brand: #ff6a00; --brand-2: #ff9a00; --brand-glow: rgba(255,106,0,0.32); --brand-soft: rgba(255,106,0,0.12);
+    --green: #34d399; --green-soft: rgba(52,211,153,0.12); --green-line: rgba(52,211,153,0.28);
+  }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; line-height: 1.55; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(255,106,0,0.16), transparent 60%), radial-gradient(ellipse 40% 30% at 0% 60%, rgba(255,106,0,0.06), transparent 60%); pointer-events: none; z-index: 0; }
+  .wrap { position: relative; z-index: 1; max-width: 540px; margin: 0 auto; padding: 32px 20px calc(56px + env(safe-area-inset-bottom)); }
+  .brand { display: flex; align-items: center; gap: 9px; justify-content: center; margin-bottom: 26px; }
+  .brand img { height: 30px; width: auto; }
+  .brand span { font-weight: 700; font-size: 16px; letter-spacing: -0.02em; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: var(--brand-2); background: var(--brand-soft); border: 1px solid rgba(255,106,0,0.24); padding: 6px 13px; border-radius: 100px; margin-bottom: 18px; letter-spacing: 0.01em; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.45;} }
+  h1 { font-size: clamp(27px, 7vw, 36px); line-height: 1.1; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 14px; }
+  h1 em { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; color: var(--brand-2); }
+  .sub { font-size: 16px; color: var(--text-dim); margin-bottom: 24px; max-width: 470px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border-2); border-radius: 18px; padding: 24px 20px; box-shadow: 0 24px 60px -32px rgba(0,0,0,0.85); }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--text-soft); margin: 0 0 7px; }
+  .field { margin-bottom: 15px; }
+  input[type=text], input[type=tel] { width: 100%; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 11px; padding: 15px 15px; color: var(--text); font-size: 16px; font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+  input::placeholder { color: var(--text-faint); }
+  input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+
+  /* consent checkbox block */
+  .consent { display: flex; align-items: flex-start; gap: 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 12px; padding: 14px 14px; margin: 4px 0 16px; }
+  .consent input[type=checkbox] { flex: none; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--brand); cursor: pointer; }
+  .consent label { font-size: 12.5px; font-weight: 400; color: var(--text-dim); line-height: 1.55; margin: 0; cursor: pointer; }
+  .consent label a { color: var(--brand-2); text-decoration: none; }
+  .consent label a:hover { text-decoration: underline; }
+
+  button.submit { width: 100%; background: linear-gradient(180deg, var(--brand-2), var(--brand)); color: #180a00; border: none; border-radius: 12px; padding: 17px; font-size: 16.5px; font-weight: 700; font-family: inherit; cursor: pointer; letter-spacing: -0.01em; margin-top: 4px; box-shadow: 0 10px 30px -10px var(--brand-glow); transition: transform .1s, box-shadow .15s, opacity .15s; }
+  button.submit:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px var(--brand-glow); }
+  button.submit:active { transform: translateY(0); }
+  button.submit:disabled { opacity: 0.55; cursor: default; transform: none; }
+
+  .disclosure { margin-top: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 18px 18px; }
+  .disclosure h3 { font-size: 12px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .disclosure p { font-size: 13px; color: var(--text-dim); line-height: 1.65; margin-bottom: 10px; }
+  .disclosure p:last-child { margin-bottom: 0; }
+  .disclosure strong { color: var(--text-soft); font-weight: 600; }
+  .disclosure a { color: var(--brand-2); text-decoration: none; }
+  .disclosure a:hover { text-decoration: underline; }
+
+  .success { display: none; text-align: center; padding: 8px 4px; }
+  .success.show { display: block; }
+  .success .ring { width: 62px; height: 62px; border-radius: 50%; background: var(--green-soft); border: 1px solid var(--green-line); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 30px; }
+  .success h2 { font-size: 23px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+  .success p { color: var(--text-dim); font-size: 15.5px; margin-bottom: 6px; }
+  .form-wrap.hide { display: none; }
+  .err { color: #f87171; font-size: 13.5px; margin-top: 12px; text-align: center; display: none; }
+  .err.show { display: block; }
+
+  footer { margin-top: 34px; text-align: center; }
+  footer a { color: var(--text-faint); font-size: 13px; text-decoration: none; margin: 0 10px; }
+  footer a:hover { color: var(--brand-2); }
+
+  @media (max-width: 400px) { .wrap { padding: 24px 16px 48px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand"><img src="/logo.png" alt="AI Lead Intel" /><span>AI Lead Intel</span></div>
+
+    <div class="form-wrap">
+      <div class="eyebrow"><span class="dot"></span> SMS sign-up</div>
+      <h1>Get <em>text updates</em> about your service request.</h1>
+      <p class="sub">Enter your info and check the box to receive SMS confirmations and follow-ups from AI Lead Intel about your request. It's optional, and you can stop anytime by replying STOP.</p>
+
+      <div class="card">
+        <form id="optForm" novalidate>
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" placeholder="First and last name" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="business">Business name (optional)</label>
+            <input id="business" name="business" type="text" placeholder="e.g. Miller Heating &amp; Air" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="phone">Mobile phone number</label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(555) 123-4567" autocomplete="tel" required />
+          </div>
+
+          <div class="consent">
+            <input id="smsConsent" name="smsConsent" type="checkbox" />
+            <label for="smsConsent">By checking this box, I agree to receive SMS text messages from AI Lead Intel about my service request, including confirmations, follow-ups, and updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See our <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>.</label>
+          </div>
+
+          <button type="submit" class="submit" id="submitBtn">Sign Me Up for Text Updates</button>
+          <div class="err" id="errMsg">Something went off. Please try again.</div>
+        </form>
+      </div>
+
+      <div class="disclosure">
+        <h3>SMS Program Details</h3>
+        <p><strong>Program:</strong> AI Lead Intel sends transactional text messages to customers who opt in — such as appointment and callback confirmations, follow-ups summarizing your service request, and a single invitation to leave a review.</p>
+        <p><strong>Message frequency:</strong> Varies based on your interaction with us; low volume.</p>
+        <p><strong>Cost:</strong> Message and data rates may apply.</p>
+        <p><strong>Opt out:</strong> Reply <strong>STOP</strong> to any message to unsubscribe at any time. Reply <strong>HELP</strong> for help, or email <a href="mailto:hello@aileadintel.com">hello@aileadintel.com</a>.</p>
+        <p><strong>Privacy:</strong> We do not share or sell your mobile number or SMS opt-in consent with any third parties for their own marketing purposes. See our <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+      </div>
+
+      <footer>
+        <a href="/">Home</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+      </footer>
+    </div>
+
+    <div class="success" id="successBox">
+      <div class="ring">✓</div>
+      <h2>You're signed up.</h2>
+      <p>You'll receive text updates from AI Lead Intel about your service request.</p>
+      <p style="margin-top:14px;">Reply <strong style="color:var(--brand-2);">STOP</strong> anytime to opt out, or <strong style="color:var(--brand-2);">HELP</strong> for help.</p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('optForm');
+    const btn = document.getElementById('submitBtn');
+    const errMsg = document.getElementById('errMsg');
+    const formWrap = document.querySelector('.form-wrap');
+    const successBox = document.getElementById('successBox');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errMsg.classList.remove('show');
+
+      const name = document.getElementById('name').value.trim();
+      const business = document.getElementById('business').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const consent = document.getElementById('smsConsent').checked;
+
+      if (!name || !phone) {
+        errMsg.textContent = 'Please enter your name and mobile number.';
+        errMsg.classList.add('show');
+        return;
+      }
+      if (!consent) {
+        errMsg.textContent = 'Please check the box to agree to receive text messages.';
+        errMsg.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing you up…';
+
+      try {
+        const res = await fetch('/api/lead-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            phone: phone,
+            business_type: 'SMS OPT-IN' + (business ? ' — ' + business : '') + ' — consent:YES'
+          })
+        });
+        if (!res.ok) throw new Error('bad status');
+        formWrap.classList.add('hide');
+        successBox.classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Sign Me Up for Text Updates';
+        errMsg.textContent = 'Something went off — please try again or email hello@aileadintel.com.';
+        errMsg.classList.add('show');
+      }
+    });
+  </script>
+</body>
+</html>
