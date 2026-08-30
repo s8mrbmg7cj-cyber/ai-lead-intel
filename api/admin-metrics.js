@@ -14,7 +14,7 @@ import { requireAdmin } from '../lib/auth.js';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 
-const PLAN_PRICES = { starter: 97, pro: 297 };
+const PLAN_PRICES = { starter: 49, pro: 149 };
 
 // ============================================================
 // SUPABASE REST HELPER
@@ -132,7 +132,7 @@ async function computeRevenue() {
     new_customers_change_pct: pctChange(new30, newPrior30),
     churn_rate_30d: churnRate,
     churned_30d: churnedLast30,
-    revenue_growth_pct: pctChange(new30 * 97, newPrior30 * 97),
+    revenue_growth_pct: pctChange(new30 * PLAN_PRICES.starter, newPrior30 * PLAN_PRICES.starter),
     counts: {
       total: all.length,
       active: active.length,

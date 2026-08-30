@@ -111,7 +111,9 @@ async function notifyOwnerEmail({ name, phone, email, business_type }) {
     const { Resend } = await import("resend");
     const resend = new Resend(RESEND_KEY);
     await resend.emails.send({
-      from: "AI Lead Intel <onboarding@resend.dev>",
+      // Verified domain — the resend.dev sandbox address only delivers to your
+      // own Resend account email, so it breaks the moment NOTIFY_EMAIL differs.
+      from: "AI Lead Intel <hello@aileadintel.com>",
       to: NOTIFY_EMAIL,
       subject: `New Facebook Lead: ${name || "Unknown"} (${business_type || "n/a"})`,
       html: `

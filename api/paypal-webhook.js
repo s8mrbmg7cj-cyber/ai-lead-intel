@@ -141,6 +141,13 @@ export default async function handler(req, res) {
         console.error('[paypal-webhook] REJECTED — failed verification');
         return res.status(200).json({ received: true, verified: false }); // ack, but do nothing
       }
+    } else if (process.env.PAYPAL_WEBHOOK_ID) {
+      // Verification is configured but we could not reach PayPal to perform it.
+      // Processing an UNVERIFIED event here would let anyone POST a fake
+      // "subscription activated" and get a free provisioned account. Return 5xx
+      // so PayPal retries later instead.
+      console.error('[paypal-webhook] cannot verify (no access token) — refusing to process');
+      return res.status(503).json({ received: false, error: 'verification_unavailable' });
     }
 
     // Only act on events we care about.
@@ -150,7 +157,15 @@ export default async function handler(req, res) {
 
     const resource = event.resource || {};
     const customId = resource.custom_id || resource.custom || null; // subscription events use custom_id
-    const subId = resource.id || resource.billing_agreement_id || null; // sale events use billing_agreement_id
+    // BILLING.SUBSCRIPTION.* → resource.id IS the subscription id (I-...).
+    // PAYMENT.SALE.*        → resource.id is the SALE id; the subscription is
+    //                         in billing_agreement_id. Reading resource.id here
+    //                         would overwrite the stored subscription id with a
+    //                         one-off sale id and make cancellation impossible.
+    const isSaleEvent = eventType.startsWith('PAYMENT.SALE.');
+    const subId = isSaleEvent
+      ? (resource.billing_agreement_id || null)
+      : (resource.id || resource.billing_agreement_id || null);
 
     const { client, by } = await findClient(customId, subId);
     if (!client) {
@@ -167,7 +182,9 @@ export default async function handler(req, res) {
         active: true,
         paid_at: new Date().toISOString(),
       };
-      if (subId) patch.payment_external_id = subId; // record/refresh the subscription id
+      // Only ever store a real PayPal subscription id (I-...). Anything else
+      // would clobber a cancellable id with something we can't cancel.
+      if (subId && String(subId).startsWith('I-')) patch.payment_external_id = subId;
       await patchClient(client.id, patch);
       // Starter never visits /setup, so make sure a paid Starter gets
       // provisioned even if they closed the browser and never returned to the

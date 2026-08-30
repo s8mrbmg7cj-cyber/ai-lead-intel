@@ -70,7 +70,14 @@ export default async function handler(req, res) {
   // The service role bypasses RLS — this is intentional and safe because it
   // runs server-side only. The service key is never exposed to the browser.
   try {
-    const url = `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}`;
+    // This route is intentionally unauthenticated — the customer reaches
+    // /go-live from an emailed slug link with no session. The slug is therefore
+    // the only credential, so keep the blast radius tiny:
+    //   • only ever writes ai_setup_status (a display flag)
+    //   • refuses rows that are cancelled (no reviving a closed account)
+    //   • returns NO account data back (see below)
+    const url = `${supabaseUrl}/rest/v1/clients?client_slug=eq.${encodeURIComponent(clientSlug)}` +
+      `&status=not.in.(cancelled,canceled)`;
 
     const supabaseRes = await fetch(url, {
       method: 'PATCH',
@@ -108,10 +115,13 @@ export default async function handler(req, res) {
     const updated = rows[0];
     console.log('[mark-live] Success — client:', updated.id, 'slug:', clientSlug);
 
+    // Deliberately does NOT echo the business name or AI phone number. Both
+    // callers (public/go-live and the admin panel) already hold those values
+    // locally and fall back to them, so returning them here would only turn an
+    // unauthenticated endpoint into a slug-guessing lookup for someone else's
+    // account details.
     return res.status(200).json({
       success: true,
-      business_name: updated.business_name || null,
-      ai_phone_number: updated.setup_ai_number || updated.twilio_number || updated.phone_number || null,
       ai_setup_status: updated.ai_setup_status || 'live',
     });
   } catch (err) {

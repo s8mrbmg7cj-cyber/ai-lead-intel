@@ -129,6 +129,15 @@ export default async function handler(req, res) {
       envRow('CLAUDE_MODEL', process.env.CLAUDE_MODEL || ''),
       envRow('PAYPAL_ENV', process.env.PAYPAL_ENV || ''),
       envRow('HEALTH_KEY', HEALTH_KEY),
+      // These decide whether webhooks and crons are actually AUTHENTICATED.
+      // When one is missing the endpoint quietly falls back to accepting
+      // anything, which is invisible from the outside — so surface it here.
+      envRow('STRIPE_SECRET_KEY', process.env.STRIPE_SECRET_KEY || ''),
+      envRow('STRIPE_WEBHOOK_SECRET', process.env.STRIPE_WEBHOOK_SECRET || ''),
+      envRow('PAYPAL_WEBHOOK_ID', process.env.PAYPAL_WEBHOOK_ID || ''),
+      envRow('VAPI_WEBHOOK_SECRET', process.env.VAPI_WEBHOOK_SECRET || ''),
+      envRow('CRON_SECRET', process.env.CRON_SECRET || ''),
+      envRow('RESEND_API_KEY', process.env.RESEND_API_KEY || ''),
     ],
   };
 

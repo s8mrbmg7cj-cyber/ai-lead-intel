@@ -18,8 +18,8 @@
 import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 
 const PLAN_PRICING = {
-  starter: { amount: 97.00, label: "AI Lead Intel — Starter" },
-  pro: { amount: 297.00, label: "AI Lead Intel — Pro" },
+  starter: { amount: 49.00, label: "AI Lead Intel — Starter" },
+  pro: { amount: 149.00, label: "AI Lead Intel — Pro" },
 };
 
 // ============================================================
@@ -227,6 +227,27 @@ export default async function handler(req, res) {
       amount: client.payment_amount,
       external_id: client.payment_external_id,
       reused: true,
+    });
+  }
+
+  // 2b. NEVER run this against a real subscriber.
+  // createPayPalLink() below is still the PayPal.me stub — it returns a fake
+  // external_id of the form `manual-<slug>-<timestamp>`. Step 4 writes that
+  // over payment_external_id, which is the ONLY handle we have on the real
+  // Stripe (sub_/cs_) or PayPal (I-) subscription. Overwrite it and the
+  // customer can never be cancelled again — /api/cancel-subscription won't
+  // recognise the id and will refuse — while the processor keeps billing them.
+  const existingId = String(client.payment_external_id || "");
+  const hasRealSubscription = existingId.startsWith("sub_")
+    || existingId.startsWith("cs_")
+    || existingId.startsWith("I-");
+  const isPayingCustomer = String(client.payment_status || "").toLowerCase() === "paid"
+    || !!client.paid_at;
+  if (hasRealSubscription || isPayingCustomer) {
+    console.warn("[payment-link] 🚫 refusing — client already has real billing set up:", clientSlug);
+    return res.status(409).json({
+      success: false,
+      error: "This client already has an active billing subscription. Creating a manual link would overwrite it and break cancellation.",
     });
   }
 

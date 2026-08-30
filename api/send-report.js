@@ -56,7 +56,11 @@ function getReportWindow(frequency) {
  */
 async function fetchCallsInWindow(clientId, start, end, supabaseUrl, supabaseKey) {
   try {
-    const url = `${supabaseUrl}/rest/v1/calls?client_id=eq.${encodeURIComponent(clientId)}` +
+    // The calls table is keyed on client_uuid — that is the ONLY column
+    // api/vapi/call-ended.js ever writes (and what the dashboard reads).
+    // Querying client_id here returned zero rows, so every report shipped
+    // all-zero stats.
+    const url = `${supabaseUrl}/rest/v1/calls?client_uuid=eq.${encodeURIComponent(clientId)}` +
       `&created_at=gte.${start.toISOString()}` +
       `&created_at=lte.${end.toISOString()}` +
       `&select=*&order=created_at.desc&limit=500`;
@@ -191,10 +195,15 @@ function buildReportEmail(client, stats, windowInfo) {
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  // Auth: Vercel cron OR admin token
+  // Auth: Vercel cron OR admin token.
+  // Each secret must be NON-EMPTY before it can grant access. Without that
+  // guard an unset CRON_SECRET makes the comparison string "Bearer undefined",
+  // which anyone can send verbatim to trigger a full customer report run.
+  const cronSecret = process.env.CRON_SECRET;
+  const adminSecret = process.env.ADMIN_API_TOKEN;
   const authHeader = req.headers["authorization"] || "";
-  const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isAdmin = (req.headers["x-admin-token"] || "") === process.env.ADMIN_API_TOKEN;
+  const isVercelCron = !!cronSecret && authHeader === `Bearer ${cronSecret}`;
+  const isAdmin = !!adminSecret && (req.headers["x-admin-token"] || "") === adminSecret;
   if (!isVercelCron && !isAdmin) {
     console.warn("[send-report] 🚫 unauthorized");
     return res.status(401).json({ success: false, error: "Unauthorized" });
@@ -280,9 +289,12 @@ export default async function handler(req, res) {
         : `Your monthly lead report — ${businessName}`;
 
       const result = await resend.emails.send({
-        from: "AI Lead Intel <onboarding@resend.dev>",
+        // MUST be the verified aileadintel.com domain. Resend's shared sandbox
+        // address (onboarding@resend.dev) only delivers to your own Resend
+        // account email — every report to an actual customer was rejected.
+        from: "AI Lead Intel <hello@aileadintel.com>",
         to: [targetEmail],
-        reply_to: "hello@aileadintel.com",
+        replyTo: "hello@aileadintel.com",
         subject,
         html: buildReportEmail(client, stats, windowInfo),
       });

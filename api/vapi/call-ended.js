@@ -2,6 +2,7 @@ export const config = {
   maxDuration: 30,
 };
 import crypto from "crypto";
+import { chargeOverage, overageRateCents, BLOCK_MINUTES } from "../../lib/stripe-overage.js";
 
 // ─────────────────────────────────────────────
 // VERIFY THE REQUEST IS REALLY FROM VAPI
@@ -228,10 +229,21 @@ async function saveToSupabase(callData) {
 // USAGE CAP — margin protection
 // ─────────────────────────────────────────────
 // Each plan includes a monthly allowance of calls + talk minutes. The AI NEVER
-// stops answering (we never want to drop a real customer's lead), but the
-// moment usage crosses the included amount we fire ONE alert to the owner so
-// they know they're in overage territory. Best-effort: any failure here is
-// swallowed so it can never break the webhook or block a lead.
+// stops answering (we never want to drop a real customer's lead). Instead:
+//
+//   1. The moment usage crosses the included amount we fire ONE alert to the
+//      owner so they know they're now in paid-overage territory.
+//   2. Every 30 talk minutes beyond the allowance is billed to their existing
+//      Stripe subscription as an invoice item, which lands on their next
+//      monthly invoice. See lib/stripe-overage.js.
+//
+// This is what makes the allowance mean something. Before overage billing the
+// caps were decorative: a heavy client could run 4x their plan and the only
+// consequence was an email, with the Vapi bill coming out of our margin.
+//
+// Best-effort: any failure here is swallowed so it can never break the webhook
+// or block a lead. Losing a $7.50 overage charge is survivable; losing a real
+// customer's lead is not.
 
 const USAGE_CAPS = {
   starter: { minutes: 250, calls: 100 },
@@ -276,21 +288,49 @@ async function checkUsageCap({ client, callData }) {
     const crossedMinutes = prevSec < capSec && totalSec >= capSec;
     const crossedCalls = prevCalls < cap.calls && totalCalls >= cap.calls;
 
-    if (!crossedMinutes && !crossedCalls) return;
-
     const usedMin = Math.round(totalSec / 60);
+
+    // ── Bill the overage ──────────────────────────────────────────────
+    // Runs on EVERY call once past the allowance, not just the crossing one.
+    // chargeOverage() works out which 30-minute blocks are already on their
+    // next invoice and only adds the new ones, so calling it repeatedly is
+    // safe and cheap.
+    let billed = null;
+    if (usedMin > cap.minutes) {
+      const res = await chargeOverage({
+        subscriptionId: client.payment_external_id || "",
+        clientSlug: client.client_slug || client.slug || "",
+        overageMinutes: usedMin - cap.minutes,
+        planLabel: plan.toUpperCase(),
+      });
+      if (res.charged > 0) billed = res;
+    }
+
+    // Tell them the first time they go over, and again each time we actually
+    // add money to their bill — never silently. A surprise line item on an
+    // invoice is how you lose a customer and earn a chargeback.
+    if (!crossedMinutes && !crossedCalls && !billed) return;
+
     const reason = crossedCalls
       ? `${totalCalls} calls this month (plan includes ${cap.calls})`
       : `${usedMin} talk minutes this month (plan includes ${cap.minutes})`;
 
-    await sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap });
+    await sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap, billed });
   } catch (err) {
     console.error("USAGE CAP CHECK FAILED:", err);
   }
 }
 
-async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap }) {
+async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, cap, billed = null }) {
   const biz = client.business_name || "your business";
+
+  const rate = overageRateCents();
+  const rateStr = `$${(rate / 100).toFixed(2)}/min`;
+  const overMin = Math.max(0, usedMin - cap.minutes);
+  // What's on their next invoice so far, across every block billed this month —
+  // not just the ones added by this webhook call.
+  const runningCents = billed ? billed.blocks * rate * BLOCK_MINUTES : 0;
+  const runningStr = `$${(runningCents / 100).toFixed(2)}`;
 
   // Push to the owner's private topic (same one used for lead alerts).
   const topic = client.ntfy_topic || process.env.NTFY_TOPIC;
@@ -302,13 +342,18 @@ async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, ca
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topic,
-          title: `📊 ${biz} — monthly plan usage reached`,
-          message:
-            `You've reached your ${plan.toUpperCase()} plan's included usage: ${reason}.\n\n` +
-            `Your AI is still answering every call — no interruption. ` +
-            `Reply to upgrade if this is your new normal.`,
+          title: billed
+            ? `💵 ${biz} — extra minutes added to your next invoice`
+            : `📊 ${biz} — monthly plan usage reached`,
+          message: billed
+            ? `You're ${overMin} min over your ${plan.toUpperCase()} allowance. ` +
+              `Extra minutes bill at ${rateStr} — ${runningStr} added to your next invoice so far.\n\n` +
+              `Your AI is still answering every call. Reply to move to a bigger plan if this is your new normal.`
+            : `You've reached your ${plan.toUpperCase()} plan's included usage: ${reason}.\n\n` +
+              `Your AI keeps answering every call — no interruption. Extra minutes bill at ${rateStr}. ` +
+              `Reply to upgrade if this is your new normal.`,
           priority: 3,
-          tags: ["bar_chart"],
+          tags: [billed ? "dollar" : "bar_chart"],
         }),
       });
     } catch (err) {
@@ -335,20 +380,41 @@ async function sendUsageCapAlert({ client, plan, reason, totalCalls, usedMin, ca
             from: `AI Lead Intel <hello@aileadintel.com>`,
             to,
             replyTo: "hello@aileadintel.com",
-            subject: `You've reached your ${plan.toUpperCase()} plan's monthly usage`,
+            subject: billed
+              ? `Extra talk minutes added to your next invoice`
+              : `You've reached your ${plan.toUpperCase()} plan's monthly usage`,
             html: `
   <div style="background:#f6f7f9;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;">
-      <div style="font-size:18px;font-weight:700;color:#111827;">You've reached your plan's included usage</div>
+      <div style="font-size:18px;font-weight:700;color:#111827;">${
+        billed ? "Extra talk minutes on your next invoice" : "You've reached your plan's included usage"
+      }</div>
       <div style="font-size:14px;color:#374151;line-height:1.6;margin-top:10px;">
-        Hi ${escapeHtml(biz)} — heads up, you've reached the usage included in your
+        Hi ${escapeHtml(biz)} — heads up, you've used the talk minutes included in your
         <strong>${plan.toUpperCase()}</strong> plan this month: <strong>${escapeHtml(reason)}</strong>.
       </div>
       <div style="font-size:14px;color:#374151;line-height:1.6;margin-top:12px;">
         <strong>Nothing is turned off.</strong> Your AI receptionist is still answering every call —
-        we'd never let a real lead slip. This is just a friendly heads-up in case you'd like to move
-        up to a plan with more room.
+        we'd never let a real lead slip.
       </div>
+      ${
+        billed
+          ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;margin-top:14px;">
+        <div style="font-size:14px;color:#9a3412;line-height:1.6;">
+          Minutes past your allowance bill at <strong>${rateStr}</strong>, in ${BLOCK_MINUTES}-minute blocks.
+          You're <strong>${overMin} minutes</strong> over, so <strong>${runningStr}</strong> has been added to your
+          next invoice. It'll appear as a normal line item — no separate charge.
+        </div>
+      </div>
+      <div style="font-size:14px;color:#374151;line-height:1.6;margin-top:12px;">
+        If this volume is your new normal, a bigger plan works out cheaper. Just reply and we'll move you over.
+      </div>`
+          : `<div style="font-size:14px;color:#374151;line-height:1.6;margin-top:12px;">
+        From here, extra talk minutes bill at <strong>${rateStr}</strong> in ${BLOCK_MINUTES}-minute blocks,
+        added to your next invoice. If you expect to keep this volume up, a bigger plan is cheaper —
+        just reply and we'll switch you.
+      </div>`
+      }
       <div style="font-size:13px;color:#6b7280;margin-top:16px;">
         This month so far: ${totalCalls} calls · ~${usedMin} talk minutes
         (plan includes ${cap.calls} calls / ${cap.minutes} minutes).

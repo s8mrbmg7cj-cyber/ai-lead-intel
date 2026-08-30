@@ -16,19 +16,42 @@
 // subscription id.
 export const config = { maxDuration: 30 };
 
-// Look up a completed Checkout Session on Stripe to get its real subscription
-// id. Best-effort — returns "" on any failure (the slug match still marks paid).
-async function fetchSubscriptionIdFromSession(sessionId) {
+// Look up the Checkout Session on Stripe. Returns the session object or null.
+//
+// This is the ONLY thing that proves the visitor actually paid. The ?slug=
+// parameter is attacker-controlled — it is just a business name in the URL —
+// so it can identify WHICH client to activate, but it can never be the
+// evidence that a payment happened.
+async function fetchCheckoutSession(sessionId) {
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key || !sessionId) return "";
+  if (!key || !sessionId) return null;
   try {
     const r = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
       headers: { Authorization: `Bearer ${key}` },
     });
-    if (!r.ok) return "";
-    const s = await r.json().catch(() => ({}));
-    return typeof s.subscription === "string" ? s.subscription : (s.subscription && s.subscription.id) || "";
-  } catch (_) { return ""; }
+    if (!r.ok) return null;
+    return await r.json().catch(() => null);
+  } catch (_) { return null; }
+}
+
+/**
+ * True only when this session really completed AND belongs to this client.
+ * A free-trial checkout reports payment_status 'no_payment_required', so the
+ * test is on completion, not on money having moved yet.
+ */
+function sessionProvesPayment(session, slug) {
+  if (!session || !session.id) return false;
+  const paid = session.payment_status === "paid"
+    || session.payment_status === "no_payment_required"
+    || session.status === "complete";
+  if (!paid) return false;
+  const owner = String(
+    session.client_reference_id || (session.metadata && session.metadata.client_slug) || ""
+  ).toLowerCase();
+  // If the session names a client, it must be THIS one — otherwise someone
+  // could replay their own valid session id against another business's slug.
+  if (owner && slug) return owner === String(slug).toLowerCase();
+  return !!owner || !slug;
 }
 
 export default async function handler(req, res) {
@@ -41,8 +64,11 @@ export default async function handler(req, res) {
   // legacy subscription_id param for safety.
   const sessionId = (req.query.session_id || "").toString();
   let subscriptionId = (req.query.subscription_id || "").toString();
-  if (!subscriptionId && sessionId) {
-    subscriptionId = await fetchSubscriptionIdFromSession(sessionId);
+  const session = sessionId ? await fetchCheckoutSession(sessionId) : null;
+  if (!subscriptionId && session) {
+    subscriptionId = typeof session.subscription === "string"
+      ? session.subscription
+      : (session.subscription && session.subscription.id) || "";
   }
   // We control the success_url, so we embed ?slug=<client_slug>.
   // Also accept ?custom_id= for backward-compat.
@@ -98,10 +124,25 @@ export default async function handler(req, res) {
     }
     console.log("[stripe-return] client match:", { matchedBy, slug: client?.client_slug, plan: client?.plan });
 
-    // A confident match = we identified the client by the slug we embedded in
-    // the Stripe success_url (custom_id) or by the subscription id. NOT the
-    // "most recent unpaid" fallback guess.
-    const confidentMatch = matchedBy === "custom_id" || matchedBy === "subscription_id";
+    // A confident match needs BOTH:
+    //   1. we know which client this is (slug or subscription id, not the
+    //      "most recent unpaid" guess), and
+    //   2. Stripe itself confirms a completed session for that client.
+    //
+    // Requirement 2 is the important one. Without it this endpoint was a plain
+    // unauthenticated GET that marked any business paid + active — and
+    // auto-provisioned a real phone number and AI assistant — for anyone who
+    // typed ?slug=<business-name>. The Stripe webhook independently marks
+    // customers paid, so a genuine payment is never lost by being strict here.
+    const identified = matchedBy === "custom_id" || matchedBy === "subscription_id";
+    const paymentVerified = sessionProvesPayment(session, client?.client_slug || customIdFromQuery);
+    const confidentMatch = identified && paymentVerified;
+
+    if (identified && !paymentVerified) {
+      console.warn("[stripe-return] REFUSED to activate — no verified Stripe session", {
+        slug: client?.client_slug, hasSessionId: !!sessionId, sessionStatus: session?.status || null,
+      });
+    }
     const planLower = (client?.plan || "").toLowerCase();
 
     // Mark client paid + active on a confident match — do NOT require a

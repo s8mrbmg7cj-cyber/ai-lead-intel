@@ -207,6 +207,23 @@ export default async function handler(req, res) {
       }
     } else if (INACTIVE_EVENTS.has(eventType)) {
       const isCancel = eventType === 'customer.subscription.deleted';
+
+      // A first soft decline is NOT a cancellation. Stripe retries a failed
+      // invoice for days (Smart Retries), and obj.next_payment_attempt holds
+      // the timestamp of the next try. Pausing here would silence a paying
+      // customer's receptionist over a card that recovers an hour later.
+      // Only go inactive once Stripe has given up (next_payment_attempt null).
+      if (eventType === 'invoice.payment_failed' && obj.next_payment_attempt) {
+        console.log(
+          '[stripe-webhook] payment failed for', client.client_slug,
+          '— Stripe retries at', new Date(obj.next_payment_attempt * 1000).toISOString(),
+          '— staying active'
+        );
+        await patchClient(client.id, { payment_status: 'past_due' });
+        await sendPaymentRetryAlert(client, obj);
+        return res.status(200).json({ received: true, processed: eventType, retrying: true });
+      }
+
       await patchClient(client.id, {
         status: isCancel ? 'cancelled' : 'paused',
         payment_status: isCancel ? 'cancelled' : 'failed',
@@ -273,6 +290,44 @@ async function releaseNumberAndCleanup(client) {
 }
 
 // ── Notify the owner when a subscription goes inactive ──
+// A card failed but Stripe will retry. Tell the owner so they can reach out,
+// WITHOUT touching the customer's service.
+async function sendPaymentRetryAlert(client, invoice) {
+  const biz = client.business_name || client.client_slug || 'A client';
+  const when = invoice.next_payment_attempt
+    ? new Date(invoice.next_payment_attempt * 1000).toUTCString()
+    : 'soon';
+  const msg = `${biz}'s payment failed. Stripe retries ${when}. Service left ON — reach out before it lapses.`;
+
+  const topic = process.env.NTFY_TOPIC;
+  if (topic) {
+    try {
+      await fetch(`https://ntfy.sh/${topic}`, {
+        method: 'POST',
+        headers: { Title: 'Payment retrying', Priority: 'default', Tags: 'warning' },
+        body: msg,
+      });
+    } catch (e) { console.error('[stripe-webhook] ntfy retry alert failed:', e.message); }
+  }
+
+  const resendKey = process.env.RESEND_API_KEY;
+  const to = process.env.NOTIFY_EMAIL;
+  if (resendKey && to) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'AI Lead Intel <hello@aileadintel.com>',
+          to: [to],
+          subject: `Payment retrying — ${biz}`,
+          text: `${msg}\n\nClient: ${client.client_slug || ''}\nInvoice: ${invoice.id || ''}`,
+        }),
+      });
+    } catch (e) { console.error('[stripe-webhook] retry email failed:', e.message); }
+  }
+}
+
 async function sendCancelAlert(client, eventType) {
   const biz = client.business_name || client.client_slug || 'A client';
   const labelMap = {

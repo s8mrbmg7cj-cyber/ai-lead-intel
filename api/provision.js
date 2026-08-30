@@ -13,7 +13,10 @@
 //
 // Env: VAPI_PRIVATE_KEY (required), SUPABASE_SERVICE_KEY (recommended),
 //      TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN (only needed to import not-yet-in-Vapi
-//      numbers), NTFY_TOPIC (optional, for low-stock alerts), CLAUDE_MODEL (optional).
+//      numbers), NTFY_TOPIC (optional, for low-stock alerts), CLAUDE_MODEL (optional),
+//      ANTHROPIC_API_KEY (optional — enables reading the client's website).
+
+import { scanBusinessSite } from '../lib/site-scan.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
@@ -41,14 +44,14 @@ const VAPI_WEBHOOK_SECRET = process.env.VAPI_WEBHOOK_SECRET || '';
 // so confirm the wording for the states you operate in before relying on it.
 const CALL_DISCLOSURE = "Just so you know, you're speaking with our AI virtual assistant, and this call may be transcribed for quality and follow-up.";
 
-// Starter voices (OpenAI — solid, low-cost). Used for the $97 plan.
+// Starter voices (OpenAI — solid, low-cost). Used for the $49 Starter plan.
 const VOICE_MAP = {
   warm_female:         { provider: 'openai', voiceId: 'shimmer' },
   professional_female: { provider: 'openai', voiceId: 'nova' },
   calm_male:           { provider: 'openai', voiceId: 'echo' },
   deep_male:           { provider: 'openai', voiceId: 'onyx' },
 };
-// Pro voices (ElevenLabs — more natural). Used for the $297 plan.
+// Pro voices (ElevenLabs — more natural). Used for the $149 Pro plan.
 // NOTE: requires ElevenLabs to be connected in your Vapi account (provider key).
 // These are ElevenLabs stock voice IDs; same style/gender mapping as Starter.
 const PRO_VOICE_MAP = {
@@ -161,17 +164,55 @@ function buildSystemPrompt(c) {
   // real dispatcher in THIS trade would ask, and flag the true emergencies.
   const niche = buildNichePlaybook(c);
   if (niche) prompt += niche;
-  // How the assistant handles "can I talk to a person?" — capture their info
-  // and promise a callback. Only if they specifically ask for a number to call
-  // does it read out the business number. Never attempt a live transfer.
-  const callback = String(c.forwarding_number || c.transfer_primary || c.business_phone || '').trim();
-  prompt += '\n\n# IF THEY WANT A PERSON\n'
-    + 'Do NOT say you are transferring them and do NOT attempt a live transfer. '
-    + 'Instead, collect their name, phone number, and what they need, then say something like '
-    + '"Got it — I\'ll pass this along and someone will get back to you shortly."';
-  if (callback) {
-    prompt += ' If the caller specifically asks for a number they can call to reach a person, '
-      + 'give them this number: ' + callback + ' — just say it, do not try to connect them.';
+  // Facts pulled from the client's own website (see lib/site-scan.js). This is
+  // usually far more complete than the few words they typed into onboarding.
+  // It is explicitly ranked BELOW what they typed: if the site is stale and the
+  // form is current, the form wins.
+  if (c.site_facts) {
+    prompt += '\n\n# FROM THEIR WEBSITE\n'
+      + 'These facts were read from the business\'s own website. Use them to answer questions '
+      + 'accurately. If anything here contradicts the details above, the details above win — '
+      + 'a website can be out of date. Never invent anything that is not listed here.\n'
+      + c.site_facts;
+  }
+  // How the assistant handles "can I talk to a person?".
+  //
+  // Two modes, decided per client at onboarding:
+  //   transfer ON  — the client answered "yes" to live transfer AND gave us a
+  //                  number. The AI gets a real transferCall tool (wired in
+  //                  buildAssistantPayload) and may use it for TRUE emergencies
+  //                  only. Everything else still becomes a captured lead.
+  //   transfer OFF — the default. Capture the lead and promise a callback.
+  //
+  // NOTE: the callback number is deliberately NOT the client's main line. Their
+  // main line is the one forwarded INTO this AI, so reading it back to a caller
+  // would loop them straight back to the receptionist they're trying to escape.
+  const callback = transferNumber(c);
+  const canTransfer = wantsLiveTransfer(c);
+
+  if (canTransfer) {
+    prompt += '\n\n# IF THEY WANT A PERSON\n'
+      + 'For a TRUE emergency, use the transferCall tool to connect them to a real person. '
+      + 'Before you transfer, you MUST already have the caller\'s name, callback number, and '
+      + 'what is wrong — if the transfer fails or nobody picks up, that information is the only '
+      + 'thing we keep, so get it first. Say "Let me get someone on the line for you now — one moment." '
+      + 'then transfer.\n'
+      + 'A TRUE emergency is an immediate safety or property risk: gas smell, sparking or burning '
+      + 'smell, flooding, no heat or no AC in dangerous weather, or someone locked out in the cold. '
+      + 'Everything else — quotes, scheduling, billing, general questions, "I just want to talk to '
+      + 'someone" — is NOT an emergency. For those, do NOT transfer: collect their name, number, and '
+      + 'what they need, then say "Got it — I\'ll pass this along and someone will get back to you shortly."\n'
+      + 'If a transfer does not connect, do not try again. Apologize once, confirm you have their '
+      + 'details, and promise an urgent callback.';
+  } else {
+    prompt += '\n\n# IF THEY WANT A PERSON\n'
+      + 'Do NOT say you are transferring them and do NOT attempt a live transfer. '
+      + 'Instead, collect their name, phone number, and what they need, then say something like '
+      + '"Got it — I\'ll pass this along and someone will get back to you shortly."';
+    if (callback) {
+      prompt += ' If the caller specifically asks for a number they can call to reach a person, '
+        + 'give them this number: ' + callback + ' — just say it, do not try to connect them.';
+    }
   }
   prompt += '\n\n# DISCLOSURE\n'
     + 'If the caller directly asks whether you are a person, tell them you are an AI assistant. '
@@ -241,7 +282,9 @@ function buildBasicPrompt(c) {
   if (c.service_area) L.push(`Service area (where the business primarily works): ${c.service_area}. Never turn a caller away based on location — always take their details even if they seem outside this area, say the team will confirm they can help, and note the location. The owner decides which jobs to take.`);
   if (c.business_hours) L.push(`Business hours: ${c.business_hours}.`);
   if (c.services_offered) L.push(`Services and any pricing you may quote: ${c.services_offered}.`);
-  if (c.transfer_destination) L.push(`Offer to transfer the caller to a human when: ${c.transfer_destination}.`);
+  // Only promise a transfer if the assistant actually has the tool to do it.
+  if (c.transfer_destination && wantsLiveTransfer(c)) L.push(`Offer to transfer the caller to a human when: ${c.transfer_destination}.`);
+  else if (c.transfer_destination) L.push(`Treat this as high priority and tell the caller you'll have someone call them right back when: ${c.transfer_destination}.`);
   if (c.emergency_rules) L.push(`Treat the call as an urgent emergency and escalate right away when: ${c.emergency_rules}.`);
   L.push("Always capture the caller's name, phone number, and reason for calling. Be concise and helpful.");
   return L.join('\n');
@@ -257,10 +300,26 @@ function toE164(raw) {
   return `+${d}`;
 }
 
+// The human's number we can actually ring. Deliberately excludes the client's
+// main business line (clients.phone_number) — that line is forwarded INTO this
+// assistant, so transferring to it would bounce the caller back to the AI.
+function transferNumber(c) {
+  return toE164(c.forwarding_number || '');
+}
+
+// Live transfer is opt-in AND needs a real number to dial. Both must be true,
+// otherwise the assistant is never told it can transfer — which keeps the
+// prompt honest instead of promising a connection that cannot happen.
+function wantsLiveTransfer(c) {
+  const v = c.offer_urgent_transfer;
+  const optedIn = v === true || v === 'true' || v === 'yes' || v === 1;
+  return optedIn && !!transferNumber(c);
+}
+
 // The complete Vapi assistant config for a client. Building this in one place
 // means create and update always produce an identical, fully-wired assistant:
-// model, voice, greeting, the call-report webhook, and (if a cell is set) the
-// ability to actually transfer urgent calls to the owner.
+// model, voice, greeting, the call-report webhook, and — when the client opted
+// in and gave us a number — a real transferCall tool for urgent calls.
 function buildAssistantPayload(client) {
   const voice = pickVoice(client);
   const sysPrompt = { role: 'system', content: buildSystemPrompt(client) };
@@ -338,12 +397,57 @@ function buildAssistantPayload(client) {
     endCallFunctionEnabled: true,
   };
 
-  // No live transfer. The AI captures the caller's info and tells them someone
-  // will get back to them; if they specifically ask for a number, it reads out
-  // the business's number (see buildSystemPrompt). Live transfer was removed
-  // because it doesn't connect reliably.
+  // ── Live transfer (opt-in, emergencies only) ──
+  // Only wired when the client said yes AND we have a number to ring. The
+  // matching prompt rules are in buildSystemPrompt — the two are gated on the
+  // same wantsLiveTransfer() check so the AI is never told it can transfer
+  // while lacking the tool, or handed the tool without rules for using it.
+  //
+  // The lead is still captured either way: end-of-call-report fires on
+  // transferred calls too, and the prompt forces the AI to collect name +
+  // number BEFORE dialling. So a transfer that rings out is a missed
+  // connection, never a lost lead.
+  const dial = transferNumber(client);
+  if (wantsLiveTransfer(client)) {
+    payload.model.tools = [
+      {
+        type: 'transferCall',
+        destinations: [
+          {
+            type: 'number',
+            number: dial,
+            // Spoken to the CALLER as the transfer starts.
+            message: "Let me get someone on the line for you now — one moment.",
+            description: 'The business owner\'s direct line. Use ONLY for a true emergency '
+              + '(gas smell, burning smell, flooding, no heat or AC in dangerous weather, '
+              + 'someone locked out in the cold). Never for quotes, scheduling, or billing.',
+          },
+        ],
+      },
+    ];
+  }
 
   return payload;
+}
+
+// Where the client's website URL lives. The onboarding form collects it, but it
+// is stored on the client_onboarding row as info_link, not on the client itself
+// — so fall back to looking it up by onboarding_id. Returns '' if there is none.
+async function resolveClientWebsite(client, token) {
+  const direct = String(client.website || client.info_link || '').trim();
+  if (direct) return direct;
+  if (!client.onboarding_id) return '';
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/client_onboarding?id=eq.${enc(client.onboarding_id)}&select=info_link&limit=1`,
+      { headers: sbHeaders(token) }
+    );
+    if (!r.ok) return '';
+    const rows = await r.json().catch(() => []);
+    return String(rows?.[0]?.info_link || '').trim();
+  } catch {
+    return '';
+  }
 }
 
 // Release a claimed number back to the pool (used if provisioning fails mid-way).
@@ -428,6 +532,25 @@ export default async function handler(req, res) {
     //    URL, prompt, voice, and transfer settings refreshed. (The old code
     //    returned early here, which is why existing clients never got the
     //    server URL attached.)
+    // 0) Read the client's website, if they gave one, and fold what it says into
+    //    the prompt. Best-effort only: a dead site, a missing API key, or a slow
+    //    page must never stop a customer going live, so failures are swallowed
+    //    inside scanBusinessSite and simply produce no extra prompt text.
+    try {
+      const siteUrl = await resolveClientWebsite(client, token);
+      if (siteUrl) {
+        const facts = await scanBusinessSite(siteUrl, { businessName: client.business_name });
+        if (facts) {
+          client.site_facts = facts;
+          console.log('[provision] website scanned for', clientSlug, '—', facts.length, 'chars of facts');
+        } else {
+          console.log('[provision] website scan produced nothing useful for', clientSlug);
+        }
+      }
+    } catch (e) {
+      console.log('[provision] website scan skipped:', e.message);
+    }
+
     const assistantPayload = buildAssistantPayload(client);
 
     let assistantId = client.vapi_assistant_id;
@@ -595,7 +718,11 @@ export default async function handler(req, res) {
     res.status(200).json({ ok: true, number: claimedNumber, assistantId, phoneNumberId: vapiPhoneId });
   } catch (err) {
     console.error('provision error', err);
-    if (claimedNumber && token) await releaseNumber(token, claimedNumber); // give the number back
+    // Give the number back. Do NOT gate this on `token` — the internal
+    // Starter auto-provision path has no token, and releaseNumber() uses the
+    // service key anyway, so the old `&& token` guard silently leaked a pool
+    // number out of inventory every time a Starter provision failed.
+    if (claimedNumber) await releaseNumber(token, claimedNumber);
     res.status(500).json({ error: err?.message || 'Provisioning failed' });
   }
 }

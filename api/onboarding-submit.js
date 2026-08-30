@@ -4,7 +4,10 @@ import { rateLimit, getClientIp } from '../lib/rate-limit.js';
 import { Resend } from "resend";
 import { createCheckoutRedirect } from '../lib/stripe-checkout.js';
 const NTFY_TOPIC = process.env.NTFY_TOPIC || "mcr-leads-andrew-2025";
-const PLAN_PRICING = { starter: { amount: 97.00 }, pro: { amount: 297.00 } };
+// MUST match the prices advertised on public/index.html and public/onboarding.html
+// AND the Stripe prices pointed at by STRIPE_STARTER_PRICE_ID / STRIPE_PRO_PRICE_ID.
+// This value is only what we RECORD; Stripe charges whatever the price id says.
+const PLAN_PRICING = { starter: { amount: 49.00 }, pro: { amount: 149.00 } };
 const INDUSTRY_LABELS = { self_storage: "Self Storage", hvac: "HVAC", plumbing: "Plumbing", electrician: "Electrician", landscaping: "Landscaping / Lawn Care", auto_detailing: "Auto Detailing", auto_repair: "Auto Repair", salon: "Salon / Spa", pest_control: "Pest Control", cleaning: "Cleaning Services", roofing: "Roofing", locksmith: "Locksmith", real_estate: "Real Estate", dental: "Dental / Medical", other: "Other" };
 const PERSONALITY_LABELS = { warm: "Warm & Conversational — friendly, approachable, talks like a real person", professional: "Professional — polished, corporate, formal", direct: "Direct — efficient, to-the-point, no fluff" };
 const PRICING_LABELS = { yes_specific: "Give exact prices when asked", yes_ranges: "Give price ranges only — never exact figures", no_quote: "Never quote prices — say 'I'll have someone send you a quote'", no_transfer: "Never quote prices — transfer pricing questions to the owner" };
@@ -202,11 +205,33 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   ].filter(Boolean).join("\n");
   const writeHeaders = { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Prefer: "return=representation" };
   const readHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
+  // Re-submitting the form should update the row you already started — but ONLY
+  // if that row is still an unfinished signup. The onboarding form is public and
+  // unauthenticated, so matching on business phone alone let anyone who knew a
+  // customer's number overwrite their business name, slug, notify_email and AI
+  // prompt, and knock their status back to "pending". A row that has been paid
+  // for or claimed by a login is off limits — we insert a fresh row instead and
+  // leave the real customer untouched.
   let existingId = null;
   if (phoneNumber) {
     try {
-      const r = await fetch(`${supabaseUrl}/rest/v1/clients?phone_number=eq.${encodeURIComponent(phoneNumber)}&select=id&limit=1`, { headers: readHeaders });
-      if (r.ok) { const rows = await r.json().catch(() => []); if (rows[0]) existingId = rows[0].id; }
+      const r = await fetch(
+        `${supabaseUrl}/rest/v1/clients?phone_number=eq.${encodeURIComponent(phoneNumber)}&select=id,status,payment_status,owner_user_id,paid_at&limit=1`,
+        { headers: readHeaders }
+      );
+      if (r.ok) {
+        const rows = await r.json().catch(() => []);
+        const cand = rows[0];
+        if (cand) {
+          const paymentStatus = String(cand.payment_status || "").toLowerCase();
+          const status = String(cand.status || "").toLowerCase();
+          const unclaimed = !cand.owner_user_id && !cand.paid_at
+            && (paymentStatus === "" || paymentStatus === "unpaid")
+            && (status === "" || status === "pending");
+          if (unclaimed) existingId = cand.id;
+          else console.warn("[onboarding] phone matches an active account — creating a separate row instead of overwriting it");
+        }
+      }
     } catch (e) { console.warn("[onboarding] phone lookup:", e.message); }
   }
   const baseFields = {
@@ -216,6 +241,10 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
     report_frequency: data.plan === "starter" ? (data.report_frequency || "monthly") : null,
     report_email: data.plan === "starter" ? (data.report_email || data.notify_email) : null,
     services_offered: data.services_offered, service_area: data.service_area,
+    // The owner's cell. Without this the assistant has no human to reach, so a
+    // "yes" to live transfer silently degrades to lead capture (see
+    // wantsLiveTransfer in api/provision.js).
+    forwarding_number: (data.transfer_primary || "").trim() || null,
     offer_urgent_transfer: urgentBool, payment_amount: pricing.amount, payment_provider: "stripe",
     ai_prompt: aiConfig.ai_prompt, ai_greeting: aiConfig.ai_greeting,
     ai_personality: aiConfig.ai_personality, transfer_behavior: aiConfig.transfer_behavior,

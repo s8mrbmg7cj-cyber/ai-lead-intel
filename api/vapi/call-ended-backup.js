@@ -1,11 +1,24 @@
-// /api/vapi/call-ended.js
-// Saves Vapi call to Supabase, scores lead, emails summary, and sends SMS follow-up
+// /api/vapi/call-ended-backup.js  —  DISABLED
+//
+// This is an old single-tenant copy of call-ended.js (note the hardcoded
+// client_id: 'prime_vault'). Nothing references it, but Vercel still routes
+// /api/vapi/call-ended-backup publicly, and it had NO authentication: anyone
+// could POST a fake end-of-call payload with an arbitrary customer.number and
+// make us send a Twilio SMS to it. That is an open SMS relay and would sink
+// the A2P registration.
+//
+// The handler now refuses every request. The body below is kept only for
+// reference — delete this file once you're sure nothing needs it.
 
 export const config = {
   maxDuration: 30,
 };
 
 export default async function handler(req, res) {
+  return res.status(410).json({ error: 'This endpoint is retired. Use /api/vapi/call-ended.' });
+}
+
+async function disabledHandler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

@@ -4,17 +4,11 @@
 //   1. Sends Andrew a push notification via ntfy (FIRST — most important)
 //   2. Logs to Supabase public.error_log table (for history)
 
+import { rateLimit, getClientIp } from '../lib/rate-limit.js';
+
 const NTFY_TOPIC = 'mcr-leads-andrew-2025';
 
 export default async function handler(req, res) {
-  // ============================================================
-// PASTE THIS BLOCK at the top of your handler function,
-// right after `export default async function handler(req, res) {`
-//
-// Add at the very top of the file (above the handler):
-//   import { rateLimit, getClientIp } from '../lib/rate-limit.js';
-// ============================================================
-
   // Security headers
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');

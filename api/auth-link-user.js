@@ -28,6 +28,12 @@ function sbHeaders(extra) {
 }
 
 // Look up the client row by slug first, then fall back to notify_email.
+//
+// SECURITY: the slug is NOT a secret — it is the slugified business name and it
+// appears in every dashboard URL. So a row found by slug is only accepted when
+// the submitted email also matches that row's notify_email. Without that check
+// anyone could claim ownership of any not-yet-registered account just by
+// guessing a business name.
 async function findClient({ clientSlug, email }) {
   const select = 'id,business_name,notify_email,owner_user_id,client_slug,plan';
   if (clientSlug) {
@@ -35,7 +41,15 @@ async function findClient({ clientSlug, email }) {
       `${SUPABASE_URL}/rest/v1/clients?client_slug=eq.${enc(clientSlug)}&select=${enc(select)}&limit=1`,
       { headers: sbHeaders() }
     );
-    if (r.ok) { const rows = await r.json().catch(() => []); if (rows && rows[0]) return rows[0]; }
+    if (r.ok) {
+      const rows = await r.json().catch(() => []);
+      const row = rows && rows[0];
+      if (row) {
+        if (String(row.notify_email || '').trim().toLowerCase() === email) return row;
+        console.warn('[auth-link-user] slug/email mismatch for', clientSlug, '— refusing');
+        return null;
+      }
+    }
     else console.error('[auth-link-user] slug lookup HTTP', r.status);
   }
   // ilike on email (case-insensitive). PostgREST: notify_email=ilike.<value>
@@ -125,17 +139,21 @@ export default async function handler(req, res) {
       const msg = String((createJson && (createJson.msg || createJson.error_description || createJson.error || createJson.message)) || '').toLowerCase();
       const alreadyExists = createRes.status === 422 || createRes.status === 409 || msg.includes('already') || msg.includes('registered') || msg.includes('exists');
       if (alreadyExists) {
+        // A login for this email already exists. Link the client row to it so a
+        // half-finished signup can still complete — but do NOT touch the
+        // password. Overwriting it here would be an unauthenticated password
+        // reset for anyone whose email address is known.
         const existing = await findAuthUserByEmail(email);
         if (existing && existing.id) {
-          userId = existing.id;
-          // Reset their password to what they just entered (admin update).
-          try {
-            await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${enc(userId)}`, {
-              method: 'PUT',
-              headers: sbHeaders(),
-              body: JSON.stringify({ password, email_confirm: true }),
-            });
-          } catch (_) {}
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/clients?id=eq.${enc(client.id)}`,
+            { method: 'PATCH', headers: sbHeaders({ Prefer: 'return=minimal' }), body: JSON.stringify({ owner_user_id: existing.id }) }
+          ).catch(() => {});
+          return res.status(409).json({
+            success: false,
+            error: 'You already have a login for this email. Please sign in with your existing password, or use "Forgot password" to reset it.',
+            client_slug: client.client_slug,
+          });
         }
       }
       if (!userId) {
