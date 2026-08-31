@@ -107,8 +107,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-number-label { font-family:'Geist Mono',monospace; font-size:10px; color:var(--brand); letter-spacing:0.14em; text-transform:uppercase; font-weight:700; margin-bottom:6px; }
 .ai-number-value { font-family:'Geist Mono',monospace; font-size:24px; font-weight:600; color:var(--text); letter-spacing:0.02em; }
 .ai-number-status { font-size:11.5px; color:var(--text-dim); margin-top:5px; }
+.ai-number-actions { display:flex; align-items:center; gap:9px; flex-shrink:0; }
 .ai-copy-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 16px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-radius:10px; font-size:13px; font-weight:600; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); }
 .ai-copy-btn.copied { background:linear-gradient(135deg,var(--green),#4ade80); }
+/* Tapping to dial only means something on a phone, so it stays hidden until
+   the 640px breakpoint below turns it on. */
+.ai-call-btn { display:none; align-items:center; gap:7px; padding:10px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--line); color:var(--text); border-radius:10px; font-size:13px; font-weight:600; text-decoration:none; }
 .alerts-card { background: linear-gradient(135deg, var(--brand-tint), transparent 70%), var(--surface); border:1px solid var(--brand-line); border-radius:14px; padding:20px 22px; margin-bottom:20px; }
 .alerts-head { display:flex; align-items:center; gap:13px; margin-bottom:14px; }
 .alerts-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 12px rgba(255,106,0,0.3); }
@@ -125,6 +129,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .alerts-copy-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 16px; background:linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-radius:9px; font-size:12.5px; font-weight:600; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22); cursor:pointer; }
 .alerts-copy-btn.copied { background:linear-gradient(135deg,var(--green),#4ade80); }
 .alerts-open-link { display:inline-block; margin-top:13px; font-size:12.5px; color:var(--brand); font-weight:600; }
+/* Hero stat — the one number that proves the product works. Given its own
+   full-width card so it reads as the headline, not one tile among six. */
+.hero-stat { display: flex; align-items: center; justify-content: space-between; gap: 18px; background: linear-gradient(135deg, var(--brand-tint) 0%, transparent 55%), linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%); border: 1px solid var(--brand-line); border-radius: 18px; padding: 22px 26px; margin-bottom: 12px; position: relative; overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 8px 26px rgba(0,0,0,0.32); }
+.hero-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--brand), transparent); }
+.hero-stat-main { min-width: 0; }
+.hero-stat-label { display: inline-flex; align-items: center; gap: 7px; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--brand); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+.hero-stat-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 8px var(--brand-glow); flex-shrink: 0; }
+.hero-stat-value { font-family: 'Geist Mono', monospace; font-size: clamp(38px, 9vw, 52px); font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 30px var(--brand-tint); }
+.hero-stat-sub { font-size: 12px; color: var(--text-dim); margin-top: 9px; line-height: 1.45; }
+.hero-stat-glyph { flex-shrink: 0; width: 52px; height: 52px; border-radius: 15px; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px var(--brand-tint); }
 .stat { background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%); border: 1px solid var(--border-2); border-radius: 16px; padding: 20px 22px; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; min-width: 0; box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 6px 20px rgba(0,0,0,0.28); }
 .stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); opacity: 0; transition: opacity 0.2s; }
 .stat:hover { transform: translateY(-2px); border-color: var(--brand-line); box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 12px 30px rgba(0,0,0,0.38), 0 0 0 1px var(--brand-line); }
@@ -194,10 +208,50 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ai-card-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
 @media (max-width: 880px) {
   .dash { padding: 24px 16px 80px; }
-  .stats-row { grid-template-columns: 1fr; gap: 10px; }
   .dash-grid { grid-template-columns: 1fr; }
-  .stat-value { font-size: 26px; }
   .panel { padding: 18px; }
+}
+/* Phones. The stats previously stacked to one-per-row, which turned six big
+   cards into an endless scroll before any real content. They stay in a 3-up
+   strip instead — smaller, but you can see everything without scrolling. */
+@media (max-width: 640px) {
+  .dash { padding: 18px 12px 72px; }
+  .hero-stat { padding: 18px 18px; gap: 12px; border-radius: 16px; }
+  .hero-stat-sub { font-size: 11.5px; }
+  .hero-stat-glyph { width: 42px; height: 42px; border-radius: 12px; }
+  .hero-stat-glyph svg { width: 21px; height: 21px; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { padding: 13px 10px; border-radius: 13px; text-align: center; }
+  /* The dot before each label eats scarce width at this size. */
+  .stat-label { font-size: 8.5px; letter-spacing: 0.08em; margin-bottom: 7px; gap: 0; justify-content: center; }
+  .stat-label::before { display: none; }
+  .stat-value { font-size: 23px; }
+  .stat-sub { font-size: 9px; margin-top: 5px; letter-spacing: 0; }
+  .panel, .activity-panel { padding: 16px 14px; border-radius: 15px; }
+  /* Tap targets can't rely on :hover, and translateY on tap feels broken. */
+  .stat:hover, .ai-card:hover { transform: none; }
+  .chart, .chart-empty { height: 132px; }
+  .chart { gap: 5px; padding-top: 16px; }
+  .chart-bar { max-width: 26px; }
+  .lead-quality { gap: 14px 18px; margin-top: 16px; }
+  .lq-num { font-size: 15px; }
+  .lq-label { font-size: 11.5px; }
+  .panel-head { margin-bottom: 13px; }
+  .calls-list { max-height: none; }
+  .alerts-copy-btn, .billing-btn, .rv-btn { min-height: 44px; }
+  .alerts-topic { font-size: 12.5px; padding: 9px 11px; }
+  .ai-number-card { padding: 16px 16px; border-radius: 15px; }
+  .ai-number-value { font-size: 21px; }
+  /* Buttons go full-width side by side rather than wrapping under the number. */
+  .ai-number-actions { width: 100%; gap: 8px; }
+  .ai-call-btn { display: inline-flex; }
+  .ai-call-btn, .ai-copy-btn { flex: 1; justify-content: center; min-height: 44px; }
+}
+/* Small phones (iPhone SE / mini). */
+@media (max-width: 380px) {
+  .stat-value { font-size: 20px; }
+  .stat-sub { display: none; }
+  .hero-stat-glyph { display: none; }
 }
 .billing-card { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; min-width: 0; }
 .billing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
@@ -428,10 +482,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <div class="ai-number-value" id="ai-number-value">—</div>
       <div class="ai-number-status" id="ai-number-status"></div>
     </div>
-    <button class="ai-copy-btn" id="ai-copy-btn" type="button">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      <span id="ai-copy-label">Copy</span>
-    </button>
+    <div class="ai-number-actions">
+      <!-- On a phone this is the fastest way to hear your own AI. Set by JS
+           once we know the number; hidden on desktop where it does nothing. -->
+      <a class="ai-call-btn" id="ai-call-btn" href="#">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Call it</span>
+      </a>
+      <button class="ai-copy-btn" id="ai-copy-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="ai-copy-label">Copy</span>
+      </button>
+    </div>
   </div>
   <div class="alerts-card" id="alerts-card" style="display:none;">
     <div class="alerts-head">
@@ -454,22 +516,30 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
     <a class="alerts-open-link" id="alerts-open-link" href="#" target="_blank" rel="noopener">Or open &amp; test it in your browser first &rarr;</a>
   </div>
-  <div class="stats-row">
-    <div class="stat"><div class="stat-label">Calls Today</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub">Since midnight</div></div>
-    <div class="stat"><div class="stat-label">This Week</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">Last 7 days</div></div>
-    <div class="stat"><div class="stat-label">This Month</div><div class="stat-value" id="stat-month">0</div><div class="stat-sub">Last 30 days</div></div>
+  <!-- Hero stat. Missed calls recovered is the ONLY number that proves the
+       product paid for itself, so it gets the whole width and everything else
+       is demoted to a compact strip beneath it. -->
+  <div class="hero-stat">
+    <div class="hero-stat-main">
+      <div class="hero-stat-label">Missed calls recovered</div>
+      <div class="hero-stat-value" id="stat-recovered">0</div>
+      <div class="hero-stat-sub" id="stat-recovered-sub">Leads your AI caught that would've gone to voicemail</div>
+    </div>
+    <div class="hero-stat-glyph" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </div>
   </div>
   <div class="stats-row">
-    <div class="stat"><div class="stat-label">Calls Answered</div><div class="stat-value" id="stat-calls">0</div><div class="stat-sub" id="stat-calls-sub">All time</div></div>
-    <div class="stat"><div class="stat-label">Missed Calls Recovered</div><div class="stat-value" id="stat-recovered">0</div><div class="stat-sub" id="stat-recovered-sub">Captured by AI</div></div>
-    <div class="stat"><div class="stat-label">Avg Call Length</div><div class="stat-value" id="stat-answer">—</div><div class="stat-sub">Per call</div></div>
+    <div class="stat"><div class="stat-label">Today</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub">Since midnight</div></div>
+    <div class="stat"><div class="stat-label">This week</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">Last 7 days</div></div>
+    <div class="stat"><div class="stat-label">Answered</div><div class="stat-value" id="stat-calls">0</div><div class="stat-sub" id="stat-calls-sub">All time</div></div>
   </div>
   <div class="activity-panel">
     <div class="panel-head">
       <div class="panel-title">Call activity</div>
       <div class="activity-legend">
         <span class="activity-total" id="activity-total">0 calls</span>
-        <span class="panel-sub">Last 14 days</span>
+        <span class="panel-sub" id="activity-range">Last 14 days</span>
       </div>
     </div>
     <div class="chart" id="chart"></div>
@@ -741,7 +811,12 @@ function renderActivityChart(calls) {
   const chart = document.getElementById('chart');
   const totalEl = document.getElementById('activity-total');
   if (!chart) return;
-  const DAYS = 14;
+  // 14 bars in a phone-width panel gives ~18px each and the date labels
+  // collide into mush. Show a week on narrow screens instead.
+  const narrow = window.matchMedia('(max-width: 640px)').matches;
+  const DAYS = narrow ? 7 : 14;
+  const rangeEl = document.getElementById('activity-range');
+  if (rangeEl) rangeEl.textContent = 'Last ' + DAYS + ' days';
   const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (DAYS - 1));
   const startMs = start.getTime();
   const buckets = [];
@@ -1125,6 +1200,8 @@ function renderDashboard(client, calls) {
         st.textContent = 'Active · your AI receptionist number';
       }
     }
+    const callBtn = document.getElementById('ai-call-btn');
+    if (callBtn) callBtn.href = 'tel:' + String(aiNum).replace(/[^\d+]/g, '');
     const copyBtn = document.getElementById('ai-copy-btn');
     if (copyBtn) {
       copyBtn.dataset.raw = aiNum;
@@ -1173,7 +1250,6 @@ function renderDashboard(client, calls) {
   const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   setText('stat-today', today);
   setText('stat-week', week);
-  setText('stat-month', month);
 
   // Missed calls recovered: a captured call that came in while the human line
   // didn't pick up. We treat any answered AI call with a real outcome as recovered,
@@ -1183,19 +1259,24 @@ function renderDashboard(client, calls) {
     c.missed === true ||
     (c.outcome && !['Short call', 'General inquiry'].includes(c.outcome))
   );
-  document.getElementById('stat-calls').textContent = callsArr.length;
-  document.getElementById('stat-recovered').textContent = recoveredCalls.length;
-  document.getElementById('stat-calls-sub').textContent = callsArr.length === 0 ? 'No calls yet' : 'All time';
-  document.getElementById('stat-recovered-sub').textContent = recoveredCalls.length === 0 ? 'None yet' : 'Captured by AI';
+  setText('stat-calls', callsArr.length);
+  setText('stat-recovered', recoveredCalls.length);
+  setText('stat-calls-sub', callsArr.length === 0 ? 'No calls yet' : 'All time');
 
-  // Avg call length (from duration_seconds).
+  // The hero subtitle carries the two numbers that no longer have their own
+  // card (this month, avg call length) so the detail isn't lost — and when
+  // there's nothing yet it explains what the number will mean instead of
+  // just showing a bare zero.
   const withDuration = callsArr.filter(c => Number(c.duration_seconds) > 0);
-  const answerEl = document.getElementById('stat-answer');
-  if (answerEl) {
-    answerEl.textContent = withDuration.length > 0
-      ? formatDuration(withDuration.reduce((s, c) => s + Number(c.duration_seconds), 0) / withDuration.length)
-      : '—';
-  }
+  const avgLen = withDuration.length > 0
+    ? formatDuration(withDuration.reduce((s, c) => s + Number(c.duration_seconds), 0) / withDuration.length)
+    : null;
+  const bits = [];
+  if (month > 0) bits.push(month + (month === 1 ? ' call' : ' calls') + ' this month');
+  if (avgLen) bits.push(avgLen + ' avg length');
+  setText('stat-recovered-sub', recoveredCalls.length === 0
+    ? "Leads your AI caught that would've gone to voicemail"
+    : bits.join('  ·  '));
 
   renderCalls(callsArr);
   renderActivityChart(callsArr);
