@@ -52,9 +52,44 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .support-pill svg { color: var(--brand); }
 @media (max-width: 720px) { .topnav { padding: 12px 14px; } .user-pill { display: none; } .support-pill span { display: none; } .logout-btn span { display: none; } .nav-billing-btn span { display: none; } }
 .state-wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 64px 24px 80px; text-align: center; }
+/* ── Loading screen ──────────────────────────────────────────────────
+   Sits between sign-in and the dashboard. Sessions usually resolve in well
+   under a second, so this is built to look composed at 200ms rather than to
+   entertain for ten seconds — the ring pulses read as "working", not "stuck". */
+.loader { display: flex; flex-direction: column; align-items: center; padding-top: 34px; animation: riseIn 0.45s cubic-bezier(0.2,0.8,0.2,1) both; }
+.loader-orb { position: relative; width: 112px; height: 112px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+.loader-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--brand); opacity: 0; animation: ringOut 2.6s cubic-bezier(0.2,0.6,0.3,1) infinite; }
+.loader-ring:nth-child(2) { animation-delay: 0.85s; }
+.loader-ring:nth-child(3) { animation-delay: 1.7s; }
+@keyframes ringOut {
+  0%   { transform: scale(0.44); opacity: 0; }
+  18%  { opacity: 0.55; }
+  100% { transform: scale(1); opacity: 0; }
+}
+.loader-mark { position: relative; width: 56px; height: 56px; border-radius: 17px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 34px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.3); animation: orbBreathe 2.6s ease-in-out infinite; }
+.loader-mark::after { content: ''; position: absolute; inset: 0; border-radius: 17px; background: linear-gradient(135deg, rgba(255,255,255,0.26), transparent 58%); }
+@keyframes orbBreathe {
+  0%,100% { transform: scale(1);    box-shadow: 0 0 30px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.3); }
+  50%     { transform: scale(1.06); box-shadow: 0 0 46px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.3); }
+}
+.loader-title { font-size: clamp(21px, 3.4vw, 26px); font-weight: 600; letter-spacing: -0.025em; margin-bottom: 9px; }
+.loader-title .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.loader-status { font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase; height: 15px; transition: opacity 0.24s; }
+.loader-status.swap { opacity: 0; }
+.loader-track { width: min(240px, 62vw); height: 2px; margin-top: 24px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+/* Indeterminate: we can't know real progress, so a travelling sliver is the
+   honest version of a progress bar. */
+.loader-fill { display: block; width: 42%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, transparent, var(--brand), var(--brand-2), transparent); animation: fillSlide 1.35s cubic-bezier(0.5,0,0.5,1) infinite; }
+@keyframes fillSlide { 0% { transform: translateX(-110%); } 100% { transform: translateX(342%); } }
+/* Hand-off to the dashboard: fade instead of snapping to it. */
+.state-out { animation: loaderOut 0.32s ease forwards; pointer-events: none; }
+@keyframes loaderOut { to { opacity: 0; transform: scale(0.985); } }
+@media (prefers-reduced-motion: reduce) {
+  .loader, .loader-ring, .loader-mark, .loader-fill, .state-out { animation: none; }
+  .loader-ring { opacity: 0.28; }
+}
 .state-icon { width: 80px; height: 80px; margin: 0 auto 26px; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18); }
 .state-icon::before { content: ''; position: absolute; inset: 0; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 60%); }
-.state-icon.loading { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); border: 1px solid var(--border-2); }
 .state-icon.preparing { background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 16px 40px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.25); }
 .state-icon.not-found { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); border: 1px solid var(--border-2); color: var(--text-dim); }
 .state-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 6px 13px; border-radius: 99px; margin-bottom: 18px; border: 1px solid; }
@@ -71,8 +106,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 10px 26px var(--brand-glow); }
 .btn-secondary { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
 .btn-secondary:hover { background: var(--surface-3); border-color: var(--border-3); }
-.spinner { width: 36px; height: 36px; border: 3px solid var(--border-2); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
 .checklist { display: flex; flex-direction: column; gap: 10px; max-width: 380px; margin: 26px auto 0; text-align: left; }
 .checklist-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; }
 .checklist-item.done .checklist-dot { background: linear-gradient(135deg, var(--green), #4ade80); border-color: transparent; color: #fff; }
@@ -86,6 +119,20 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .checklist-item.active .checklist-meta { color: var(--brand); }
 .dash { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 32px 28px 80px; display: none; }
 .dash.visible { display: block; }
+/* Blocks rise in sequence as the dashboard appears. Purely decorative, so it
+   runs once and is skipped entirely for reduced-motion users. */
+@keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.dash.visible > * { animation: riseIn 0.5s cubic-bezier(0.2,0.8,0.2,1) both; }
+.dash.visible > *:nth-child(1) { animation-delay: 0.02s; }
+.dash.visible > *:nth-child(2) { animation-delay: 0.06s; }
+.dash.visible > *:nth-child(3) { animation-delay: 0.10s; }
+.dash.visible > *:nth-child(4) { animation-delay: 0.14s; }
+.dash.visible > *:nth-child(5) { animation-delay: 0.18s; }
+.dash.visible > *:nth-child(6) { animation-delay: 0.22s; }
+.dash.visible > *:nth-child(n+7) { animation-delay: 0.26s; }
+@media (prefers-reduced-motion: reduce) {
+  .dash.visible > * { animation: none; }
+}
 .dash-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
 .dash-head-left { min-width: 0; flex: 1 1 auto; }
 .dash-title { font-size: clamp(22px, 3vw, 28px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; word-wrap: break-word; overflow-wrap: break-word; }
@@ -157,7 +204,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .chart-bar.has { background: linear-gradient(180deg, var(--brand-2), var(--brand)); box-shadow: 0 0 14px var(--brand-tint), inset 0 1px 0 rgba(255,255,255,0.25); }
 .chart-bar.today.has { background: linear-gradient(180deg, #ffc274, var(--brand)); }
 .chart-col:hover .chart-bar.has { filter: brightness(1.18); }
-.chart-count { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-soft); }
+/* Held back until its bar has finished growing, otherwise the number floats
+   in mid-air above a flat bar. */
+.chart-count { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-soft); opacity: 0; animation: countFade 0.45s ease 0.35s forwards; }
+@keyframes countFade { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .chart-count { opacity: 1; animation: none; } }
 .chart-x { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.02em; }
 .chart-x.today { color: var(--brand); font-weight: 700; }
 .chart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 168px; gap: 8px; color: var(--text-faint); }
@@ -177,6 +228,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .panel-title { font-size: 14px; font-weight: 600; }
 .panel-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
 .calls-list { display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow-y: auto; }
+.call-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 11px; min-width: 0; transition: border-color 0.18s, background 0.18s; animation: riseIn 0.42s cubic-bezier(0.2,0.8,0.2,1) both; }
+.call-row:hover { border-color: var(--brand-line); background: var(--bg-2); }
+@media (prefers-reduced-motion: reduce) { .call-row { animation: none; } }
 .empty-state { padding: 32px 16px; text-align: center; }
 .empty-state-icon { width: 44px; height: 44px; margin: 0 auto 14px; border-radius: 12px; background: var(--surface-input); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
 .empty-state-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
@@ -238,7 +292,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .lq-label { font-size: 11.5px; }
   .panel-head { margin-bottom: 13px; }
   .calls-list { max-height: none; }
-  .alerts-copy-btn, .billing-btn, .rv-btn { min-height: 44px; }
+  .alerts-copy-btn, .billing-btn { min-height: 44px; }
   .alerts-topic { font-size: 12.5px; padding: 9px 11px; }
   .ai-number-card { padding: 16px 16px; border-radius: 15px; }
   .ai-number-value { font-size: 21px; }
@@ -300,60 +354,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .billing-inactive-sub a:hover { text-decoration: underline; }
 .dashboard-disabled .panel, .dashboard-disabled .stat, .dashboard-disabled .ai-section, .dashboard-disabled .status-banner { opacity: 0.45; pointer-events: none; }
 .dashboard-disabled .billing-card, .dashboard-disabled .billing-inactive-banner, .dashboard-disabled .dash-head { opacity: 1; pointer-events: auto; }
-/* ── Google review requests ── */
-.rv-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
-@media (max-width: 880px) { .rv-grid { grid-template-columns: 1fr; } }
-.rv-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-@media (max-width: 640px) { .rv-stats { grid-template-columns: 1fr 1fr; } }
-.rv-stat { background: var(--surface-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
-.rv-stat-label { font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
-.rv-stat-value { font-family: 'Geist Mono', monospace; font-size: 24px; font-weight: 600; color: var(--text); line-height: 1; font-variant-numeric: tabular-nums; }
-.rv-field { margin-bottom: 14px; }
-.rv-label { display: block; font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--text-faint); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: 7px; }
-.rv-input { width: 100%; padding: 12px 14px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 11px; color: var(--text); font-size: 14px; font-weight: 500; font-family: inherit; outline: none; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s; }
-.rv-input:hover { border-color: var(--border-3); }
-.rv-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-tint); background: var(--bg-2); }
-.rv-input::placeholder { color: var(--text-muted); font-weight: 400; }
-.rv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.rv-hint { font-size: 11.5px; color: var(--text-faint); line-height: 1.5; margin-top: 6px; }
-.rv-check { display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 11px; cursor: pointer; transition: border-color 0.18s, background 0.18s; }
-.rv-check:hover { border-color: var(--border-3); }
-.rv-check.checked { border-color: var(--brand-line); background: var(--brand-tint); }
-.rv-check input { width: 17px; height: 17px; margin-top: 1px; accent-color: var(--brand); flex-shrink: 0; cursor: pointer; }
-.rv-check-text { font-size: 12.5px; color: var(--text-soft); line-height: 1.55; }
-.rv-note { font-size: 11.5px; color: var(--text-faint); line-height: 1.55; margin-top: 12px; padding: 11px 13px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 10px; }
-.rv-note strong { color: var(--text-dim); font-weight: 600; }
-.rv-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
-.rv-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.18s; border: 1px solid transparent; cursor: pointer; min-height: 42px; }
-.rv-btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px var(--brand-glow); }
-.rv-btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 22px var(--brand-glow); }
-.rv-btn-secondary { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
-.rv-btn-secondary:hover:not(:disabled) { background: var(--surface-3); border-color: var(--border-3); }
-.rv-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.rv-msg { display: none; font-size: 12.5px; padding: 10px 13px; border-radius: 10px; margin-top: 12px; line-height: 1.5; }
-.rv-msg.open { display: block; }
-.rv-msg.ok { background: var(--green-soft); border: 1px solid var(--green-line); color: var(--green); }
-.rv-msg.err { background: var(--hot-soft); border: 1px solid var(--hot-line); color: var(--hot); }
-.rv-list { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; }
-.rv-item { display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: var(--surface-input); border: 1px solid var(--border); border-radius: 11px; min-width: 0; }
-.rv-item-text { flex: 1; min-width: 0; }
-.rv-item-name { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rv-item-meta { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-faint); margin-top: 3px; }
-.rv-tag { font-family: 'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; padding: 4px 9px; border-radius: 99px; border: 1px solid; flex-shrink: 0; }
-.rv-tag.pending { color: var(--text-dim); background: var(--surface-2); border-color: var(--border-2); }
-.rv-tag.sent { color: var(--brand); background: var(--brand-soft); border-color: var(--brand-line); }
-.rv-tag.clicked { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
-.rv-tag.opted_out { color: var(--text-faint); background: var(--surface-2); border-color: var(--border-2); }
-.rv-tag.failed { color: var(--hot); background: var(--hot-soft); border-color: var(--hot-line); }
-.rv-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px; background: var(--surface-input); border: 1px solid var(--border-2); border-radius: 11px; margin-bottom: 14px; }
-.rv-toggle-text { min-width: 0; }
-.rv-toggle-title { font-size: 13px; font-weight: 600; color: var(--text); }
-.rv-toggle-sub { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
-@media (max-width: 640px) {
-  .rv-row { grid-template-columns: 1fr; }
-  .rv-actions { flex-direction: column; align-items: stretch; }
-  .rv-btn { width: 100%; }
-}
 @media (max-width: 640px) {
   .billing-card { padding: 18px 16px; }
   .billing-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -401,9 +401,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </nav>
 <div class="state-wrap" id="state-loading">
-  <div class="state-icon loading"><div class="spinner"></div></div>
-  <div class="state-title">Loading dashboard<span class="accent">…</span></div>
-  <div class="state-desc">Verifying your session.</div>
+  <div class="loader">
+    <div class="loader-orb">
+      <span class="loader-ring"></span>
+      <span class="loader-ring"></span>
+      <span class="loader-ring"></span>
+      <span class="loader-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </span>
+    </div>
+    <div class="loader-title">Opening your <span class="accent">dashboard</span></div>
+    <div class="loader-status" id="loader-status">Verifying your session</div>
+    <div class="loader-track"><span class="loader-fill"></span></div>
+  </div>
 </div>
 <div class="state-wrap" id="state-preparing" style="display:none;">
   <div class="state-icon preparing">
@@ -495,27 +505,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </button>
     </div>
   </div>
-  <div class="alerts-card" id="alerts-card" style="display:none;">
-    <div class="alerts-head">
-      <div class="alerts-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-      <div>
-        <div class="alerts-eyebrow">Phone Alerts</div>
-        <div class="alerts-title">Get buzzed on your phone for every lead</div>
-      </div>
-    </div>
-    <div class="alerts-desc">On top of the email, get an instant push notification the second a call comes in — with the caller's name, number, and what they wanted. Free, and it works on any phone.</div>
-    <div class="alerts-steps">
-      <div class="alerts-step"><span class="alerts-step-num">1</span><span>Install the free <strong>ntfy</strong> app — <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> &middot; <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a></span></div>
-      <div class="alerts-step"><span class="alerts-step-num">2</span><span>Open it, tap <strong>+</strong> to subscribe to a topic, and paste your alert code below</span></div>
-      <div class="alerts-step"><span class="alerts-step-num">3</span><span>Done — every captured lead now buzzes your phone instantly</span></div>
-    </div>
-    <div class="alerts-topic-label">Your private alert code</div>
-    <div class="alerts-topic-box">
-      <code class="alerts-topic" id="alerts-topic">—</code>
-      <button class="alerts-copy-btn" id="alerts-copy-btn" type="button">Copy</button>
-    </div>
-    <a class="alerts-open-link" id="alerts-open-link" href="#" target="_blank" rel="noopener">Or open &amp; test it in your browser first &rarr;</a>
-  </div>
   <!-- Hero stat. Missed calls recovered is the ONLY number that proves the
        product paid for itself, so it gets the whole width and everything else
        is demoted to a compact strip beneath it. -->
@@ -574,6 +563,27 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
     </div>
   </div>
+  <div class="alerts-card" id="alerts-card" style="display:none;">
+    <div class="alerts-head">
+      <div class="alerts-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div>
+        <div class="alerts-eyebrow">Phone Alerts</div>
+        <div class="alerts-title">Get buzzed on your phone for every lead</div>
+      </div>
+    </div>
+    <div class="alerts-desc">On top of the email, get an instant push notification the second a call comes in — with the caller's name, number, and what they wanted. Free, and it works on any phone.</div>
+    <div class="alerts-steps">
+      <div class="alerts-step"><span class="alerts-step-num">1</span><span>Install the free <strong>ntfy</strong> app — <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> &middot; <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a></span></div>
+      <div class="alerts-step"><span class="alerts-step-num">2</span><span>Open it, tap <strong>+</strong> to subscribe to a topic, and paste your alert code below</span></div>
+      <div class="alerts-step"><span class="alerts-step-num">3</span><span>Done — every captured lead now buzzes your phone instantly</span></div>
+    </div>
+    <div class="alerts-topic-label">Your private alert code</div>
+    <div class="alerts-topic-box">
+      <code class="alerts-topic" id="alerts-topic">—</code>
+      <button class="alerts-copy-btn" id="alerts-copy-btn" type="button">Copy</button>
+    </div>
+    <a class="alerts-open-link" id="alerts-open-link" href="#" target="_blank" rel="noopener">Or open &amp; test it in your browser first &rarr;</a>
+  </div>
   <div class="ai-section" id="ai-section">
     <div class="ai-section-head"><div class="ai-section-title"><span class="ai-dot"></span>AI Configuration</div></div>
     <div class="ai-grid">
@@ -595,116 +605,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
     </div>
   </div>
-  <div class="ai-section" id="reviews-section" style="display:none;margin-top:22px;">
-    <div class="ai-section-head"><div class="ai-section-title"><span class="ai-dot"></span>Google Reviews</div></div>
-    <div class="rv-stats">
-      <div class="rv-stat"><div class="rv-stat-label">Requests Sent</div><div class="rv-stat-value" id="rv-count-sent">0</div></div>
-      <div class="rv-stat"><div class="rv-stat-label">Opened Review Page</div><div class="rv-stat-value" id="rv-count-clicked">0</div></div>
-      <div class="rv-stat"><div class="rv-stat-label">Queued</div><div class="rv-stat-value" id="rv-count-pending">0</div></div>
-      <div class="rv-stat"><div class="rv-stat-label">Opted Out</div><div class="rv-stat-value" id="rv-count-opted">0</div></div>
-    </div>
-    <div class="rv-grid">
-      <div class="panel">
-        <div class="panel-head"><div class="panel-title">Ask a customer for a review</div><div class="panel-sub">Job complete</div></div>
-        <form id="rv-form" autocomplete="off">
-          <div class="rv-row">
-            <div class="rv-field">
-              <label class="rv-label" for="rv-name">Customer name</label>
-              <input class="rv-input" id="rv-name" type="text" maxlength="120" placeholder="Jane Smith" />
-            </div>
-            <div class="rv-field">
-              <label class="rv-label" for="rv-phone">Mobile number</label>
-              <input class="rv-input" id="rv-phone" type="tel" inputmode="tel" maxlength="20" placeholder="(555) 123-4567" />
-            </div>
-          </div>
-          <label class="rv-check" id="rv-consent-wrap" for="rv-consent">
-            <input type="checkbox" id="rv-consent" />
-            <span class="rv-check-text">I confirm this customer is a real customer we just did work for, and they <strong>agreed to receive text messages</strong> from us about their service.</span>
-          </label>
-          <div class="rv-field" style="margin-top:12px;">
-            <label class="rv-label" for="rv-consent-method">How did they agree?</label>
-            <select class="rv-input" id="rv-consent-method">
-              <option value="">Select one…</option>
-              <option value="verbal_at_job">Told us in person at the job</option>
-              <option value="verbal_on_phone">Told us over the phone</option>
-              <option value="written_form">Signed a form or work order</option>
-              <option value="text_reply">Texted us first / replied to us</option>
-              <option value="online_form">Checked the box on our website form</option>
-            </select>
-            <div class="rv-hint">We store this with the request. It's your proof of consent if a carrier ever asks.</div>
-          </div>
-          <div class="rv-actions">
-            <button class="rv-btn rv-btn-primary" id="rv-submit" type="submit">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Send review request
-            </button>
-            <span class="rv-hint" id="rv-timing" style="margin-top:0;"></span>
-          </div>
-          <div class="rv-msg" id="rv-form-msg"></div>
-        </form>
-        <div class="rv-note">
-          <strong>How it works:</strong> we wait, then send one text from your AI number asking for a Google review. Every message says who it's from and includes “Reply STOP to opt out.” Anyone who replies STOP is never texted again. Never add someone who didn't agree — that's the law, and it gets your number blocked.
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div class="panel-title">Recent requests</div><div class="panel-sub">Last 15</div></div>
-        <div class="rv-list" id="rv-list">
-          <div class="empty-state">
-            <div class="empty-state-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-            <div class="empty-state-title">No requests yet</div>
-            <div class="empty-state-desc">Mark a job complete above and your first review request will appear here.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:14px;">
-      <div class="panel-head"><div class="panel-title">Review request settings</div><div class="panel-sub">Setup</div></div>
-      <div class="rv-toggle">
-        <div class="rv-toggle-text">
-          <div class="rv-toggle-title">Review requests</div>
-          <div class="rv-toggle-sub" id="rv-enabled-sub">Turn on to start sending review texts.</div>
-        </div>
-        <label class="rv-check" style="border:none;background:none;padding:0;" for="rv-enabled">
-          <input type="checkbox" id="rv-enabled" />
-        </label>
-      </div>
-      <div class="rv-field">
-        <label class="rv-label" for="rv-link">Your Google review link</label>
-        <input class="rv-input" id="rv-link" type="url" maxlength="500" placeholder="https://g.page/r/…/review" />
-        <div class="rv-hint">In Google Business Profile, tap <strong>Ask for reviews</strong> and copy the link it gives you. Must start with https://</div>
-      </div>
-      <div class="rv-row">
-        <div class="rv-field">
-          <label class="rv-label" for="rv-delay">Wait before texting</label>
-          <select class="rv-input" id="rv-delay">
-            <option value="0">Send right away</option>
-            <option value="1">1 hour after the job</option>
-            <option value="2">2 hours after the job</option>
-            <option value="4">4 hours after the job</option>
-            <option value="24">1 day after the job</option>
-            <option value="48">2 days after the job</option>
-          </select>
-        </div>
-        <div class="rv-field">
-          <label class="rv-label" for="rv-followup-days">Follow-up wait</label>
-          <select class="rv-input" id="rv-followup-days">
-            <option value="2">2 days later</option>
-            <option value="3">3 days later</option>
-            <option value="5">5 days later</option>
-            <option value="7">7 days later</option>
-          </select>
-        </div>
-      </div>
-      <label class="rv-check" id="rv-followup-wrap" for="rv-followup">
-        <input type="checkbox" id="rv-followup" />
-        <span class="rv-check-text">Send <strong>one</strong> polite follow-up if they don't open the review link. Off by default — one reminder is plenty, and more looks like spam.</span>
-      </label>
-      <div class="rv-actions">
-        <button class="rv-btn rv-btn-secondary" id="rv-save" type="button">Save settings</button>
-      </div>
-      <div class="rv-msg" id="rv-settings-msg"></div>
-    </div>
-  </div>
 </div>
 <script>
 'use strict';
@@ -723,10 +623,36 @@ function getSlugFromUrl() {
   }
   return '';
 }
+// Cycles the line under the loading orb. Each message is a real stage of
+// what init() is doing, so a slow load actually tells you where it's stuck.
+const LOADER_STEPS = ['Verifying your session', 'Finding your account', 'Loading your calls', 'Almost there'];
+let loaderTimer = null;
+function startLoaderStatus() {
+  const el = document.getElementById('loader-status');
+  if (!el || loaderTimer) return;
+  let i = 0;
+  loaderTimer = setInterval(() => {
+    i += 1;
+    if (i >= LOADER_STEPS.length) { clearInterval(loaderTimer); loaderTimer = null; return; }
+    el.classList.add('swap');
+    setTimeout(() => { el.textContent = LOADER_STEPS[i]; el.classList.remove('swap'); }, 240);
+  }, 900);
+}
+
 function showState(which) {
+  if (loaderTimer && which !== 'state-loading') { clearInterval(loaderTimer); loaderTimer = null; }
   ['state-loading', 'state-preparing', 'state-notfound', 'state-mismatch'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = (id === which) ? '' : 'none';
+    if (!el) return;
+    if (id === which) { el.style.display = ''; el.classList.remove('state-out'); return; }
+    // Fade the loader out rather than snapping — otherwise the dashboard's own
+    // entrance animation is competing with a hard cut.
+    if (id === 'state-loading' && el.style.display !== 'none') {
+      el.classList.add('state-out');
+      setTimeout(() => { el.style.display = 'none'; el.classList.remove('state-out'); }, 320);
+    } else {
+      el.style.display = 'none';
+    }
   });
   const dash = document.getElementById('dash');
   if (dash) dash.classList.toggle('visible', which === 'dash');
@@ -790,9 +716,12 @@ function renderCalls(calls) {
   if (!list) return;
   if (!calls || calls.length === 0) return;
   list.innerHTML = '';
-  calls.forEach(call => {
+  calls.forEach((call, i) => {
     const item = document.createElement('div');
-    item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface-input);border:1px solid var(--border);border-radius:11px;min-width:0;';
+    item.className = 'call-row';
+    // Only the first handful are staggered — past that the delay would stack
+    // up into a visible wait on a list of 20.
+    item.style.animationDelay = Math.min(i, 7) * 45 + 'ms';
     const durationLabel = call.duration_seconds ? ` · ${formatDuration(call.duration_seconds)}` : '';
     item.innerHTML = `
       <div style="width:32px;height:32px;border-radius:9px;background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -838,11 +767,21 @@ function renderActivityChart(calls) {
     const isToday = i === DAYS - 1;
     const h = b.count > 0 ? Math.max(8, Math.round((b.count / max) * 100)) : 2;
     const label = b.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // +320ms so the count appears as its own bar lands, not while it's rising.
+    const delay = (380 + i * 45) + 'ms';
+    // Rendered flat, then grown to `data-h` below. Scaling the bar instead
+    // would squash the count label sitting inside it.
     return '<div class="chart-col" title="' + b.count + ' call' + (b.count === 1 ? '' : 's') + ' \u00b7 ' + label + '">'
-      + '<div class="chart-bar-wrap"><div class="chart-bar' + (b.count > 0 ? ' has' : '') + (isToday ? ' today' : '') + '" style="height:' + h + '%;">'
-      + (b.count > 0 ? '<span class="chart-count">' + b.count + '</span>' : '') + '</div></div>'
+      + '<div class="chart-bar-wrap"><div class="chart-bar' + (b.count > 0 ? ' has' : '') + (isToday ? ' today' : '') + '" data-h="' + h + '" style="height:2%;">'
+      + (b.count > 0 ? '<span class="chart-count" style="animation-delay:' + delay + ';">' + b.count + '</span>' : '') + '</div></div>'
       + '<div class="chart-x' + (isToday ? ' today' : '') + '">' + b.date.getDate() + '</div></div>';
   }).join('');
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  chart.querySelectorAll('.chart-bar').forEach((bar, i) => {
+    const to = bar.dataset.h + '%';
+    if (still) { bar.style.height = to; return; }
+    setTimeout(() => { bar.style.height = to; }, 60 + i * 45);
+  });
 }
 function renderLeadQuality(calls) {
   const el = document.getElementById('lead-quality');
@@ -945,227 +884,25 @@ function renderBilling(client) {
     }
   }
 }
-// ─────────────────────────────────────────────
-// GOOGLE REVIEW REQUESTS
-// ─────────────────────────────────────────────
-// Talks to /api/review-settings and /api/review-request-create with the
-// Supabase access token as a Bearer header — the server re-checks ownership.
-
-const RV_TAG_LABEL = { pending: 'Queued', sending: 'Sending', sent: 'Sent', clicked: 'Opened', opted_out: 'Opted out', failed: 'Failed' };
-
-function rvMsg(id, text, kind) {
+// Counts a stat up from zero so the dashboard feels alive on load. Small
+// numbers get a shorter ramp — counting "3" over a full second reads as lag,
+// not polish. Respects the OS "reduce motion" setting.
+function countTo(id, value) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (!text) { el.className = 'rv-msg'; el.textContent = ''; return; }
-  el.className = 'rv-msg open ' + (kind || 'ok');
-  el.textContent = text;
-}
-
-async function rvFetch(url, options) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { window.location.assign('/sign-in'); return null; }
-  const opts = options || {};
-  return fetch(url, {
-    method: opts.method || 'GET',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
-}
-
-function rvFormatPhoneInput(el) {
-  el.addEventListener('input', () => {
-    const d = el.value.replace(/\D/g, '').slice(0, 10);
-    if (d.length > 6) el.value = `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
-    else if (d.length > 3) el.value = `(${d.slice(0,3)}) ${d.slice(3)}`;
-    else if (d.length > 0) el.value = `(${d}`;
-    else el.value = '';
-  });
-}
-
-function rvRenderCounts(counts) {
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('rv-count-sent', counts.sent || 0);
-  set('rv-count-clicked', counts.clicked || 0);
-  set('rv-count-pending', counts.pending || 0);
-  set('rv-count-opted', counts.opted_out || 0);
-}
-
-function rvRenderList(recent) {
-  const list = document.getElementById('rv-list');
-  if (!list) return;
-  if (!recent || recent.length === 0) return;
-  list.innerHTML = '';
-  recent.forEach(r => {
-    const item = document.createElement('div');
-    item.className = 'rv-item';
-    const status = r.status || 'pending';
-    const when = r.sent_at ? 'Sent ' + formatTimeAgo(r.sent_at)
-      : r.scheduled_for ? 'Goes out ' + new Date(r.scheduled_for).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-      : formatTimeAgo(r.created_at);
-    item.innerHTML =
-      '<div class="rv-item-text">'
-      + '<div class="rv-item-name">' + escapeHtml(r.customer_name || r.phone_masked || 'Customer') + '</div>'
-      + '<div class="rv-item-meta">' + escapeHtml(r.phone_masked) + ' · ' + escapeHtml(when) + '</div>'
-      + '</div>'
-      + '<span class="rv-tag ' + escapeHtml(status) + '">' + escapeHtml(RV_TAG_LABEL[status] || status) + '</span>';
-    list.appendChild(item);
-  });
-}
-
-function rvApplySettings(s) {
-  const link = document.getElementById('rv-link');
-  const delay = document.getElementById('rv-delay');
-  const enabled = document.getElementById('rv-enabled');
-  const followup = document.getElementById('rv-followup');
-  const followupDays = document.getElementById('rv-followup-days');
-  if (link) link.value = s.google_review_link || '';
-  if (delay) delay.value = String(s.delay_hours);
-  if (enabled) enabled.checked = !!s.enabled;
-  if (followup) followup.checked = !!s.follow_up_enabled;
-  if (followupDays) followupDays.value = String(s.follow_up_days);
-
-  const wrap = document.getElementById('rv-followup-wrap');
-  if (wrap) wrap.classList.toggle('checked', !!s.follow_up_enabled);
-  const sub = document.getElementById('rv-enabled-sub');
-  if (sub) sub.textContent = s.enabled ? 'On — new jobs will get a review text.' : 'Turn on to start sending review texts.';
-
-  const timing = document.getElementById('rv-timing');
-  if (timing) {
-    timing.textContent = !s.enabled ? 'Turn on review requests below first.'
-      : s.delay_hours === 0 ? 'Sends right away.'
-      : s.delay_hours === 1 ? 'Sends 1 hour from now.'
-      : s.delay_hours < 24 ? `Sends ${s.delay_hours} hours from now.`
-      : `Sends ${Math.round(s.delay_hours / 24)} day(s) from now.`;
+  const target = Number(value) || 0;
+  if (target <= 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = target;
+    return;
   }
-  const submit = document.getElementById('rv-submit');
-  if (submit) submit.disabled = !s.enabled;
-}
-
-async function rvLoad(slug) {
-  const resp = await rvFetch(`/api/review-settings?client_slug=${encodeURIComponent(slug)}`);
-  if (!resp || !resp.ok) return null;
-  const data = await resp.json().catch(() => null);
-  if (!data || !data.ok) return null;
-  rvApplySettings(data.settings);
-  rvRenderCounts(data.counts);
-  rvRenderList(data.recent);
-  return data;
-}
-
-function initReviews(client) {
-  const section = document.getElementById('reviews-section');
-  if (!section) return;
-  const slug = client.client_slug;
-  // NOTE: the section stays hidden until rvLoad() comes back clean (see the
-  // bottom of this function). If the migration hasn't been run, or the API is
-  // down, the dashboard renders exactly as it did before this feature existed.
-
-  const phoneEl = document.getElementById('rv-phone');
-  if (phoneEl) rvFormatPhoneInput(phoneEl);
-
-  // Checkbox highlight states.
-  const consentWrap = document.getElementById('rv-consent-wrap');
-  const consentBox = document.getElementById('rv-consent');
-  if (consentBox && consentWrap) {
-    consentBox.addEventListener('change', () => consentWrap.classList.toggle('checked', consentBox.checked));
-  }
-  const fuWrap = document.getElementById('rv-followup-wrap');
-  const fuBox = document.getElementById('rv-followup');
-  if (fuBox && fuWrap) {
-    fuBox.addEventListener('change', () => fuWrap.classList.toggle('checked', fuBox.checked));
-  }
-
-  // ── Save settings ──
-  const saveBtn = document.getElementById('rv-save');
-  if (saveBtn) saveBtn.addEventListener('click', async () => {
-    rvMsg('rv-settings-msg', '');
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving…';
-    try {
-      const resp = await rvFetch('/api/review-settings', {
-        method: 'POST',
-        body: {
-          client_slug: slug,
-          enabled: document.getElementById('rv-enabled').checked,
-          google_review_link: document.getElementById('rv-link').value.trim(),
-          delay_hours: Number(document.getElementById('rv-delay').value),
-          follow_up_enabled: document.getElementById('rv-followup').checked,
-          follow_up_days: Number(document.getElementById('rv-followup-days').value),
-        },
-      });
-      const j = resp ? await resp.json().catch(() => ({})) : {};
-      if (resp && resp.ok && j.ok) {
-        rvApplySettings(j.settings);
-        rvMsg('rv-settings-msg', 'Settings saved.', 'ok');
-      } else {
-        rvMsg('rv-settings-msg', (j && j.error) || 'Could not save. Please try again.', 'err');
-      }
-    } catch (_) {
-      rvMsg('rv-settings-msg', 'Network error. Please try again.', 'err');
-    }
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Save settings';
-  });
-
-  // ── Queue a review request ──
-  const form = document.getElementById('rv-form');
-  if (form) form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    rvMsg('rv-form-msg', '');
-
-    const nameEl = document.getElementById('rv-name');
-    const methodEl = document.getElementById('rv-consent-method');
-    const submit = document.getElementById('rv-submit');
-
-    const digits = phoneEl.value.replace(/\D/g, '');
-    if (digits.length !== 10) {
-      rvMsg('rv-form-msg', 'Enter a 10-digit US mobile number.', 'err');
-      return;
-    }
-    if (!consentBox.checked) {
-      rvMsg('rv-form-msg', 'You must confirm this customer agreed to receive texts.', 'err');
-      return;
-    }
-    if (!methodEl.value) {
-      rvMsg('rv-form-msg', 'Please tell us how they agreed.', 'err');
-      return;
-    }
-
-    submit.disabled = true;
-    try {
-      const resp = await rvFetch('/api/review-request-create', {
-        method: 'POST',
-        body: {
-          client_slug: slug,
-          customer_name: nameEl.value.trim(),
-          customer_phone: digits,
-          consent: true,
-          consent_method: methodEl.value,
-        },
-      });
-      const j = resp ? await resp.json().catch(() => ({})) : {};
-      if (resp && resp.ok && j.ok) {
-        rvMsg('rv-form-msg', j.duplicate
-          ? 'That customer already has a review request queued.'
-          : 'Queued. We\'ll text them shortly and you\'ll see the result here.', 'ok');
-        form.reset();
-        consentWrap.classList.remove('checked');
-        await rvLoad(slug);
-      } else {
-        rvMsg('rv-form-msg', (j && j.error) || 'Could not queue that request.', 'err');
-      }
-    } catch (_) {
-      rvMsg('rv-form-msg', 'Network error. Please try again.', 'err');
-    }
-    submit.disabled = false;
-  });
-
-  // Only reveal the panel once we know the backend answered. A failure here
-  // (migration not run, API error, network) leaves it hidden rather than
-  // showing a paying customer a dead panel.
-  rvLoad(slug)
-    .then(data => { if (data) section.style.display = 'block'; })
-    .catch(err => console.error('[dashboard] review load failed:', err));
+  const duration = Math.min(900, 260 + target * 45);
+  const start = performance.now();
+  (function frame(t) {
+    const p = Math.min(1, (t - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);   // ease-out: fast start, soft landing
+    el.textContent = Math.round(target * eased);
+    if (p < 1) requestAnimationFrame(frame);
+  })(start);
 }
 
 function renderDashboard(client, calls) {
@@ -1248,8 +985,8 @@ function renderDashboard(client, calls) {
   const week = callsArr.filter(c => ts(c) >= since(7)).length;
   const month = callsArr.filter(c => ts(c) >= since(30)).length;
   const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setText('stat-today', today);
-  setText('stat-week', week);
+  countTo('stat-today', today);
+  countTo('stat-week', week);
 
   // Missed calls recovered: a captured call that came in while the human line
   // didn't pick up. We treat any answered AI call with a real outcome as recovered,
@@ -1259,8 +996,8 @@ function renderDashboard(client, calls) {
     c.missed === true ||
     (c.outcome && !['Short call', 'General inquiry'].includes(c.outcome))
   );
-  setText('stat-calls', callsArr.length);
-  setText('stat-recovered', recoveredCalls.length);
+  countTo('stat-calls', callsArr.length);
+  countTo('stat-recovered', recoveredCalls.length);
   setText('stat-calls-sub', callsArr.length === 0 ? 'No calls yet' : 'All time');
 
   // The hero subtitle carries the two numbers that no longer have their own
@@ -1285,13 +1022,10 @@ function renderDashboard(client, calls) {
   renderBilling(client);
   showState('dash');
 
-  // Reviews are an add-on and must never be able to take the dashboard down
-  // with them. Runs LAST, after the dashboard is already on screen, and any
-  // failure is swallowed — worst case the panel stays hidden.
-  try { initReviews(client); } catch (err) { console.error('[dashboard] reviews init failed:', err); }
 }
 
 async function init() {
+  startLoaderStatus();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     console.log('[dashboard] no session — redirecting to sign-in');

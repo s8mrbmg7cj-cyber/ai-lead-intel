@@ -63,10 +63,6 @@
     {
       "path": "/api/send-report",
       "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/review-request-send",
-      "schedule": "0 9 * * *"
     }
   ]
 }
