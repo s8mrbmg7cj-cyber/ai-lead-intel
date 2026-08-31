@@ -71,8 +71,13 @@ async function isSlugTaken(slug, supabaseUrl, supabaseKey) {
   } catch (_) { return false; }
 }
 async function resolveSlug(data, supabaseUrl, supabaseKey) {
-  let base = (data.client_slug_from_form || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
-  if (!base) base = slugifyBase(data.business_name);
+  // The form slugifies before posting, but this must not depend on that. The
+  // old code only *stripped* illegal characters, so a value that arrived
+  // unslugified lost its spaces instead of gaining hyphens — "Landscape Ads AI"
+  // became "landscapeadsai". That slug is permanent: it's the dashboard URL and
+  // the seed for the client's ntfy topic, both of which the customer sees.
+  let base = slugifyBase(data.client_slug_from_form);
+  if (base === "client") base = slugifyBase(data.business_name);
   const taken = await isSlugTaken(base, supabaseUrl, supabaseKey);
   if (!taken) return base;
   return `${base}-${Math.random().toString(36).slice(2, 6)}`;
