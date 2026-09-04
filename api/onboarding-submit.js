@@ -218,6 +218,12 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   // for or claimed by a login is off limits — we insert a fresh row instead and
   // leave the real customer untouched.
   let existingId = null;
+  // phone_number carries a unique index. When the row we found belongs to a real
+  // customer we deliberately don't touch it — but we then can't reuse their phone
+  // on the new row either, or the insert dies on that index and the signup fails
+  // with "Could not save your submission." The number is still captured in
+  // notes/forwarding_number; this column is only ever used as the dedupe key.
+  let phoneTakenByActiveAccount = false;
   if (phoneNumber) {
     try {
       const r = await fetch(
@@ -234,7 +240,10 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
             && (paymentStatus === "" || paymentStatus === "unpaid")
             && (status === "" || status === "pending");
           if (unclaimed) existingId = cand.id;
-          else console.warn("[onboarding] phone matches an active account — creating a separate row instead of overwriting it");
+          else {
+            phoneTakenByActiveAccount = true;
+            console.warn("[onboarding] phone matches an active account — creating a separate row without the phone instead of overwriting it");
+          }
         }
       }
     } catch (e) { console.warn("[onboarding] phone lookup:", e.message); }
@@ -267,8 +276,17 @@ async function createClientRow(data, onboardingId, finalSlug, supabaseUrl, supab
   // Generated once, only on first insert — never rotated on re-submit, or a
   // customer who already subscribed in the ntfy app would stop getting alerts.
   const ntfyTopic = `ali-${finalSlug}-${crypto.randomBytes(6).toString("hex")}`;
-  const insertPayload = { ...baseFields, ntfy_topic: ntfyTopic, phone_number: phoneNumber, active: true, payment_required: true, payment_pending: true, payment_status: "unpaid" };
-  const r = await fetch(`${supabaseUrl}/rest/v1/clients`, { method: "POST", headers: writeHeaders, body: JSON.stringify(insertPayload) });
+  const insertPayload = { ...baseFields, ntfy_topic: ntfyTopic, phone_number: phoneTakenByActiveAccount ? null : phoneNumber, active: true, payment_required: true, payment_pending: true, payment_status: "unpaid" };
+  const insert = (payload) => fetch(`${supabaseUrl}/rest/v1/clients`, { method: "POST", headers: writeHeaders, body: JSON.stringify(payload) });
+  let r = await insert(insertPayload);
+  // 409 means we still collided with a unique index — the lookup above can miss
+  // one (it only reads a single row, and it swallows network errors). Losing a
+  // paying signup over a duplicate dedupe key is far worse than storing the row
+  // without its phone or on a suffixed slug, so retry once stripped down.
+  if (r.status === 409) {
+    console.warn("[onboarding] insert conflicted on a unique index — retrying without phone/slug collision");
+    r = await insert({ ...insertPayload, phone_number: null, client_slug: `${finalSlug}-${crypto.randomBytes(2).toString("hex")}` });
+  }
   if (!r.ok) { const t = await r.text().catch(() => ""); throw new Error(`Insert failed (${r.status}): ${t.slice(0,300)}`); }
   const rows = await r.json().catch(() => []);
   const row = rows[0]; if (!row) throw new Error("Insert returned no row");
@@ -347,7 +365,7 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
     if (!supabaseUrl || !supabaseKey) return res.status(500).json({ success: false, error: "Server misconfigured" });
-    const finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
+    let finalSlug = await resolveSlug(data, supabaseUrl, supabaseKey);
     const onboardingId = await saveOnboardingToSupabase(data, supabaseUrl, supabaseKey);
     let clientResult;
     try { clientResult = await createClientRow(data, onboardingId, finalSlug, supabaseUrl, supabaseKey); }
@@ -357,6 +375,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: "Could not save your submission." });
     }
     const clientRow = clientResult.row;
+    // The conflict retry inside createClientRow can suffix the slug. The slug is
+    // the dashboard URL we email and return, so read back what actually landed.
+    finalSlug = clientRow.client_slug || finalSlug;
 
     // ── Instant SMS lead-alert number ──────────────────────────────────
     // Store the owner's cell (their transfer number — "usually your cell") so
