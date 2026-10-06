@@ -1,0 +1,446 @@
+{
+  "id": "leadpipe00000001",
+  "name": "Lead -> AI qualify -> CRM + 60s callback",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        300
+      ],
+      "id": "Lead arrives (webhook)",
+      "name": "Lead arrives (webhook)",
+      "webhookId": "lead-pipeline-new-lead"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Node 1 of 3 — Normalize & validate.\n//\n// Accepts three shapes without caring which: a Meta Lead Ads webhook, a plain\n// JSON website form, or a form-encoded POST. Emits one flat lead object.\n//\n// Rule that matters: a lead is only INVALID if we cannot reach the human.\n// Everything else is a warning. A missing name is not a reason to drop someone\n// who left a working phone number.\n\nfunction normalizeLead(raw) {\n  const flat = {};\n\n  // Meta Lead Ads nests the answers in entry[].changes[].value.field_data[].\n  const fd =\n    raw?.entry?.[0]?.changes?.[0]?.value?.field_data ||\n    raw?.field_data ||\n    null;\n\n  if (Array.isArray(fd)) {\n    for (const f of fd) {\n      const key = String(f?.name ?? '').toLowerCase().trim();\n      if (!key) continue;\n      flat[key] = Array.isArray(f?.values) ? f.values[0] : f?.value;\n    }\n  }\n\n  // Plain form shapes: take every scalar at the top level.\n  for (const [k, v] of Object.entries(raw ?? {})) {\n    if (typeof v === 'string' || typeof v === 'number') {\n      flat[k.toLowerCase().trim()] = v;\n    }\n  }\n\n  const pick = (...names) => {\n    for (const n of names) {\n      const v = flat[n];\n      if (v !== undefined && v !== null && String(v).trim() !== '') {\n        return String(v).trim();\n      }\n    }\n    return '';\n  };\n\n  const name = pick('full_name', 'fullname', 'name', 'contact_name', 'first_name');\n  const emailRaw = pick('email', 'email_address', 'work_email').toLowerCase();\n  const phoneRaw = pick('phone', 'phone_number', 'mobile', 'tel', 'telephone');\n  const message = pick(\n    'message', 'notes', 'comments', 'details', 'job_description',\n    'describe_your_project', 'what_do_you_need', 'how_can_we_help'\n  );\n  const service = pick('service', 'service_needed', 'job_type', 'category', 'what_service');\n  const city = pick('city', 'town', 'location');\n  const zip = pick('zip', 'zip_code', 'postal_code', 'postcode');\n  const source = pick('source', 'utm_source', 'platform') ||\n    (Array.isArray(fd) ? 'meta_lead_ads' : 'web_form');\n\n  // Phone → E.164. Twilio rejects anything else, so do it here, once.\n  const digits = phoneRaw.replace(/[^\\d]/g, '');\n  let phone = '';\n  if (digits.length === 10) phone = '+1' + digits;\n  else if (digits.length === 11 && digits.startsWith('1')) phone = '+' + digits;\n  else if (digits.length >= 11 && digits.length <= 15) phone = '+' + digits;\n\n  // The domain is one or more dot-separated labels followed by a TLD. The first\n  // version of this pattern forbade dots inside the domain, which silently\n  // rejected every \"@company.co.uk\" and every subdomain address — and a lead who\n  // left only that email was then marked unreachable and never contacted at all.\n  // Deliberately not RFC 5322: the only question is whether it is worth sending\n  // to, and anything this lets through that bounces will bounce visibly.\n  const emailOk = /^[^@\\s]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}$/i.test(emailRaw);\n  const email = emailOk ? emailRaw : '';\n\n  const errors = [];\n  const warnings = [];\n\n  // The ONLY fatal condition: nobody to contact.\n  if (!phone && !email) {\n    errors.push('unreachable: no usable phone and no usable email');\n  }\n  if (phoneRaw && !phone) warnings.push(`phone could not be parsed: \"${phoneRaw}\"`);\n  if (emailRaw && !emailOk) warnings.push(`email could not be parsed: \"${emailRaw}\"`);\n  if (!name) warnings.push('no name supplied');\n  if (!message && !service) warnings.push('no message and no service selected');\n\n  return {\n    valid: errors.length === 0,\n    errors,\n    warnings,\n    lead: {\n      name,\n      email,\n      phone,\n      message,\n      service,\n      city,\n      zip,\n      source,\n      received_at: new Date().toISOString(),\n      t0: Date.now(),\n      // Used to suppress a duplicate alert if the same person submits twice.\n      dedupe_key: (phone || email || name).toLowerCase(),\n      raw_field_count: Object.keys(flat).length,\n    },\n  };\n}\n\n// ---- n8n glue ----\nconst out = [];\nfor (const item of $input.all()) {\n  // Webhook v2 puts the posted body under .body; accept a bare object too.\n  out.push({ json: normalizeLead(item.json.body ?? item.json) });\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "id": "1. Normalize + validate",
+      "name": "1. Normalize + validate"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "reachable",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        300
+      ],
+      "id": "Reachable?",
+      "name": "Reachable?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ANTHROPIC_API_KEY }}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'claude-sonnet-4-6',\n  max_tokens: 700,\n  temperature: 0,\n  system: \"You qualify inbound leads for a local home-service business (HVAC, plumbing, roofing, electrical and similar).\\n\\nReturn ONLY a JSON object, no prose, with exactly these keys:\\n  score              integer 0-100, how likely this person is to book paid work soon\\n  intent             <=8 words, what they actually want\\n  urgency            one of: emergency, this week, this month, no rush, unknown\\n  summary_for_owner  <=180 chars, written to be read on a phone lock screen\\n  first_question     <=100 chars, the single best question to open the callback with\\n  red_flags          array of short strings, [] if none\\n\\nScoring guide:\\n  80-100  a described problem plus urgency plus a reachable number\\n  60-79   real need, timing unclear\\n  40-59   vague enquiry, thin detail\\n  20-39   price shopping, no described problem\\n  0-19    spam, test submission, competitor, or clearly out of scope\\n\\nHard rules:\\n  - Use ONLY what is in the lead. Never invent a budget, a timeline, an address or a problem.\\n  - If the message is empty, say so in summary_for_owner and score on contactability alone.\\n  - summary_for_owner must contain no greeting, no emoji, and no advice to the owner.\\n  - Flag it rather than guessing if something looks like an agency pitch or an automated submission.\\n  - The score is advisory. It is bounded in code against a rule engine, so do not inflate it.\",\n  messages: [\n    { role: 'user', content: 'Qualify this lead.\\n\\n<lead>\\n' + JSON.stringify($json.lead, null, 2) + '\\n</lead>' },\n    { role: 'assistant', content: '{' }\n  ]\n}) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        200
+      ],
+      "id": "2. Claude qualifies the lead",
+      "name": "2. Claude qualifies the lead",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Node 2 of 3 — Qualify.\n//\n// Takes whatever the model returned (or whatever the API error was) and always\n// produces a usable qualification. The AI is allowed to fail; the lead is not\n// allowed to disappear. If the model is down, rate-limited, or returns garbage,\n// `ruleScore` answers instead and `source` says so out loud.\n//\n// Two deliberate choices:\n//   1. The tier is ALWAYS recomputed from the score here. The model's own tier\n//      field is ignored even when present — a score and a tier that agree today\n//      are not a guarantee they agree tomorrow.\n//   2. The model never computes a number we depend on for routing. It writes\n//      the sentence a human reads; the score it proposes is clamped and bounded\n//      by the rule engine.\n\nconst TIER_A_MIN = 70;\nconst TIER_B_MIN = 40;\n\nfunction tierFor(score) {\n  if (score >= TIER_A_MIN) return 'A';\n  if (score >= TIER_B_MIN) return 'B';\n  return 'C';\n}\n\n// Deterministic scorer. Runs on every lead, used alone when the AI is unusable,\n// and used as a sanity bound when the AI is usable.\nfunction ruleScore(lead) {\n  const reasons = [];\n  let s = 20;\n\n  if (lead.phone) { s += 25; reasons.push('reachable by phone'); }\n  if (lead.email) { s += 10; reasons.push('email present'); }\n  if (lead.service) { s += 10; reasons.push('named a service'); }\n\n  const msg = String(lead.message || '');\n  const words = msg.split(/\\s+/).filter(Boolean).length;\n  if (words >= 15) { s += 15; reasons.push('detailed message'); }\n  else if (words >= 5) { s += 8; reasons.push('some detail'); }\n\n  const urgent = /\\b(asap|today|tonight|tomorrow|urgent|emergency|right away|no heat|no hot water|no a\\/?c|not working|stopped working|broken|leak|leaking|flood)/i;\n  if (urgent.test(msg)) { s += 20; reasons.push('urgency language'); }\n\n  const shopping = /\\b(just looking|just curious|just browsing|how much (is|does|would)|ballpark|price range|price list|quote only|not ready|window shopping)\\b/i;\n  if (shopping.test(msg)) { s -= 15; reasons.push('price-shopping language'); }\n\n  const spam = /\\b(seo services|rank your (site|website)|increase your traffic|guest post|backlink|crypto|loan offer|bitcoin|investment opportunity)\\b/i;\n  const junkName = /^(test|asdf|qwerty|aaa+|xxx+|n\\/?a)$/i;\n  if (spam.test(msg) || junkName.test(String(lead.name || '').trim())) {\n    s = Math.min(s, 10);\n    reasons.push('matches spam/test pattern');\n  }\n\n  // Capped at 95, not 100. The weights above happen to sum to exactly 100 on a\n  // good lead, and a rules-only score of \"100\" reads like certainty the rule\n  // engine does not have — it has seen a phone number and some keywords. 95\n  // leaves the top of the range for a qualification that actually read the text.\n  s = Math.max(0, Math.min(95, Math.round(s)));\n  return { score: s, tier: tierFor(s), reasons };\n}\n\n// Pull the first JSON object out of model output that may be fenced, prefixed,\n// or (because we prefill the assistant turn with \"{\") missing its opening brace.\nfunction extractJson(text) {\n  if (typeof text !== 'string' || text.trim() === '') return null;\n  let t = text.trim();\n  t = t.replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/, '').trim();\n  if (!t.startsWith('{')) {\n    const i = t.indexOf('{');\n    if (i === -1) t = '{' + t;        // assistant prefill case\n    else t = t.slice(i);\n  }\n  const end = t.lastIndexOf('}');\n  if (end !== -1) t = t.slice(0, end + 1);\n  try { return JSON.parse(t); } catch { return null; }\n}\n\nfunction clip(text, max) {\n  const s = String(text ?? '').replace(/\\s+/g, ' ').trim();\n  if (s.length <= max) return s;\n  const cut = s.slice(0, max - 1);\n  const sp = cut.lastIndexOf(' ');\n  return (sp > max * 0.6 ? cut.slice(0, sp) : cut).trim() + '\\u2026';\n}\n\n// `aiText` is the model's text, or '' / null when the API call failed.\nfunction qualify(lead, aiText, apiError) {\n  const fb = ruleScore(lead);\n  const parsed = extractJson(aiText);\n\n  const problems = [];\n  if (apiError) problems.push(`api: ${String(apiError).slice(0, 120)}`);\n  if (!parsed) problems.push(aiText ? 'model output was not valid JSON' : 'no model output');\n\n  let score = fb.score;\n  let summary = '';\n  let intent = '';\n  let urgency = '';\n  let next_question = '';\n  let red_flags = [];\n  let source = 'fallback';\n\n  if (parsed) {\n    const n = Number(parsed.score);\n    const hasScore = Number.isFinite(n);\n    if (!hasScore) problems.push('model score missing or not a number');\n\n    summary = clip(parsed.summary_for_owner ?? parsed.summary, 200);\n    intent = clip(parsed.intent, 60);\n    urgency = clip(parsed.urgency, 24);\n    next_question = clip(parsed.first_question ?? parsed.suggested_first_question, 120);\n    red_flags = Array.isArray(parsed.red_flags)\n      ? parsed.red_flags.map((r) => clip(r, 60)).filter(Boolean).slice(0, 4)\n      : [];\n\n    if (!summary) problems.push('model summary was empty');\n\n    // Accept the model's score only if it is a real number AND within 25 points\n    // of the rule engine. A wild disagreement means one of them misread the\n    // lead, and we are not betting the owner's phone on which.\n    if (hasScore && summary) {\n      const clamped = Math.max(0, Math.min(100, Math.round(n)));\n      if (Math.abs(clamped - fb.score) <= 25) {\n        score = clamped;\n        source = 'ai';\n      } else {\n        score = Math.round((clamped + fb.score) / 2);\n        source = 'ai+rules(disagreed)';\n        problems.push(`model score ${clamped} vs rules ${fb.score} — averaged`);\n      }\n    }\n  }\n\n  if (!summary) {\n    const bits = [\n      lead.service || 'enquiry',\n      lead.message ? clip(lead.message, 90) : null,\n      lead.city || null,\n    ].filter(Boolean);\n    summary = clip(bits.join(' \\u2014 '), 200);\n  }\n\n  return {\n    score,\n    tier: tierFor(score),            // never trust a model-supplied tier\n    summary,\n    intent,\n    urgency,\n    next_question,\n    red_flags,\n    source,                          // 'ai' | 'ai+rules(disagreed)' | 'fallback'\n    rule_score: fb.score,\n    rule_reasons: fb.reasons,\n    problems,                        // empty means the AI path ran clean\n  };\n}\n\n// ---- n8n glue ----\n// Reach back to node 1 for the lead, because the HTTP node replaced the item.\nconst norm = $('1. Normalize + validate').all();\nconst items = $input.all();\nconst out = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const lead = norm[Math.min(i, norm.length - 1)].json.lead;\n  const resp = items[i].json ?? {};\n\n  let text = '';\n  let apiError = null;\n\n  if (Array.isArray(resp.content)) {\n    // Anthropic success. The assistant turn was prefilled with \"{\", so the\n    // text that comes back is missing its opening brace — extractJson knows.\n    text = resp.content.map((c) => c.text ?? '').join('');\n  } else if (resp.error) {\n    apiError = resp.error.message ?? JSON.stringify(resp.error);\n  } else if (resp.message) {\n    apiError = String(resp.message);\n  } else {\n    apiError = 'no response body from the model endpoint';\n  }\n\n  out.push({ json: { lead, q: qualify(lead, text, apiError) } });\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        200
+      ],
+      "id": "3. Qualify (AI, bounded by rules)",
+      "name": "3. Qualify (AI, bounded by rules)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Node 3 of 3 — Compose the owner alert, the CRM record, and the audit row.\n//\n// The alert is written for a lock screen, not an inbox. The first line has to\n// survive being truncated to ~55 characters by the notification, so the tier,\n// the score and the name go first and nothing else competes for that space.\n// The phone number is left bare on its own line so the OS linkifies it and the\n// owner can dial by tapping once.\n\nconst SMS_SEGMENT = 160;\nconst MAX_SEGMENTS = 2;           // 320 chars. Past this, carriers split and bill extra.\n\nfunction humanMs(ms) {\n  if (!Number.isFinite(ms) || ms < 0) return 'n/a';\n  if (ms < 1000) return `${Math.round(ms)}ms`;\n  return `${(ms / 1000).toFixed(1)}s`;\n}\n\nfunction segments(text) {\n  return Math.max(1, Math.ceil(String(text).length / SMS_SEGMENT));\n}\n\nfunction composeAlert(lead, q) {\n  const head = `${q.tier}-LEAD ${q.score} ${lead.name || 'No name given'}`;\n\n  const lines = [head];\n  if (q.summary) lines.push(q.summary);\n  if (lead.phone) lines.push(lead.phone);\n\n  const meta = [lead.service, lead.city, lead.source].filter(Boolean).join(' | ');\n  if (meta) lines.push(meta);\n\n  if (q.next_question) lines.push(`Ask: ${q.next_question}`);\n  if (q.red_flags?.length) lines.push(`Flag: ${q.red_flags.join('; ')}`);\n  if (q.source !== 'ai') lines.push(`[scored by ${q.source}]`);\n\n  let text = lines.join('\\n');\n\n  // Trim from the least important line up until it fits two segments. Never\n  // truncate the head or the phone number — those are the whole point.\n  const protectedCount = lead.phone ? 3 : 2;\n  while (segments(text) > MAX_SEGMENTS && lines.length > protectedCount) {\n    lines.splice(protectedCount, 1);\n    text = lines.join('\\n');\n  }\n  if (segments(text) > MAX_SEGMENTS) {\n    text = text.slice(0, SMS_SEGMENT * MAX_SEGMENTS - 1) + '\\u2026';\n  }\n\n  return text;\n}\n\n// WhatsApp is not SMS wearing a different logo. A Cloud API text message holds\n// 4096 characters, so the context that composeAlert is forced to throw away to\n// fit two segments can stay. That is the entire reason this is a separate\n// function rather than a flag on the one above: the SMS alert is shaped by a\n// billing limit, and repeating that limit where it does not apply would be\n// cargo cult.\nconst WA_MAX = 4096;\n\nfunction composeWhatsapp(lead, q) {\n  const lines = [`*${q.tier}-LEAD ${q.score}* — ${lead.name || 'No name given'}`];\n  if (q.summary) lines.push('', q.summary);\n\n  const facts = [\n    lead.phone && `Phone: ${lead.phone}`,\n    lead.email && `Email: ${lead.email}`,\n    lead.service && `Service: ${lead.service}`,\n    lead.city && `Area: ${lead.city}`,\n    `Source: ${lead.source}`,\n  ].filter(Boolean);\n  lines.push('', ...facts);\n\n  // These three are the first casualties in the SMS. Here they survive, which\n  // is the whole point of having the channel.\n  if (q.intent) lines.push('', `Intent: ${q.intent}`);\n  if (q.urgency) lines.push(`Urgency: ${q.urgency}`);\n  if (q.next_question) lines.push('', `*Ask first:* ${q.next_question}`);\n  if (q.red_flags?.length) lines.push('', `*Flags:* ${q.red_flags.join('; ')}`);\n  if (q.source !== 'ai') lines.push('', `_[scored by ${q.source}]_`);\n\n  const text = lines.join('\\n');\n  return text.length <= WA_MAX ? text : text.slice(0, WA_MAX - 1) + '\\u2026';\n}\n\n// Meta Cloud API free-form text. Note this only delivers inside the 24-hour\n// customer service window; outside it Meta requires an approved template, which\n// is a provisioning decision and not something code can paper over.\nfunction composeWhatsappPayload(lead, q, to) {\n  return {\n    messaging_product: 'whatsapp',\n    recipient_type: 'individual',\n    to: String(to || '').replace(/^\\+/, ''),   // Cloud API wants digits, no plus\n    type: 'text',\n    text: { preview_url: false, body: composeWhatsapp(lead, q) },\n  };\n}\n\nfunction composeCrm(lead, q, locationId) {\n  const parts = (lead.name || '').split(/\\s+/).filter(Boolean);\n  return {\n    locationId: locationId || '',\n    firstName: parts[0] || '',\n    lastName: parts.slice(1).join(' '),\n    name: lead.name || '',\n    email: lead.email || undefined,\n    phone: lead.phone || undefined,\n    source: lead.source,\n    tags: [\n      'ai-qualified',\n      `tier-${q.tier.toLowerCase()}`,\n      lead.source,\n      q.source === 'ai' ? 'scored-ai' : 'scored-rules',\n    ].filter(Boolean),\n    customFields: [\n      { key: 'lead_score', field_value: String(q.score) },\n      { key: 'lead_summary', field_value: q.summary },\n      { key: 'lead_intent', field_value: q.intent || '' },\n      { key: 'lead_urgency', field_value: q.urgency || '' },\n    ],\n  };\n}\n\nfunction compose(lead, q, opts = {}) {\n  const now = opts.now ?? Date.now();\n  const latency_ms = Number.isFinite(lead.t0) ? now - lead.t0 : null;\n  const alert = composeAlert(lead, q);\n\n  return {\n    tier: q.tier,\n    score: q.score,\n    // Only an A pages the owner immediately. B and C land in the CRM and the\n    // daily digest, which is the difference between a useful alert and one the\n    // owner learns to ignore.\n    notify_now: q.tier === 'A',\n    alert_text: alert,\n    alert_segments: segments(alert),\n    whatsapp: composeWhatsappPayload(lead, q, opts.ownerPhone),\n    crm: composeCrm(lead, q, opts.locationId),\n    audit: {\n      received_at: lead.received_at,\n      name: lead.name,\n      phone: lead.phone,\n      email: lead.email,\n      source: lead.source,\n      service: lead.service,\n      score: q.score,\n      tier: q.tier,\n      scored_by: q.source,\n      rule_score: q.rule_score,\n      problems: (q.problems || []).join('; '),\n      latency_ms,\n      latency_human: humanMs(latency_ms),\n      dedupe_key: lead.dedupe_key,\n    },\n  };\n}\n\n// ---- n8n glue ----\nconst out = [];\nfor (const item of $input.all()) {\n  const lead = item.json.lead;\n  const q = item.json.q;\n  out.push({ json: { lead, q, ...compose(lead, q, { locationId: $env.GHL_LOCATION_ID, ownerPhone: $env.OWNER_PHONE }) } });\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        200
+      ],
+      "id": "4. Compose alert + CRM record",
+      "name": "4. Compose alert + CRM record"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "notify",
+              "leftValue": "={{ $json.notify_now }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1140,
+        200
+      ],
+      "id": "Tier A?",
+      "name": "Tier A?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SMS_ENDPOINT }}",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $env.OWNER_PHONE }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $env.TWILIO_FROM }}"
+            },
+            {
+              "name": "Body",
+              "value": "={{ $json.alert_text }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        100
+      ],
+      "id": "Text the owner now",
+      "name": "Text the owner now",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.WHATSAPP_ENDPOINT }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.whatsapp) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        0
+      ],
+      "id": "WhatsApp the owner now",
+      "name": "WhatsApp the owner now",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        300
+      ],
+      "id": "Hold for daily digest",
+      "name": "Hold for daily digest"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_ENDPOINT }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.GHL_API_KEY }}"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.crm) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        460
+      ],
+      "id": "Upsert into GoHighLevel",
+      "name": "Upsert into GoHighLevel",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// One row per lead, including how long the whole thing took and whether the\n// AI or the rule engine produced the score. Swap this for a Google Sheets\n// \"Append Row\" node and map these keys straight across.\nreturn $input.all().map((i) => ({ json: i.json.audit }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        620
+      ],
+      "id": "Audit row",
+      "name": "Audit row"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Nothing is thrown away silently. An unreachable submission still gets a\n// row, so \"we never heard from them\" can be told apart from \"we dropped it\".\nconst out = [];\nfor (const item of $input.all()) {\n  out.push({ json: {\n    outcome: 'not_contactable',\n    reason: (item.json.errors || []).join('; '),\n    warnings: (item.json.warnings || []).join('; '),\n    lead: item.json.lead,\n  } });\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        460
+      ],
+      "id": "Log unreachable",
+      "name": "Log unreachable"
+    }
+  ],
+  "connections": {
+    "Lead arrives (webhook)": {
+      "main": [
+        [
+          {
+            "node": "1. Normalize + validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Normalize + validate": {
+      "main": [
+        [
+          {
+            "node": "Reachable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reachable?": {
+      "main": [
+        [
+          {
+            "node": "2. Claude qualifies the lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log unreachable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Claude qualifies the lead": {
+      "main": [
+        [
+          {
+            "node": "3. Qualify (AI, bounded by rules)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Qualify (AI, bounded by rules)": {
+      "main": [
+        [
+          {
+            "node": "4. Compose alert + CRM record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Compose alert + CRM record": {
+      "main": [
+        [
+          {
+            "node": "Tier A?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upsert into GoHighLevel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Audit row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tier A?": {
+      "main": [
+        [
+          {
+            "node": "Text the owner now",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "WhatsApp the owner now",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hold for daily digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "lead-pipeline-portfolio"
+  }
+}

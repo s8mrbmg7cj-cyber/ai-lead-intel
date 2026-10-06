@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lead → AI qualify → CRM + instant callback — AI Lead Intel</title>
+<meta name="description" content="An n8n workflow for home-service businesses. A lead hits a webhook; within seconds the owner's phone buzzes with a text they can act on, and the contact is already in the CRM, scor">
+<meta property="og:title" content="Lead → AI qualify → CRM + instant callback">
+<meta property="og:description" content="An n8n workflow for home-service businesses. A lead hits a webhook; within seconds the owner's phone buzzes with a text they can act on, and the contact is already in the CRM, scor">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#17171f; --panel:#1e1e28; --line:#2b2b37; --ink:#fafafa;
+        --mute:#a1a1aa; --dim:#71717a; --accent:#ff6a00; --ok:#34d399; --warn:#f59e0b; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:island; max-width:50rem; margin:0 auto; padding:2.5rem 1.25rem 6rem; }
+.top { display:flex; justify-content:space-between; align-items:center; gap:1rem;
+  border-bottom:1px solid var(--line); padding-bottom:1rem; margin-bottom:2.25rem;
+  flex-wrap:wrap; }
+.top a.home { color:var(--mute); text-decoration:none; font-size:.85rem;
+  letter-spacing:.08em; text-transform:uppercase; }
+.top a.home:hover { color:var(--accent); }
+.badge { font-family:'Geist Mono',ui-monospace,monospace; font-size:.74rem;
+  color:var(--ok); border:1px solid #2f5d4a; background:#16281f;
+  padding:.3rem .55rem; border-radius:999px; }
+h1 { font-size:2.05rem; line-height:1.2; margin:0 0 .4rem; letter-spacing:-.02em; }
+h2 { font-size:1.3rem; margin:2.75rem 0 .75rem; letter-spacing:-.01em; }
+h3 { font-size:1.02rem; margin:2rem 0 .5rem; color:var(--accent); }
+p { margin:0 0 1rem; color:#e6e6ea; }
+hr { border:0; border-top:1px solid var(--line); margin:2.5rem 0; }
+a { color:var(--accent); }
+strong { color:#fff; }
+ul { padding-left:1.1rem; margin:0 0 1.1rem; }
+li { margin-bottom:.45rem; color:#e6e6ea; }
+code { font-family:'Geist Mono',ui-monospace,monospace; font-size:.86em;
+  background:#26262f; border:1px solid var(--line); border-radius:4px;
+  padding:.08em .34em; color:#ffd2ad; }
+pre { background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent);
+  border-radius:8px; padding:1rem 1.1rem; overflow-x:auto; margin:0 0 1.35rem; }
+pre code { background:none; border:0; padding:0; color:#d8d8e0; font-size:.8rem;
+  line-height:1.6; white-space:pre; }
+table { width:100%; border-collapse:collapse; margin:0 0 1.5rem; font-size:.9rem;
+  display:block; overflow-x:auto; }
+th { text-align:left; padding:.6rem .7rem; border-bottom:1px solid var(--accent);
+  color:var(--accent); font-size:.74rem; text-transform:uppercase; letter-spacing:.07em;
+  white-space:nowrap; }
+td { padding:.6rem .7rem; border-bottom:1px solid var(--line); vertical-align:top;
+  color:#dcdce2; }
+tr:last-child td { border-bottom:0; }
+.files { display:flex; flex-wrap:wrap; gap:.5rem; margin:.25rem 0 0; }
+.files a { font-family:'Geist Mono',ui-monospace,monospace; font-size:.78rem;
+  text-decoration:none; color:var(--mute); border:1px solid var(--line);
+  background:var(--panel); border-radius:6px; padding:.4rem .6rem; }
+.files a:hover { border-color:var(--accent); color:var(--accent); }
+.foot { margin-top:3.5rem; padding-top:1.25rem; border-top:1px solid var(--line);
+  color:var(--dim); font-size:.84rem; }
+</style>
+</head><body><div class="wrap">
+<div class="top">
+  <a class="home" href="/">&larr; AI Lead Intel</a>
+  <span class="badge">149 assertions &middot; 5/5 mutation guards &middot; 12 live executions</span>
+</div>
+<h1>Lead → AI qualify → CRM + instant callback</h1>
+<p>An n8n workflow for home-service businesses. A lead hits a webhook; within seconds the owner's phone buzzes with a text they can act on, and the contact is already in the CRM, scored and tagged.</p>
+<p>The point of the build is not that it calls an AI model. The point is that <strong>the lead never disappears</strong> — not when the model is down, not when the form is half empty, not when the phone number is garbage. Every path ends in a row somewhere.</p>
+<pre><code>Lead arrives (webhook)
+  └─ 1. Normalize + validate
+       └─ Reachable? ──false──&gt; Log unreachable          (a row, with the reason)
+            │true
+            └─ 2. Claude qualifies the lead  (allowed to fail)
+                 └─ 3. Qualify (AI, bounded by rules)
+                      └─ 4. Compose alert + CRM record
+                           ├─ Tier A? ─┬─true──&gt; Text the owner now      (SMS)
+                           │           ├─true──&gt; WhatsApp the owner now
+                           │           └─false─&gt; Hold for daily digest
+                           ├─ Upsert into GoHighLevel
+                           └─ Audit row</code></pre>
+<hr>
+<h2>Four design decisions worth defending</h2>
+<p><strong>1. The AI writes the sentence. The code decides the routing.</strong></p>
+<p>The model proposes a score. <code>src/qualify.js</code> accepts it only if it lands within 25 points of a deterministic rule score computed from the same lead. Outside that window the two are averaged and the disagreement is recorded. The tier (A/B/C) is <em>always</em> recomputed from the final score — a model-supplied <code>tier</code> field is ignored even when it is present and even when it agrees. A prompt is a request; a clamp is a guarantee, and the owner's phone is wired to the clamp.</p>
+<p><strong>2. A lead is invalid only if we cannot reach the human.</strong></p>
+<p>No name, no message, no service, no city — all warnings. The one fatal condition is no usable phone <em>and</em> no usable email. A bare working phone number with nothing else attached is a real lead and is treated as one.</p>
+<p><strong>3. Nothing is thrown away silently.</strong></p>
+<p>The unreachable branch writes a row carrying the failure reason, so "we never heard from them" can be told apart from "we dropped it." Every lead that does get through also writes an audit row recording end-to-end latency and <em>which engine produced the score</em> — so a quiet degradation to the rule fallback is visible the next morning instead of a month later.</p>
+<p><strong>4. SMS and WhatsApp are two messages, not one message sent twice.</strong></p>
+<p>Both hang off the same tier-A gate as siblings, not as a fallback chain. The SMS is shaped by a billing limit — 160 characters per segment — so <code>composeAlert</code> throws away the lead's intent, urgency and the suggested opening question to fit two segments. A WhatsApp Cloud API text holds 4,096 characters, so <code>composeWhatsapp</code> keeps exactly the context the SMS had to drop. Reusing the 160-char shape where it does not apply would be cargo cult, which is why these are separate functions rather than one function with a flag.</p>
+<p>The caveat is a provisioning fact, not a code problem: Meta only delivers a free-form WhatsApp message inside the 24-hour customer-service window. Outside it, an approved template is required. No amount of code papers over that, so it is stated here. Delete whichever of the two nodes a client does not want.</p>
+<hr>
+<h2>The code lives in <code>src/</code>, not in the JSON</h2>
+<p><code>lead-to-callback.json</code> is <strong>generated</strong>. The Code-node bodies are built from <code>src/*.js</code> by <code>build.mjs</code>, so the functions <code>verify.mjs</code> tests are byte-for-byte the ones that ship inside the workflow. Editing the JSON by hand is the one thing not to do.</p>
+<pre><code>src/normalize.js   field mapping (incl. Meta Lead Ads envelope), E.164 phones, validity
+src/qualify.js     rule scorer, JSON extraction, the clamp, the tier
+src/compose.js     the SMS, the WhatsApp payload, the CRM payload, the audit row
+src/prompt.js      the system prompt (advisory score, no invented facts)
+build.mjs          src/*.js  -&gt;  lead-to-callback.json
+verify.mjs         149 assertions + 5 mutation tests
+fixtures.json      7 leads, 9 model responses (clean, fenced, prefilled, broken, lying)
+mock-endpoints.mjs stand-in Twilio + WhatsApp + GoHighLevel on :4000, real wire formats</code></pre>
+<h3>Run it</h3>
+<pre><code>node build.mjs          # regenerate the workflow JSON
+node verify.mjs         # 149 assertions, 0 failures
+node verify.mjs --all   # the above plus the 5 mutation tests</code></pre>
+<p><code>verify.mjs</code> includes five <strong>mutation tests</strong>: it patches a copy of the relevant source file to disable one guard at a time and asserts the suite notices. Four target <code>qualify.js</code> (the clamp, the tier recompute, the score-range limit, the empty-summary check). The fifth targets <code>normalize.js</code> and restores a bug that really shipped — see below. If a guard can be deleted and the tests still pass, the guard was never tested. The harness also fails loudly if a mutation's anchor text no longer exists in its file, because a stale test that silently stops testing is worse than no test.</p>
+<h3>The email bug, and why it is in the test suite forever</h3>
+<p>The first version of the email validator was <code>/^[^@\s]+@[^@\s.]+\.[a-z]{2,}$/i</code>. That domain half forbids dots, so it rejected <strong>every</strong> <code>@company.co.uk</code> address and every subdomain address. Combined with design decision 2, the consequence was not a cosmetic validation miss: a lead who left only a <code>.co.uk</code> email came out the far end marked <code>unreachable</code> and was never contacted at all.</p>
+<p>It was caught by a new WhatsApp test asserting the long-form alert keeps the email the SMS has no room for — the email was missing, because normalization had thrown it away. The fix allows one or more dot-separated labels before the TLD. A 14-case table test (7 accept, 7 reject) and mutation test #5 now stand on it; the mutation puts the old pattern back and asserts the suite fails.</p>
+<p>Deliberately not RFC 5322. The only question an inbound lead form needs answered is whether the address is worth sending to, and anything this lets through that bounces bounces visibly.</p>
+<hr>
+<h2>What is actually verified</h2>
+<p>Run on n8n 2.42.3 locally, against the mock endpoints, on 2026-10-06. Numbers below are measured, not estimated.</p>
+<table><thead><tr><th>Claim</th><th>Evidence</th></tr></thead><tbody><tr><td>The graph executes end to end</td><td>12 production executions, <strong>all</strong> <code>success</code>, webhook → SMS + WhatsApp → CRM → audit</td></tr><tr><td>Tier-A lead pages the owner</td><td>207-char / 2-segment SMS delivered to <code>the owner's number</code></td></tr><tr><td>The WhatsApp message carries what the SMS drops</td><td>274 chars, including the lead's email, which the 207-char SMS has no room for</td></tr><tr><td>Non-A leads do not page the owner, on <strong>either</strong> channel</td><td>4 leads posted (price-shopper, spam, unreachable, test) → <strong>0 SMS, 0 WhatsApp, 4 CRM rows</strong></td></tr><tr><td>An unreachable lead is recorded, not dropped</td><td><code>Log unreachable</code> emitted <code>outcome: not_contactable</code>, <code>reason: "unreachable: no usable phone and no usable email"</code>, plus both parse failures (<code>"12"</code>, <code>"not-an-email"</code>)</td></tr><tr><td>The CRM gets a usable record</td><td>full GHL payload, tags <code>ai-qualified, tier-a, meta_lead_ads, scored-rules</code></td></tr><tr><td>A dead model does not stop the pipeline</td><td>see below</td></tr><tr><td>End-to-end latency</td><td><strong>2,019 ms</strong> (<code>latency_human: "2.0s"</code>) from the audit row of the tier-A execution</td></tr></tbody></table>
+<p>The SMS that actually arrived:</p>
+<pre><code>A-LEAD 95 Dana Whitfield
+Furnace repair — Furnace stopped working last night and the house is down to 54 degrees. Two kids at… — Flint
++18105550147
+Furnace repair | Flint | meta_lead_ads
+[scored by fallback]</code></pre>
+<p>The phone number sits bare on its own line so the OS linkifies it and the owner dials by tapping once. The alert is trimmed to fit two SMS segments, dropping context lines from the middle and never the head, the number, or the tag line.</p>
+<p>The WhatsApp message for the same lead, 274 characters, same instant:</p>
+<pre><code>*A-LEAD 95* — Dana Whitfield
+
+Furnace repair — Furnace stopped working last night and the house is down to 54 degrees. Two kids at… — Flint
+
+Phone: +18105550147
+Email: dana.whitfield@gmail.com
+Service: Furnace repair
+Area: Flint
+Source: meta_lead_ads
+
+_[scored by fallback]_</code></pre>
+<p>The email is the visible difference: it survives here and cannot in the SMS. On a live model run the <code>Intent:</code>, <code>Urgency:</code> and <code>*Ask first:*</code> lines appear here too — they are written by the model, so on this run (see below) they were absent.</p>
+<h3>The fallback was proven by accident, which is the best way</h3>
+<p>The <code>ANTHROPIC_API_KEY</code> in this run was dead. The API returned <code>401 authentication_error: invalid x-api-key</code>. That is the real failure, unsimulated, and it is what the audit row recorded. The pipeline:</p>
+<ul><li>did not stop (<code>onError: continueRegularOutput</code> on the HTTP node)</li><li>scored the lead by rule instead — 95, tier A, correctly urgent</li><li><strong>said so out loud</strong>: <code>[scored by fallback]</code> in the SMS, <code>scored-rules</code> in the CRM tags, <code>scored_by: "fallback"</code> and the full 401 text in the audit row</li></ul>
+<p>Caveat stated plainly: <code>lead_intent</code> and <code>lead_urgency</code> landed in the CRM <strong>empty</strong>, because those fields only exist if the model wrote them. The rule engine does not invent them. That is the honest cost of the degraded path, and it is visible in the record rather than papered over.</p>
+<h3>What is NOT verified yet</h3>
+<ul><li><strong>The AI path has never run green.</strong> <code>source</code> has only ever been observed as <code>fallback</code> on a live execution. The <code>ai</code>, <code>ai+rules(disagreed)</code> and out-of-range-clamp paths are covered by <code>verify.mjs</code> against the nine fixture responses, but not yet by a real model call. Needs a working API key.</li><li><strong>Latency with a live model is unmeasured.</strong> The 2.0 s above includes a failing call plus one 1,500 ms retry wait. A successful Sonnet call will dominate that figure instead. It will not approach 60 s; it has not been timed.</li><li><strong>No real Twilio, WhatsApp or GoHighLevel traffic.</strong> All three endpoints are mocks that speak the real wire formats (form-encoded for Twilio; Cloud API JSON with the recipient as digits and no leading <code>+</code>; GHL JSON with the <code>Version: 2021-07-28</code> header). What was verified is the exact request the live APIs would receive.</li><li><strong>The WhatsApp 24-hour window is untested</strong>, because a mock has no window. A free-form text only delivers if the owner messaged the business number in the last 24 hours. For an owner-alert use case that is usually fine — it is their own number — but a client who goes quiet for a day needs an approved template.</li></ul>
+<hr>
+<h2>Going live</h2>
+<p>One value per node, no code changes.</p>
+<table><thead><tr><th>What</th><th>Env var</th><th>Change to</th></tr></thead><tbody><tr><td>SMS</td><td><code>SMS_ENDPOINT</code></td><td><code>https://api.twilio.com/2010-04-01/Accounts/&lt;SID&gt;/Messages.json</code> + basic auth credential</td></tr><tr><td>WhatsApp</td><td><code>WHATSAPP_ENDPOINT</code>, <code>WHATSAPP_TOKEN</code></td><td><code>https://graph.facebook.com/v21.0/&lt;PHONE_NUMBER_ID&gt;/messages</code> + a permanent system-user token</td></tr><tr><td>CRM</td><td><code>CRM_ENDPOINT</code></td><td><code>https://services.leadconnectorhq.com/contacts/</code></td></tr><tr><td>Model</td><td><code>ANTHROPIC_API_KEY</code></td><td>a live key</td></tr><tr><td>Owner</td><td><code>OWNER_PHONE</code>, <code>TWILIO_FROM</code>, <code>GHL_API_KEY</code>, <code>GHL_LOCATION_ID</code></td><td>the client's</td></tr></tbody></table>
+<p>The <code>Audit row</code> node is a Code node that emits one flat object per lead. Swap it for a Google Sheets <strong>Append Row</strong> and the keys map straight across.</p>
+<h3>Local run</h3>
+<pre><code>node mock-endpoints.mjs          # terminal 1 — :4000 /sms /whatsapp /crm
+~/n8n-local/start.sh             # terminal 2 — :5678, env wired to the mocks
+
+curl -s -X POST http://localhost:5678/webhook/new-lead \
+  -H 'content-type: application/json' \
+  -d "$(node -e 'console.log(JSON.stringify(require("./fixtures.json").leads[0].payload))')"</code></pre>
+<p>Terminal 1 prints the SMS with its character and segment count, the WhatsApp body, and the CRM upsert with every custom field. <code>mock-received.log</code> keeps the transcript, which is what the gate test counts.</p>
+<p>Three things that cost time and are worth knowing:</p>
+<ul><li>The workflow JSON needs a stable top-level <code>id</code>. Without it the n8n CLI import fails on <code>NOT NULL constraint failed: workflow_entity.id</code>. With it, re-importing updates this workflow instead of adding a duplicate.</li><li><strong>Importing deactivates the workflow, and flipping <code>active</code> back does not undo that.</strong> Setting <code>workflow_entity.active = 1</code> in sqlite makes the UI show the workflow as active while every POST still 404s, because the row that actually registers a production webhook lives in <code>webhook_entity</code> and is still empty. The sequence that works is <code>n8n import:workflow</code>, then <code>n8n publish:workflow --id=leadpipe00000001</code>, then restart n8n. Confirm with <code>select webhookPath, method from webhook_entity;</code> before trusting a curl.</li><li>If a POST returns <code>{"message":"Workflow was started"}</code> but nothing reaches the mock, check the n8n log for <code>port 5678 is already in use</code> — a second instance answers the webhook and runs a stale copy of the graph.</li></ul>
+<h2>Read the source</h2>
+<p>Every file, unmodified. The workflow JSON is importable into any n8n instance
+(<code>Workflows &rarr; Import from File</code>); the Code-node bodies inside it are generated
+from the <code>src</code> files, so what you read here is what runs.</p>
+<div class="files">
+<a href="./lead-to-callback.json">lead-to-callback.json</a>
+<a href="./build.mjs">build.mjs</a>
+<a href="./fixtures.json">fixtures.json</a>
+<a href="./mock-endpoints.mjs">mock-endpoints.mjs</a>
+<a href="./publish.mjs">publish.mjs</a>
+<a href="./verify.mjs">verify.mjs</a>
+<a href="./src/compose.js">src/compose.js</a>
+<a href="./src/normalize.js">src/normalize.js</a>
+<a href="./src/prompt.js">src/prompt.js</a>
+<a href="./src/qualify.js">src/qualify.js</a>
+</div>
+<div class="foot">
+  Built and measured on 2026-10-06.
+  Every number on this page came out of a run; nothing here is an estimate.
+  Want this wired to your own Twilio, WhatsApp and CRM? <a href="/">Start here</a>.
+</div>
+</div></body></html>

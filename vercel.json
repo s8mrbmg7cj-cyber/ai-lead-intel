@@ -28,6 +28,8 @@
     { "source": "/reset-password/", "destination": "/reset-password.html" },
     { "source": "/forgot-password", "destination": "/forgot-password.html" },
     { "source": "/forgot-password/", "destination": "/forgot-password.html" },
+    { "source": "/build/lead-pipeline", "destination": "/build/lead-pipeline/index.html" },
+    { "source": "/build/lead-pipeline/", "destination": "/build/lead-pipeline/index.html" },
     { "source": "/quote", "destination": "/quote/index.html" },
     { "source": "/quote/", "destination": "/quote/index.html" },
     { "source": "/quote/:slug", "destination": "/quote/:slug/index.html" },

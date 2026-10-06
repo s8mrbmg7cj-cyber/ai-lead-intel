@@ -1,0 +1,134 @@
+{
+  "leads": [
+    {
+      "id": "meta-emergency",
+      "note": "Real Meta Lead Ads envelope. Urgent, detailed, reachable -> should be an A.",
+      "payload": {
+        "entry": [
+          {
+            "id": "102938475610293",
+            "changes": [
+              {
+                "field": "leadgen",
+                "value": {
+                  "leadgen_id": "7781920384756",
+                  "page_id": "102938475610293",
+                  "form_id": "6652819374650",
+                  "created_time": 1791234567,
+                  "field_data": [
+                    { "name": "full_name", "values": ["Dana Whitfield"] },
+                    { "name": "phone_number", "values": ["(810) 555-0147"] },
+                    { "name": "email", "values": ["Dana.Whitfield@gmail.com"] },
+                    { "name": "city", "values": ["Flint"] },
+                    { "name": "service_needed", "values": ["Furnace repair"] },
+                    {
+                      "name": "describe_your_project",
+                      "values": ["Furnace stopped working last night and the house is down to 54 degrees. Two kids at home. Need someone today if at all possible."]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "expect": { "valid": true, "phone": "+18105550147", "source": "meta_lead_ads", "min_rule_score": 70 }
+    },
+    {
+      "id": "web-price-shopper",
+      "note": "Plain website form, price shopping language -> must not be an A.",
+      "payload": {
+        "name": "Marcus Lee",
+        "email": "marcuslee@outlook.com",
+        "phone": "810-555-0982",
+        "service": "AC install",
+        "message": "Just curious how much does a new AC unit run these days? Not ready to buy, looking for a ballpark price range.",
+        "utm_source": "google_ads"
+      },
+      "expect": { "valid": true, "source": "google_ads", "max_rule_score": 69 }
+    },
+    {
+      "id": "agency-spam",
+      "note": "Agency pitch through the contact form. Must be capped low.",
+      "payload": {
+        "name": "Growth Partners",
+        "email": "outreach@growthpartners.biz",
+        "phone": "+1 415 555 0100",
+        "message": "Hi, we provide SEO services that will rank your website #1 and increase your traffic by 300%. Interested in guest post and backlink packages?"
+      },
+      "expect": { "valid": true, "max_rule_score": 10 }
+    },
+    {
+      "id": "phone-only",
+      "note": "No name, no message, just a working number. This is still a real lead.",
+      "payload": { "phone": "8105550333" },
+      "expect": { "valid": true, "phone": "+18105550333", "warnings_include": "no name supplied" }
+    },
+    {
+      "id": "unreachable",
+      "note": "Both contact fields unusable -> the ONLY fatal case.",
+      "payload": { "name": "Someone", "phone": "12", "email": "not-an-email", "message": "help" },
+      "expect": { "valid": false, "errors_include": "unreachable" }
+    },
+    {
+      "id": "international",
+      "note": "UK mobile, already in international form.",
+      "payload": { "full_name": "Priya Raman", "phone": "+44 7700 900123", "message": "Boiler is leaking, need an emergency visit today please." },
+      "expect": { "valid": true, "phone": "+447700900123", "min_rule_score": 60 }
+    },
+    {
+      "id": "test-submission",
+      "note": "Owner testing their own form. Should be capped, not alerted.",
+      "payload": { "name": "test", "phone": "8105550000", "message": "test" },
+      "expect": { "valid": true, "max_rule_score": 10 }
+    }
+  ],
+  "ai_responses": [
+    {
+      "id": "clean",
+      "text": "{\"score\": 88, \"intent\": \"furnace repair today\", \"urgency\": \"emergency\", \"summary_for_owner\": \"Furnace dead overnight, house at 54F, two kids home, wants someone today.\", \"first_question\": \"Is the furnace making any noise when it tries to start?\", \"red_flags\": []}",
+      "expect": { "source": "ai", "score": 88, "tier": "A", "problems": 0 }
+    },
+    {
+      "id": "fenced",
+      "text": "```json\n{\"score\": 82, \"intent\": \"furnace repair\", \"urgency\": \"emergency\", \"summary_for_owner\": \"No heat since last night, two children at home.\", \"first_question\": \"Any noise from the unit?\", \"red_flags\": []}\n```",
+      "expect": { "source": "ai", "tier": "A", "problems": 0 }
+    },
+    {
+      "id": "assistant-prefill",
+      "text": "\"score\": 79, \"intent\": \"furnace repair\", \"urgency\": \"emergency\", \"summary_for_owner\": \"Furnace out overnight, wants a same-day visit.\", \"first_question\": \"Is anyone in the home at risk from the cold?\", \"red_flags\": []}",
+      "expect": { "source": "ai", "score": 79, "tier": "A", "problems": 0 }
+    },
+    {
+      "id": "not-json",
+      "text": "Sure! This looks like a strong lead and I would call them right away.",
+      "expect": { "source": "fallback", "problems_min": 1 }
+    },
+    {
+      "id": "api-down",
+      "text": "",
+      "api_error": "401 authentication_error",
+      "expect": { "source": "fallback", "problems_min": 2 }
+    },
+    {
+      "id": "wild-disagreement",
+      "text": "{\"score\": 3, \"intent\": \"unclear\", \"urgency\": \"no rush\", \"summary_for_owner\": \"Caller mentioned a furnace.\", \"first_question\": \"What is the model number?\", \"red_flags\": []}",
+      "expect": { "source": "ai+rules(disagreed)", "problems_min": 1 }
+    },
+    {
+      "id": "out-of-range-score",
+      "text": "{\"score\": 9999, \"intent\": \"furnace\", \"urgency\": \"emergency\", \"summary_for_owner\": \"No heat, urgent.\", \"first_question\": \"Noise?\", \"red_flags\": []}",
+      "expect": { "score_max": 100 }
+    },
+    {
+      "id": "lying-tier",
+      "text": "{\"score\": 11, \"tier\": \"A\", \"intent\": \"browsing\", \"urgency\": \"no rush\", \"summary_for_owner\": \"Asked a general question about pricing.\", \"first_question\": \"What is your budget?\", \"red_flags\": []}",
+      "expect": { "tier_not": "A" }
+    },
+    {
+      "id": "empty-summary",
+      "text": "{\"score\": 90, \"intent\": \"furnace\", \"urgency\": \"emergency\", \"summary_for_owner\": \"\", \"first_question\": \"\", \"red_flags\": []}",
+      "expect": { "source": "fallback", "summary_nonempty": true, "problems_min": 1 }
+    }
+  ]
+}
