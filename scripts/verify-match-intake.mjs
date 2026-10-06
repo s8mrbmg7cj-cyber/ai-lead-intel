@@ -199,6 +199,13 @@ function run(html) {
   ok("the page does not claim contractors are vetted or screened",
     !/\b(vetted|pre-?screened|background-?checked)\b/i.test(html));
 
+  // Caught by clicking through the live form, not by reading the diff: the
+  // success screen said "reply to the text we sent". Nothing texts the
+  // homeowner -- A2P 10DLC is unapproved and the only SMS goes to Andrew. A
+  // promise the code cannot keep surfaces exactly when someone is annoyed.
+  ok("the page never promises the homeowner a text or email from us",
+    !/\b(the text we sent|we('ll| will) text you|reply to (the|our) (text|email)|check your (email|inbox))\b/i.test(html));
+
   return { pass, fails: [...fails] };
 }
 
@@ -227,6 +234,8 @@ const MUTATIONS = [
   ["delete the who-pays sentence", "paid by the contractor only", "funded differently"],
   ["point the form at the wrong endpoint", '"/api/match-intake"', '"/api/lead-submit"'],
   ["treat a 502 as a success", "if (!r.ok) {", "if (false) {"],
+  ["promise the homeowner a text we never send", "send the form again",
+   "reply to the text we sent"],
 ];
 
 console.log("\n--- mutation tests: break the page, prove the suite notices ---");

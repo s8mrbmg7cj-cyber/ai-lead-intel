@@ -142,8 +142,13 @@
       <div class="tick">✓</div>
       <h2>Got it — we're on it.</h2>
       <p class="sub" id="doneLine"></p>
-      <p class="hint">If nobody has called you in a couple of hours, something went
-      wrong on our end — reply to the text we sent and we'll sort it.</p>
+      <!-- Do not promise the homeowner a text. A2P 10DLC is not approved on
+           this Twilio number, so no message is sent to them at all -- the
+           alert goes to us. A reassurance the code cannot keep is a lie that
+           only surfaces when someone is already annoyed. -->
+      <p class="hint">Nothing else happens until a pro calls you. If a couple of
+      hours go by and your phone hasn't rung, something broke on our end —
+      send the form again and it'll land in front of a person.</p>
     </div>
   </section>
 
