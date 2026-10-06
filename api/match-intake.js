@@ -172,6 +172,19 @@ const CHANNELS = [
   ["sms", smsAndrew],
 ];
 
+// The reason a channel failed has to travel in the RESPONSE. `vercel logs` on
+// this project shows request lines only -- console.error is invisible from this
+// machine -- so a log is a comment. But this is an anonymous public endpoint,
+// so the reason gets scrubbed of anything that identifies a person or a secret
+// first. Keep the shape of the error, lose the contents.
+export function scrub(detail) {
+  return String(detail || "unknown")
+    .replace(/[\w.+-]+@[\w.-]+\.\w+/g, "<email>")
+    .replace(/\+?\d[\d\s().-]{8,}\d/g, "<phone>")
+    .replace(/\b(re_|SK|AC|sk_|sb_)[A-Za-z0-9_-]{6,}/g, "<key>")
+    .slice(0, 180);
+}
+
 export default async function handler(req, res) {
   const allowed = ["https://aileadintel.com", "https://www.aileadintel.com", "https://ai-lead-intel.vercel.app"];
   if (allowed.includes(req.headers.origin)) {
@@ -218,15 +231,15 @@ export default async function handler(req, res) {
     return res.status(502).json({
       error: "We couldn't get your request through. Please try again in a moment.",
       delivered,
-      failed: failed.map((f) => `${f.name}: ${f.detail}`),
+      failed: failed.map((f) => `${f.name}: ${scrub(f.detail)}`),
     });
   }
 
   return res.status(200).json({
     ok: true,
     delivered,
-    // Named channels, never a credential or a stack. Safe on a public endpoint
-    // and it means a half-broken notifier is visible from a single curl.
-    failed: failed.map((f) => f.name),
+    // Scrubbed reasons, so a half-broken notifier is diagnosable from one curl
+    // instead of sitting unnoticed behind a cheerful 200.
+    failed: failed.map((f) => `${f.name}: ${scrub(f.detail)}`),
   });
 }

@@ -23,7 +23,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const PAGE = join(root, "public/match/index.html");
 
-const { SERVICES, URGENCIES, validate, normalizePhone, summarize } =
+const { SERVICES, URGENCIES, validate, normalizePhone, summarize, scrub } =
   await import(join(root, "api/match-intake.js"));
 
 let pass = 0;
@@ -140,6 +140,16 @@ function run(html) {
   // product and it has to be readable on a lock screen.
   ok("the alert tells him what to actually do", /CALL THEM BACK/.test(text));
   ok("the alert fits a lock screen (under 320 chars)", text.length < 320, `${text.length} chars`);
+
+  // ── the scrubber on the public failure reason ────────────────────────────
+  // The reason a channel failed is returned to an anonymous caller, so it is
+  // only safe if it carries the SHAPE of the error and none of the contents.
+  ok("an address is removed", !scrub("550 no mailbox for andrew3333422@gmail.com").includes("@gmail"));
+  ok("a phone number is removed", !scrub("to=+13035550142 unreachable").includes("3035550142"));
+  ok("an API key is removed", !scrub("bad key re_8Xq2VbNm4PkZ").includes("re_8Xq2VbNm4PkZ"));
+  ok("the useful part survives", /ENOTFOUND/.test(scrub("ENOTFOUND api.resend.com")));
+  ok("the reason is capped", scrub("x".repeat(900)).length <= 180);
+  ok("a missing reason does not become 'undefined'", scrub(undefined) === "unknown");
 
   // ── the page's own promises ──────────────────────────────────────────────
   // Copy expires when features change, and these two sentences are the offer.
