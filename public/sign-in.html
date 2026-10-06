@@ -84,6 +84,7 @@ input { font-family: inherit; outline: none; }
 .forgot-card.visible { display: block; }
 .signin-card.hidden { display: none; }
 </style>
+  <script src="/supabase-config.js"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -144,8 +145,8 @@ input { font-family: inherit; outline: none; }
 </div>
 <script>
 'use strict';
-const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Prefill email from URL params
 const urlParams = new URLSearchParams(window.location.search);

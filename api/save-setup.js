@@ -10,8 +10,11 @@
 //   SUPABASE_ANON_KEY            (optional — defaults below)
 //   SUPABASE_SERVICE_ROLE_KEY    (RECOMMENDED — lets the save bypass RLS so it always works)
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+// See the note in api/provision.js: the hardcoded fallback that used to be
+// here named a Supabase project that no longer exists, so an unset env var
+// failed silently against a dead host instead of saying it was unset.
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const ALLOWED_FIELDS = [

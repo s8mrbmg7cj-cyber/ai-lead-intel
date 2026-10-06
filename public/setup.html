@@ -97,6 +97,7 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
   gtag('js', new Date());
   gtag('config', 'AW-18217723734');
 </script>
+  <script src="/supabase-config.js"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -191,8 +192,8 @@ button { font-family:inherit; cursor:pointer; border:none; background:none; colo
 
 <script>
 (function () {
-  const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+  const SUPABASE_URL = window.SUPABASE_URL;
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const loadingEl = document.getElementById('loading');

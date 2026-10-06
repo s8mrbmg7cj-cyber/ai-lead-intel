@@ -620,6 +620,7 @@ input, select, textarea { font-family: inherit; outline: none; }
   .live-stats { grid-template-columns: 1fr; }
 }
 </style>
+  <script src="/supabase-config.js"></script>
 </head>
 <body>
 
@@ -661,8 +662,8 @@ input, select, textarea { font-family: inherit; outline: none; }
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const SUPABASE_URL = 'https://mbrhkeddgmywqqgdfdgx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable__YkhmAu61Nr8VetJS8pJqA_MHrmO69t';
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
