@@ -60,8 +60,17 @@ export function describeFetchError(e, url) {
   let detail = code && !msg.includes(code) ? `${code}: ${msg}` : msg;
   if (host && !detail.includes(host)) detail += ` (host ${host})`;
   if (code === 'ENOTFOUND') {
-    detail += ' — that hostname does not resolve, so nothing is listening there at all.'
-      + ' Either the URL is wrong or the project behind it was deleted.';
+    // MEASURED 2026-10-06, do not "simplify" this to "deleted": a PAUSED
+    // Supabase project also returns NXDOMAIN. Checked bamoxbalnbmfwbxcvjgh
+    // (paused, visible in the dashboard) against 8.8.8.8, 1.1.1.1 and 9.9.9.9
+    // — NXDOMAIN from all three, identical to the project we had written off
+    // as deleted. Free-tier projects pause themselves after ~7 days idle, so
+    // PAUSED is the far likelier cause and it is a one-click fix. Saying
+    // "deleted" here sends the reader off to rebuild a schema they still have.
+    detail += ' — that hostname does not resolve. On Supabase free tier the usual cause is'
+      + ' the project PAUSED ITSELF after ~7 days idle; a paused project stops resolving'
+      + ' exactly like a deleted one. Open the Supabase dashboard and look before assuming'
+      + ' any data is lost. It can also be a typo in the URL.';
   }
   return detail;
 }
