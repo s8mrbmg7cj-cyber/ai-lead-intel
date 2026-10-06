@@ -25,6 +25,7 @@ const PAGE = join(root, "public/match/index.html");
 
 const { SERVICES, URGENCIES, validate, normalizePhone, summarize, scrub } =
   await import(join(root, "api/match-intake.js"));
+const { parseNotifyTo } = await import(join(root, "lib/notify-to.js"));
 
 let pass = 0;
 const fails = [];
@@ -141,6 +142,38 @@ function run(html) {
   ok("the alert tells him what to actually do", /CALL THEM BACK/.test(text));
   ok("the alert fits a lock screen (under 320 chars)", text.length < 320, `${text.length} chars`);
 
+  // ── NOTIFY_EMAIL parsing ─────────────────────────────────────────────────
+  // Resend rejected the raw env value on the first live submission, so each of
+  // these is a shape a human plausibly typed into a Vercel env field. The old
+  // `process.env.NOTIFY_EMAIL || "default"` could not survive any of them,
+  // because a SET-but-broken variable takes the first branch and then fails.
+  const FB = "fallback@example.com";
+  const cases = [
+    ["a single address", "a@b.com", ["a@b.com"]],
+    ["a comma-joined list", "a@b.com,c@d.com", ["a@b.com", "c@d.com"]],
+    ["a list with spaces", "a@b.com, c@d.com", ["a@b.com", "c@d.com"]],
+    ["a semicolon list", "a@b.com; c@d.com", ["a@b.com", "c@d.com"]],
+    ["surrounding quotes", '"a@b.com"', ["a@b.com"]],
+    ["a Name <addr> wrapper", "Andrew <a@b.com>", ["a@b.com"]],
+    ["a trailing comma", "a@b.com,", ["a@b.com"]],
+    ["the same address twice", "a@b.com,A@B.com", ["a@b.com"]],
+    ["leading/trailing whitespace", "  a@b.com  ", ["a@b.com"]],
+    ["one good and one junk entry", "a@b.com,not-an-email", ["a@b.com"]],
+  ];
+  for (const [label, raw, want] of cases) {
+    const got = parseNotifyTo(raw, FB).to;
+    ok(`NOTIFY_EMAIL handles ${label}`, JSON.stringify(got) === JSON.stringify(want),
+      `got ${JSON.stringify(got)}`);
+  }
+  ok("junk entries are reported, not silently dropped",
+    parseNotifyTo("a@b.com,not-an-email", FB).rejected.length === 1);
+  ok("an unset variable uses the fallback", parseNotifyTo(undefined, FB).to[0] === FB);
+  ok("an all-junk variable uses the fallback", parseNotifyTo("nonsense", FB).to[0] === FB);
+  ok("using the fallback is reported", parseNotifyTo("nonsense", FB).usedFallback === true);
+  ok("a working variable does NOT use the fallback", parseNotifyTo("a@b.com", FB).usedFallback === false);
+  ok("a bad fallback is refused too, leaving zero recipients",
+    parseNotifyTo("", "also-not-an-email").to.length === 0);
+
   // ── the scrubber on the public failure reason ────────────────────────────
   // The reason a channel failed is returned to an anonymous caller, so it is
   // only safe if it carries the SHAPE of the error and none of the contents.
@@ -225,4 +258,56 @@ const again = run(readFileSync(PAGE, "utf8"));
 const clean = again.pass === first.pass && again.fails.length === first.fails.length;
 console.log(clean ? "re-ran clean: same result" : "WARNING: suite is not idempotent");
 
-process.exit(first.fails.length === 0 && caught === MUTATIONS.length && stale === 0 && clean ? 0 : 1);
+// The page mutations above cannot reach lib/notify-to.js, so the NOTIFY_EMAIL
+// assertions would pass unchallenged. Run the same cases against deliberately
+// naive parsers -- including the exact one that was live and failing -- and
+// require each to be rejected. An assertion nothing can break is decoration.
+const FB = "fallback@example.com";
+const NAIVE = [
+  ["the version that was live (raw env or default)", (raw, fb) => ({ to: [raw || fb], rejected: [], usedFallback: !raw })],
+  ["splits but never validates", (raw, fb) => ({ to: String(raw ?? "").split(","), rejected: [], usedFallback: false })],
+  ["validates but never splits", (raw, fb) => ({ to: /@.*\./.test(raw || "") ? [raw] : [fb], rejected: [], usedFallback: !raw })],
+  ["forgets to trim", (raw, fb) => ({ to: String(raw ?? "").split(",").filter((s) => /^[^\s@]+@[^\s@]+\.\w+$/.test(s)), rejected: [], usedFallback: false })],
+  ["never dedupes", (raw, fb) => ({ to: String(raw ?? "").split(",").map((s) => s.trim()).filter((s) => /@.*\./.test(s)), rejected: [], usedFallback: false })],
+];
+
+const PARSER_CASES = [
+  ["a@b.com", ["a@b.com"]],
+  ["a@b.com,c@d.com", ["a@b.com", "c@d.com"]],
+  ["a@b.com, c@d.com", ["a@b.com", "c@d.com"]],
+  ['"a@b.com"', ["a@b.com"]],
+  ["Andrew <a@b.com>", ["a@b.com"]],
+  ["a@b.com,A@B.com", ["a@b.com"]],
+  ["a@b.com,not-an-email", ["a@b.com"]],
+  ["  a@b.com  ", ["a@b.com"]],
+  [undefined, [FB]],
+  ["nonsense", [FB]],
+];
+
+function parserFails(fn) {
+  return PARSER_CASES.filter(([raw, want]) => {
+    try {
+      return JSON.stringify(fn(raw, FB).to) !== JSON.stringify(want);
+    } catch { return true; }
+  });
+}
+
+console.log("\n--- naive NOTIFY_EMAIL parsers, each must be rejected ---");
+let rejected = 0;
+// Control: the real parser must pass all of them, or the comparison is hollow.
+const realFails = parserFails(parseNotifyTo);
+console.log(realFails.length === 0
+  ? "  control: the real parser passes all 10 cases"
+  : `  CONTROL FAILED: real parser misses ${JSON.stringify(realFails.map((c) => c[0]))}`);
+for (const [label, fn] of NAIVE) {
+  const bad = parserFails(fn);
+  if (bad.length) { rejected++; console.log(`  rejected ${label} (fails ${bad.length}/10, first: ${JSON.stringify(bad[0][0])})`); }
+  else console.log(`  ACCEPTED ${label}  <-- these cases prove nothing`);
+}
+console.log(`${rejected} of ${NAIVE.length} naive parsers rejected`);
+
+const parserOk = realFails.length === 0 && rejected === NAIVE.length;
+
+process.exit(
+  first.fails.length === 0 && caught === MUTATIONS.length && stale === 0 && clean && parserOk ? 0 : 1
+);

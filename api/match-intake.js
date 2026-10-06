@@ -13,6 +13,8 @@
 // return 502 and the page tells the homeowner so, because a silently dropped
 // lead is worse than an error message.
 
+import { parseNotifyTo } from "../lib/notify-to.js";
+
 export const SERVICES = [
   "Plumbing",
   "Heating / Furnace",
@@ -137,21 +139,37 @@ async function pushNtfy(lead) {
 
 async function emailAndrew(lead) {
   const key = process.env.RESEND_API_KEY;
-  // Default rather than skip: an unset NOTIFY_EMAIL used to mean no record of
-  // the lead existed anywhere. The inbox is the only durable copy right now.
-  const to = process.env.NOTIFY_EMAIL || "andrew3333422@gmail.com";
   if (!key) throw new Error("RESEND_API_KEY not set");
+
+  // Fall back rather than skip: with Supabase down the inbox is the only
+  // durable copy of a lead, so "no valid recipient" must not mean "no record".
+  const { to, rejected, usedFallback } = parseNotifyTo(
+    process.env.NOTIFY_EMAIL,
+    "andrew3333422@gmail.com"
+  );
+  if (to.length === 0) throw new Error("no valid recipient in NOTIFY_EMAIL and no usable fallback");
 
   const { Resend } = await import("resend");
   const resend = new Resend(key);
   const { error } = await resend.emails.send({
     from: "Home Match <hello@aileadintel.com>",
     to,
-    replyTo: to,
+    replyTo: to[0],
     subject: `${lead.urgency.startsWith("Emergency") ? "EMERGENCY " : ""}${lead.service} - ${lead.zip} - ${lead.name}`,
     text: summarize(lead),
   });
   if (error) throw new Error(`resend: ${error.message || JSON.stringify(error)}`);
+
+  // Partial delivery is not delivery. If NOTIFY_EMAIL held three addresses and
+  // two were malformed, "email: ok" would hide that two inboxes never got it.
+  if (rejected.length || usedFallback) {
+    return {
+      note:
+        `sent to ${to.length}` +
+        (rejected.length ? `, ${rejected.length} entr(ies) in NOTIFY_EMAIL are not valid addresses` : "") +
+        (usedFallback ? ", used the hardcoded fallback because NOTIFY_EMAIL had nothing usable" : ""),
+    };
+  }
 }
 
 async function smsAndrew(lead) {
@@ -205,8 +223,8 @@ export default async function handler(req, res) {
   const results = await Promise.all(
     CHANNELS.map(async ([name, fn]) => {
       try {
-        await fn(v.lead);
-        return { name, ok: true };
+        const out = await fn(v.lead);
+        return { name, ok: true, note: out && out.note };
       } catch (e) {
         // Unwrap .cause -- undici's entire .message for a network failure is
         // the useless string "fetch failed", and throwing the real reason away
@@ -220,7 +238,7 @@ export default async function handler(req, res) {
     })
   );
 
-  const delivered = results.filter((r) => r.ok).map((r) => r.name);
+  const delivered = results.filter((r) => r.ok).map((r) => (r.note ? `${r.name} (${r.note})` : r.name));
   const failed = results.filter((r) => !r.ok);
 
   // Log the lead itself last, so even a total alert failure leaves the details
