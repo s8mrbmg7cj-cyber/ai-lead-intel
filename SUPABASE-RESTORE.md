@@ -117,6 +117,11 @@ deploy, and check `/api/health`. **It is only fixed when that reads
 `overall: ok`.** A page returning 200 proves nothing — the site returned 200
 on every page the whole time it was broken.
 
+If you mistype the URL in step 4, `/api/health` will now say so in plain
+words — it prints the hostname that failed and that it doesn't resolve.
+It used to just say `fetch failed`, which is the reason nobody noticed the
+database was gone for a month. That's fixed regardless of the rest of this.
+
 ---
 
 ## Two things that will still be empty afterwards
@@ -145,4 +150,9 @@ PGQUERY=/tmp/pgparse/node_modules/pg-query-emscripten/pg_query.js \
   node sql/verify-schema.mjs            # expect: PASS — all 99 column references
 PGQUERY=/tmp/pgparse/node_modules/pg-query-emscripten/pg_query.js \
   node sql/verify-schema.mjs --mutate   # expect: all 6 mutation tests caught
+
+node scripts/verify-health-errors.mjs  # expect: PASS — all 11 assertions
 ```
+
+The last one needs no setup and no database. It checks that `/api/health`
+names the *cause* of a failure rather than saying `fetch failed`.
