@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0d1117">
+<title>Dispatch</title>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dispatch">
+<style>
+:root{
+  --bg:#0d1117; --card:#161b22; --card2:#1c2430; --line:#263040;
+  --ink:#e6edf3; --mid:#8b98a5; --acc:#2f81f7; --ok:#3fb950; --warn:#d29922; --bad:#f85149;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial}
+body{padding:0 0 env(safe-area-inset-bottom)}
+.wrap{max-width:720px;margin:0 auto;padding:16px 14px 110px}
+header{display:flex;align-items:center;gap:10px;padding:4px 0 14px}
+header h1{font-size:19px;margin:0;letter-spacing:-.01em}
+header .sp{margin-left:auto;display:flex;gap:8px}
+.ghost{background:var(--card2);color:var(--mid);border:1px solid var(--line);
+  border-radius:9px;padding:8px 12px;font:13px inherit;cursor:pointer}
+.ghost:active{background:#243041}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin:0 0 12px}
+.lead{border-left:3px solid var(--acc)}
+.lead.emg{border-left-color:var(--bad)}
+.lead h2{margin:0;font-size:18px;letter-spacing:-.01em}
+.lead .sub{color:var(--mid);font-size:13.5px;margin:3px 0 0}
+.pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 8px;border-radius:6px;background:#1f2b3d;color:#79c0ff;margin-right:6px}
+.pill.emg{background:#3d1d1d;color:#ff9a92}
+.pill.age{background:#23262d;color:var(--mid)}
+.quote{background:#0f141b;border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+  margin:10px 0 0;font-size:14px;color:#c9d6e2}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{flex:1;min-width:132px;border:0;border-radius:11px;padding:13px 10px;font:15px inherit;font-weight:650;
+  cursor:pointer;color:#fff;background:var(--acc);text-align:center;text-decoration:none;display:block}
+.btn:active{opacity:.8}
+.btn.call{background:var(--ok)}
+.btn.grey{background:#2b3440;color:var(--ink)}
+.btn[disabled]{opacity:.4}
+.clock{font-size:13px;color:var(--mid);margin-top:9px}
+.clock b{color:var(--warn)} .clock b.late{color:var(--bad)}
+
+h3{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mid);margin:22px 0 9px;font-weight:650}
+.bench{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}
+.bench:last-child{border-bottom:0}
+.bench .nm{flex:1;min-width:0}
+.bench .nm b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bench .nm span{color:var(--mid);font-size:12.5px}
+.bench input[type=checkbox]{width:22px;height:22px;accent-color:var(--acc)}
+.x{background:0;border:0;color:var(--mid);font-size:19px;cursor:pointer;padding:0 4px}
+.add{display:flex;gap:7px;margin-top:11px}
+.add input{flex:1;min-width:0;background:#0f141b;border:1px solid var(--line);color:var(--ink);
+  border-radius:9px;padding:11px;font:15px inherit}
+.add button{background:var(--card2);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:0 15px;font:15px inherit;cursor:pointer}
+select{width:100%;background:#0f141b;border:1px solid var(--line);color:var(--ink);
+  border-radius:9px;padding:11px;font:15px inherit;margin-bottom:10px}
+
+.empty{color:var(--mid);text-align:center;padding:26px 14px;font-size:14.5px}
+.note{color:var(--mid);font-size:12.5px;margin-top:9px;line-height:1.5}
+.err{background:#2d1618;border:1px solid #5c2b2b;color:#ffb4ae;border-radius:10px;padding:11px 13px;font-size:14px;margin:0 0 12px}
+.okbox{background:#12261a;border:1px solid #1f4d2e;color:#8fe0a4;border-radius:10px;padding:11px 13px;font-size:14px;margin:0 0 12px}
+.res{font-size:13.5px;margin-top:9px}
+.res div{padding:4px 0;border-bottom:1px solid var(--line)}
+.res div:last-child{border-bottom:0}
+.res .y{color:var(--ok)} .res .n{color:var(--bad)}
+
+dialog{border:0;background:var(--card);color:var(--ink);border-radius:16px;padding:18px;max-width:460px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h4{margin:0 0 9px;font-size:17px}
+dialog pre{white-space:pre-wrap;background:#0f141b;border:1px solid var(--line);border-radius:9px;
+  padding:11px;font:13px/1.5 ui-monospace,Menlo,monospace;margin:0 0 12px;color:#c9d6e2}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#0a0e14;border-top:1px solid var(--line);
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:9px;align-items:center;font-size:13px;color:var(--mid)}
+.bar b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Dispatch</h1>
+    <div class="sp">
+      <button class="ghost" id="refresh">Refresh</button>
+      <button class="ghost" id="benchBtn">Bench</button>
+    </div>
+  </header>
+
+  <div id="msg"></div>
+  <div id="leads"></div>
+
+  <div id="benchPane" style="display:none">
+    <h3>Your bench</h3>
+    <div class="card">
+      <select id="trade"></select>
+      <div id="benchList"></div>
+      <div class="add">
+        <input id="bn" placeholder="Name" autocomplete="off">
+        <input id="bp" placeholder="Mobile" inputmode="tel" autocomplete="off">
+        <button id="badd">Add</button>
+      </div>
+      <p class="note">Stored on this phone only. Nothing to set up, nothing to pay for, and no database that can go down and take your bench with it. Three per trade is the target — enough to always offer a choice and still have a spare.</p>
+    </div>
+    <h3>Your number</h3>
+    <div class="card">
+      <div class="add"><input id="me" placeholder="Your mobile" inputmode="tel" autocomplete="tel"></div>
+      <p class="note">Goes at the bottom of every text so contractors can reach you. Saved on this phone.</p>
+      <button class="btn grey" id="selftest" style="width:100%;margin-top:4px">Text myself a test job</button>
+      <div class="res" id="selfres"></div>
+      <p class="note">Sends one real text to the number above, using a made-up job, so you can see exactly what a contractor sees. This is the only way to know the texting actually works — until a text lands on a phone, nothing here is proven.</p>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <h4 id="dlgT">Send this?</h4>
+  <pre id="dlgP"></pre>
+  <div id="dlgWho" class="note" style="margin-bottom:12px"></div>
+  <div class="row">
+    <button class="btn grey" id="dlgC">Cancel</button>
+    <button class="btn" id="dlgG">Send it</button>
+  </div>
+</dialog>
+
+<div class="bar">
+  <span id="stat">Loading…</span>
+  <span style="margin-left:auto"><b id="nb">0</b> on bench</span>
+</div>
+
+<script type="module">
+const TRADES = ["Plumbing","Heating / Furnace","Air conditioning","Roofing","Electrical",
+  "Water heater","Water damage / Mold","Appliance repair","Garage door","Windows","Gutters",
+  "Siding","Painting","Drywall","Flooring","Concrete / Driveway","Fencing","Deck / Patio",
+  "Tree removal","Landscaping","Pest control","Chimney / Fireplace","Locksmith",
+  "Handyman / Odd jobs","Something else"];
+
+// The key arrives once in the bookmarked URL, then lives in localStorage and is
+// scrubbed from the address bar so it never ends up in a screenshot or a shared
+// link. It is deliberately NOT in this file's source.
+const KS = "dispatch-key";
+const u = new URL(location.href);
+if (u.searchParams.get("k")) {
+  localStorage.setItem(KS, u.searchParams.get("k"));
+  u.searchParams.delete("k");
+  history.replaceState({}, "", u.pathname + u.hash);
+}
+const KEY = localStorage.getItem(KS) || "";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const bench = () => { try { return JSON.parse(localStorage.getItem("dispatch-bench")) || {}; } catch { return {}; } };
+const setBench = (b) => localStorage.setItem("dispatch-bench", JSON.stringify(b));
+const myPhone = () => localStorage.getItem("dispatch-me") || "";
+// Which contractors have been texted before — drives the one-time STOP line.
+const seen = () => { try { return JSON.parse(localStorage.getItem("dispatch-seen")) || {}; } catch { return {}; } };
+const markSeen = (ps) => { const s = seen(); ps.forEach((p) => s[p] = 1); localStorage.setItem("dispatch-seen", JSON.stringify(s)); };
+const dg = (p) => String(p || "").replace(/\D/g, "");
+
+function pretty(p) {
+  const t = dg(p).replace(/^1/, "");
+  return t.length === 10 ? `(${t.slice(0,3)}) ${t.slice(3,6)}-${t.slice(6)}` : String(p || "");
+}
+function ago(ms) {
+  if (!ms) return "";
+  const m = Math.floor((Date.now() - ms) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + " min ago";
+  const h = Math.floor(m / 60);
+  return h < 24 ? h + "h ago" : Math.floor(h / 24) + "d ago";
+}
+
+function api(path, opts = {}) {
+  return fetch(path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", "X-Dispatch-Key": KEY, ...(opts.headers || {}) },
+  }).then(async (r) => {
+    const j = await r.json().catch(() => ({ error: "server sent something that isn't JSON" }));
+    return { status: r.status, body: j };
+  });
+}
+
+function show(kind, html) { $("msg").innerHTML = `<div class="${kind}">${html}</div>`; }
+function clearMsg() { $("msg").innerHTML = ""; }
+
+// --------------------------------------------------------------- leads ----
+let LEADS = [];
+let handled = (() => { try { return JSON.parse(localStorage.getItem("dispatch-handled")) || {}; } catch { return {}; } })();
+
+async function load() {
+  if (!KEY) {
+    show("err", "This page needs the access link. Open the bookmark Andrew was given — it has the key in it.");
+    $("stat").textContent = "locked";
+    return;
+  }
+  $("stat").textContent = "Loading…";
+  const { status, body } = await api("/api/dispatch-leads");
+  if (status === 401) { show("err", "That access key isn't right. Re-open the original link."); $("stat").textContent = "locked"; return; }
+  if (status !== 200) {
+    show("err", `Couldn't load leads — ${esc(body.error || status)}${body.detail ? "<br><small>" + esc(body.detail) + "</small>" : ""}`);
+    $("stat").textContent = "error"; return;
+  }
+  clearMsg();
+  LEADS = body.leads || [];
+  // A capped window can never prove a zero. Say the window out loud rather than
+  // let an empty list imply nothing has ever come in.
+  $("stat").textContent = `${LEADS.length} in the last ${body.cache_window_hours}h`;
+  render();
+}
+
+function render() {
+  const box = $("leads");
+  if (!LEADS.length) {
+    box.innerHTML = `<div class="card"><div class="empty">
+      No jobs in the last 12 hours.<br><br>
+      This list only reaches back 12 hours — it is not your records. Every lead is also emailed to you, and that copy is permanent.
+    </div></div>`;
+    return;
+  }
+  box.innerHTML = LEADS.map((l, i) => {
+    const mins = l.at ? Math.floor((Date.now() - l.at) / 60000) : null;
+    const late = mins !== null && mins > 10;
+    const done = handled[l.id];
+    return `<div class="card lead ${l.emergency ? "emg" : ""}">
+      <div>
+        ${l.emergency ? '<span class="pill emg">Emergency</span>' : ""}
+        <span class="pill">${esc(l.service)}</span>
+        <span class="pill age">${esc(ago(l.at))}</span>
+      </div>
+      <h2 style="margin-top:8px">${esc(l.name)} · ${esc(l.zip)}</h2>
+      <p class="sub">${esc(pretty(l.phone))}${l.urgency ? " · " + esc(l.urgency) : ""}${l.referred_by ? " · via " + esc(l.referred_by) : ""}</p>
+      ${l.details ? `<div class="quote">${esc(l.details)}</div>` : ""}
+      ${mins !== null ? `<p class="clock">Came in <b class="${late ? "late" : ""}">${mins} min</b> ago${late ? " — call first, then blast." : ""}</p>` : ""}
+      <div class="row">
+        <a class="btn call" href="tel:${esc(l.phone)}">Call them</a>
+        <button class="btn" data-blast="${i}">Text my ${esc(l.service.split(" ")[0].toLowerCase())} guys</button>
+      </div>
+      <div class="row">
+        <button class="btn grey" data-hand="${i}">Hand it over</button>
+        <button class="btn grey" data-done="${i}">${done ? "✓ Done" : "Mark done"}</button>
+      </div>
+      <div class="res" id="res${i}"></div>
+    </div>`;
+  }).join("");
+}
+
+// --------------------------------------------------------------- bench ----
+function renderBench() {
+  const t = $("trade").value;
+  const b = bench();
+  const list = b[t] || [];
+  $("benchList").innerHTML = list.length ? list.map((c, i) => `
+    <div class="bench">
+      <div class="nm"><b>${esc(c.name)}</b><span>${esc(pretty(c.phone))}</span></div>
+      <button class="x" data-del="${i}">✕</button>
+    </div>`).join("")
+    : `<div class="empty" style="padding:14px">Nobody here yet. Add three.</div>`;
+  $("nb").textContent = Object.values(b).reduce((n, a) => n + a.length, 0);
+}
+
+$("trade").innerHTML = TRADES.map((t) => `<option>${esc(t)}</option>`).join("");
+$("trade").addEventListener("change", renderBench);
+$("badd").addEventListener("click", () => {
+  const n = $("bn").value.trim(), p = $("bp").value.trim();
+  if (!n || dg(p).length < 10) { alert("Need a name and a 10-digit mobile."); return; }
+  const b = bench(), t = $("trade").value;
+  b[t] = b[t] || [];
+  if (b[t].some((c) => dg(c.phone) === dg(p))) { alert("That number is already on this trade."); return; }
+  b[t].push({ name: n, phone: p });
+  setBench(b); $("bn").value = ""; $("bp").value = ""; renderBench();
+});
+$("benchList").addEventListener("click", (e) => {
+  const i = e.target.dataset.del; if (i === undefined) return;
+  const b = bench(), t = $("trade").value;
+  b[t].splice(+i, 1); setBench(b); renderBench();
+});
+$("me").value = myPhone();
+$("me").addEventListener("input", () => localStorage.setItem("dispatch-me", $("me").value));
+$("benchBtn").addEventListener("click", () => {
+  const p = $("benchPane");
+  const on = p.style.display === "none";
+  p.style.display = on ? "block" : "none";
+  $("leads").style.display = on ? "none" : "block";
+  $("benchBtn").textContent = on ? "Jobs" : "Bench";
+});
+$("refresh").addEventListener("click", load);
+
+// ---------------------------------------------------------- the sending ---
+let pending = null;
+function confirmSend(title, preview, who, fn) {
+  $("dlgT").textContent = title;
+  $("dlgP").textContent = preview;
+  $("dlgWho").textContent = who;
+  pending = fn;
+  $("dlg").showModal();
+}
+$("dlgC").addEventListener("click", () => { $("dlg").close(); pending = null; });
+$("dlgG").addEventListener("click", async () => {
+  $("dlg").close();
+  const fn = pending; pending = null;
+  if (fn) await fn();
+});
+
+function benchFor(service) {
+  const b = bench();
+  if (b[service] && b[service].length) return { trade: service, list: b[service] };
+  // Nothing on that exact trade — offer the fullest one rather than silently
+  // sending nothing.
+  const best = Object.entries(b).sort((a, c) => c[1].length - a[1].length)[0];
+  return best && best[1].length ? { trade: best[0], list: best[1], fallback: true } : null;
+}
+
+function resultHtml(body) {
+  const rows = (body.results || []).map((r) =>
+    `<div class="${r.ok ? "y" : "n"}">${r.ok ? "✓ sent to " : "✗ failed — "}${esc(r.name)}${r.ok ? "" : ": " + esc(r.detail || r.code || "")}</div>`
+  ).join("");
+  const rej = (body.rejected || []).map((r) => `<div class="n">✗ skipped ${esc(r.name)} — ${esc(r.reason)}</div>`).join("");
+  return rows + rej;
+}
+
+document.getElementById("leads").addEventListener("click", async (e) => {
+  const bi = e.target.dataset.blast, hi = e.target.dataset.hand, di = e.target.dataset.done;
+
+  if (di !== undefined) {
+    const l = LEADS[+di];
+    handled[l.id] = handled[l.id] ? 0 : 1;
+    localStorage.setItem("dispatch-handled", JSON.stringify(handled));
+    render(); return;
+  }
+
+  if (bi !== undefined) {
+    const l = LEADS[+bi];
+    const b = benchFor(l.service);
+    if (!b) { alert("Your bench is empty. Tap Bench and add three plumbers first — this is the step that stops a homeowner waiting four hours."); return; }
+    const s = seen();
+    const contractors = b.list.map((c) => ({ ...c, firstTime: !s[dg(c.phone)] }));
+    const btn = e.target;
+
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Checking…";
+    const { status: pstat, body: prev } = await api("/api/dispatch-send", {
+      method: "POST",
+      body: JSON.stringify({ mode: "blast", lead: l, contractors, callbackPhone: myPhone(), dryRun: true }),
+    });
+    btn.disabled = false; btn.textContent = label;
+
+    // The server returns the exact text it WILL send, so what gets confirmed is
+    // the real message rather than a copy built here that could drift from it.
+    //
+    // If the dry run did NOT come back, stop. The old behaviour was to show
+    // "(preview unavailable — the message will still send correctly)" and carry
+    // on, which is a promise this page cannot keep: the commonest reason the
+    // dry run fails is a 400 saying none of those numbers are dialable, so the
+    // sentence was reassuring him at the exact moment it was wrong.
+    const previewText = (prev && prev.preview) || "";
+    if (pstat !== 200 || !previewText) {
+      $("res" + bi).innerHTML =
+        `<div class="n">Didn't send — ${esc((prev && (prev.error || prev.detail)) || "the server didn't answer")}</div>` +
+        ((prev && prev.rejected || []).map((r) => `<div class="n">✗ ${esc(r.name)} — ${esc(r.reason)}</div>`).join(""));
+      return;
+    }
+
+    confirmSend(
+      `Text ${contractors.length} ${b.trade.toLowerCase()} ${contractors.length === 1 ? "guy" : "guys"}?`,
+      previewText,
+      (b.fallback ? `No one on your bench for ${l.service}, so this goes to your ${b.trade} list: ` : "Going to: ") +
+        (prev.would_send_to || []).map((c) => c.name).join(", "),
+      async () => {
+        btn.disabled = true; btn.textContent = "Sending…";
+        const { status, body } = await api("/api/dispatch-send", {
+          method: "POST",
+          body: JSON.stringify({ mode: "blast", lead: l, contractors, callbackPhone: myPhone() }),
+        });
+        btn.disabled = false; btn.textContent = label;
+        $("res" + bi).innerHTML = resultHtml(body);
+        if (body.sent) markSeen(contractors.map((c) => dg(c.phone)));
+        if (status !== 200) $("res" + bi).innerHTML += `<div class="n">Nothing sent — ${esc(body.error || status)}</div>`;
+      }
+    );
+    return;
+  }
+
+  if (hi !== undefined) {
+    const l = LEADS[+hi];
+    const b = benchFor(l.service);
+    if (!b) { alert("Add contractors to your bench first."); return; }
+    const who = prompt("Which one said yes?\n\n" + b.list.map((c, i) => `${i + 1}. ${c.name}`).join("\n"));
+    const idx = parseInt(who, 10) - 1;
+    if (!(idx >= 0 && idx < b.list.length)) return;
+    const winner = b.list[idx];
+    confirmSend(
+      `Hand the job to ${winner.name}?`,
+      `${winner.name} gets ${l.name}'s number, and ${l.name} gets told ${winner.name} is calling.`,
+      "Two texts: one to the contractor, one to the homeowner.",
+      async () => {
+        const a = await api("/api/dispatch-send", { method: "POST",
+          body: JSON.stringify({ mode: "handoff", lead: l, winner, callbackPhone: myPhone() }) });
+        const c = await api("/api/dispatch-send", { method: "POST",
+          body: JSON.stringify({ mode: "notify-homeowner", lead: l, company: winner.name, callbackPhone: myPhone() }) });
+        $("res" + hi).innerHTML =
+          `<div class="${a.status === 200 ? "y" : "n"}">${a.status === 200 ? "✓ sent the number to " + esc(winner.name) : "✗ contractor text failed — " + esc(a.body.error || "")}</div>` +
+          `<div class="${c.status === 200 ? "y" : "n"}">${c.status === 200 ? "✓ told " + esc(l.name) + " to expect the call" : "✗ homeowner text failed — " + esc(c.body.error || "")}</div>`;
+        if (a.status === 200) { handled[l.id] = 1; localStorage.setItem("dispatch-handled", JSON.stringify(handled)); render(); }
+      }
+    );
+  }
+});
+
+// ------------------------------------------------------------ self test ----
+// Every other claim on this page was checked by a test script. This one cannot
+// be: no script here can prove a text reaches a real handset, and `vercel logs`
+// on this project shows request lines only, so a successful-looking response is
+// not evidence. One real message to his own phone is the whole proof.
+//
+// It goes through the SAME endpoint and the SAME blast builder as a live job —
+// a separate "test" code path would only prove the test path works.
+$("selftest").addEventListener("click", async () => {
+  const me = myPhone();
+  if (dg(me).length < 10) { alert("Put your mobile in the box above first."); return; }
+  const btn = $("selftest");
+  const testLead = {
+    service: "Water heater", zip: "80205", urgency: "Emergency - today",
+    details: "TEST — this is Andrew checking the system, not a real job",
+    name: "Test Homeowner", phone: "+13035550199",
+  };
+  const contractors = [{ name: "Me (test)", phone: me, firstTime: true }];
+
+  btn.disabled = true; btn.textContent = "Checking…";
+  const { status: ps, body: prev } = await api("/api/dispatch-send", { method: "POST",
+    body: JSON.stringify({ mode: "blast", lead: testLead, contractors, callbackPhone: me, dryRun: true }) });
+  btn.disabled = false; btn.textContent = "Text myself a test job";
+  if (ps !== 200 || !prev.preview) {
+    $("selfres").innerHTML = `<div class="n">Didn't send — ${esc(prev.error || prev.detail || "the server didn't answer")}</div>`;
+    return;
+  }
+  confirmSend("Send this to yourself?", prev.preview, "One text to " + pretty(me), async () => {
+    btn.disabled = true; btn.textContent = "Sending…";
+    const { status, body } = await api("/api/dispatch-send", { method: "POST",
+      body: JSON.stringify({ mode: "blast", lead: testLead, contractors, callbackPhone: me }) });
+    btn.disabled = false; btn.textContent = "Text myself a test job";
+    // Deliberately does NOT say "sent" on a 200 alone. Twilio accepting a
+    // message is not a message arriving, and this codebase has already hidden a
+    // dead notifier behind a cheerful 200 for a month.
+    $("selfres").innerHTML = status === 200
+      ? resultHtml(body) + `<div class="note" style="margin-top:6px">Twilio accepted it. Check your phone — if nothing arrives in a minute, it did not work, whatever this says.</div>`
+      : `<div class="n">Failed — ${esc(body.error || status)}${body.detail ? ": " + esc(body.detail) : ""}</div>` + resultHtml(body);
+  });
+});
+
+renderBench();
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

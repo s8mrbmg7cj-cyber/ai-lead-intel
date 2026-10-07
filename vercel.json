@@ -32,6 +32,8 @@
     { "source": "/build/lead-pipeline/", "destination": "/build/lead-pipeline/index.html" },
     { "source": "/match", "destination": "/match/index.html" },
     { "source": "/match/", "destination": "/match/index.html" },
+    { "source": "/dispatch", "destination": "/dispatch/index.html" },
+    { "source": "/dispatch/", "destination": "/dispatch/index.html" },
     { "source": "/quote", "destination": "/quote/index.html" },
     { "source": "/quote/", "destination": "/quote/index.html" },
     { "source": "/quote/:slug", "destination": "/quote/:slug/index.html" },
