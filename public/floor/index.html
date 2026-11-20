@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hourly Floor Calculator — What Should Your Trade Business Charge?</title>
+<meta name="description" content="Free hourly floor calculator for cleaning, handyman, lawn care and pressure washing businesses. Type 4 numbers — costs, pay, taxes, real billable hours — and get the price per hour below which a job costs you money.">
+<meta property="og:title" content="What's your real hourly floor?">
+<meta property="og:description" content="Type 4 numbers. Get the price per hour below which a job costs you money. Free calculator for cleaning, handyman, lawn care and pressure washing businesses.">
+<style>
+:root{
+  --ink:#18202c; --grey:#697382; --line:#d6dde6; --bg:#f6f8fa; --card:#ffffff;
+  --accent:#0e7490; --accent-dark:#0b586e; --accent-soft:#e0f2f7;
+  --green-bg:#d1fae5; --green-tx:#065f46; --red-bg:#fecaca; --red-tx:#9b1c1c;
+  --yell:#fef3c7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:28px 20px 60px}
+.topbar{height:6px;background:var(--accent);border-radius:0 0 6px 6px;transition:background .3s}
+.eyebrow{display:inline-block;background:var(--accent);color:#fff;font-weight:700;font-size:13px;
+  letter-spacing:.06em;padding:6px 14px;border-radius:999px;margin:26px 0 14px;transition:background .3s}
+h1{font-size:clamp(30px,6vw,44px);font-weight:900;letter-spacing:-.02em;line-height:1.08}
+.sub{color:var(--grey);font-size:17px;margin:12px 0 26px;max-width:54ch}
+.trades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+.trade{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:10px 6px;
+  font-weight:700;font-size:13px;cursor:pointer;text-align:center;color:var(--grey);transition:all .15s}
+.trade.on{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft)}
+@media(max-width:480px){.trades{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;
+  box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;
+  border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:none}
+.row label{font-size:15px;font-weight:600;flex:1}
+.row small{display:block;font-weight:400;color:var(--grey);font-size:12.5px;margin-top:2px}
+.in{position:relative}
+.in input{width:128px;padding:10px 12px;font-size:17px;font-weight:700;color:var(--ink);
+  border:2px solid var(--line);border-radius:10px;background:var(--yell);text-align:right;
+  font-variant-numeric:tabular-nums;outline:none;transition:border .15s}
+.in input:focus{border-color:var(--accent)}
+.in.pct::after{content:"%";position:absolute;right:-18px;top:50%;transform:translateY(-50%);
+  color:var(--grey);font-weight:700}
+.result{margin-top:18px;background:var(--green-bg);border-radius:14px;padding:20px 22px;
+  display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.result .lab{font-weight:800;font-size:15px;letter-spacing:.04em;color:var(--green-tx)}
+.result .num{font-size:clamp(34px,8vw,48px);font-weight:900;color:var(--green-tx);
+  font-variant-numeric:tabular-nums}
+.meaning{margin-top:14px;font-size:15px;color:var(--ink)}
+.meaning b{color:var(--red-tx)}
+.trap{margin-top:22px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);
+  border-radius:12px;padding:16px 18px;font-size:14.5px;color:var(--ink);transition:border-color .3s}
+.trap b{display:block;margin-bottom:4px}
+.cta{margin-top:30px;background:var(--accent);border-radius:16px;padding:26px 22px;text-align:center;
+  color:#fff;transition:background .3s}
+.cta h2{font-size:22px;font-weight:900;letter-spacing:-.01em}
+.cta p{margin:8px auto 16px;font-size:15px;opacity:.94;max-width:46ch}
+.cta a{display:inline-block;background:#fff;color:var(--accent-dark);font-weight:900;font-size:17px;
+  padding:14px 26px;border-radius:12px;text-decoration:none;transition:transform .12s,color .3s}
+.cta a:hover{transform:translateY(-1px)}
+.cta .price{margin-top:10px;font-size:13.5px;opacity:.85}
+.foot{margin-top:34px;text-align:center;color:var(--grey);font-size:13px}
+.foot a{color:var(--accent-dark);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="topbar" id="topbar"></div>
+<div class="wrap">
+  <span class="eyebrow" id="eyebrow">FREE CALCULATOR · NO SIGNUP</span>
+  <h1>What's your real hourly&nbsp;floor?</h1>
+  <p class="sub">The price per hour below which a job <em>costs you money</em>. Type 4 numbers —
+  it computes live. Pick your trade for honest starting numbers.</p>
+
+  <div class="trades" id="trades"></div>
+
+  <div class="card">
+    <div class="row">
+      <label>Monthly business costs
+        <small>Insurance, fuel, equipment, phone, software</small></label>
+      <span class="in"><input id="costs" type="number" inputmode="decimal" min="0"></span>
+    </div>
+    <div class="row">
+      <label>Take-home pay you need
+        <small>Per month — what your family actually needs</small></label>
+      <span class="in"><input id="pay" type="number" inputmode="decimal" min="0"></span>
+    </div>
+    <div class="row">
+      <label>Tax set-aside
+        <small>Self-employment + income. 25% is a common start</small></label>
+      <span class="in pct"><input id="tax" type="number" inputmode="decimal" min="0" max="60" style="width:92px"></span>
+    </div>
+    <div class="row">
+      <label>Billable hours per month
+        <small id="hrsNote">Hours a customer PAYS for — not hours worked</small></label>
+      <span class="in"><input id="hours" type="number" inputmode="decimal" min="1" style="background:#fef3c7"></span>
+    </div>
+    <div class="result">
+      <span class="lab">YOUR HOURLY FLOOR</span>
+      <span class="num" id="floor">$—</span>
+    </div>
+    <p class="meaning">Quote below this and <b>you pay to work</b>. The math:
+      (costs + pay ÷ (1 − tax)) ÷ billable hours.</p>
+  </div>
+
+  <div class="trap" id="trap">
+    <b>⚠ The trap that breaks most quotes</b>
+    A 40-hour week is only ~25–28 billable hours on a tight route — driving, quoting
+    and rain days don't pay. Divide by hours <em>worked</em> instead of hours <em>billed</em>
+    and every price you quote is too low.
+  </div>
+
+  <div class="cta" id="cta">
+    <h2 id="ctaTitle"></h2>
+    <p id="ctaBody"></p>
+    <a id="ctaLink" href="" rel="noopener">Get the spreadsheet →</a>
+    <div class="price" id="ctaPrice"></div>
+  </div>
+
+  <p class="foot">A free tool from
+    <a href="https://tradesheetssupply.etsy.com" rel="noopener">TradeSheetsSupply</a>
+    — Excel &amp; Google Sheets systems for service trades.<br>
+    Not tax or legal advice. Your floor is only as honest as your 4 numbers.</p>
+</div>
+
+<script>
+// Presets = the exact sample inputs shipped in each spreadsheet.
+// Known answers (verify_sheets.py / verify_sheets2.py): 56.83 / 66.00 / 53.03 / 74.44
+const TRADES = {
+  cleaning: {label:"Cleaning", costs:350, pay:4000, tax:25, hours:100,
+    accent:"#0e7490", dark:"#0b586e", soft:"#e0f2f7",
+    hrsNote:"Hours a customer PAYS for — drive time doesn't bill",
+    title:"Cleaning Business Spreadsheet",
+    body:"This calculator is one tab of 10. The full sheet prices whole jobs, tracks true $/hr per clean, chases invoices and flags every below-floor job in red.",
+    url:"https://tradesheetssupply.etsy.com/listing/4621528632", price:"$14 · Excel + Google Sheets · instant download"},
+  handyman: {label:"Handyman", costs:600, pay:4500, tax:25, hours:100,
+    accent:"#b45309", dark:"#92400e", soft:"#fdf0e0",
+    hrsNote:"Store runs and drive time don't bill — count them out",
+    title:"Handyman Business Spreadsheet",
+    body:"One tab of 12. The full sheet computes your minimum visit charge, marks up materials 30%, counts store trips in the hours and builds quotes that protect your floor.",
+    url:"https://tradesheetssupply.etsy.com/listing/4621524793", price:"$14 · Excel + Google Sheets · instant download"},
+  lawn: {label:"Lawn Care", costs:500, pay:4000, tax:25, hours:110,
+    accent:"#15803d", dark:"#105f2e", soft:"#e3f6e9",
+    hrsNote:"In season. A 40-hr week is ~25–28 billable on a tight route",
+    title:"Lawn Care Business Spreadsheet",
+    body:"One tab of 12. The full sheet prices each cut with drive time in the math, plans the winter gap (the Season Planner), and flags every below-floor lawn in red.",
+    url:"https://tradesheetssupply.etsy.com/listing/4621947079", price:"$14 · Excel + Google Sheets · instant download"},
+  washing: {label:"Pressure Washing", costs:700, pay:4500, tax:25, hours:90,
+    accent:"#1d4ed8", dark:"#173ca6", soft:"#e4ecfc",
+    hrsNote:"Weather-limited: rain, wind and sub-40° days don't bill",
+    title:"Pressure Washing Business Spreadsheet",
+    body:"One tab of 12. The full sheet computes your minimum visit charge, a floor price per surface, and the SH mix chart — batch math done for you, safety rules included.",
+    url:"https://tradesheetssupply.etsy.com/listing/4621957448", price:"$14 · Excel + Google Sheets · instant download"}
+};
+
+const $ = id => document.getElementById(id);
+let current = "cleaning";
+
+function money(x){ return "$" + x.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+function compute(){
+  const costs = parseFloat($("costs").value);
+  const pay   = parseFloat($("pay").value);
+  const tax   = parseFloat($("tax").value);
+  const hrs   = parseFloat($("hours").value);
+  const el = $("floor");
+  if (!isFinite(costs) || !isFinite(pay) || !isFinite(tax) || !isFinite(hrs) || hrs <= 0 || tax >= 100 || tax < 0){
+    el.textContent = "$—"; return;
+  }
+  const floor = (costs + pay / (1 - tax/100)) / hrs;
+  el.textContent = money(Math.round(floor*100)/100) + "/hr";
+}
+
+function setTrade(key){
+  current = key;
+  const t = TRADES[key];
+  document.documentElement.style.setProperty("--accent", t.accent);
+  document.documentElement.style.setProperty("--accent-dark", t.dark);
+  document.documentElement.style.setProperty("--accent-soft", t.soft);
+  document.querySelectorAll(".trade").forEach(b => b.classList.toggle("on", b.dataset.k === key));
+  $("costs").value = t.costs; $("pay").value = t.pay; $("tax").value = t.tax; $("hours").value = t.hours;
+  $("hrsNote").textContent = t.hrsNote;
+  $("ctaTitle").textContent = "This is one tab of the " + t.title + ".";
+  $("ctaBody").textContent = t.body;
+  $("ctaLink").href = t.url;
+  $("ctaPrice").textContent = t.price;
+  compute();
+}
+
+const bar = $("trades");
+for (const [k, t] of Object.entries(TRADES)){
+  const b = document.createElement("button");
+  b.className = "trade"; b.dataset.k = k; b.textContent = t.label;
+  b.addEventListener("click", () => setTrade(k));
+  bar.appendChild(b);
+}
+["costs","pay","tax","hours"].forEach(id => $(id).addEventListener("input", compute));
+setTrade("cleaning");
+
+// Known-answer self-check (console only): presets must reproduce the verified floors.
+(function(){
+  const want = {cleaning:56.83, handyman:66.00, lawn:53.03, washing:74.44};
+  for (const [k,t] of Object.entries(TRADES)){
+    const got = Math.round(((t.costs + t.pay/(1 - t.tax/100)) / t.hours)*100)/100;
+    if (got !== want[k]) console.error("FLOOR CALIBRATION FAIL", k, got, "expected", want[k]);
+  }
+})();
+</script>
+</body>
+</html>

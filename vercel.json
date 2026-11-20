@@ -30,6 +30,8 @@
     { "source": "/forgot-password/", "destination": "/forgot-password.html" },
     { "source": "/build/lead-pipeline", "destination": "/build/lead-pipeline/index.html" },
     { "source": "/build/lead-pipeline/", "destination": "/build/lead-pipeline/index.html" },
+    { "source": "/floor", "destination": "/floor/index.html" },
+    { "source": "/floor/", "destination": "/floor/index.html" },
     { "source": "/match", "destination": "/match/index.html" },
     { "source": "/match/", "destination": "/match/index.html" },
     { "source": "/dispatch", "destination": "/dispatch/index.html" },
