@@ -21,7 +21,7 @@
  * ENOTFOUND and case 2 will (correctly) complain.
  */
 
-import { describeFetchError } from '../api/health.js';
+import { describeFetchError } from '../api-handlers/health.js';
 
 const MUTATE = process.argv.includes('--mutate');
 
