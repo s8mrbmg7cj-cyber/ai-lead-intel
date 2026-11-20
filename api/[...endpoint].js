@@ -1,4 +1,4 @@
-// api/[...__route].js — consolidated API dispatcher.
+// api/[...endpoint].js — consolidated API dispatcher.
 //
 // WHY THIS EXISTS: Vercel's Hobby plan allows at most 12 serverless functions
 // per deployment, and it counts every .js file under api/ as one function.
@@ -82,9 +82,9 @@ const routes = {
 };
 
 export default function handler(req, res) {
-  const seg = req.query.__route;
+  const seg = req.query.endpoint;
   const name = Array.isArray(seg) ? seg.join('/') : seg;
-  delete req.query.__route; // handlers should see exactly the query they always saw
+  delete req.query.endpoint; // handlers should see exactly the query they always saw
 
   const route = Object.prototype.hasOwnProperty.call(routes, name) ? routes[name] : null;
   if (!route) {
