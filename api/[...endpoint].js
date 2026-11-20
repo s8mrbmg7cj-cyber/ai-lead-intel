@@ -82,13 +82,17 @@ const routes = {
 };
 
 export default function handler(req, res) {
-  const seg = req.query.endpoint;
+  // Vercel's bare-functions router (non-Next) passes the catch-all segment
+  // under the LITERAL key "...endpoint" — dots included. Measured 2026-11-20
+  // via the deployed diagnostic: qkeys were ["...endpoint"], not ["endpoint"].
+  const seg = req.query['...endpoint'] ?? req.query.endpoint;
   const name = Array.isArray(seg) ? seg.join('/') : seg;
-  delete req.query.endpoint; // handlers should see exactly the query they always saw
+  delete req.query['...endpoint']; // handlers should see exactly the query they always saw
+  delete req.query.endpoint;
 
   const route = Object.prototype.hasOwnProperty.call(routes, name) ? routes[name] : null;
   if (!route) {
-    res.status(404).json({ error: 'Not found', _diag: { url: req.url, qkeys: Object.keys(req.query || {}), seg } });
+    res.status(404).json({ error: 'Not found' });
     return;
   }
   return route(req, res);
