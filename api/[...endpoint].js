@@ -88,7 +88,7 @@ export default function handler(req, res) {
 
   const route = Object.prototype.hasOwnProperty.call(routes, name) ? routes[name] : null;
   if (!route) {
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).json({ error: 'Not found', _diag: { url: req.url, qkeys: Object.keys(req.query || {}), seg } });
     return;
   }
   return route(req, res);
